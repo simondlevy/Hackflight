@@ -64,8 +64,8 @@ namespace hf {
             static auto update(
                     const OpticalFlowFilter & filter,
                     const uint32_t usec_curr,
-                    const OpticalFlowSensor::RawData &
-                    rawdata) -> OpticalFlowFilter
+                    const OpticalFlowSensor::RawData & rawdata
+                    ) -> OpticalFlowFilter
             {
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)

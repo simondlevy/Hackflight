@@ -119,7 +119,8 @@ namespace hf {
 
             PidControl _pidControl;
 
-            static double * motors2doubless(const float * f, const size_t n)
+            static auto motors2doubless(const float * f,
+                    const size_t n) -> double *
             {
                 static double d[MAX_MOTOR_COUNT];
                 for (size_t k=0; k<n; ++k) {
@@ -128,7 +129,8 @@ namespace hf {
                 return d;
             }
 
-            static VehicleState SimStateToVehicleState(const SimState state)
+            static auto SimStateToVehicleState(
+                    const SimState state) -> VehicleState 
             {
                 return VehicleState(
                         (float)state.dx,

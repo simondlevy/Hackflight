@@ -60,14 +60,20 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m1 = t + r * mixer.roll[0] + p * mixer.pitch[0] + y * mixer.yaw[0];
-                const float m2 = t + r * mixer.roll[1] + p * mixer.pitch[1] + y * mixer.yaw[1];
-                const float m3 = t + r * mixer.roll[2] + p * mixer.pitch[2] + y * mixer.yaw[2];
-                const float m4 = t + r * mixer.roll[3] + p * mixer.pitch[3] + y * mixer.yaw[3];
+                const float m1 = t +
+                    r * mixer.roll[0] + p * mixer.pitch[0] + y * mixer.yaw[0];
+
+                const float m2 = t +
+                    r * mixer.roll[1] + p * mixer.pitch[1] + y * mixer.yaw[1];
+
+                const float m3 = t +
+                    r * mixer.roll[2] + p * mixer.pitch[2] + y * mixer.yaw[2];
+
+                const float m4 = t +
+                    r * mixer.roll[3] + p * mixer.pitch[3] + y * mixer.yaw[3];
 
                 return Mixer(m1, m2, m3, m4);
             }
-
     };
 
 }

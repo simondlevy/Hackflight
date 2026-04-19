@@ -192,7 +192,7 @@ namespace hf {
             // Flag for whether we're airborne and can update dynamics
             bool _airborne;
 
-            static float constrain_psi(const double psi)
+            static auto constrain_psi(const double psi) -> float
             {
                 const auto twopi = 2 * M_PI;
                 return psi + (psi > twopi ? -twopi : psi < -twopi ? twopi : 0);

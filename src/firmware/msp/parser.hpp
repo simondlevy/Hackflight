@@ -113,7 +113,6 @@ namespace hf {
                     checksum(checksum),
                     index(index),
                     id(id) {}
-
     };
 
 }

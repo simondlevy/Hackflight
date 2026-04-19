@@ -102,7 +102,7 @@ namespace hf {
                     uint16_t aux;
                     uint32_t msec_prev;
 
-                    static float scale(const uint16_t val)
+                    static auto scale(const uint16_t val) -> float
                     {
                         return 2 * (val - 1500.f) / 1024;
                     }

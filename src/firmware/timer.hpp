@@ -26,7 +26,7 @@ namespace hf {
 
             Timer(const float freq) : _freq(freq) { }
 
-            bool ready()
+            auto ready() -> bool
             {
                 const uint32_t msec_curr = millis();
 
@@ -40,7 +40,7 @@ namespace hf {
                 return false;
             }
 
-            static float getDt()
+            static auto getDt() -> float
             {
                 const auto usec_curr = micros();      
                 static uint32_t _usec_prev;
