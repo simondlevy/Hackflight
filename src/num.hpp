@@ -32,18 +32,18 @@ class Num {
         static constexpr float RAD2DEG = 180.0f / M_PI;
         static constexpr float DEG2RAD = M_PI / 180.0f;
 
-        static float fconstrain(const float val, const float maxabs)
+        static auto fconstrain(const float val, const float maxabs) -> float
         {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
         }
 
-        static float fconstrain(
-                float value, const float minVal, const float maxVal)
+        static auto fconstrain(float value, const float minVal,
+                const float maxVal) -> float
         {
             return fminf(maxVal, fmaxf(minVal,value));
         }
 
-        static float cap_angle(float angle) 
+        static auto cap_angle(const float angle) -> float
         {
             float result = angle;
 
@@ -58,12 +58,12 @@ class Num {
             return result;
         }
 
-        static float rescale(
+        static auto rescale(
                 const float value,
                 const float oldmin, 
                 const float oldmax, 
                 const float newmin, 
-                const float newmax) 
+                const float newmax) -> float
         {
             return (value - oldmin) / (oldmax - oldmin) * 
                 (newmax - newmin) + newmin;

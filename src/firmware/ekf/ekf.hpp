@@ -21,7 +21,6 @@
 #include <firmware/ekf/quaternion.hpp>
 #include <firmware/ekf/rotation.hpp>
 #include <firmware/ekf/three_axis_subsampler.hpp>
-#include <firmware/flow_filter.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/zranger/filter.hpp>
