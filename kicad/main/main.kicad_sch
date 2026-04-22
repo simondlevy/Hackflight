@@ -2510,16 +2510,6 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 111.76) (xy 124.46 111.76)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "05c6a2f2-c020-422d-aa06-a7d0d6c3b851")
-	)
-	(wire
-		(pts
 			(xy 144.78 78.74) (xy 149.86 78.74)
 		)
 		(stroke
@@ -2770,16 +2760,6 @@
 	)
 	(wire
 		(pts
-			(xy 119.38 114.3) (xy 124.46 114.3)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "917236f8-1f94-430f-ba5f-e24f1431d1d6")
-	)
-	(wire
-		(pts
 			(xy 85.09 148.59) (xy 90.17 148.59)
 		)
 		(stroke
@@ -2968,16 +2948,6 @@
 		)
 		(uuid "18cca8fd-a40e-4f6b-b536-729e60f35336")
 	)
-	(label "RX5"
-		(at 119.38 111.76 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1e9ce16e-513f-4d1f-8ceb-8f1712f0c47b")
-	)
 	(label "SDA0"
 		(at 119.38 119.38 0)
 		(effects
@@ -3007,16 +2977,6 @@
 			(justify left bottom)
 		)
 		(uuid "22741c49-1921-4b61-ad23-9b6c8496d589")
-	)
-	(label "TX5"
-		(at 119.38 114.3 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "23851d8b-b105-47cd-9dc2-8f6b7c70351c")
 	)
 	(label "GND"
 		(at 92.71 99.06 0)

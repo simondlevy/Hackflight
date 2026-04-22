@@ -57,7 +57,7 @@ def telemetry_threadfun(port):
 
 telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
 telemetry_thread.daemon = True
-telemetry_thread.start()
+#telemetry_thread.start()
 
 rm = RadioMaster(port)
 

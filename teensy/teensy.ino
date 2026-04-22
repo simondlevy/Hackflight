@@ -43,13 +43,7 @@
 #include <pidcontrol/stabilizer.hpp>
 using namespace hf;
 
-//#define POSHOLD
-
-#ifdef POSHOLD
 static const uint8_t LED_PIN = 9;
-#else
-static const uint8_t LED_PIN = LED_BUILTIN;
-#endif
 
 // Rate constants
 static constexpr float EKF_PREDICTION_RATE_HZ       = 100;
@@ -151,7 +145,7 @@ void loop()
     // Check receiver timeout
     rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
-    //_debugger.report(rxdata);
+    _debugger.report(state);
     //_profiler.report();
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
