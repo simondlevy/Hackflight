@@ -145,7 +145,7 @@ void loop()
     // Check receiver timeout
     rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
-    _debugger.report(state);
+    _debugger.report(rxdata);
     //_profiler.report();
 
     _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);

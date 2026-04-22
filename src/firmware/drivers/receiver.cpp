@@ -28,11 +28,15 @@ using namespace hf;
 
 static Receiver::Data _rxdata;
 
+static uint32_t _count;
+
 void serialEvent1()
 {
     static MspParser _parser;
 
     while (Serial1.available()) {
+
+        _count++;
 
         _parser = MspParser::parse(_parser, Serial1.read());
 
