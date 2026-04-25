@@ -1286,7 +1286,7 @@
 		)
 		(uuid "dcf91c1e-1d01-4b07-b3e9-9d82eba43871")
 	)
-	(label "CS"
+	(label "MISO"
 		(at 123.19 102.87 0)
 		(effects
 			(font
@@ -1316,7 +1316,7 @@
 		)
 		(uuid "2fbbb159-19eb-467c-814a-955465f619a4")
 	)
-	(label "MISO"
+	(label "CS"
 		(at 123.19 107.95 0)
 		(effects
 			(font

@@ -2906,7 +2906,7 @@
 		)
 		(uuid "0d561b67-8e9d-45b3-b897-b820768ef1c3")
 	)
-	(label "MISO"
+	(label "GND"
 		(at 50.8 123.19 0)
 		(effects
 			(font
@@ -3056,16 +3056,6 @@
 		)
 		(uuid "46728f40-f4de-4613-8b55-f40c7bbaedfb")
 	)
-	(label "SCK"
-		(at 50.8 120.65 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4944ed18-6edf-4687-a371-1c7739e68af7")
-	)
 	(label "MISO"
 		(at 91.44 132.08 0)
 		(effects
@@ -3116,7 +3106,7 @@
 		)
 		(uuid "6d99f568-76d4-4811-8413-937d7144d411")
 	)
-	(label "SDA1"
+	(label "MOSI"
 		(at 50.8 133.35 0)
 		(effects
 			(font
@@ -3176,7 +3166,7 @@
 		)
 		(uuid "8cf6469b-611d-4842-aa30-2f3674983279")
 	)
-	(label "3V3"
+	(label "SCK"
 		(at 50.8 138.43 0)
 		(effects
 			(font
@@ -3186,7 +3176,7 @@
 		)
 		(uuid "945aabe2-e9a1-4a2a-bc45-f4bb46b61f05")
 	)
-	(label "MOSI"
+	(label "SDA1"
 		(at 50.8 125.73 0)
 		(effects
 			(font
@@ -3226,7 +3216,7 @@
 		)
 		(uuid "b0ece478-ea82-415f-9af2-23acb427cc00")
 	)
-	(label "CS"
+	(label "SCL1"
 		(at 50.8 128.27 0)
 		(effects
 			(font
@@ -3266,7 +3256,7 @@
 		)
 		(uuid "c1cb030c-3d49-4372-a877-80fa160f1ce4")
 	)
-	(label "SCL1"
+	(label "MISO"
 		(at 50.8 130.81 0)
 		(effects
 			(font
@@ -3276,7 +3266,7 @@
 		)
 		(uuid "cd75f628-c4c6-440e-8bf7-8de0d49ebbd7")
 	)
-	(label "GND"
+	(label "CS"
 		(at 50.8 135.89 0)
 		(effects
 			(font
@@ -3285,6 +3275,16 @@
 			(justify left bottom)
 		)
 		(uuid "d6b96eef-9d37-4144-ba13-14228c394b6b")
+	)
+	(label "3V3"
+		(at 50.8 120.65 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e204ebf0-bbeb-47c6-8246-7e91fb0a8cce")
 	)
 	(label "3V3"
 		(at 120.65 104.14 0)
