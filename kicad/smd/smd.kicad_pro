@@ -451,7 +451,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "main.kicad_pro",
+    "filename": "smd.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -488,7 +488,7 @@
       "idf": "",
       "netlist": "",
       "plot": "",
-      "pos_files": "",
+      "pos_files": "production/",
       "specctra_dsn": "",
       "step": "teensy2-bottom-small.stl",
       "svg": "",
