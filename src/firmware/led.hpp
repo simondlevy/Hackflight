@@ -14,6 +14,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <Arduino.h>
 
 #include <hackflight.h>
@@ -30,7 +32,12 @@ namespace hf {
 
         public:
 
-            LED(const uint8_t pin) : _pin(pin) {}
+            LED(const uint8_t pin=LED_BUILTIN) : _pin(pin) {}
+
+            void setPint(const uint8_t pin)
+            {
+                _pin = pin;
+            }
 
             void begin()
             {

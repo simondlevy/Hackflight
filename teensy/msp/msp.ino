@@ -1,5 +1,5 @@
 /*
-   Hackflight main sketch for Teensy
+   Hackflight main sketch for Teensy using MSP custom receiver with telemetry
 
    Copyright (C) 2026 Simon D. Levy
 
