@@ -32,12 +32,7 @@ namespace hf {
 
         public:
 
-            LED(const uint8_t pin=LED_BUILTIN) : _pin(pin) {}
-
-            void setPint(const uint8_t pin)
-            {
-                _pin = pin;
-            }
+            LED(const uint8_t pin) : _pin(pin) {}
 
             void begin()
             {

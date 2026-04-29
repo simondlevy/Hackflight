@@ -47,6 +47,9 @@ namespace hf {
 
         private:
 
+            // Arbitrary
+            static const uint8_t LED_PIN = 9;
+
             // Rate constants
             static constexpr float EKF_PREDICTION_RATE_HZ = 100;
             static constexpr float FLYING_CHECK_RATE_HZ   = 25;
@@ -150,7 +153,7 @@ namespace hf {
 
             // Devices
             IMU _imu;
-            LED _led;
+            LED _led = LED(LED_PIN);
             DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
             ZRanger _zranger;
             OpticalFlowSensor _flowsensor;
