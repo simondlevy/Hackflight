@@ -1,5 +1,5 @@
 /*
-   Hackflight main sketch for Teensy using COTS ELRS receiver
+   Hackflight main sketch for Teensy
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -22,13 +22,11 @@ using namespace hf;
 
 static QuadCore _core;
 
-// Setup
 void setup()
 {
     _core.begin();
 }
 
-// Loop
 void loop()
 {
     _core.step();

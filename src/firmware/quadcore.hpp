@@ -124,10 +124,15 @@ namespace hf {
                 // Get vehicle state from EKF
                 const auto state = EKF::getVehicleState(_ekf);
 
+                // Send telemetry periodically
+                if (_telemetryTimer.ready()) {
+                    Receiver::send(state);
+                }
+
                 // Check receiver timeout
                 rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
-                _debugger.report(rxdata);
+                //_debugger.report(rxdata);
                 //_profiler.report();
 
                 _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
