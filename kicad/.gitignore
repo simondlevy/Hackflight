@@ -1,4 +1,4 @@
-*.history
+.history
 fabrication-toolkit-options.json
 production/
 *.lck
