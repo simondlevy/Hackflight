@@ -2191,13 +2191,14 @@
 		(tags "Resistor Axial_DIN0204 series Axial Horizontal pin pitch 7.62mm 0.167W length 3.6mm diameter 1.6mm")
 		(property "Reference" "R1"
 			(at 3.81 0 90)
-			(layer "F.SilkS")
+			(layer "B.SilkS")
 			(uuid "eb2fd9cd-67ad-47ee-b669-fb7d3b59cb3d")
 			(effects
 				(font
 					(size 1 1)
 					(thickness 0.15)
 				)
+				(justify mirror)
 			)
 		)
 		(property "Value" "R"
