@@ -31,8 +31,8 @@ static constexpr Bmi088Accel::Range ARANGE = Bmi088Accel::RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
-static Bmi088Accel _accel = Bmi088Accel(Wire, 0x18);
-static Bmi088Gyro _gyro = Bmi088Gyro(Wire, 0x68);
+static Bmi088Accel _accel = Bmi088Accel(Wire, 0x19);
+static Bmi088Gyro _gyro = Bmi088Gyro(Wire, 0x69);
 
 static bool okay(const int status)
 {
