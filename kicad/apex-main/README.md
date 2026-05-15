@@ -11,7 +11,7 @@ soldering, and doing a continunity check for bridges/shorts after each step:
    protruding from bottom, using 0.2-0.8mm fine/conical tip.
 
 3. [SHUTTLE BOARD 3.0 BMI088](https://www.digikey.com/en/products/detail/bosch-sensortec/SHUTTLE-BOARD-3-0-BMI088/14617528), on top, 
-using 0.2-0.8mm fine/conical tip.  To avoid soldering a bridge (short circuit), you should solder only the three indicated
+using 0.2-0.8mm fine/conical tip.  To avoid soldering a bridge (short circuit), you should solder only the four indicated
 pins (3V3, GND, SDA, SCL), and in the bottom corners for added mounting security.
 
 4. 28AWG silicone-insulates wires to 4-in-1 ESC, protruding from bottom, using 0.2-0.8mm fine/conical tip.
