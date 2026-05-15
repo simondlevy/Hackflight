@@ -1,3 +1,5 @@
+<img src="main.png">
+
 # BOM, in order of soldering
 
 Note: I recommend using Scotch tape to mask the pins you're not currently
