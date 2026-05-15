@@ -1,4 +1,4 @@
-<img src="main.png">
+<img src="pcb.png">
 
 # BOM, in order of soldering
 
