@@ -3492,7 +3492,7 @@
 		)
 	)
 	(gr_text "To ESC"
-		(at 150.6 69.6 0)
+		(at 150.6 70 0)
 		(layer "B.SilkS")
 		(uuid "de6183aa-1d43-476a-8e05-9bb6bb5a8878")
 		(effects
