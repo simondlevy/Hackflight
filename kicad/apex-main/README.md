@@ -21,4 +21,4 @@ using a kit like
 
 5. 220Ω resitor, on bottom, using 1-2mm chisel/bevel tip.
 
-6. [LED](https://lighthouseleds.com/1-8mm-2mm-led-red-ultra-bright.html], on top, using 1-2mm chisel/bevel tip.
+6. [LED](https://lighthouseleds.com/1-8mm-2mm-led-red-ultra-bright.html), on top, using 1-2mm chisel/bevel tip.
