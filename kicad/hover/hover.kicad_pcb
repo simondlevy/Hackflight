@@ -1121,7 +1121,7 @@
 	)
 	(gr_poly
 		(pts
-			(xy 146.033866 72) (xy 145.233866 74) (xy 146.833866 74)
+			(xy 146.313317 71.7) (xy 144.683733 74.333753) (xy 147.883733 74.333753)
 		)
 		(stroke
 			(width 0.1)
@@ -1129,18 +1129,6 @@
 		)
 		(fill yes)
 		(layer "F.SilkS")
-		(uuid "93e2b6a0-de27-4a10-8b60-e14a94c9fe25")
-	)
-	(gr_poly
-		(pts
-			(xy 146.277733 78.744857) (xy 144.227733 82.144857) (xy 148.352733 82.144857)
-		)
-		(stroke
-			(width 0.1)
-			(type solid)
-		)
-		(fill yes)
-		(layer "B.SilkS")
 		(uuid "f92dd10c-efff-4de6-b5c4-0ec545f6af51")
 	)
 	(gr_rect
@@ -1167,7 +1155,7 @@
 		)
 	)
 	(gr_text "SCL"
-		(at 135 89.3 0)
+		(at 134.9 89.3 0)
 		(layer "F.SilkS")
 		(uuid "6206151d-2d0c-4ebd-b684-47b3e937e7c4")
 		(effects
@@ -1179,7 +1167,7 @@
 		)
 	)
 	(gr_text "SDA"
-		(at 135 91.7 0)
+		(at 134.9 91.7 0)
 		(layer "F.SilkS")
 		(uuid "aaa38072-6c51-4fb9-b02e-09073252f0ee")
 		(effects
@@ -1238,32 +1226,8 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "GD"
-		(at 154.5 89.6 0)
-		(layer "F.SilkS")
-		(uuid "2e42ec6c-a31c-4873-b25e-2245232343ca")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
-	(gr_text "3V3"
-		(at 154.6 92.2 0)
-		(layer "F.SilkS")
-		(uuid "5e80a326-0616-4127-8b38-174d932bb61d")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "SO"
-		(at 154.7 76.7 0)
+		(at 154.25 76.7 0)
 		(layer "F.SilkS")
 		(uuid "ca546e80-4fe0-4dca-b407-9410f492d8d8")
 		(effects
@@ -1275,7 +1239,7 @@
 		)
 	)
 	(gr_text "SI"
-		(at 154.7 79.175 0)
+		(at 154.25 79.175 0)
 		(layer "F.SilkS")
 		(uuid "943ee563-328c-4486-86ed-2e9175df0269")
 		(effects
@@ -1287,9 +1251,33 @@
 		)
 	)
 	(gr_text "CS"
-		(at 154.7 81.7 0)
+		(at 154.25 81.7 0)
 		(layer "F.SilkS")
 		(uuid "49350aba-488b-43ac-a93a-797b0520c8fe")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 154.25 89.6 0)
+		(layer "F.SilkS")
+		(uuid "2e42ec6c-a31c-4873-b25e-2245232343ca")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 154.25 92.2 0)
+		(layer "F.SilkS")
+		(uuid "5e80a326-0616-4127-8b38-174d932bb61d")
 		(effects
 			(font
 				(size 0.8 0.8)
