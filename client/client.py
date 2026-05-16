@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 '''
 Copyright (C) 2026 Simon D. Levy
 
@@ -26,22 +25,6 @@ from radiomaster import RadioMaster
 from telemetry import TelemetryParser
 
 
-argparser = argparse.ArgumentParser(
-            formatter_class=ArgumentDefaultsHelpFormatter)
-
-argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
-                       help='Serial port for dongle')
-
-args = argparser.parse_args()
-
-try:
-    port = serial.Serial(args.port, 115200)
-
-except serial.SerialException:
-    print('Unable to open port ' + args.port)
-    exit(0)
-
-
 def telemetry_threadfun(port):
 
     telemetryParser = TelemetryParser()
@@ -55,16 +38,38 @@ def telemetry_threadfun(port):
         sleep(0)  # yield
 
 
-telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
-telemetry_thread.daemon = True
-telemetry_thread.start()
+def main():
 
-rm = RadioMaster(port)
+    argparser = argparse.ArgumentParser(
+                formatter_class=ArgumentDefaultsHelpFormatter)
 
-while rm.connected:
+    argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
+                           help='Serial port for dongle')
+
+    args = argparser.parse_args()
 
     try:
-        rm.step()
+        port = serial.Serial(args.port, 115200)
 
-    except KeyboardInterrupt:
-        break
+    except serial.SerialException:
+        print('Unable to open port ' + args.port)
+        exit(0)
+
+    print('Waiting for server ...')
+
+    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
+    telemetry_thread.daemon = True
+    telemetry_thread.start()
+
+    rm = RadioMaster(port)
+
+    while rm.connected:
+
+        try:
+            rm.step()
+
+        except KeyboardInterrupt:
+            break
+
+
+main()
