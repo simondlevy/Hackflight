@@ -1,6 +1,6 @@
 <img src="main.png">
 
-# Add M2 nylon machine screws
+# Secure M2 nylon machine screws
 
 Before soldering on any of the components, you'll need to decide how you're going to mount the PCB to your
 airframe.  I've also used [VHB tape](https://www.amazon.com/dp/B007Y7GIKI?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_3),
