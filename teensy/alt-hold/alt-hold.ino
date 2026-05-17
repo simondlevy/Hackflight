@@ -20,7 +20,7 @@
 #include <firmware/quadcore.hpp>
 using namespace hf;
 
-static QuadCore _core; 
+static QuadCore _core = QuadCore(true);
 
 void setup()
 {

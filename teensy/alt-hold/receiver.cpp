@@ -1,0 +1,77 @@
+/*
+   Hackflight with ESPNOW receiver
+
+   Copyright (C) 2026 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
+#include <Arduino.h>
+
+// Hackflight library
+#include <hackflight.h>
+#include <firmware/msp/parser.hpp>
+#include <firmware/msp/serializer.hpp>
+#include <firmware/msp/__messages__.h>
+#include <firmware/receiver.hpp>
+using namespace hf;
+
+static Receiver::Data _rxdata;
+
+static uint32_t _count;
+
+void serialEvent1()
+{
+    static MspParser _parser;
+
+    while (Serial1.available()) {
+
+        _count++;
+
+        _parser = MspParser::parse(_parser, Serial1.read());
+
+        if (MspParser::getid(_parser) == 203) {
+
+            _rxdata = Receiver::Data::update(
+                    _rxdata, 
+                    MspParser::getUshort(_parser, 0),
+                    MspParser::getUshort(_parser, 1),
+                    MspParser::getUshort(_parser, 2),
+                    MspParser::getUshort(_parser, 3),
+                    MspParser::getUshort(_parser, 4),
+                    millis());
+        }
+    }
+}
+
+void Receiver::begin()
+{
+    Serial1.begin(115200);
+}
+
+auto Receiver::read() -> Receiver::Data
+{
+    return _rxdata;
+}
+
+void Receiver::send(const VehicleState & state)
+{
+    static MspSerializer _serializer;
+
+    _serializer = MspSerializer::serializeFloats(
+            _serializer, MSP_STATE, (float *)&state, 10);
+
+    Serial1.write(
+            MspSerializer::payloadBytes(_serializer),
+            MspSerializer::payloadSize(_serializer));
+}
