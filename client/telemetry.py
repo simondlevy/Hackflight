@@ -54,6 +54,8 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser(
             formatter_class=ArgumentDefaultsHelpFormatter)
 
+    argparser.add_argument('-o', '--outfile', help='CSV file for logging')
+
     argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
                            help='Serial port for dongle')
 
@@ -66,12 +68,22 @@ if __name__ == '__main__':
         print('Unable to open port ' + args.port)
         exit(0)
 
-    telemetryParser = TelemetryParser()
+    outfile = None
+
+    if args.outfile is not None:
+        try:
+            outfile = open(args.outfile, 'w')
+        except Exception as e:
+            print('Unable to open log file %s: %s' % (args.outfile, str(e)))
+            exit(1)
+
+
+    telemetryParser = TelemetryParser(outfile)
 
     while True:
 
         try:
-            telemetryParser.parse(port.read(1), outfile)
+            telemetryParser.parse(port.read(1))
 
         except KeyboardInterrupt:
             break
