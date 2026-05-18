@@ -53,8 +53,14 @@ class TelemetryParser(MspParser):
         self.outfile = None
 
         if args.outfile is not None:
+
             try:
+
                 self.outfile = open(args.outfile, 'w')
+
+                self.outfile.write(
+                        'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
+
             except Exception as e:
                 print('Unable to open log file %s: %s' %
                       (args.outfile, str(e)))
