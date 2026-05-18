@@ -29,18 +29,25 @@ except Exception as e:
 
 class TelemetryParser(MspParser):
 
-    def __init__(self):
+    def __init__(self, outfile):
 
         MspParser.__init__(self)
+        self.outfile = outfile
         self.running = True
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-               'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-               'psi=%+5.1f dpsi=%+5.1f') %
-              (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
-
+        if self.outfile is None:
+            print(('dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
+                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
+                   'psi=%+5.1f dpsi=%+5.1f') %
+                  (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+        else:
+            self.outfile.write(('z=%+03.2f dz=%+03.2f ' +
+                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
+                   'psi=%+5.1f dpsi=%+5.1f\n') %
+                  (z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+ 
 
 if __name__ == '__main__':
 
@@ -64,7 +71,7 @@ if __name__ == '__main__':
     while True:
 
         try:
-            telemetryParser.parse(port.read(1))
+            telemetryParser.parse(port.read(1), outfile)
 
         except KeyboardInterrupt:
             break

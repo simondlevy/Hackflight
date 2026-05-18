@@ -25,9 +25,9 @@ from radiomaster import RadioMaster
 from telemetry import TelemetryParser
 
 
-def telemetry_threadfun(port):
+def telemetry_threadfun(port, outfile):
 
-    telemetryParser = TelemetryParser()
+    telemetryParser = TelemetryParser(outfile)
 
     while True:
         try:
@@ -55,7 +55,7 @@ def main():
 
     except serial.SerialException:
         print('Unable to open port ' + args.port)
-        exit(0)
+        exit(1)
 
     outfile = None
 
@@ -64,11 +64,12 @@ def main():
             outfile = open(args.outfile, 'w')
         except Exception as e:
             print('Unable to open log file %s: %s' % (args.outfile, str(e)))
+            exit(1)
 
 
     print('Waiting for server ...')
 
-    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, ))
+    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, outfile))
     telemetry_thread.daemon = True
     telemetry_thread.start()
 
