@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
+from time import sleep
+from threading import Thread
 
 RealtimePlotter = None
 try:
@@ -32,6 +34,14 @@ except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
 
+
+def telemetry_threadfun(telemetryParser):
+
+    while True:
+
+        telemetryParser.step()
+
+        sleep(0)  # yield
 
 class TelemetryPlotter(RealtimePlotter):
 
@@ -47,9 +57,15 @@ class TelemetryPlotter(RealtimePlotter):
         self.xcurr = 0
         self.ycurr = 0
 
+        self.count = 0
+
     def getValues(self):
 
-         return (self.ycurr,)
+        print('getValues: %04d z=%f' % (self.count, self.ycurr))
+
+        self.count += 1
+
+        return (self.ycurr,)
 
 
 class TelemetryParser(MspParser):
@@ -110,6 +126,7 @@ class TelemetryParser(MspParser):
 
         print('Connected')
 
+
     def step(self):
 
         try:
@@ -131,17 +148,17 @@ class TelemetryParser(MspParser):
                                 phi, dphi, theta, dtheta, psi, dpsi))
 
         if self.plotter is not None:
-            print(self.plotter)
+            self.plotter.ycurr = z
 
 
 if __name__ == '__main__':
 
     telemetryParser = TelemetryParser()
 
-    while True:
+    telemetry_thread = Thread(target=telemetry_threadfun,
+                              args=(telemetryParser, ))
+    telemetry_thread.daemon = True
+    telemetry_thread.start()
 
-        try:
-            telemetryParser.step()
-
-        except KeyboardInterrupt:
-            break
+    if telemetryParser.plotter is not None:
+        telemetryParser.plotter.start()
