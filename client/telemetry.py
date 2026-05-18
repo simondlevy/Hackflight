@@ -56,16 +56,15 @@ class TelemetryParser(MspParser):
             try:
                 self.outfile = open(args.outfile, 'w')
             except Exception as e:
-                print('Unable to open log file %s: %s' % (args.outfile, str(e)))
+                print('Unable to open log file %s: %s' %
+                      (args.outfile, str(e)))
                 exit(1)
-
 
         print('Waiting for server ... ', end='')
 
         self.running = True
 
-        if self.outfile is not None:
-            print('Connected')
+        print('Connected')
 
     def step(self):
 
@@ -75,7 +74,6 @@ class TelemetryParser(MspParser):
         except serial.SerialException:
             print('Unable to read telemtry from port')
 
-
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         if self.outfile is None:
@@ -84,11 +82,9 @@ class TelemetryParser(MspParser):
                    'psi=%+5.1f dpsi=%+5.1f') %
                   (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
         else:
-            self.outfile.write(('z=%+03.2f dz=%+03.2f ' +
-                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-                   'psi=%+5.1f dpsi=%+5.1f\n') %
-                  (z, dz, phi, dphi, theta, dtheta, psi, dpsi))
- 
+            self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f\n' %
+                               (z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+
 
 if __name__ == '__main__':
 
