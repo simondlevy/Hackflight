@@ -20,11 +20,36 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
 
+RealtimePlotter = None
+try:
+    from realtime_plot import RealtimePlotter
+except Exception as e:
+    pass
+
 try:
     from __msp__ import Parser as MspParser
 except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
+
+
+class TelemetryPlotter(RealtimePlotter):
+
+    Z_RANGE = (0, 2)
+
+    def __init__(self):
+
+        RealtimePlotter.__init__(self, [self.Z_RANGE], 
+                window_name='Flight Telemetry',
+                yticks = [self.Z_RANGE],
+                styles = ['b-'])
+
+        self.xcurr = 0
+        self.ycurr = 0
+
+    def getValues(self):
+
+         return (self.ycurr,)
 
 
 class TelemetryParser(MspParser):
@@ -38,6 +63,9 @@ class TelemetryParser(MspParser):
 
         argparser.add_argument('-o', '--outfile', help='CSV file for logging')
 
+        argparser.add_argument('-r', '--realtime', action='store_true',
+                               help='Real-time plot')
+
         argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
                                help='Serial port for dongle')
 
@@ -48,7 +76,7 @@ class TelemetryParser(MspParser):
 
         except serial.SerialException:
             print('Unable to open port ' + args.port)
-            exit(0)
+            exit(1)
 
         self.outfile = None
 
@@ -65,6 +93,16 @@ class TelemetryParser(MspParser):
                 print('Unable to open log file %s: %s' %
                       (args.outfile, str(e)))
                 exit(1)
+
+
+        plotter = None
+
+        if args.realtime:
+            if RealtimePlotter is None:
+                print('Realtime plotter not installed')
+                exit(1)
+            else:
+                plotter = TelemetryPlotter()
 
         print('Waiting for server ... ', end='')
 
