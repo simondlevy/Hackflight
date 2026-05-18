@@ -82,8 +82,9 @@ class TelemetryParser(MspParser):
                    'psi=%+5.1f dpsi=%+5.1f') %
                   (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
         else:
-            self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f\n' %
-                               (z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+            self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
+                               (dx, dy, z, dz,
+                                phi, dphi, theta, dtheta, psi, dpsi))
 
 
 if __name__ == '__main__':
