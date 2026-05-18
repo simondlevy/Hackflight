@@ -17,10 +17,10 @@
  */
 
 #include <hackflight.h>
-#include <firmware/quadcore.hpp>
+#include <firmware/alt-hold.hpp>
 using namespace hf;
 
-static QuadCore _core; 
+static QuadCore _core;
 
 void setup()
 {

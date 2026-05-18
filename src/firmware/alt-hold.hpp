@@ -25,12 +25,10 @@
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
-#include <firmware/ekf/ekf.hpp>
+#include <firmware/ekf/zdz.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
-#include <firmware/opticalflow/filter.hpp>
-#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
@@ -58,9 +56,6 @@ namespace hf {
 
         public:
 
-            QuadCore(const bool wantPoshold=false) 
-                : _wantPoshold(wantPoshold) {}
-
             void begin()
             {
                 Receiver::begin();
@@ -68,11 +63,7 @@ namespace hf {
                 _imu.begin();
                 _motors.begin(); 
                 _led.begin(); 
-
-                if (_wantPoshold) {
-                    _zranger.begin();
-                    _flowsensor.begin();
-                }
+                _zranger.begin();
             }
 
             void step()
@@ -83,7 +74,6 @@ namespace hf {
                 static ImuFilter _imuFilter;
                 static Mixer _mixer;
                 static StabilizerPid _stabilizerPid;
-                static OpticalFlowFilter _opticalFlowFilter;
                 static ZRangerFilter _zrangerFilter;
 
                 // Flight mode
@@ -103,14 +93,10 @@ namespace hf {
                 _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
                         _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-                if (_wantPoshold && _flowdeckTimer.ready()) {
-                    // Slower EKF update with range, optical flow
+                if (_flowdeckTimer.ready()) {
                     _zrangerFilter = ZRangerFilter::update(
                             _zrangerFilter, _zranger.read());
-                    _opticalFlowFilter = OpticalFlowFilter::update(
-                            _opticalFlowFilter, micros(),
-                            _flowsensor.read());
-                    _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+                    _ekf = EKF::update(_ekf, _zrangerFilter);
                 }
 
                 // Run the system dynamics to predict the state forward.
@@ -132,7 +118,7 @@ namespace hf {
                 // Check receiver timeout
                 rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
-                //_debugger.report(state, _wantPoshold);
+                //_debugger.report(state, true);
                 //_profiler.report();
 
                 _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
@@ -172,9 +158,6 @@ namespace hf {
             // Debugging / profiling
             Debugger _debugger;
             Profiler _profiler;
-
-            // Position hold
-            bool _wantPoshold;
 
     }; // class QuadCore
 
