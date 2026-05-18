@@ -29,6 +29,9 @@ def telemetry_threadfun(port, outfile):
 
     telemetryParser = TelemetryParser(outfile)
 
+    if outfile is not None:
+        print('Connected')
+
     while True:
         try:
             telemetryParser.parse(port.read(1))
@@ -67,7 +70,7 @@ def main():
             exit(1)
 
 
-    print('Waiting for server ...')
+    print('Waiting for server ... ', end='')
 
     telemetry_thread = Thread(target=telemetry_threadfun, args=(port, outfile))
     telemetry_thread.daemon = True
