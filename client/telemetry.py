@@ -29,11 +29,52 @@ except Exception as e:
 
 class TelemetryParser(MspParser):
 
-    def __init__(self, outfile):
+    def __init__(self):
 
         MspParser.__init__(self)
-        self.outfile = outfile
+
+        argparser = argparse.ArgumentParser(
+                formatter_class=ArgumentDefaultsHelpFormatter)
+
+        argparser.add_argument('-o', '--outfile', help='CSV file for logging')
+
+        argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
+                               help='Serial port for dongle')
+
+        args = argparser.parse_args()
+
+        try:
+            self.port = serial.Serial(args.port, 115200)
+
+        except serial.SerialException:
+            print('Unable to open port ' + args.port)
+            exit(0)
+
+        self.outfile = None
+
+        if args.outfile is not None:
+            try:
+                self.outfile = open(args.outfile, 'w')
+            except Exception as e:
+                print('Unable to open log file %s: %s' % (args.outfile, str(e)))
+                exit(1)
+
+
+        print('Waiting for server ... ', end='')
+
         self.running = True
+
+        if self.outfile is not None:
+            print('Connected')
+
+    def step(self):
+
+        try:
+            self.parse(self.port.read(1))
+
+        except serial.SerialException:
+            print('Unable to read telemtry from port')
+
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -51,39 +92,12 @@ class TelemetryParser(MspParser):
 
 if __name__ == '__main__':
 
-    argparser = argparse.ArgumentParser(
-            formatter_class=ArgumentDefaultsHelpFormatter)
-
-    argparser.add_argument('-o', '--outfile', help='CSV file for logging')
-
-    argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
-                           help='Serial port for dongle')
-
-    args = argparser.parse_args()
-
-    try:
-        port = serial.Serial(args.port, 115200)
-
-    except serial.SerialException:
-        print('Unable to open port ' + args.port)
-        exit(0)
-
-    outfile = None
-
-    if args.outfile is not None:
-        try:
-            outfile = open(args.outfile, 'w')
-        except Exception as e:
-            print('Unable to open log file %s: %s' % (args.outfile, str(e)))
-            exit(1)
-
-
-    telemetryParser = TelemetryParser(outfile)
+    telemetryParser = TelemetryParser()
 
     while True:
 
         try:
-            telemetryParser.parse(port.read(1))
+            telemetryParser.step()
 
         except KeyboardInterrupt:
             break

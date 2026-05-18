@@ -25,58 +25,25 @@ from radiomaster import RadioMaster
 from telemetry import TelemetryParser
 
 
-def telemetry_threadfun(port, outfile):
-
-    telemetryParser = TelemetryParser(outfile)
-
-    if outfile is not None:
-        print('Connected')
+def telemetry_threadfun(telemetryParser):
 
     while True:
-        try:
-            telemetryParser.parse(port.read(1))
-        except serial.SerialException:
-            print('Unable to read telemtry from port')
+
+        telemetryParser.step()
 
         sleep(0)  # yield
 
 
 def main():
 
-    argparser = argparse.ArgumentParser(
-                formatter_class=ArgumentDefaultsHelpFormatter)
+    telemetryParser = TelemetryParser()
 
-    argparser.add_argument('-o', '--outfile', help='CSV file for logging')
-
-    argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
-                           help='Serial port for dongle')
-
-    args = argparser.parse_args()
-
-    try:
-        port = serial.Serial(args.port, 115200)
-
-    except serial.SerialException:
-        print('Unable to open port ' + args.port)
-        exit(1)
-
-    outfile = None
-
-    if args.outfile is not None:
-        try:
-            outfile = open(args.outfile, 'w')
-        except Exception as e:
-            print('Unable to open log file %s: %s' % (args.outfile, str(e)))
-            exit(1)
-
-
-    print('Waiting for server ... ', end='')
-
-    telemetry_thread = Thread(target=telemetry_threadfun, args=(port, outfile))
+    telemetry_thread = Thread(target=telemetry_threadfun,
+                              args=(telemetryParser, ))
     telemetry_thread.daemon = True
     telemetry_thread.start()
 
-    rm = RadioMaster(port)
+    rm = RadioMaster(telemetryParser.port)
 
     while rm.connected:
 
