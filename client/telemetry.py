@@ -95,14 +95,14 @@ class TelemetryParser(MspParser):
                 exit(1)
 
 
-        plotter = None
+        self.plotter = None
 
         if args.realtime:
             if RealtimePlotter is None:
                 print('Realtime plotter not installed')
                 exit(1)
             else:
-                plotter = TelemetryPlotter()
+                self.plotter = TelemetryPlotter()
 
         print('Waiting for server ... ', end='')
 
@@ -129,6 +129,9 @@ class TelemetryParser(MspParser):
             self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
                                (dx, dy, z, dz,
                                 phi, dphi, theta, dtheta, psi, dpsi))
+
+        if self.plotter is not None:
+            print(self.plotter)
 
 
 if __name__ == '__main__':
