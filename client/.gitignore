@@ -1,2 +1,3 @@
+*.csv
 __pycache__/
 __msp__.py

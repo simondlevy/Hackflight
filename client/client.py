@@ -43,6 +43,8 @@ def main():
     argparser = argparse.ArgumentParser(
                 formatter_class=ArgumentDefaultsHelpFormatter)
 
+    argparser.add_argument('-o', '--outfile', help='CSV file for logging')
+
     argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
                            help='Serial port for dongle')
 
@@ -54,6 +56,15 @@ def main():
     except serial.SerialException:
         print('Unable to open port ' + args.port)
         exit(0)
+
+    outfile = None
+
+    if args.outfile is not None:
+        try:
+            outfile = open(args.outfile, 'w')
+        except Exception as e:
+            print('Unable to open log file %s: %s' % (args.outfile, str(e)))
+
 
     print('Waiting for server ...')
 
