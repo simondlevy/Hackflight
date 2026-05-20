@@ -35,34 +35,9 @@ except Exception as e:
     exit(0)
 
 
-'''
-class TelemetryPlotter(RealtimePlotter):
-
-    Z_RANGE = (0, 2)
-
-    def __init__(self):
-
-        RealtimePlotter.__init__(self, [self.Z_RANGE], 
-                window_name='Flight Telemetry',
-                yticks = [self.Z_RANGE],
-                styles = ['b-'])
-
-        self.xcurr = 0
-        self.ycurr = 0
-
-    def getValues(self):
-
-        print('getValues: z=%f' % self.ycurr)
-
-        self.xcurr += 1
-
-        sleep(.002)
-
-        return (self.ycurr,)
-'''
-
-
 class TelemetryParser(MspParser):
+
+    Z_RANGE = 0.1, 2
 
     def __init__(self):
 
@@ -112,7 +87,12 @@ class TelemetryParser(MspParser):
                 print('Realtime plotter not installed')
                 exit(1)
             else:
-                self.plotter = TelemetryPlotter()
+                self.plotter = RealtimePlotter(
+                        self,
+                        (self.Z_RANGE, ), 
+                        window_name='Flight Telemetry',
+                        yticks = (self.Z_RANGE, ),
+                        styles = ('b-', ))
 
         print('Waiting for server ... ', end='')
 
@@ -149,14 +129,18 @@ if __name__ == '__main__':
 
     telemetryParser = TelemetryParser()
 
-    #if telemetryParser.plotter is not None:
-    #    telemetryParser.plotter.start()
+    if telemetryParser.plotter is not None:
 
+        # telemetryParser.plotter.start()
 
-    while True:
+        print('Plotting ...')
 
-        try:
-            telemetryParser.step()
+    else:
 
-        except KeyboardInterrupt:
-            break
+        while True:
+
+            try:
+                telemetryParser.step()
+
+            except KeyboardInterrupt:
+                break
