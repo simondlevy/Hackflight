@@ -128,7 +128,11 @@ class TelemetryParser(MspParser):
                                (dx, dy, z, dz,
                                 phi, dphi, theta, dtheta, psi, dpsi))
 
+        z = np.append(np.roll(self.plotter_data[0], -1), [z])
+
         self.plotter_data = z, 
+
+        print(self.plotter_data)
 
 
 if __name__ == '__main__':
