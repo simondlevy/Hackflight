@@ -39,6 +39,7 @@ except Exception as e:
 class TelemetryParser(MspParser):
 
     PLOTTER_Z_RANGE = 0, 2
+    PLOTTER_DZ_RANGE = -3,+3
     PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
@@ -83,7 +84,10 @@ class TelemetryParser(MspParser):
 
 
         self.plotter = None
-        self.plotter_data = np.zeros(self.PLOTTER_DATA_SIZE), 
+
+        self.plotter_data = (
+                np.zeros(self.PLOTTER_DATA_SIZE),
+                np.zeros(self.PLOTTER_DATA_SIZE))
 
         if args.realtime:
 
@@ -94,13 +98,13 @@ class TelemetryParser(MspParser):
             else:
                 self.plotter = RealtimePlotter(
                         self,
-                        (self.PLOTTER_Z_RANGE, ), 
+                        (self.PLOTTER_Z_RANGE, self.PLOTTER_DZ_RANGE), 
                         size=self.PLOTTER_DATA_SIZE,
                         show_yvals=True,
                         window_name='Flight Telemetry',
-                        yticks=(self.PLOTTER_Z_RANGE, ),
-                        ylabels=('Z (m)', ),
-                        styles = ('b-', ))
+                        yticks=(self.PLOTTER_Z_RANGE, self.PLOTTER_DZ_RANGE),
+                        ylabels=('Z (m)', 'dZ/dt (m/s)'),
+                        styles=('b-', 'g-'))
 
         print('Waiting for server ... ', end='')
 
@@ -119,7 +123,7 @@ class TelemetryParser(MspParser):
     def read(self):
         '''For RealtimePlotter'''
         self.step()
-        return self.plotter_data  # np.zeros(self.PLOTTER_DATA_SIZE), 
+        return self.plotter_data
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -138,7 +142,11 @@ class TelemetryParser(MspParser):
 
         newz = np.roll(self.plotter_data[0], -1)
         newz[-1] = z
-        self.plotter_data = newz, 
+
+        newdz = np.roll(self.plotter_data[1], -1)
+        newdz[-1] = z
+
+        self.plotter_data = newz, newdz
 
 
 if __name__ == '__main__':
