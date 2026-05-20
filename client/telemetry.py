@@ -114,7 +114,9 @@ class TelemetryParser(MspParser):
 
     def read(self):
         '''For RealtimePlotter'''
-        return self.plotter_data
+        self.step()
+        print('read')
+        return np.zeros(self.PLOTTER_DATA_SIZE), 
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
@@ -123,6 +125,7 @@ class TelemetryParser(MspParser):
                    'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
                    'psi=%+5.1f dpsi=%+5.1f') %
                   (dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+
         else:
             self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
                                (dx, dy, z, dz,
@@ -132,7 +135,7 @@ class TelemetryParser(MspParser):
 
         self.plotter_data = z, 
 
-        print(self.plotter_data)
+        print('handle_state')
 
 
 if __name__ == '__main__':
