@@ -38,7 +38,7 @@ except Exception as e:
 
 class TelemetryParser(MspParser):
 
-    PLOTTER_Z_RANGE = -0.01, 2
+    PLOTTER_Z_RANGE = 0, 2
     PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
