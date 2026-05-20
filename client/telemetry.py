@@ -20,13 +20,11 @@ import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
-from time import sleep
-from threading import Thread
 
 RealtimePlotter = None
 try:
     from realtime_plot import RealtimePlotter
-except Exception as e:
+except Exception:
     pass
 
 try:
@@ -39,7 +37,7 @@ except Exception as e:
 class TelemetryParser(MspParser):
 
     PLOTTER_Z_RANGE = 0, 2
-    PLOTTER_DZ_RANGE = -1,+1
+    PLOTTER_DZ_RANGE = -1, +1
     PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
@@ -82,7 +80,6 @@ class TelemetryParser(MspParser):
                       (args.outfile, str(e)))
                 exit(1)
 
-
         self.plotter = None
 
         self.plotter_data = (
@@ -98,7 +95,7 @@ class TelemetryParser(MspParser):
             else:
                 self.plotter = RealtimePlotter(
                         self,
-                        (self.PLOTTER_Z_RANGE, self.PLOTTER_DZ_RANGE), 
+                        (self.PLOTTER_Z_RANGE, self.PLOTTER_DZ_RANGE),
                         size=self.PLOTTER_DATA_SIZE,
                         show_yvals=True,
                         window_name='Flight Telemetry',
@@ -145,8 +142,9 @@ class TelemetryParser(MspParser):
     def _roll_data(self, index, newval):
 
         data = np.roll(self.plotter_data[index], -1)
-        data[-1] = newval 
+        data[-1] = newval
         return data
+
 
 if __name__ == '__main__':
 
