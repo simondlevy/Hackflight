@@ -38,7 +38,7 @@ except Exception as e:
 
 class TelemetryParser(MspParser):
 
-    PLOTTER_Z_RANGE = -1, 2
+    PLOTTER_Z_RANGE = -0.01, 2
     PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
@@ -86,14 +86,17 @@ class TelemetryParser(MspParser):
         self.plotter_data = np.zeros(self.PLOTTER_DATA_SIZE), 
 
         if args.realtime:
+
             if RealtimePlotter is None:
                 print('Realtime plotter not installed')
                 exit(1)
+
             else:
                 self.plotter = RealtimePlotter(
                         self,
                         (self.PLOTTER_Z_RANGE, ), 
                         size=self.PLOTTER_DATA_SIZE,
+                        show_yvals=True,
                         window_name='Flight Telemetry',
                         yticks = (self.PLOTTER_Z_RANGE, ),
                         styles = ('b-', ))
