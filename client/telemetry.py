@@ -82,6 +82,7 @@ class TelemetryParser(MspParser):
 
 
         self.plotter = None
+        self.plotter_data = np.ones(100), 
 
         if args.realtime:
             if RealtimePlotter is None:
@@ -111,7 +112,7 @@ class TelemetryParser(MspParser):
 
     def read(self):
         '''For RealtimePlotter'''
-        return np.ones(100), 
+        return self.plotter_data  # np.ones(100), 
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
