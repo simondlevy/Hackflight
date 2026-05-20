@@ -23,20 +23,14 @@ from telemetry import TelemetryParser
 
 
 def telemetry_threadfun(telemetryParser):
-
     while True:
-
         telemetryParser.step()
-
         sleep(0)  # yield
 
 
 def radio_threadfun(rm):
-
     while rm.connected:
-
         rm.step()
-
         sleep(0)  # yield
 
 
@@ -54,12 +48,15 @@ def main():
 
     rm = RadioMaster(port)
 
+    # If we're plotting telemetry, we need to run the setpoint control on
+    # its own thread
     if telemetryParser.plotter is not None:
 
         launch_thread(radio_threadfun, rm)
 
         telemetryParser.plotter.start()
 
+    # No telemetry; run setpoint control on main thread
     else:
 
         launch_thread(telemetry_threadfun, telemetryParser)
