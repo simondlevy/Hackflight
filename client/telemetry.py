@@ -35,14 +35,7 @@ except Exception as e:
     exit(0)
 
 
-def telemetry_threadfun(telemetryParser):
-
-    while True:
-
-        telemetryParser.step()
-
-        sleep(0)  # yield
-
+'''
 class TelemetryPlotter(RealtimePlotter):
 
     Z_RANGE = (0, 2)
@@ -57,15 +50,16 @@ class TelemetryPlotter(RealtimePlotter):
         self.xcurr = 0
         self.ycurr = 0
 
-        self.count = 0
-
     def getValues(self):
 
-        print('getValues: %04d z=%f' % (self.count, self.ycurr))
+        print('getValues: z=%f' % self.ycurr)
 
-        self.count += 1
+        self.xcurr += 1
+
+        sleep(.002)
 
         return (self.ycurr,)
+'''
 
 
 class TelemetryParser(MspParser):
@@ -155,10 +149,14 @@ if __name__ == '__main__':
 
     telemetryParser = TelemetryParser()
 
-    telemetry_thread = Thread(target=telemetry_threadfun,
-                              args=(telemetryParser, ))
-    telemetry_thread.daemon = True
-    telemetry_thread.start()
+    #if telemetryParser.plotter is not None:
+    #    telemetryParser.plotter.start()
 
-    if telemetryParser.plotter is not None:
-        telemetryParser.plotter.start()
+
+    while True:
+
+        try:
+            telemetryParser.step()
+
+        except KeyboardInterrupt:
+            break
