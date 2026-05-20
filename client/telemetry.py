@@ -101,7 +101,6 @@ class TelemetryParser(MspParser):
 
         print('Connected')
 
-
     def step(self):
 
         try:
@@ -111,7 +110,7 @@ class TelemetryParser(MspParser):
             print('Unable to read telemtry from port')
 
     def read(self):
-
+        '''For RealtimePlotter'''
         return np.ones(100), 
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
@@ -126,8 +125,7 @@ class TelemetryParser(MspParser):
                                (dx, dy, z, dz,
                                 phi, dphi, theta, dtheta, psi, dpsi))
 
-        if self.plotter is not None:
-            self.plotter.ycurr = z
+        self.plotter_data = z, 
 
 
 if __name__ == '__main__':
