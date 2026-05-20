@@ -140,14 +140,13 @@ class TelemetryParser(MspParser):
                                (dx, dy, z, dz,
                                 phi, dphi, theta, dtheta, psi, dpsi))
 
-        newz = np.roll(self.plotter_data[0], -1)
-        newz[-1] = z
+        self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
-        newdz = np.roll(self.plotter_data[1], -1)
-        newdz[-1] = dz
+    def _roll_data(self, index, newval):
 
-        self.plotter_data = newz, newdz
-
+        data = np.roll(self.plotter_data[index], -1)
+        data[-1] = newval 
+        return data
 
 if __name__ == '__main__':
 
