@@ -35,10 +35,16 @@ def main():
 
     telemetryParser = TelemetryParser()
 
-    telemetry_thread = Thread(target=telemetry_threadfun,
-                              args=(telemetryParser, ))
-    telemetry_thread.daemon = True
-    telemetry_thread.start()
+    if telemetryParser.plotter is not None:
+
+        telemetryParser.plotter.start()
+
+    else:
+
+        telemetry_thread = Thread(target=telemetry_threadfun,
+                                  args=(telemetryParser, ))
+        telemetry_thread.daemon = True
+        telemetry_thread.start()
 
     rm = RadioMaster(telemetryParser.port)
 
