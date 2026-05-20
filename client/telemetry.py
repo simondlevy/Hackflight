@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
@@ -109,6 +110,10 @@ class TelemetryParser(MspParser):
         except serial.SerialException:
             print('Unable to read telemtry from port')
 
+    def read(self):
+
+        return np.ones(100), 
+
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         if self.outfile is None:
@@ -131,9 +136,7 @@ if __name__ == '__main__':
 
     if telemetryParser.plotter is not None:
 
-        # telemetryParser.plotter.start()
-
-        print('Plotting ...')
+        telemetryParser.plotter.start()
 
     else:
 
