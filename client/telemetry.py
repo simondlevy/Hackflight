@@ -39,7 +39,7 @@ except Exception as e:
 class TelemetryParser(MspParser):
 
     PLOTTER_Z_RANGE = 0, 2
-    PLOTTER_DZ_RANGE = -3,+3
+    PLOTTER_DZ_RANGE = -1,+1
     PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
@@ -144,7 +144,7 @@ class TelemetryParser(MspParser):
         newz[-1] = z
 
         newdz = np.roll(self.plotter_data[1], -1)
-        newdz[-1] = z
+        newdz[-1] = dz
 
         self.plotter_data = newz, newdz
 
