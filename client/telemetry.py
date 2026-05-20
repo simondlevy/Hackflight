@@ -98,7 +98,8 @@ class TelemetryParser(MspParser):
                         size=self.PLOTTER_DATA_SIZE,
                         show_yvals=True,
                         window_name='Flight Telemetry',
-                        yticks = (self.PLOTTER_Z_RANGE, ),
+                        yticks=(self.PLOTTER_Z_RANGE, ),
+                        ylabels=('Z (m)', ),
                         styles = ('b-', ))
 
         print('Waiting for server ... ', end='')
