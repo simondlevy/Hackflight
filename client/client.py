@@ -35,14 +35,9 @@ def radio_threadfun(port):
 
     rm = RadioMaster(port)
 
-    count = 0
-
     while rm.connected:
 
         rm.step()
-
-        print(count)
-        count += 1
 
         sleep(0)  # yield
 
@@ -50,10 +45,11 @@ def main():
 
     telemetryParser = TelemetryParser()
 
+    port = telemetryParser.port
+
     if telemetryParser.plotter is not None:
 
-        radio_thread = Thread(target=radio_threadfun,
-                                  args=(telemetryParser.port, ))
+        radio_thread = Thread(target=radio_threadfun, args=(port, ))
         radio_thread.daemon = True
         radio_thread.start()
 
@@ -66,7 +62,7 @@ def main():
         telemetry_thread.daemon = True
         telemetry_thread.start()
 
-        rm = RadioMaster(telemetryParser.port)
+        rm = RadioMaster(port)
 
         while rm.connected:
 
