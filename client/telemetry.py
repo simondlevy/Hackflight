@@ -38,7 +38,8 @@ except Exception as e:
 
 class TelemetryParser(MspParser):
 
-    Z_RANGE = 0.1, 2
+    PLOTTER_Z_RANGE = 0.1, 2
+    PLOTTER_DATA_SIZE = 100
 
     def __init__(self):
 
@@ -91,9 +92,10 @@ class TelemetryParser(MspParser):
             else:
                 self.plotter = RealtimePlotter(
                         self,
-                        (self.Z_RANGE, ), 
+                        (self.PLOTTER_Z_RANGE, ), 
+                        size=self.PLOTTER_DATA_SIZE,
                         window_name='Flight Telemetry',
-                        yticks = (self.Z_RANGE, ),
+                        yticks = (self.PLOTTER_Z_RANGE, ),
                         styles = ('b-', ))
 
         print('Waiting for server ... ', end='')
@@ -112,7 +114,7 @@ class TelemetryParser(MspParser):
 
     def read(self):
         '''For RealtimePlotter'''
-        return self.plotter_data  # np.ones(100), 
+        return self.plotter_data
 
     def handle_STATE(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
