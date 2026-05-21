@@ -21,7 +21,6 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -102,21 +101,6 @@ namespace hf {
 
                     printf("%5lu | %s=%s\n",
                             _helper.count, label, flag ? "true" : "false");
-                }
-            }
-
-            void report(const Receiver::Data & rxdata)
-            {
-                if (_helper.ready()) {
-
-                    const auto ax = rxdata.axes;
-
-                    printf("%5lu | armed=%d | throt_down=%d | "
-                            "throt=%+3.3f roll=%+3.3f pitch=%3.3f "
-                            "yaw=%+3.3f\n",
-                            _helper.count, rxdata.is_armed,
-                            rxdata.is_throttle_down, 
-                            ax.thrust, ax.roll, ax.pitch, ax.yaw);
                 }
             }
 

@@ -64,10 +64,37 @@ static QuadCore _core;
 
 void setup()
 {
+    Receiver::begin();
+
     _core.begin();
 }
 
 void loop()
 {
-    _core.step();
+    static StabilizerPid _stabilizerPid;
+
+    _core.getState();
+
+    auto rxdata = Receiver::read();
+
+    // Disable arming while gyro is calibrating
+    rxdata = _core.isGyroCalibrated ? rxdata : Receiver::Data();
+
+    // Check receiver timeout
+    rxdata = Receiver::Data::checkTimeout(rxdata, millis());
+
+    const auto isArmed = rxdata.is_armed;
+
+    const auto setpoint = mksetpoint(rxdata.axes);
+
+    _stabilizerPid = StabilizerPid::run(
+            _stabilizerPid,
+            !rxdata.is_throttle_down,
+            Timer::getDt(),
+            _core.state,
+            setpoint);
+
+    const auto pidSetpoint = _stabilizerPid.setpoint;
+
+    _core.runMotors(isArmed, pidSetpoint);
 }

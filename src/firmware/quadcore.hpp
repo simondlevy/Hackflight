@@ -31,7 +31,6 @@
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/profiling.hpp>
-#include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
@@ -56,10 +55,11 @@ namespace hf {
 
         public:
 
+            VehicleState state;
+            bool isGyroCalibrated;
+
             void begin()
             {
-                Receiver::begin();
-
                 Serial1.begin(115200);
 
                 _imu.begin();
@@ -67,32 +67,14 @@ namespace hf {
                 _led.begin(); 
             }
 
-            void step()
+            void getState()
             {
-                // Computation
-                static EKF _ekf;
-                static FlyingCheck _flyingCheck;
-                static ImuFilter _imuFilter;
-                static Mixer _mixer;
-                static StabilizerPid _stabilizerPid;
-
-                // Flight mode
-                static mode_e _mode;
-
-                const auto dt = Timer::getDt();
-
                 _led.blink(_imuFilter.isGyroCalibrated);
-
-                auto rxdata = Receiver::read();
-
-                // Disable arming while gyro is calibrating
-                rxdata = _imuFilter.isGyroCalibrated ? rxdata : Receiver::Data();
 
                 const auto imuraw = _imu.read();
 
                 _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
                         _imu.gyroRangeDps(), _imu.accelRangeGs());
-
 
                 // Run the system dynamics to predict the state forward.
                 if (_ekfPredictionTimer.ready()) {
@@ -103,42 +85,40 @@ namespace hf {
                 _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
                 // Get vehicle state from EKF
-                const auto state = EKF::getVehicleState(_ekf);
+                state = EKF::getVehicleState(_ekf);
 
                 // Send telemetry periodically
                 if (_telemetryTimer.ready()) {
                     sendTelemetry(state);
                 }
 
-                /////////////////////////////////////////////////////////
-                // Check receiver timeout
-                rxdata = Receiver::Data::checkTimeout(rxdata, millis());
+                isGyroCalibrated = _imuFilter.isGyroCalibrated;
+            } 
 
-                //_debugger.report(rxdata);
-                //_profiler.report();
+            void runMotors(const bool isArmed, const Setpoint & pidSetpoint)
+            {
+                _mode = Safety::updateMode(state, isArmed, _imuFilter, _mode);
 
-                _mode = Safety::updateMode(
-                        state, rxdata.is_armed, _imuFilter, _mode);
-
-                const auto setpoint = mksetpoint(rxdata.axes);
-                _stabilizerPid = StabilizerPid::run( _stabilizerPid,
-                        !rxdata.is_throttle_down, dt, state, setpoint);
-
-                /////////////////////////////////////////////////////////
-                _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
+                _mixer = Mixer::run(_mixer, pidSetpoint);
 
                 if (_mode != MODE_PANIC) {
-                    _motors.run(rxdata.is_armed, _mixer.motorvals);
+                    _motors.run(isArmed, _mixer.motorvals);
                 }
 
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(
                             _flyingCheck, millis(), _mixer.motorvals, 4);
                 }
-
-            } // step
+            }
 
         private:
+
+            // Computation
+            ImuFilter _imuFilter;
+            Mixer _mixer;
+            EKF _ekf;
+            mode_e _mode;
+            FlyingCheck _flyingCheck;
 
             // Devices
             IMU _imu;

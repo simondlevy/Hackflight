@@ -18,7 +18,6 @@
 
 #include <hackflight.h>
 #include <firmware/imu/filter.hpp>
-#include <firmware/receiver.hpp>
 
 namespace hf {
 
