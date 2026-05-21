@@ -16,18 +16,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from gamepad import Gamepad
-from telemetry import TelemetryParser
+from telemetry import Telemetry
 
 def main():
 
-    gamepad = Gamepad(True)
+    # Telemetry parser does all the initialization
+    telemetryParser = Telemetry()
 
-    telemetryParser = TelemetryParser()
-
-    port = telemetryParser.port
+    gamepad = Gamepad(telemetryParser.port)
 
     while gamepad.connected:
 
         gamepad.step()
+
+        telemetryParser.step()
 
 main()

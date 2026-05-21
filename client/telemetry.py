@@ -35,7 +35,7 @@ except Exception as e:
     exit(0)
 
 
-class TelemetryParser(MspParser):
+class Telemetry(MspParser):
 
     PLOTTER_Z_RANGE = 0, 2
     PLOTTER_DZ_RANGE = -1, +1
@@ -107,11 +107,7 @@ class TelemetryParser(MspParser):
                         ylabels=('Z (m)', 'dZ/dt (m/s)'),
                         styles=('b-', 'g-'))
 
-        print('Waiting for server ... ', end='')
-
         self.running = True
-
-        print('Connected')
 
     def step(self):
 
@@ -152,7 +148,7 @@ class TelemetryParser(MspParser):
 
 if __name__ == '__main__':
 
-    telemetryParser = TelemetryParser()
+    telemetryParser = Telemetry()
 
     if telemetryParser.plotter is not None:
 
