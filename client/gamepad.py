@@ -147,22 +147,21 @@ class Gamepad:
 
     def _send(self):
 
+        port, serializer = self.comms
+
         if self.armed != self.was_armed:
-            #client.send(MspParser.serialize_SET_ARMING(self.armed))
+            serializer.serialize_SET_ARMING(self.armed)
             self.was_armed = self.armed
-            print('arming')
 
         if not self.armed:
             self.hovering = False
 
         if self.hovering:
-            #client.send(MspParser.serialize_SET_HOVER(
-            #    self.thrust, self.vx, self.vy, self.yawrate))
-            print('hovering')
+            serializer.serialize_SET_HOVER(
+                self.thrust, self.vx, self.vy, self.yawrate)
 
         else:
-            #client.send(MspParser.serialize_SET_IDLE())
-            print('idle')
+            serializer.serialize_SET_IDLE()
 
     def _debug(self):
 

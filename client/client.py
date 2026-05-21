@@ -22,7 +22,7 @@ from gamepad import Gamepad
 from telemetry import Telemetry
 
 try:
-    from __msp__ import Parser as serializer
+    from __msp__ import Serializer as serializer
 except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
