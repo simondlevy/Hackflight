@@ -29,7 +29,7 @@ run:
         echo "World file" $(WORLD_FILE) "not found";\
 	else \
 	    webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
-		--stdout-redirect ./standard.py $(world);\
+		--stdout-redirect ./standard.py $(world) &> /dev/null;\
 	fi
 
 edit:
