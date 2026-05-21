@@ -35,11 +35,12 @@ class Gamepad:
     ALTITUDE_MIN_M = 0.2
     ALTITUDE_INC_MPS = 0.01
 
-    def __init__(self, port=None):
+    def __init__(self, comms=None):
 
         self.armed = False
+        self.was_armed = False
         self.hovering = False
-        self.port = port
+        self.comms = comms
         self.connected = True
         self.vx = 0
         self.vy = 0
@@ -137,11 +138,31 @@ class Gamepad:
         except KeyboardInterrupt:
             self.connected = False
 
-        if self.port is None:
+        if self.comms is None:
             self._debug()
 
         else:
-            print(self.port)
+
+            self._send()
+
+    def _send(self):
+
+        if self.armed != self.was_armed:
+            #client.send(MspParser.serialize_SET_ARMING(self.armed))
+            self.was_armed = self.armed
+            print('arming')
+
+        if not self.armed:
+            self.hovering = False
+
+        if self.hovering:
+            #client.send(MspParser.serialize_SET_HOVER(
+            #    self.thrust, self.vx, self.vy, self.yawrate))
+            print('hovering')
+
+        else:
+            #client.send(MspParser.serialize_SET_IDLE())
+            print('idle')
 
     def _debug(self):
 

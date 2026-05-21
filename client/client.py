@@ -21,6 +21,12 @@ from threading import Thread
 from gamepad import Gamepad
 from telemetry import Telemetry
 
+try:
+    from __msp__ import Parser as MspParser
+except Exception as e:
+    print('%s;\nto install msp: cd ../msppg; make install' % str(e))
+    exit(0)
+
 
 def telemetry_threadfun(telemetry):
 
@@ -43,7 +49,7 @@ def main():
     thread.daemon = True
     thread.start()
 
-    gamepad = Gamepad(telemetry.port)
+    gamepad = Gamepad((telemetry.port, MspParser))
 
     while gamepad.connected:
 
