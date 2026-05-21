@@ -22,7 +22,7 @@ from gamepad import Gamepad
 from telemetry import Telemetry
 
 try:
-    from __msp__ import Parser as MspParser
+    from __msp__ import Parser as serializer
 except Exception as e:
     print('%s;\nto install msp: cd ../msppg; make install' % str(e))
     exit(0)
@@ -49,7 +49,7 @@ def main():
     thread.daemon = True
     thread.start()
 
-    gamepad = Gamepad((telemetry.port, MspParser))
+    gamepad = Gamepad((telemetry.port, serializer))
 
     while gamepad.connected:
 
