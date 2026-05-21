@@ -24,6 +24,9 @@ from telemetry import Telemetry
 
 def telemetry_threadfun(telemetry):
 
+    if telemetry.plotter is not None:
+        telemetry.plotter.start()
+
     while True:
 
         telemetry.step()

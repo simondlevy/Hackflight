@@ -148,18 +148,18 @@ class Telemetry(MspParser):
 
 if __name__ == '__main__':
 
-    telemetryParser = Telemetry()
+    telemetry = Telemetry()
 
-    if telemetryParser.plotter is not None:
+    if telemetry.plotter is not None:
 
-        telemetryParser.plotter.start()
+        telemetry.plotter.start()
 
     else:
 
         while True:
 
             try:
-                telemetryParser.step()
+                telemetry.step()
 
             except KeyboardInterrupt:
                 break
