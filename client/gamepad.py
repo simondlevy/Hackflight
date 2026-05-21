@@ -138,9 +138,12 @@ class Gamepad:
             self.connected = False
 
         if self.port is None:
-            self._report()
+            self._debug()
 
-    def _report(self):
+        else:
+            print(self.port)
+
+    def _debug(self):
 
         print('armed=%d' % self.armed, end='')
 
