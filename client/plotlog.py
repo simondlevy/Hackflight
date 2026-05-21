@@ -24,9 +24,11 @@ def main():
 
     plt.subplot(2, 1, 1)
     plt.plot(data[:,2])
+    plt.ylabel('Z (m)')
 
     plt.subplot(2, 1, 2)
     plt.plot(data[:,3])
+    plt.ylabel('dZ/dt (m/s)')
 
     plt.show()
 
