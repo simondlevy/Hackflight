@@ -155,6 +155,7 @@ class Gamepad:
 
         stdout.flush()
 
+
 if __name__ == '__main__':
 
     gamepad = Gamepad()
