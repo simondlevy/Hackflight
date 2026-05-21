@@ -29,9 +29,11 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
+#include <firmware/msp/__messages__.h>
 #include <firmware/profiling.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
+#include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/setpoint.hpp>
 #include <mixers/bfquadx.hpp>
@@ -57,6 +59,8 @@ namespace hf {
             void begin()
             {
                 Receiver::begin();
+
+                Serial1.begin(115200);
 
                 _imu.begin();
                 _motors.begin(); 
@@ -103,13 +107,13 @@ namespace hf {
 
                 // Send telemetry periodically
                 if (_telemetryTimer.ready()) {
-                    Receiver::send(state);
+                    sendTelemetry(state);
                 }
 
                 // Check receiver timeout
                 rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
-                _debugger.report(rxdata);
+                //_debugger.report(rxdata);
                 //_profiler.report();
 
                 _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
@@ -147,6 +151,18 @@ namespace hf {
             // Debugging / profiling
             Debugger _debugger;
             Profiler _profiler;
+
+            void sendTelemetry(const VehicleState & state)
+            {
+                static MspSerializer _serializer;
+
+                _serializer = MspSerializer::serializeFloats(
+                        _serializer, MSP_STATE, (float *)&state, 10);
+
+                Serial1.write(
+                        MspSerializer::payloadBytes(_serializer),
+                        MspSerializer::payloadSize(_serializer));
+            }
 
     }; // class QuadCore
 

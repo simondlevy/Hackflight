@@ -1,5 +1,5 @@
 /*
-   Hackflight with ESPNOW receiver
+   Hackflight with ELRS receiver
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -61,9 +61,4 @@ auto Receiver::read() -> Receiver::Data
     _crsf.update();
 
     return _rxdata;
-}
-
-void Receiver::send(const VehicleState & state)
-{
-    (void)state;
 }
