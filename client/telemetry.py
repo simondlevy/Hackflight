@@ -20,6 +20,7 @@ import numpy as np
 import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 import serial
+import time
 
 RealtimePlotter = None
 try:
@@ -99,7 +100,10 @@ class TelemetryParser(MspParser):
                         size=self.PLOTTER_DATA_SIZE,
                         show_yvals=True,
                         window_name='Flight Telemetry',
-                        yticks=(self.PLOTTER_Z_RANGE, self.PLOTTER_DZ_RANGE),
+                        yticks=(
+                            self.PLOTTER_Z_RANGE,
+                            (self.PLOTTER_DZ_RANGE[0],
+                             0, self.PLOTTER_DZ_RANGE[1])),
                         ylabels=('Z (m)', 'dZ/dt (m/s)'),
                         styles=('b-', 'g-'))
 
@@ -133,8 +137,8 @@ class TelemetryParser(MspParser):
 
         elif self.outfile is not None:
 
-            self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
-                               (dx, dy, z, dz,
+            self.outfile.write('%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
+                               (time.time(), dx, dy, z, dz,
                                 phi, dphi, theta, dtheta, psi, dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
