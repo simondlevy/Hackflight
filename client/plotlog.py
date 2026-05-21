@@ -19,7 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ZMAX = 1.5
-DZMAX = 1.0
+DZMAX = 2.0
 
 def main():
 
