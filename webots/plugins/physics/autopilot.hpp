@@ -59,7 +59,6 @@ class AutopilotHelper {
 
             char log_path[256] = {};
             sprintf(log_path, "%s/%s.csv", pwd, worldname);
-            _logfile = fopen(log_path, "w");
             fprintf(_logfile, "%s\n", worldname);
 
             _collided = false;

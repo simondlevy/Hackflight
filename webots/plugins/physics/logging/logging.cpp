@@ -20,6 +20,10 @@
 
 static PluginHelper * _helper;
 
+static FILE * _logfile;
+
+static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
+
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -27,7 +31,12 @@ DLLEXPORT void webots_physics_step()
 
     const auto state = _helper->run_simulator(message.mode, message.setpoint);
 
-     printf("dx=%+f dy=%+f z=%f dz=%+f\n", state.dx, state.dy, state.z, state.dz);
+
+
+    fprintf(_logfile, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+            dWebotsGetTime()/1000,
+            state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+            state.theta, state.dtheta, state.psi, state.dpsi);
 
     _helper->set_dbody_from_state(state);
 }
@@ -39,5 +48,14 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
+    const auto pwd = getenv(PATH_VARIABLE_NAME);
+
+    char log_path[256] = {};
+    sprintf(log_path, "%s/log.csv", pwd);
+
+    _logfile = fopen(log_path, "w");
+
+    fprintf(_logfile, "t,dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n");
+
     _helper = new PluginHelper();
 }
