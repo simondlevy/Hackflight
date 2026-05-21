@@ -27,7 +27,7 @@
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static CRSFforArduino _crsf = CRSFforArduino(&Serial3);
+static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
 static Receiver::Data _rxdata;
 
