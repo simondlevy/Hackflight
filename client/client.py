@@ -16,10 +16,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from gamepad import Gamepad
+from telemetry import TelemetryParser
 
 def main():
 
     gamepad = Gamepad(True)
+
+    telemetryParser = TelemetryParser()
+
+    port = telemetryParser.port
 
     while gamepad.connected:
 

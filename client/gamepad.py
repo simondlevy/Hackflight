@@ -35,11 +35,11 @@ class Gamepad:
     ALTITUDE_MIN_M = 0.2
     ALTITUDE_INC_MPS = 0.01
 
-    def __init__(self, debug=False):
+    def __init__(self, port=None):
 
         self.armed = False
         self.hovering = False
-        self.debug = debug
+        self.port = port
         self.connected = True
         self.vx = 0
         self.vy = 0
@@ -137,7 +137,7 @@ class Gamepad:
         except KeyboardInterrupt:
             self.connected = False
 
-        if self.debug:
+        if self.port is None:
             self._report()
 
     def _report(self):
@@ -157,7 +157,7 @@ class Gamepad:
 
 if __name__ == '__main__':
 
-    gamepad = Gamepad(True)
+    gamepad = Gamepad()
 
     while gamepad.connected:
 
