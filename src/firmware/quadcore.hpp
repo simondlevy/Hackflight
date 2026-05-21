@@ -110,18 +110,21 @@ namespace hf {
                     sendTelemetry(state);
                 }
 
+                /////////////////////////////////////////////////////////
                 // Check receiver timeout
                 rxdata = Receiver::Data::checkTimeout(rxdata, millis());
 
                 //_debugger.report(rxdata);
                 //_profiler.report();
 
-                _mode = Safety::updateMode(state, rxdata, _imuFilter, _mode);
+                _mode = Safety::updateMode(
+                        state, rxdata.is_armed, _imuFilter, _mode);
 
                 const auto setpoint = mksetpoint(rxdata.axes);
                 _stabilizerPid = StabilizerPid::run( _stabilizerPid,
                         !rxdata.is_throttle_down, dt, state, setpoint);
 
+                /////////////////////////////////////////////////////////
                 _mixer = Mixer::run(_mixer, _stabilizerPid.setpoint);
 
                 if (_mode != MODE_PANIC) {
