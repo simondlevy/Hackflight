@@ -34,7 +34,6 @@
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
-#include <firmware/setpoint.hpp>
 #include <mixers/bfquadx.hpp>
 #include <pidcontrol/stabilizer.hpp>
 

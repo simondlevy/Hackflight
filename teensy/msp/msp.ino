@@ -1,5 +1,5 @@
 /*
-   Hackflight main sketch for Teensy
+   Hackflight main sketch for Teensy using ESP32 receiver with MSP protocol
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -17,17 +17,39 @@
  */
 
 #include <hackflight.h>
-#include <firmware/alt-hold.hpp>
+#include <firmware/quadcore.hpp>
+#include <firmware/msp/parser.hpp>
 using namespace hf;
 
 static QuadCore _core;
 
+void serialEvent1()
+{
+    static MspParser _parser;
+
+    while (Serial1.available()) {
+
+        _parser = MspParser::parse(_parser, Serial1.read());
+
+        const auto msgid = MspParser::getid(_parser); 
+
+        if (msgid) {
+            printf("msgid=%d\n", msgid);
+        }
+    }
+}
+
 void setup()
 {
+    // Start core sensors and motors (this will also start Serial1)
     _core.begin();
 }
 
 void loop()
 {
-    _core.step();
+    // Read core sensors and do sensor fusion
+    _core.getState();
+
+    // Run motor mixer and motors
+    //_core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);
 }

@@ -48,6 +48,15 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
     }
 }
 
+static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
+{
+    return Setpoint(
+            (receiver_setpoint.thrust+1)/2,
+            receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
+            receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+            receiver_setpoint.yaw);
+}
+
 void setup()
 {
     // Start receiver
@@ -57,7 +66,7 @@ void setup()
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
-    // Start core sensors
+    // Start core sensors and motors
     _core.begin();
 }
 
