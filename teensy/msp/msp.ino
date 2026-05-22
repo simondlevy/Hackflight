@@ -31,10 +31,22 @@ void serialEvent1()
 
         _parser = MspParser::parse(_parser, Serial1.read());
 
-        const auto msgid = MspParser::getid(_parser); 
+        switch (MspParser::getid(_parser)) {
 
-        if (msgid) {
-            printf("msgid=%d\n", msgid);
+            case MSP_SET_ARMING:
+                printf("set_arming\n");
+                break;
+
+            case MSP_SET_IDLE:
+                printf("set_idle\n");
+                break;
+
+            case MSP_SET_HOVER:
+                printf("set_hover\n");
+                break;
+
+            default:
+                break;
         }
     }
 }
