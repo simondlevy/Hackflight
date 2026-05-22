@@ -35,6 +35,7 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
 #include <mixers/bfquadx.hpp>
+#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 namespace hf {
