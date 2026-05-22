@@ -23,6 +23,17 @@ using namespace hf;
 
 static QuadCore _core;
 
+typedef struct {
+
+    uint32_t timestamp;
+    bool armed;
+    bool hovering;
+    Setpoint setpoint;
+
+} message_t;
+
+static message_t _message;
+
 void serialEvent1()
 {
     static MspParser _parser;
@@ -34,15 +45,22 @@ void serialEvent1()
         switch (MspParser::getid(_parser)) {
 
             case MSP_SET_ARMING:
-                printf("set_arming\n");
+                _message.armed = !_message.armed;
+                _message.timestamp = millis();
                 break;
 
             case MSP_SET_IDLE:
-                printf("set_idle\n");
+                _message.hovering = false;
+                _message.timestamp = millis();
                 break;
 
             case MSP_SET_HOVER:
-                printf("set_hover\n");
+                _message.hovering = true;
+                _message.setpoint.thrust = MspParser::getFloat(_parser, 0);
+                _message.setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
+                _message.setpoint.roll = MspParser::getFloat(_parser, 2); // vy
+                _message.setpoint.yaw = MspParser::getFloat(_parser, 3);
+                _message.timestamp = millis();
                 break;
 
             default:
@@ -61,6 +79,8 @@ void loop()
 {
     // Read core sensors and do sensor fusion
     _core.getState();
+
+    printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
 
     // Run motor mixer and motors
     //_core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);

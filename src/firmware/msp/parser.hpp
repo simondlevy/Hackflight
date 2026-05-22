@@ -80,6 +80,20 @@ namespace hf {
                 return p.id;
             }
 
+            static auto getFloat(const MspParser & p,
+                    const uint8_t index) -> float
+            {
+                const uint8_t offset = 4 * index;
+                uint32_t tmp = (uint32_t) (
+                        p.buffer[offset+3] << 24 |
+                        p.buffer[offset+2] << 16 |
+                        p.buffer[offset+1] << 8 |
+                        p.buffer[offset]);
+                float value = 0;
+                memcpy(&value, &tmp, 4);
+                return value;
+            }
+
             static auto getUshort(const MspParser & p,
                     const uint8_t index) -> uint16_t
             {
