@@ -1,5 +1,5 @@
 /**
- * Abstract class for old-school R/C receiver
+ * Class for old-school R/C receiver data
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    class Receiver {
+    class ReceiverData {
 
         private:
 
@@ -32,88 +32,92 @@ namespace hf {
 
         public:
 
-            class Data {
+            Setpoint axes;
+            bool is_armed;
+            bool is_throttle_down;
 
-                public:
+            ReceiverData() = default;
 
-                    Setpoint axes;
-                    bool is_armed;
-                    bool is_throttle_down;
+            ReceiverData(
+                    const Setpoint & axes,
+                    const bool is_armed,
+                    const bool is_throttle_down,
+                    const uint16_t aux,
+                    const uint32_t msec_prev)
+                :
+                    axes(axes),
+                    is_armed(is_armed),
+                    is_throttle_down(is_throttle_down),
+                    aux(aux),
+                    msec_prev(msec_prev) {}
 
-                    Data() = default;
+            ReceiverData& operator=(const ReceiverData& other) = default;
 
-                    Data(
-                            const Setpoint & axes,
-                            const bool is_armed,
-                            const bool is_throttle_down,
-                            const uint16_t aux,
-                            const uint32_t msec_prev)
-                        :
-                            axes(axes),
-                            is_armed(is_armed),
-                            is_throttle_down(is_throttle_down),
-                            aux(aux),
-                            msec_prev(msec_prev) {}
+            static auto update(
+                    const ReceiverData & data,
+                    const uint16_t throttle,
+                    const uint16_t roll,
+                    const uint16_t pitch,
+                    const uint16_t yaw,
+                    const uint16_t aux,
+                    const uint32_t msec_curr) -> ReceiverData
+            {
+                const auto axes = Setpoint(
+                        scale(throttle),
+                        scale(roll),
+                        scale(pitch),
+                        scale(yaw));
 
-                    Data& operator=(const Data& other) = default;
+                const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
 
-                    static auto update(
-                            const Data & data,
-                            const uint16_t throttle,
-                            const uint16_t roll,
-                            const uint16_t pitch,
-                            const uint16_t yaw,
-                            const uint16_t aux,
-                            const uint32_t msec_curr) -> Data
-                    {
-                        const auto axes = Setpoint(
-                                scale(throttle),
-                                scale(roll),
-                                scale(pitch),
-                                scale(yaw));
+                // Push-button arming; ignores startup transient
+                const auto did_aux_change = data.aux >= 988 && aux != data.aux;
 
-                        const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
+                const auto is_armed = 
+                    did_aux_change && data.is_armed ? false :
+                    did_aux_change && data.is_throttle_down ? true :
+                    data.is_armed;
 
-                        // Push-button arming; ignores startup transient
-                        const auto did_aux_change = data.aux >= 988 && aux != data.aux;
+                return ReceiverData(axes, is_armed, is_throttle_down, aux, msec_curr);
+            }
 
-                        const auto is_armed = 
-                            did_aux_change && data.is_armed ? false :
-                            did_aux_change && data.is_throttle_down ? true :
-                            data.is_armed;
+            static auto checkTimeout(const ReceiverData & data,
+                    const uint32_t msec_curr) -> ReceiverData
+            {
+                const auto timed_out = 
+                    data.msec_prev > 0 &&
+                    msec_curr > data.msec_prev &&
+                    msec_curr - data.msec_prev > TIMEOUT_MSEC;
 
-                        return Data(axes, is_armed, is_throttle_down, aux, msec_curr);
-                    }
+                const auto is_armed = timed_out ? false : data.is_armed;
 
-                    static auto checkTimeout(const Data & data,
-                            const uint32_t msec_curr) -> Data
-                    {
-                        const auto timed_out = 
-                            data.msec_prev > 0 &&
-                            msec_curr > data.msec_prev &&
-                            msec_curr - data.msec_prev > TIMEOUT_MSEC;
+                return ReceiverData(data.axes, is_armed,
+                        data.is_throttle_down, data.aux, data.msec_prev);
+            } 
 
-                        const auto is_armed = timed_out ? false : data.is_armed;
+            static void report(const ReceiverData & data)
+            {
+                static uint32_t _count;
 
-                        return Data(data.axes, is_armed,
-                                data.is_throttle_down, data.aux, data.msec_prev);
-                    } 
+                const auto ax = data.axes;
 
-                private:
+                printf("%5lu | armed=%d | throt_down=%d | "
+                        "throt=%+3.3f roll=%+3.3f pitch=%3.3f "
+                        "yaw=%+3.3f\n",
+                        _count++, data.is_armed,
+                        data.is_throttle_down, 
+                        ax.thrust, ax.roll, ax.pitch, ax.yaw);
+            }
 
-                    uint16_t aux;
-                    uint32_t msec_prev;
+        private:
 
-                    static auto scale(const uint16_t val) -> float
-                    {
-                        return 2 * (val - 1500.f) / 1024;
-                    }
+            uint16_t aux;
+            uint32_t msec_prev;
 
-            }; // Data::Data
+            static auto scale(const uint16_t val) -> float
+            {
+                return 2 * (val - 1500.f) / 1024;
+            }
 
-            static void begin();
-
-            static auto read() -> Data;
-
-    }; // receiver
+    };
 }

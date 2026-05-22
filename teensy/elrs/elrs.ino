@@ -1,5 +1,5 @@
 /*
-   Hackflight main sketch for Teensy
+   Hackflight main sketch for Teensy using ELRS receiver
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -25,15 +25,19 @@
 #include <firmware/receiver.hpp>
 using namespace hf;
 
+static QuadCore _core;
+
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static Receiver::Data _rxdata;
+static ReceiverData _rxdata;
+
+static StabilizerPid _stabilizerPid;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
-        _rxdata = Receiver::Data::update(
+        _rxdata = ReceiverData::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -44,57 +48,41 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
     }
 }
 
-void Receiver::begin()
+void setup()
 {
+    // Start receiver
     if (!_crsf.begin()) {
         _crsf.end();
         Debugger::reportForever("Unable to start ELRS receiver");
     }
-
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
-}
 
-auto Receiver::read() -> Receiver::Data
-{
-    _crsf.update();
-
-    return _rxdata;
-}
-static QuadCore _core;
-
-void setup()
-{
-    Receiver::begin();
-
+    // Start core sensors
     _core.begin();
 }
 
 void loop()
 {
-    static StabilizerPid _stabilizerPid;
-
+    // Read core sensors and do sensor fusion
     _core.getState();
 
-    auto rxdata = Receiver::read();
+    // This will trigger onReceiveRcChannels() above
+    _crsf.update();
 
     // Disable arming while gyro is calibrating
-    rxdata = _core.isGyroCalibrated ? rxdata : Receiver::Data();
+    _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
 
     // Check receiver timeout
-    rxdata = Receiver::Data::checkTimeout(rxdata, millis());
+    _rxdata = ReceiverData::checkTimeout(_rxdata, millis());
 
-    const auto isArmed = rxdata.is_armed;
-
-    const auto setpoint = mksetpoint(rxdata.axes);
-
+    // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
             _stabilizerPid,
-            !rxdata.is_throttle_down,
+            !_rxdata.is_throttle_down,
             Timer::getDt(),
             _core.state,
-            setpoint);
+            mksetpoint(_rxdata.axes));
 
-    const auto pidSetpoint = _stabilizerPid.setpoint;
-
-    _core.runMotors(isArmed, pidSetpoint);
+    // Run motor mixer and motors
+    _core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);
 }
