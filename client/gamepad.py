@@ -64,11 +64,11 @@ class Gamepad:
             print(devname + ' not supported')
             exit(0)
 
-        thread = Thread(target=self.threadfun, args=(self.gamepad_vals, ))
+        thread = Thread(target=self._threadfun, args=(self.gamepad_vals, ))
         thread.daemon = True
         thread.start()
 
-    def threadfun(self, vals):
+    def _threadfun(self, vals):
 
         arming_prev = 0
         hover_prev = 0
@@ -150,18 +150,18 @@ class Gamepad:
         port, serializer = self.comms
 
         if self.armed != self.was_armed:
-            serializer.serialize_SET_ARMING(self.armed)
+            port.write(serializer.serialize_SET_ARMING(self.armed))
             self.was_armed = self.armed
 
         if not self.armed:
             self.hovering = False
 
         if self.hovering:
-            serializer.serialize_SET_HOVER(
-                self.thrust, self.vx, self.vy, self.yawrate)
+            port.write(serializer.serialize_SET_HOVER(
+                self.thrust, self.vx, self.vy, self.yawrate))
 
         else:
-            serializer.serialize_SET_IDLE()
+            port.write(serializer.serialize_SET_IDLE())
 
     def _debug(self):
 

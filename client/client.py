@@ -49,10 +49,11 @@ def main():
     thread.daemon = True
     thread.start()
 
+    # Launch the gamepad UI thread
     gamepad = Gamepad((telemetry.port, serializer))
 
+    # Run the gamepad main (comms) thread
     while gamepad.connected:
-
         gamepad.step()
 
 
