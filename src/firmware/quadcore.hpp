@@ -106,7 +106,13 @@ namespace hf {
                 const auto isArmed =
                     checkTimeout(millis(), rxMsecPrev, rxRequestedArming);
 
-                _mode = Safety::updateMode(state, isArmed, _imuFilter, _mode);
+                _mode = Safety::updateMode(
+                        state,
+                        isArmed,
+                        millis(),
+                        rxMsecPrev,
+                        _imuFilter,
+                        _mode);
 
                 //_debugger.report(_mode);
 

@@ -27,19 +27,23 @@ namespace hf {
 
             static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
 
+            static constexpr uint32_t TIMEOUT_MSEC = 500;
+
         public:
 
             static auto updateMode(
                     const VehicleState & state,
-                    const bool rxRequestedArming,
+                    const bool isArmed,
+                    const uint32_t msecCurr,
+                    const uint32_t rxMsecPrev,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
-                    rxRequestedArming && imufilt.isGyroCalibrated ? MODE_ARMED :
-                    mode == MODE_ARMED && !rxRequestedArming ? MODE_IDLE :
+                    isArmed && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode == MODE_ARMED && !isArmed ? MODE_IDLE :
                     mode;
             }
 
@@ -55,5 +59,18 @@ namespace hf {
             {
                 return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
             }
+
+            static auto checkTimeout(
+                    const uint32_t msec_curr,
+                    const uint32_t msec_prev,
+                    const bool is_armed) -> bool
+            {
+                const auto timed_out = 
+                    msec_prev > 0 &&
+                    msec_curr > msec_prev &&
+                    msec_curr - msec_prev > TIMEOUT_MSEC;
+
+                return timed_out ? false : is_armed;
+            } 
     };
 }
