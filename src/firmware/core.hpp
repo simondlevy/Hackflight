@@ -67,34 +67,39 @@ namespace hf {
             {
                 const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
+                // Blink IMU to indicate status
                 _led.blink(isGyroCalibrated);
 
+                // Read the raw IMU data
                 const auto imuraw = _imu.read();
 
+                // Filter the raw IMU data
                 _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
                         _imu.gyroRangeDps(), _imu.accelRangeGs());
 
-                // Run the system dynamics to predict the state forward.
+                // Periodically run the EKF prediction step
                 if (_ekfPredictionTimer.ready()) {
                     _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
                 }
 
-                // Faster EKF update with IMU readings
+                // Do EKF fast-update with IMU readings
                 _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
                 // Get vehicle state from EKF
                 state = EKF::getVehicleState(_ekf);
 
-                // Send telemetry periodically
+                // Periodically send telemetry
                 if (_telemetryTimer.ready()) {
                     sendTelemetry(state);
                 }
 
+                // Run safety checks
                 _mode = Safety::updateMode(millis(), state, isGyroCalibrated, 
                         rxRequestedArming, rxMsecPrev, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
 
+                // Periodically run flying check to get status for EKF
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
                             motorvals, motorcount);
@@ -113,10 +118,12 @@ namespace hf {
 
         private:
 
+            // idle, armed, etc.
+            mode_e _mode;
+
             // Computation
             ImuFilter _imuFilter;
             EKF _ekf;
-            mode_e _mode;
             FlyingCheck _flyingCheck;
 
             // Devices
