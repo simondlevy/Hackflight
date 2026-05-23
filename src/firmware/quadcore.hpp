@@ -102,17 +102,8 @@ namespace hf {
                     const bool rxRequestedArming,
                     const Setpoint & pidSetpoint)
             {
-                // Check receiver timeout
-                const auto isArmed =
-                    checkTimeout(millis(), rxMsecPrev, rxRequestedArming);
-
-                _mode = Safety::updateMode(
-                        state,
-                        isArmed,
-                        millis(),
-                        rxMsecPrev,
-                        _imuFilter,
-                        _mode);
+                _mode = Safety::updateMode(state, rxRequestedArming, millis(),
+                        rxMsecPrev, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
 

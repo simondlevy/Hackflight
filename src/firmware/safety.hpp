@@ -33,12 +33,16 @@ namespace hf {
 
             static auto updateMode(
                     const VehicleState & state,
-                    const bool isArmed,
+                    const bool rxRequestedArming,
                     const uint32_t msecCurr,
                     const uint32_t rxMsecPrev,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
+                // Check receiver timeout
+                const auto isArmed =
+                    checkTimeout(msecCurr, rxMsecPrev, rxRequestedArming);
+
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
