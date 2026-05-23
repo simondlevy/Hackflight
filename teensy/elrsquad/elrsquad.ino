@@ -1,5 +1,5 @@
 /*
-   Hackflight main sketch for Teensy using ELRS receiver
+   Hackflight main sketch for Teensy quadcopter using ELRS receiver
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -76,10 +76,10 @@ void loop()
     _crsf.update();
 
     // Disable arming while gyro is calibrating
-    _rxdata = _core._core.isGyroCalibrated ? _rxdata : ReceiverData();
+    const auto is_armed = _core._core.isGyroCalibrated ? _rxdata.is_armed : false;
 
     // Read core sensors and do sensor fusion
-    _core.update(_rxdata.msec_prev, _rxdata.is_armed);
+    _core.update(_rxdata.msec_prev, is_armed);
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
