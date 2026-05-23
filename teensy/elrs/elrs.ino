@@ -59,15 +59,17 @@ static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
             receiver_setpoint.yaw);
 }
 
-static auto checkTimeout(const ReceiverData & data,
-        const uint32_t msec_curr) -> bool
+static auto checkTimeout(
+        const uint32_t msec_curr,
+        const uint32_t msec_prev,
+        const bool is_armed) -> bool
 {
     const auto timed_out = 
-        data.msec_prev > 0 &&
-        msec_curr > data.msec_prev &&
-        msec_curr - data.msec_prev > TIMEOUT_MSEC;
+        msec_prev > 0 &&
+        msec_curr > msec_prev &&
+        msec_curr - msec_prev > TIMEOUT_MSEC;
 
-    return timed_out ? false : data.is_armed;
+    return timed_out ? false : is_armed;
 } 
 
 
@@ -96,7 +98,8 @@ void loop()
     _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
 
     // Check receiver timeout
-    const auto is_armed = checkTimeout(_rxdata, millis());
+    const auto is_armed =
+        checkTimeout(millis(), _rxdata.msec_prev, _rxdata.is_armed);
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
