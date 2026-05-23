@@ -65,7 +65,9 @@ namespace hf {
                     const uint32_t rxMsecPrev, const bool rxRequestedArming,
                     const float * motorvals, const uint8_t motorcount)
             {
-                _led.blink(_imuFilter.isGyroCalibrated);
+                const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
+
+                _led.blink(isGyroCalibrated);
 
                 const auto imuraw = _imu.read();
 
@@ -88,13 +90,8 @@ namespace hf {
                     sendTelemetry(state);
                 }
 
-                isGyroCalibrated = _imuFilter.isGyroCalibrated;
-
-                // Disable arming while gyro is calibrating
-                const auto is_armed = isGyroCalibrated ? rxRequestedArming : false;
-
-                _mode = Safety::updateMode(state, is_armed, millis(),
-                        rxMsecPrev, _imuFilter, _mode);
+                _mode = Safety::updateMode(millis(), state, isGyroCalibrated, 
+                        rxRequestedArming, rxMsecPrev, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
 
@@ -131,9 +128,6 @@ namespace hf {
             Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
             Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
-
-            // Safety
-            bool isGyroCalibrated;
 
             // Debugging / profiling
             Debugger _debugger;

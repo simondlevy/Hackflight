@@ -32,16 +32,20 @@ namespace hf {
         public:
 
             static auto updateMode(
-                    const VehicleState & state,
-                    const bool rxRequestedArming,
                     const uint32_t msecCurr,
+                    const VehicleState & state,
+                    const bool isGyroCalibrated,
+                    const bool rxRequestedArming,
                     const uint32_t rxMsecPrev,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
+                // Disable arming while gyro is calibrating
+                const auto is_armed = isGyroCalibrated ? rxRequestedArming : false;
+
                 // Check receiver timeout
                 const auto wantArming =
-                    checkFailsafe(msecCurr, rxMsecPrev, rxRequestedArming);
+                    checkFailsafe(msecCurr, rxMsecPrev, is_armed);
 
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
