@@ -21,8 +21,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/newquadcore.hpp>
-#include <firmware/newquadcore.hpp>
+#include <firmware/quadcore.hpp>
 #include <firmware/receiver.hpp>
 using namespace hf;
 

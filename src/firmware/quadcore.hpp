@@ -18,140 +18,52 @@
 
 #pragma once
 
-// Hackflight library
-
-#include <hackflight.h>
-#include <datatypes.hpp>
-#include <firmware/debugging.hpp>
-#include <firmware/flying.hpp>
-#include <firmware/ekf/ekf.hpp>
-#include <firmware/imu/filter.hpp>
-#include <firmware/imu/sensor.hpp>
-#include <firmware/led.hpp>
-#include <firmware/msp/__messages__.h>
-#include <firmware/profiling.hpp>
-#include <firmware/safety.hpp>
-#include <firmware/msp/serializer.hpp>
-#include <firmware/timer.hpp>
-#include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/stabilizer.hpp>
-
-#include <mixers/bfquadx.hpp>
+// Third-party libraries
 #include <dshot-teensy4.hpp>  
+
+// Hackflight library
+#include <hackflight.h>
+#include <firmware/core.hpp>
+#include <mixers/bfquadx.hpp>
 
 namespace hf {
 
-    class QuadCore {
-
-        private:
-
-            // Arbitrary
-            static const uint8_t LED_PIN = 9;
-
-            // Rate constants
-            static constexpr float EKF_PREDICTION_RATE_HZ = 100;
-            static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
-            static constexpr float TELEMETRY_RATE_HZ = 50;
+    class NewQuadCore {
 
         public:
 
-            VehicleState state;
-            bool isGyroCalibrated;
+            Core _core;
 
             void begin()
             {
-                Serial1.begin(115200);
-
-                _imu.begin();
-                _led.begin(); 
+                _core.begin();
 
                 _motors.begin(); 
             }
 
             void update(const uint32_t rxMsecPrev, const bool rxRequestedArming)
             {
-                _led.blink(_imuFilter.isGyroCalibrated);
-
-                const auto imuraw = _imu.read();
-
-                _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                        _imu.gyroRangeDps(), _imu.accelRangeGs());
-
-                // Run the system dynamics to predict the state forward.
-                if (_ekfPredictionTimer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
-                }
-
-                // Faster EKF update with IMU readings
-                _ekf = EKF::update(_ekf, _imuFilter.output, millis());
-
-                // Get vehicle state from EKF
-                state = EKF::getVehicleState(_ekf);
-
-                // Send telemetry periodically
-                if (_telemetryTimer.ready()) {
-                    sendTelemetry(state);
-                }
-
-                isGyroCalibrated = _imuFilter.isGyroCalibrated;
-
-                _mode = Safety::updateMode(state, rxRequestedArming, millis(),
-                        rxMsecPrev, _imuFilter, _mode);
-
-                //_debugger.report(_mode);
+                _core.update(rxMsecPrev, rxRequestedArming,
+                        _mixer.motorvals, 4);
             } 
 
             void runMotors(const Setpoint & pidSetpoint)
             {
                 _mixer = Mixer::run(_mixer, pidSetpoint);
 
-                if (_mode != MODE_PANIC) {
-                    _motors.run(_mode != MODE_IDLE, _mixer.motorvals);
+                if (_core.isSafeToFly()) {
+                    _motors.run(_core.isArmed(), _mixer.motorvals);
                 }
-
-                if (_flyingCheckTimer.ready()) {
-                    _flyingCheck = FlyingCheck::run( _flyingCheck, millis(),
-                            _mixer.motorvals, _mixer.motorcount);
-                }
-            }
+             }
 
         private:
 
             // Computation
-            ImuFilter _imuFilter;
             Mixer _mixer;
-            EKF _ekf;
-            mode_e _mode;
-            FlyingCheck _flyingCheck;
 
             // Devices
-            IMU _imu;
-            LED _led = LED(LED_PIN);
             DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-            // Timers
-            Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
-            Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
-            Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
-
-            // Debugging / profiling
-            Debugger _debugger;
-            Profiler _profiler;
-
-            void sendTelemetry(const VehicleState & state)
-            {
-                static MspSerializer _serializer;
-
-                _serializer = MspSerializer::serializeFloats(
-                        _serializer, MSP_STATE, (float *)&state, 10);
-
-                Serial1.write(
-                        MspSerializer::payloadBytes(_serializer),
-                        MspSerializer::payloadSize(_serializer));
-            }
-
-    }; // class QuadCore
+    }; // class NewQuadCore
 
 } // namespace hf
