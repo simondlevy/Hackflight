@@ -28,7 +28,7 @@
 
 namespace hf {
 
-    class NewQuadCore {
+    class QuadCore {
 
         public:
 

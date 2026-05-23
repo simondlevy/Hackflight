@@ -25,7 +25,7 @@
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static NewQuadCore _core;
+static QuadCore _core;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 

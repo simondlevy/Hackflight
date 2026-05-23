@@ -1,5 +1,5 @@
 /*
-   Hackflight core firmware for quadcopter
+   Hackflight core firmware
 
    Copyright (C) 2026 Simon D. Levy
 
