@@ -47,6 +47,8 @@ namespace hf {
             // Arbitrary
             static const uint8_t LED_PIN = 9;
 
+            static constexpr uint32_t TIMEOUT_MSEC = 500;
+
             // Rate constants
             static constexpr float EKF_PREDICTION_RATE_HZ = 100;
             static constexpr float FLYING_CHECK_RATE_HZ   = 25;
@@ -95,8 +97,15 @@ namespace hf {
                 isGyroCalibrated = _imuFilter.isGyroCalibrated;
             } 
 
-            void runMotors(const bool isArmed, const Setpoint & pidSetpoint)
+            void runMotors(
+                    const uint32_t rx_msec_prev,
+                    const bool rx_is_armed,
+                    const Setpoint & pidSetpoint)
             {
+                // Check receiver timeout
+                const auto isArmed =
+                    checkTimeout(millis(), rx_msec_prev, rx_is_armed);
+
                 _mode = Safety::updateMode(state, isArmed, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
@@ -148,6 +157,20 @@ namespace hf {
                         MspSerializer::payloadBytes(_serializer),
                         MspSerializer::payloadSize(_serializer));
             }
+
+            static auto checkTimeout(
+                    const uint32_t msec_curr,
+                    const uint32_t msec_prev,
+                    const bool is_armed) -> bool
+            {
+                const auto timed_out = 
+                    msec_prev > 0 &&
+                    msec_curr > msec_prev &&
+                    msec_curr - msec_prev > TIMEOUT_MSEC;
+
+                return timed_out ? false : is_armed;
+            } 
+
 
     }; // class QuadCore
 

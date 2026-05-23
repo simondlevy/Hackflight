@@ -25,8 +25,6 @@
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static constexpr uint32_t TIMEOUT_MSEC = 500;
-
 static QuadCore _core;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
@@ -59,20 +57,6 @@ static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
             receiver_setpoint.yaw);
 }
 
-static auto checkTimeout(
-        const uint32_t msec_curr,
-        const uint32_t msec_prev,
-        const bool is_armed) -> bool
-{
-    const auto timed_out = 
-        msec_prev > 0 &&
-        msec_curr > msec_prev &&
-        msec_curr - msec_prev > TIMEOUT_MSEC;
-
-    return timed_out ? false : is_armed;
-} 
-
-
 void setup()
 {
     // Start receiver
@@ -97,10 +81,6 @@ void loop()
     // Disable arming while gyro is calibrating
     _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
 
-    // Check receiver timeout
-    const auto is_armed =
-        checkTimeout(millis(), _rxdata.msec_prev, _rxdata.is_armed);
-
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
             _stabilizerPid,
@@ -110,5 +90,8 @@ void loop()
             mksetpoint(_rxdata.axes));
 
     // Run motor mixer and motors
-    _core.runMotors(is_armed, _stabilizerPid.setpoint);
+    _core.runMotors(
+            _rxdata.msec_prev,
+            _rxdata.is_armed,
+            _stabilizerPid.setpoint);
 }
