@@ -101,12 +101,8 @@ namespace hf {
 
                 const auto ax = data.axes;
 
-                printf("%5lu | armed=%d | throt_down=%d | "
-                        "throt=%+3.3f roll=%+3.3f pitch=%3.3f "
-                        "yaw=%+3.3f\n",
-                        _count++, data.is_armed,
-                        data.is_throttle_down, 
-                        ax.thrust, ax.roll, ax.pitch, ax.yaw);
+                printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
+                        _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw);
             }
 
         private:

@@ -99,6 +99,8 @@ namespace hf {
             {
                 _mode = Safety::updateMode(state, isArmed, _imuFilter, _mode);
 
+                //_debugger.report(_mode);
+
                 _mixer = Mixer::run(_mixer, pidSetpoint);
 
                 if (_mode != MODE_PANIC) {

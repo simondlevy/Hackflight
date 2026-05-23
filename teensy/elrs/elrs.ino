@@ -84,6 +84,8 @@ void loop()
     // Check receiver timeout
     _rxdata = ReceiverData::checkTimeout(_rxdata, millis());
 
+    //ReceiverData::report(_rxdata);
+
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
             _stabilizerPid,
