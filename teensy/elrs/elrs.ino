@@ -60,17 +60,14 @@ static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
 }
 
 static auto checkTimeout(const ReceiverData & data,
-        const uint32_t msec_curr) -> ReceiverData
+        const uint32_t msec_curr) -> bool
 {
     const auto timed_out = 
         data.msec_prev > 0 &&
         msec_curr > data.msec_prev &&
         msec_curr - data.msec_prev > TIMEOUT_MSEC;
 
-    const auto is_armed = timed_out ? false : data.is_armed;
-
-    return ReceiverData(data.axes, is_armed,
-            data.is_throttle_down, data.aux, data.msec_prev);
+    return timed_out ? false : data.is_armed;
 } 
 
 
@@ -99,7 +96,7 @@ void loop()
     _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
 
     // Check receiver timeout
-    _rxdata = checkTimeout(_rxdata, millis());
+    const auto is_armed = checkTimeout(_rxdata, millis());
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
@@ -110,5 +107,5 @@ void loop()
             mksetpoint(_rxdata.axes));
 
     // Run motor mixer and motors
-    _core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);
+    _core.runMotors(is_armed, _stabilizerPid.setpoint);
 }
