@@ -75,11 +75,8 @@ void loop()
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
 
-    // Disable arming while gyro is calibrating
-    const auto is_armed = _core._core.isGyroCalibrated ? _rxdata.is_armed : false;
-
     // Read core sensors and do sensor fusion
-    _core.update(_rxdata.msec_prev, is_armed);
+    _core.update(_rxdata.msec_prev, _rxdata.is_armed);
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(

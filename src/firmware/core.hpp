@@ -52,7 +52,6 @@ namespace hf {
         public:
 
             VehicleState state;
-            bool isGyroCalibrated;
 
             void begin()
             {
@@ -91,10 +90,13 @@ namespace hf {
 
                 isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
-                _mode = Safety::updateMode(state, rxRequestedArming, millis(),
+                // Disable arming while gyro is calibrating
+                const auto is_armed = isGyroCalibrated ? rxRequestedArming : false;
+
+                _mode = Safety::updateMode(state, is_armed, millis(),
                         rxMsecPrev, _imuFilter, _mode);
 
-                 //_debugger.report(_mode);
+                //_debugger.report(_mode);
 
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
@@ -129,6 +131,9 @@ namespace hf {
             Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
             Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
+
+            // Safety
+            bool isGyroCalibrated;
 
             // Debugging / profiling
             Debugger _debugger;
