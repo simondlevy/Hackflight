@@ -72,14 +72,14 @@ void setup()
 
 void loop()
 {
-    // Read core sensors and do sensor fusion
-    _core.getState();
-
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
 
     // Disable arming while gyro is calibrating
     _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
+
+    // Read core sensors and do sensor fusion
+    _core.update(_rxdata.msec_prev, _rxdata.is_armed);
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
@@ -90,8 +90,5 @@ void loop()
             mksetpoint(_rxdata.axes));
 
     // Run motor mixer and motors
-    _core.runMotors(
-            _rxdata.msec_prev,
-            _rxdata.is_armed,
-            _stabilizerPid.setpoint);
+    _core.runMotors(_stabilizerPid.setpoint);
 }

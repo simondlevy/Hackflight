@@ -16,8 +16,6 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Third-party libraries
-#include <dshot-teensy4.hpp>  
 
 // Hackflight library
 
@@ -34,9 +32,11 @@
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
-#include <mixers/bfquadx.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
+
+#include <mixers/bfquadx.hpp>
+#include <dshot-teensy4.hpp>  
 
 namespace hf {
 
@@ -63,11 +63,12 @@ namespace hf {
                 Serial1.begin(115200);
 
                 _imu.begin();
-                _motors.begin(); 
                 _led.begin(); 
+
+                _motors.begin(); 
             }
 
-            void getState()
+            void update(const uint32_t rxMsecPrev, const bool rxRequestedArming)
             {
                 _led.blink(_imuFilter.isGyroCalibrated);
 
@@ -93,18 +94,15 @@ namespace hf {
                 }
 
                 isGyroCalibrated = _imuFilter.isGyroCalibrated;
-            } 
 
-            void runMotors(
-                    const uint32_t rxMsecPrev,
-                    const bool rxRequestedArming,
-                    const Setpoint & pidSetpoint)
-            {
                 _mode = Safety::updateMode(state, rxRequestedArming, millis(),
                         rxMsecPrev, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
+            } 
 
+            void runMotors(const Setpoint & pidSetpoint)
+            {
                 _mixer = Mixer::run(_mixer, pidSetpoint);
 
                 if (_mode != MODE_PANIC) {
@@ -112,8 +110,8 @@ namespace hf {
                 }
 
                 if (_flyingCheckTimer.ready()) {
-                    _flyingCheck = FlyingCheck::run(
-                            _flyingCheck, millis(), _mixer.motorvals, 4);
+                    _flyingCheck = FlyingCheck::run( _flyingCheck, millis(),
+                            _mixer.motorvals, _mixer.motorcount);
                 }
             }
 
