@@ -98,13 +98,13 @@ namespace hf {
             } 
 
             void runMotors(
-                    const uint32_t rx_msec_prev,
-                    const bool rx_is_armed,
+                    const uint32_t rxMsecPrev,
+                    const bool rxRequestedArming,
                     const Setpoint & pidSetpoint)
             {
                 // Check receiver timeout
                 const auto isArmed =
-                    checkTimeout(millis(), rx_msec_prev, rx_is_armed);
+                    checkTimeout(millis(), rxMsecPrev, rxRequestedArming);
 
                 _mode = Safety::updateMode(state, isArmed, _imuFilter, _mode);
 
@@ -113,7 +113,7 @@ namespace hf {
                 _mixer = Mixer::run(_mixer, pidSetpoint);
 
                 if (_mode != MODE_PANIC) {
-                    _motors.run(isArmed, _mixer.motorvals);
+                    _motors.run(_mode != MODE_IDLE, _mixer.motorvals);
                 }
 
                 if (_flyingCheckTimer.ready()) {

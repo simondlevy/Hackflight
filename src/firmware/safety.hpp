@@ -31,15 +31,15 @@ namespace hf {
 
             static auto updateMode(
                     const VehicleState & state,
-                    const bool didToggleArming,
+                    const bool rxRequestedArming,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
-                    didToggleArming && imufilt.isGyroCalibrated ? MODE_ARMED :
-                    mode == MODE_ARMED && !didToggleArming ? MODE_IDLE :
+                    rxRequestedArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode == MODE_ARMED && !rxRequestedArming ? MODE_IDLE :
                     mode;
             }
 
