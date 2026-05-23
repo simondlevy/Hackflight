@@ -26,8 +26,6 @@ namespace hf {
 
         private:
 
-            static constexpr uint32_t TIMEOUT_MSEC = 500;
-
             static constexpr float THROTTLE_DOWN_MAX = -0.95;
 
         public:
@@ -35,6 +33,8 @@ namespace hf {
             Setpoint axes;
             bool is_armed;
             bool is_throttle_down;
+            uint16_t aux;
+            uint32_t msec_prev;
 
             ReceiverData() = default;
 
@@ -81,20 +81,6 @@ namespace hf {
                 return ReceiverData(axes, is_armed, is_throttle_down, aux, msec_curr);
             }
 
-            static auto checkTimeout(const ReceiverData & data,
-                    const uint32_t msec_curr) -> ReceiverData
-            {
-                const auto timed_out = 
-                    data.msec_prev > 0 &&
-                    msec_curr > data.msec_prev &&
-                    msec_curr - data.msec_prev > TIMEOUT_MSEC;
-
-                const auto is_armed = timed_out ? false : data.is_armed;
-
-                return ReceiverData(data.axes, is_armed,
-                        data.is_throttle_down, data.aux, data.msec_prev);
-            } 
-
             static void report(const ReceiverData & data)
             {
                 static uint32_t _count;
@@ -106,9 +92,6 @@ namespace hf {
             }
 
         private:
-
-            uint16_t aux;
-            uint32_t msec_prev;
 
             static auto scale(const uint16_t val) -> float
             {

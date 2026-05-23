@@ -25,6 +25,8 @@
 #include <firmware/receiver.hpp>
 using namespace hf;
 
+static constexpr uint32_t TIMEOUT_MSEC = 500;
+
 static QuadCore _core;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
@@ -57,6 +59,21 @@ static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
             receiver_setpoint.yaw);
 }
 
+static auto checkTimeout(const ReceiverData & data,
+        const uint32_t msec_curr) -> ReceiverData
+{
+    const auto timed_out = 
+        data.msec_prev > 0 &&
+        msec_curr > data.msec_prev &&
+        msec_curr - data.msec_prev > TIMEOUT_MSEC;
+
+    const auto is_armed = timed_out ? false : data.is_armed;
+
+    return ReceiverData(data.axes, is_armed,
+            data.is_throttle_down, data.aux, data.msec_prev);
+} 
+
+
 void setup()
 {
     // Start receiver
@@ -82,9 +99,7 @@ void loop()
     _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
 
     // Check receiver timeout
-    _rxdata = ReceiverData::checkTimeout(_rxdata, millis());
-
-    //ReceiverData::report(_rxdata);
+    _rxdata = checkTimeout(_rxdata, millis());
 
     // Run stabilizer PID control
     _stabilizerPid = StabilizerPid::run(
