@@ -25,9 +25,9 @@ namespace hf {
 
         private:
 
-            static constexpr float TILT_ANGLE_FLIPPED_MIN = 75;
+            static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
 
-            static constexpr uint32_t TIMEOUT_MSEC = 500;
+            static constexpr uint32_t FAILSAFE_MSEC = 500;
 
         public:
 
@@ -40,14 +40,14 @@ namespace hf {
                     const mode_e mode) -> mode_e
             {
                 // Check receiver timeout
-                const auto isArmed =
-                    checkTimeout(msecCurr, rxMsecPrev, rxRequestedArming);
+                const auto wantArming =
+                    checkFailsafe(msecCurr, rxMsecPrev, rxRequestedArming);
 
                 return 
                     mode == MODE_PANIC ? MODE_PANIC : // can't recover from this
                     isFlipped(state) ? MODE_PANIC :
-                    isArmed && imufilt.isGyroCalibrated ? MODE_ARMED :
-                    mode == MODE_ARMED && !isArmed ? MODE_IDLE :
+                    wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode == MODE_ARMED && !wantArming ? MODE_IDLE :
                     mode;
             }
 
@@ -61,10 +61,10 @@ namespace hf {
 
             static auto isFlippedAngle(const float angle) -> bool
             {
-                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN;
+                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
             }
 
-            static auto checkTimeout(
+            static auto checkFailsafe(
                     const uint32_t msec_curr,
                     const uint32_t msec_prev,
                     const bool is_armed) -> bool
@@ -72,7 +72,7 @@ namespace hf {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
-                    msec_curr - msec_prev > TIMEOUT_MSEC;
+                    msec_curr - msec_prev > FAILSAFE_MSEC;
 
                 return timed_out ? false : is_armed;
             } 
