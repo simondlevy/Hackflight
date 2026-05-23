@@ -21,11 +21,12 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/quadcore.hpp>
+#include <firmware/newquadcore.hpp>
+#include <firmware/newquadcore.hpp>
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static QuadCore _core;
+static NewQuadCore _core;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
@@ -76,7 +77,7 @@ void loop()
     _crsf.update();
 
     // Disable arming while gyro is calibrating
-    _rxdata = _core.isGyroCalibrated ? _rxdata : ReceiverData();
+    _rxdata = _core._core.isGyroCalibrated ? _rxdata : ReceiverData();
 
     // Read core sensors and do sensor fusion
     _core.update(_rxdata.msec_prev, _rxdata.is_armed);
@@ -86,7 +87,7 @@ void loop()
             _stabilizerPid,
             !_rxdata.is_throttle_down,
             Timer::getDt(),
-            _core.state,
+            _core._core.state,
             mksetpoint(_rxdata.axes));
 
     // Run motor mixer and motors

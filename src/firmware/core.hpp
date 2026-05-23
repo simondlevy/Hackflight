@@ -18,8 +18,6 @@
 
 #pragma once
 
-// Hackflight library
-
 #include <hackflight.h>
 #include <datatypes.hpp>
 #include <firmware/debugging.hpp>
@@ -36,12 +34,9 @@
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
-#include <mixers/bfquadx.hpp>
-#include <dshot-teensy4.hpp>  
-
 namespace hf {
 
-    class QuadCore {
+    class Core {
 
         private:
 
@@ -65,11 +60,11 @@ namespace hf {
 
                 _imu.begin();
                 _led.begin(); 
-
-                _motors.begin(); 
             }
 
-            void update(const uint32_t rxMsecPrev, const bool rxRequestedArming)
+            void update(
+                    const uint32_t rxMsecPrev, const bool rxRequestedArming,
+                    const float * motorvals, const uint8_t motorcount)
             {
                 _led.blink(_imuFilter.isGyroCalibrated);
 
@@ -99,28 +94,28 @@ namespace hf {
                 _mode = Safety::updateMode(state, rxRequestedArming, millis(),
                         rxMsecPrev, _imuFilter, _mode);
 
-                //_debugger.report(_mode);
-            } 
-
-            void runMotors(const Setpoint & pidSetpoint)
-            {
-                _mixer = Mixer::run(_mixer, pidSetpoint);
-
-                if (_mode != MODE_PANIC) {
-                    _motors.run(_mode != MODE_IDLE, _mixer.motorvals);
-                }
+                 //_debugger.report(_mode);
 
                 if (_flyingCheckTimer.ready()) {
-                    _flyingCheck = FlyingCheck::run( _flyingCheck, millis(),
-                            _mixer.motorvals, _mixer.motorcount);
+                    _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
+                            motorvals, motorcount);
                 }
+            } 
+
+            bool isSafeToFly()
+            {
+                return _mode != MODE_PANIC;
+            }
+
+            bool isArmed()
+            {
+                return _mode != MODE_IDLE;
             }
 
         private:
 
             // Computation
             ImuFilter _imuFilter;
-            Mixer _mixer;
             EKF _ekf;
             mode_e _mode;
             FlyingCheck _flyingCheck;
@@ -128,7 +123,6 @@ namespace hf {
             // Devices
             IMU _imu;
             LED _led = LED(LED_PIN);
-            DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
             // Timers
             Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
@@ -152,6 +146,6 @@ namespace hf {
                         MspSerializer::payloadSize(_serializer));
             }
 
-    }; // class QuadCore
+    }; // class Core
 
 } // namespace hf
