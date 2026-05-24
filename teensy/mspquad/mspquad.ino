@@ -18,6 +18,7 @@
  */
 
 #include <hackflight.h>
+#include <firmware/debugging.hpp>
 #include <firmware/quadcore.hpp>
 #include <firmware/msp/parser.hpp>
 using namespace hf;
@@ -70,10 +71,9 @@ void setup()
 void loop()
 {
     // Read core sensors and do sensor fusion
-    //_core.update(_rxdata.msec_prev, _rxdata.is_armed);
+    _core.update(_message.timestamp, _message.armed);
 
-
-    printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
+    //printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
 
     // Run motor mixer and motors
     //_core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);

@@ -41,10 +41,9 @@ namespace hf {
                 _motors.begin(); 
             }
 
-            void update(const uint32_t rxMsecPrev, const bool rxRequestedArming)
+            auto update(const ReceiverData & rxdata) -> Setpoint
             {
-                _core.update(rxMsecPrev, rxRequestedArming,
-                        _mixer.motorvals, 4);
+                return _core.update(rxdata, _mixer.motorvals, 4);
             } 
 
             void runMotors(const Setpoint & pidSetpoint)

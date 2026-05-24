@@ -21,17 +21,16 @@
 
 // Hackflight library
 #include <hackflight.h>
+#include <firmware/debugging.hpp>
 #include <firmware/quadcore.hpp>
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static QuadCore _core;
+static QuadCore _quadcore;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
 static ReceiverData _rxdata;
-
-static StabilizerPid _stabilizerPid;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
@@ -48,15 +47,6 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
     }
 }
 
-static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
-{
-    return Setpoint(
-            (receiver_setpoint.thrust+1)/2,
-            receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
-            receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
-            receiver_setpoint.yaw);
-}
-
 void setup()
 {
     // Start receiver
@@ -67,7 +57,7 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start core sensors and motors
-    _core.begin();
+    _quadcore.begin();
 }
 
 void loop()
@@ -75,17 +65,9 @@ void loop()
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
 
-    // Read core sensors and do sensor fusion
-    _core.update(_rxdata.msec_prev, _rxdata.is_armed);
+    // Run core algorithm to get setpoint from PID controllers
+    const auto setpoint = _quadcore.update(_rxdata);
 
-    // Run stabilizer PID control
-    _stabilizerPid = StabilizerPid::run(
-            _stabilizerPid,
-            !_rxdata.is_throttle_down,
-            Timer::getDt(),
-            _core._core.state,
-            mksetpoint(_rxdata.axes));
-
-    // Run motor mixer and motors
-    _core.runMotors(_stabilizerPid.setpoint);
+    // Run motor mixer on setpoint
+    _quadcore.runMotors(setpoint);
 }

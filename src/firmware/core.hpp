@@ -27,6 +27,7 @@
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/profiling.hpp>
+#include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
@@ -67,11 +68,12 @@ namespace hf {
 
                 _imu.begin();
                 _led.begin(); 
+
+                _mode = MODE_IDLE;
             }
 
-            void update(
-                    const uint32_t rxMsecPrev, const bool rxRequestedArming,
-                    const float * motorvals, const uint8_t motorcount)
+            auto update(const ReceiverData & rxdata, const float * motorvals,
+                    const uint8_t motorcount) -> Setpoint
             {
                 const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
@@ -103,21 +105,31 @@ namespace hf {
 
                 // Run safety checks
                 _mode = Safety::updateMode(millis(), state, isGyroCalibrated, 
-                        rxRequestedArming, rxMsecPrev, _imuFilter, _mode);
+                        rxdata.is_armed, rxdata.msec_prev, _imuFilter, _mode);
 
                 // Periodically run flying check to get status for EKF
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
                             motorvals, motorcount);
                 }
+
+                // Run stabilizer PID control
+                _stabilizerPid = StabilizerPid::run(
+                        _stabilizerPid,
+                        !rxdata.is_throttle_down,
+                        Timer::getDt(),
+                        state,
+                        mksetpoint(rxdata.axes));
+
+                return _stabilizerPid.setpoint;
             } 
 
-            bool isSafeToFly()
+            auto isSafeToFly() -> bool
             {
                 return _mode != MODE_PANIC;
             }
 
-            bool isArmed()
+            auto isArmed() -> bool
             {
                 return _mode != MODE_IDLE;
             }
@@ -142,6 +154,8 @@ namespace hf {
             Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
 
+            StabilizerPid _stabilizerPid;
+
             void sendTelemetry(const VehicleState & state)
             {
                 static MspSerializer _serializer;
@@ -152,6 +166,15 @@ namespace hf {
                 Serial1.write(
                         MspSerializer::payloadBytes(_serializer),
                         MspSerializer::payloadSize(_serializer));
+            }
+
+            static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
+            {
+                return Setpoint(
+                        (receiver_setpoint.thrust+1)/2,
+                        receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
+                        receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+                        receiver_setpoint.yaw);
             }
 
     }; // class Core
