@@ -74,7 +74,6 @@ namespace hf {
 
     } mode_e;
 
-
     class Setpoint {
 
         public:
@@ -92,4 +91,5 @@ namespace hf {
 
             Setpoint& operator=(const Setpoint& other) = default;
     };
+
 }

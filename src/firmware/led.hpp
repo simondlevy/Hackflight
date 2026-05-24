@@ -19,6 +19,7 @@
 #include <Arduino.h>
 
 #include <hackflight.h>
+#include <firmware/timer.hpp>
 
 namespace hf {
 

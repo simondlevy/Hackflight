@@ -20,7 +20,6 @@
 
 #include <hackflight.h>
 #include <datatypes.hpp>
-#include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
@@ -50,6 +49,15 @@ namespace hf {
             static constexpr float TELEMETRY_RATE_HZ = 50;
 
         public:
+
+            typedef struct {
+
+                uint32_t timestamp;
+                bool armed;
+                bool hovering;
+                Setpoint setpoint;
+
+            } message_t;
 
             VehicleState state;
 
@@ -97,8 +105,6 @@ namespace hf {
                 _mode = Safety::updateMode(millis(), state, isGyroCalibrated, 
                         rxRequestedArming, rxMsecPrev, _imuFilter, _mode);
 
-                //_debugger.report(_mode);
-
                 // Periodically run flying check to get status for EKF
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
@@ -135,10 +141,6 @@ namespace hf {
             Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
             Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
-
-            // Debugging / profiling
-            Debugger _debugger;
-            Profiler _profiler;
 
             void sendTelemetry(const VehicleState & state)
             {

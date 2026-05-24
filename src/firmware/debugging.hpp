@@ -17,6 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/core.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
@@ -54,10 +55,10 @@ namespace hf {
 
         public:
 
-            static void reportForever(const char * message)
+            static void reportForever(const char * errmsg)
             {
                 while (true) {
-                    printf("%s\n", message);
+                    printf("%s\n", errmsg);
                     delay(500);
                 }
             }
@@ -66,7 +67,7 @@ namespace hf {
             {
                 if (_helper.ready()) {
 
-                    static const char * modes[6] = {
+                    static const char * MODENAMES[6] = {
                         "IDLE",
                         "ARMED",
                         "HOVERING",
@@ -75,15 +76,7 @@ namespace hf {
                         "PANIC"
                     };
 
-                    printf("%5lu | mode=%s\n", _helper.count, modes[mode]);
-                }
-            }
-
-            void report(const char * message)
-            {
-                if (_helper.ready()) {
-
-                    printf("%5lu | %s\n", _helper.count, message);
+                    printf("%5lu | mode=%s\n", _helper.count, MODENAMES[mode]);
                 }
             }
 
@@ -134,7 +127,7 @@ namespace hf {
                                 _helper.count, 
                                 state.phi, state.dphi, state.theta, state.dtheta,
                                 state.psi, state.dpsi);
-                     }
+                    }
                 }
             }
 
@@ -186,5 +179,7 @@ namespace hf {
         private:
 
             Helper _helper;
+
+
     };
 }

@@ -24,16 +24,7 @@ using namespace hf;
 
 static QuadCore _core;
 
-typedef struct {
-
-    uint32_t timestamp;
-    bool armed;
-    bool hovering;
-    Setpoint setpoint;
-
-} message_t;
-
-static message_t _message;
+static Core::message_t _message;
 
 void serialEvent1()
 {
@@ -79,7 +70,8 @@ void setup()
 void loop()
 {
     // Read core sensors and do sensor fusion
-    _core.getState();
+    //_core.update(_rxdata.msec_prev, _rxdata.is_armed);
+
 
     printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
 
