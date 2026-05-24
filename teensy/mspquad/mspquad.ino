@@ -23,7 +23,7 @@
 #include <firmware/msp/parser.hpp>
 using namespace hf;
 
-static QuadCore _core;
+static QuadCore _quadcore;
 
 static msp_message_t _message;
 
@@ -65,16 +65,14 @@ void serialEvent1()
 void setup()
 {
     // Start core sensors and motors (this will also start Serial1)
-    _core.begin();
+    _quadcore.begin();
 }
 
 void loop()
 {
-    // Read core sensors and do sensor fusion
-    //_core.update(_message.timestamp, _message.armed);
+    // Run core algorithm to get setpoint from PID controllers
+    const auto setpoint = _quadcore.update(_message);
 
-    //printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
-
-    // Run motor mixer and motors
-    //_core.runMotors(_rxdata.is_armed, _stabilizerPid.setpoint);
+    // Run motor mixer on setpoint
+    _quadcore.runMotors(setpoint);
 }
