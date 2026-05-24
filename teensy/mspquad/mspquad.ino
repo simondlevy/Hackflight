@@ -25,7 +25,7 @@ using namespace hf;
 
 static QuadCore _core;
 
-static Core::message_t _message;
+static msp_message_t _message;
 
 void serialEvent1()
 {
@@ -71,7 +71,7 @@ void setup()
 void loop()
 {
     // Read core sensors and do sensor fusion
-    _core.update(_message.timestamp, _message.armed);
+    //_core.update(_message.timestamp, _message.armed);
 
     //printf("armed=%d hovering=%d\n", _message.armed, _message.hovering);
 

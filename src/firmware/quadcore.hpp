@@ -41,6 +41,11 @@ namespace hf {
                 _motors.begin(); 
             }
 
+            auto update(const msp_message_t & message) -> Setpoint
+            {
+                return _core.update(message, _mixer.motorvals, 4);
+            } 
+
             auto update(const ReceiverData & rxdata) -> Setpoint
             {
                 return _core.update(rxdata, _mixer.motorvals, 4);

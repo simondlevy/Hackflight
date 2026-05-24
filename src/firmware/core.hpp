@@ -19,7 +19,7 @@
 #pragma once
 
 #include <hackflight.h>
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
@@ -50,15 +50,6 @@ namespace hf {
             static constexpr float TELEMETRY_RATE_HZ = 50;
 
         public:
-
-            typedef struct {
-
-                uint32_t timestamp;
-                bool armed;
-                bool hovering;
-                Setpoint setpoint;
-
-            } message_t;
 
             VehicleState state;
 
@@ -122,6 +113,12 @@ namespace hf {
                         mksetpoint(rxdata.axes));
 
                 return _stabilizerPid.setpoint;
+            } 
+
+            auto update(const msp_message_t & message, const float * motorvals,
+                    const uint8_t motorcount) -> Setpoint
+            {
+                return Setpoint(0, 0, 0, 0); // XXX
             } 
 
             auto isSafeToFly() -> bool
