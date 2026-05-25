@@ -80,6 +80,9 @@ namespace hf {
             auto update(const msp_message_t & message, const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                update(message.armed, message.timestamp, motorvals,
+                        motorcount);
+
                 return Setpoint(0, 0, 0, 0); // XXX
             } 
 
