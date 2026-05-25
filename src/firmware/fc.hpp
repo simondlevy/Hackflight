@@ -97,11 +97,6 @@ namespace hf {
                 return _mode != MODE_IDLE;
             }
 
-            auto getState() -> VehicleState
-            {
-                return _state;
-            }
-
         private:
 
             // Vehicle state

@@ -60,6 +60,11 @@ namespace hf {
                 }
              }
 
+            auto getState() -> VehicleState
+            {
+                return _fc._state;
+            }
+
         private:
 
             // Computation
