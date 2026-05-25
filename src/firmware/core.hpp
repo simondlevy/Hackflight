@@ -31,8 +31,7 @@
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/timer.hpp>
-#include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/stabilizer.hpp>
+#include <pidcontrol/new_pidcontrol.hpp>
 
 namespace hf {
 
