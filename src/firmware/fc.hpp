@@ -37,6 +37,8 @@ namespace hf {
 
     class FC {
 
+        friend class QuadFC;
+
         private:
 
             // Arbitrary
@@ -48,7 +50,7 @@ namespace hf {
             static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
             static constexpr float TELEMETRY_RATE_HZ = 50;
 
-        public:
+        protected:
 
             void begin()
             {
@@ -93,6 +95,11 @@ namespace hf {
             auto isArmed() -> bool
             {
                 return _mode != MODE_IDLE;
+            }
+
+            auto getState() -> VehicleState
+            {
+                return _state;
             }
 
         private:
