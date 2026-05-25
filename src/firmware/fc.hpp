@@ -26,10 +26,14 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
+#include <firmware/opticalflow/filter.hpp>
+#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
 #include <firmware/msp/serializer.hpp>
+#include <firmware/zranger/filter.hpp>
+#include <firmware/zranger/sensor.hpp>
 #include <firmware/timer.hpp>
 #include <pidcontrol/new_pidcontrol.hpp>
 
@@ -48,12 +52,17 @@ namespace hf {
         static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
         static constexpr float TELEMETRY_RATE_HZ = 50;
 
-        void begin()
+        void begin(const bool useHoverdeck=false)
         {
             Serial1.begin(115200);
 
             _imu.begin();
             _led.begin(); 
+
+            if (useHoverdeck) {
+                _zranger.begin();
+                _flowsensor.begin();
+            }
 
             _mode = MODE_IDLE;
         }
@@ -78,7 +87,7 @@ namespace hf {
                 const uint8_t motorcount) -> Setpoint
         {
             update(message.is_armed, message.timestamp_msec, motorvals,
-                    motorcount);
+                    motorcount, true);
 
             return Setpoint(0, 0, 0, 0); // XXX
         } 
@@ -107,6 +116,8 @@ namespace hf {
         // Devices
         IMU _imu;
         LED _led = LED(LED_PIN);
+        ZRanger _zranger;
+        OpticalFlowSensor _flowsensor;
 
         // Timers
         Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
@@ -114,13 +125,18 @@ namespace hf {
         Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
         Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
 
+        // Hover-deck support
+        OpticalFlowFilter _opticalFlowFilter;
+        ZRangerFilter _zrangerFilter;
+
         // PID control for stabilize-only
         StabilizerPid _stabilizerPid;
 
         void update(const bool remote_is_armed,
                 const uint32_t remote_message_msec,
                 const float * motorvals,
-                const uint8_t motorcount)
+                const uint8_t motorcount,
+                const bool useHoverdeck=false)
         {
             const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
@@ -141,6 +157,14 @@ namespace hf {
 
             // Do EKF fast-update with IMU readings
             _ekf = EKF::update(_ekf, _imuFilter.output, millis());
+
+            // Slower EKF update with range, optical flow
+            if (useHoverdeck && _hoverDeckTimer.ready()) {
+                _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
+                _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
+                        micros(), _flowsensor.read());
+                _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+            }
 
             // Get vehicle state from EKF
             _state = EKF::getVehicleState(_ekf);
