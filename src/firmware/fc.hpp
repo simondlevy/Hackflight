@@ -1,5 +1,5 @@
 /*
-   Hackflight core firmware
+   Hackflight core flight-control algorithm
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -35,7 +35,7 @@
 
 namespace hf {
 
-    class Core {
+    class FC {
 
         private:
 
@@ -187,6 +187,6 @@ namespace hf {
                         receiver_setpoint.yaw);
             }
 
-    }; // class Core
+    }; // class FC
 
 } // namespace hf

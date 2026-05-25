@@ -17,7 +17,6 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/core.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>

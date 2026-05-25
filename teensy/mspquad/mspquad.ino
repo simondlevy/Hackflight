@@ -19,11 +19,11 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/quadcore.hpp>
+#include <firmware/fcs/quad.hpp>
 #include <firmware/msp/parser.hpp>
 using namespace hf;
 
-static QuadCore _quadcore;
+static QuadFC _fc;
 
 static msp_message_t _message;
 
@@ -65,14 +65,14 @@ void serialEvent1()
 void setup()
 {
     // Start core sensors and motors (this will also start Serial1)
-    _quadcore.begin();
+    _fc.begin();
 }
 
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _quadcore.update(_message);
+    const auto setpoint = _fc.update(_message);
 
     // Run motor mixer on setpoint
-    _quadcore.runMotors(setpoint);
+    _fc.runMotors(setpoint);
 }

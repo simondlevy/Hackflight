@@ -1,5 +1,5 @@
 /*
-   Hackflight core firmware for quadcopter
+   Hackflight core flight-control for quadcopter
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -23,40 +23,40 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/core.hpp>
+#include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
 
 namespace hf {
 
-    class QuadCore {
+    class QuadFC {
 
         public:
 
-            Core _core;
+            FC _fc;
 
             void begin()
             {
-                _core.begin();
+                _fc.begin();
 
                 _motors.begin(); 
             }
 
             auto update(const msp_message_t & message) -> Setpoint
             {
-                return _core.update(message, _mixer.motorvals, 4);
+                return _fc.update(message, _mixer.motorvals, 4);
             } 
 
             auto update(const ReceiverData & rxdata) -> Setpoint
             {
-                return _core.update(rxdata, _mixer.motorvals, 4);
+                return _fc.update(rxdata, _mixer.motorvals, 4);
             } 
 
             void runMotors(const Setpoint & pidSetpoint)
             {
                 _mixer = Mixer::run(_mixer, pidSetpoint);
 
-                if (_core.isSafeToFly()) {
-                    _motors.run(_core.isArmed(), _mixer.motorvals);
+                if (_fc.isSafeToFly()) {
+                    _motors.run(_fc.isArmed(), _mixer.motorvals);
                 }
              }
 
@@ -68,6 +68,5 @@ namespace hf {
             // Devices
             DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-    }; // class NewQuadCore
-
-} // namespace hf
+    };
+}

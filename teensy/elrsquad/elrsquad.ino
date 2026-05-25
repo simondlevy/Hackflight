@@ -22,11 +22,11 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/quadcore.hpp>
+#include <firmware/fcs/quad.hpp>
 #include <firmware/receiver.hpp>
 using namespace hf;
 
-static QuadCore _quadcore;
+static QuadFC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
@@ -57,7 +57,7 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start core sensors and motors
-    _quadcore.begin();
+    _fc.begin();
 }
 
 void loop()
@@ -66,8 +66,8 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _quadcore.update(_rxdata);
+    const auto setpoint = _fc.update(_rxdata);
 
     // Run motor mixer on setpoint
-    _quadcore.runMotors(setpoint);
+    _fc.runMotors(setpoint);
 }
