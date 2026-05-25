@@ -71,7 +71,7 @@ namespace hf {
                 const uint8_t motorcount) -> Setpoint
         {
             update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
-                    motorcount);
+                    motorcount, false);
 
             _stabilizerPid = StabilizerPid::run(
                     _stabilizerPid,
@@ -87,7 +87,7 @@ namespace hf {
                 const uint8_t motorcount) -> Setpoint
         {
             update(message.is_armed, message.timestamp_msec, motorvals,
-                    motorcount);
+                    motorcount, true);
 
             return Setpoint(0, 0, 0, 0); // XXX
         } 
@@ -136,7 +136,7 @@ namespace hf {
                 const uint32_t remote_message_msec,
                 const float * motorvals,
                 const uint8_t motorcount,
-                const bool useHoverDeck=false)
+                const bool useHoverDeck)
         {
             const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
@@ -160,10 +160,11 @@ namespace hf {
 
             // Slower EKF update with range, optical flow
             if (useHoverDeck && _hoverDeckTimer.ready()) {
+                /*
                 _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
                 _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
                         micros(), _flowsensor.read());
-                _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+                _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);*/
             }
 
             // Get vehicle state from EKF
