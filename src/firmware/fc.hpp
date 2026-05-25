@@ -60,7 +60,7 @@ namespace hf {
             _led.begin(); 
 
             if (useHoverDeck) {
-                //_zranger.begin();
+                _zranger.begin();
                 //_flowsensor.begin();
             }
 
