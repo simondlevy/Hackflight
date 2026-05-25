@@ -64,7 +64,7 @@ namespace hf {
             auto update(const ReceiverData & rxdata, const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                update(rxdata.is_armed, rxdata.msec_prev, motorvals,
+                update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
                         motorcount);
 
                 _stabilizerPid = StabilizerPid::run(
@@ -80,7 +80,7 @@ namespace hf {
             auto update(const msp_message_t & message, const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                update(message.armed, message.timestamp, motorvals,
+                update(message.is_armed, message.timestamp_msec, motorvals,
                         motorcount);
 
                 return Setpoint(0, 0, 0, 0); // XXX

@@ -38,22 +38,22 @@ void serialEvent1()
         switch (MspParser::getid(_parser)) {
 
             case MSP_SET_ARMING:
-                _message.armed = !_message.armed;
-                _message.timestamp = millis();
+                _message.is_armed = !_message.is_armed;
+                _message.timestamp_msec = millis();
                 break;
 
             case MSP_SET_IDLE:
-                _message.hovering = false;
-                _message.timestamp = millis();
+                _message.is_hovering = false;
+                _message.timestamp_msec = millis();
                 break;
 
             case MSP_SET_HOVER:
-                _message.hovering = true;
+                _message.is_hovering = true;
                 _message.setpoint.thrust = MspParser::getFloat(_parser, 0);
                 _message.setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
                 _message.setpoint.roll = MspParser::getFloat(_parser, 2); // vy
                 _message.setpoint.yaw = MspParser::getFloat(_parser, 3);
-                _message.timestamp = millis();
+                _message.timestamp_msec = millis();
                 break;
 
             default:

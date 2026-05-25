@@ -25,9 +25,9 @@ namespace hf {
 
     typedef struct {
 
-        uint32_t timestamp;
-        bool armed;
-        bool hovering;
+        uint32_t timestamp_msec;
+        bool is_armed;
+        bool is_hovering;
         Setpoint setpoint;
 
     } msp_message_t;

@@ -34,7 +34,7 @@ namespace hf {
             bool is_armed;
             bool is_throttle_down;
             uint16_t aux;
-            uint32_t msec_prev;
+            uint32_t timestamp_msec;
 
             ReceiverData() = default;
 
@@ -43,13 +43,13 @@ namespace hf {
                     const bool is_armed,
                     const bool is_throttle_down,
                     const uint16_t aux,
-                    const uint32_t msec_prev)
+                    const uint32_t timestamp_msec)
                 :
                     axes(axes),
                     is_armed(is_armed),
                     is_throttle_down(is_throttle_down),
                     aux(aux),
-                    msec_prev(msec_prev) {}
+                    timestamp_msec(timestamp_msec) {}
 
             ReceiverData& operator=(const ReceiverData& other) = default;
 
