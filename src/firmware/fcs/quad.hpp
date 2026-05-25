@@ -34,9 +34,9 @@ namespace hf {
 
             FC _fc;
 
-            void begin()
+            void begin(const bool useHoverDeck=false)
             {
-                _fc.begin();
+                _fc.begin(useHoverDeck);
 
                 _motors.begin(); 
             }

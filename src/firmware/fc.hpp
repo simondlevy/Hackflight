@@ -52,16 +52,16 @@ namespace hf {
         static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
         static constexpr float TELEMETRY_RATE_HZ = 50;
 
-        void begin(const bool useHoverdeck=false)
+        void begin(const bool useHoverDeck)
         {
             Serial1.begin(115200);
 
             _imu.begin();
             _led.begin(); 
 
-            if (useHoverdeck) {
-                _zranger.begin();
-                _flowsensor.begin();
+            if (useHoverDeck) {
+                //_zranger.begin();
+                //_flowsensor.begin();
             }
 
             _mode = MODE_IDLE;
@@ -87,7 +87,7 @@ namespace hf {
                 const uint8_t motorcount) -> Setpoint
         {
             update(message.is_armed, message.timestamp_msec, motorvals,
-                    motorcount, true);
+                    motorcount);
 
             return Setpoint(0, 0, 0, 0); // XXX
         } 
@@ -136,7 +136,7 @@ namespace hf {
                 const uint32_t remote_message_msec,
                 const float * motorvals,
                 const uint8_t motorcount,
-                const bool useHoverdeck=false)
+                const bool useHoverDeck=false)
         {
             const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
 
@@ -159,7 +159,7 @@ namespace hf {
             _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
             // Slower EKF update with range, optical flow
-            if (useHoverdeck && _hoverDeckTimer.ready()) {
+            if (useHoverDeck && _hoverDeckTimer.ready()) {
                 _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
                 _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
                         micros(), _flowsensor.read());

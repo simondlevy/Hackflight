@@ -64,8 +64,8 @@ void serialEvent1()
 
 void setup()
 {
-    // Start core sensors and motors (this will also start Serial1)
-    _fc.begin();
+    // Start sensors and motors (this will also start Serial1)
+    _fc.begin(true);
 }
 
 void loop()
