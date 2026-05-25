@@ -105,6 +105,14 @@ namespace hf {
                             setpoint.pitch, setpoint.yaw); }
             }
 
+            void reportZ(const VehicleState & state)
+            {
+                if (_helper.ready()) {
+                    printf("%5lu | z=%6.3f dz=%+5.3f\n",
+                            _helper.count, state.z, state.dz);
+                }
+            }
+
             void report(const VehicleState & state, const bool full=false)
             {
                 if (_helper.ready()) {

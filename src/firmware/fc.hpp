@@ -39,155 +39,149 @@ namespace hf {
 
         friend class QuadFC;
 
-        private:
+        // Arbitrary
+        static const uint8_t LED_PIN = 9;
 
-            // Arbitrary
-            static const uint8_t LED_PIN = 9;
+        // Rate constants
+        static constexpr float EKF_PREDICTION_RATE_HZ = 100;
+        static constexpr float FLYING_CHECK_RATE_HZ   = 25;
+        static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
+        static constexpr float TELEMETRY_RATE_HZ = 50;
 
-            // Rate constants
-            static constexpr float EKF_PREDICTION_RATE_HZ = 100;
-            static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float FLOWDECK_ACQUISITION_RATE_HZ = 100;
-            static constexpr float TELEMETRY_RATE_HZ = 50;
+        void begin()
+        {
+            Serial1.begin(115200);
 
-        protected:
+            _imu.begin();
+            _led.begin(); 
 
-            void begin()
-            {
-                Serial1.begin(115200);
+            _mode = MODE_IDLE;
+        }
 
-                _imu.begin();
-                _led.begin(); 
+        auto update(const ReceiverData & rxdata, const float * motorvals,
+                const uint8_t motorcount) -> Setpoint
+        {
+            update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
+                    motorcount);
 
-                _mode = MODE_IDLE;
+            _stabilizerPid = StabilizerPid::run(
+                    _stabilizerPid,
+                    !rxdata.is_throttle_down,
+                    Timer::getDt(),
+                    _state,
+                    mksetpoint(rxdata.axes));
+
+            return _stabilizerPid.setpoint;
+        } 
+
+        auto update(const msp_message_t & message, const float * motorvals,
+                const uint8_t motorcount) -> Setpoint
+        {
+            update(message.is_armed, message.timestamp_msec, motorvals,
+                    motorcount);
+
+            return Setpoint(0, 0, 0, 0); // XXX
+        } 
+
+        auto isSafeToFly() -> bool
+        {
+            return _mode != MODE_PANIC;
+        }
+
+        auto isArmed() -> bool
+        {
+            return _mode != MODE_IDLE;
+        }
+
+        // Vehicle state
+        VehicleState _state;
+
+        // Idle, armed, etc.
+        mode_e _mode;
+
+        // Computation
+        ImuFilter _imuFilter;
+        EKF _ekf;
+        FlyingCheck _flyingCheck;
+
+        // Devices
+        IMU _imu;
+        LED _led = LED(LED_PIN);
+
+        // Timers
+        Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
+        Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
+        Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
+        Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
+
+        // PID control for stabilize-only
+        StabilizerPid _stabilizerPid;
+
+        void update(const bool remote_is_armed,
+                const uint32_t remote_message_msec,
+                const float * motorvals,
+                const uint8_t motorcount)
+        {
+            const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
+
+            // Blink IMU to indicate status
+            _led.blink(isGyroCalibrated);
+
+            // Read the raw IMU data
+            const auto imuraw = _imu.read();
+
+            // Filter the raw IMU data
+            _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
+                    _imu.gyroRangeDps(), _imu.accelRangeGs());
+
+            // Periodically run the EKF prediction step
+            if (_ekfPredictionTimer.ready()) {
+                _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
             }
 
-            auto update(const ReceiverData & rxdata, const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
-            {
-                update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
-                        motorcount);
+            // Do EKF fast-update with IMU readings
+            _ekf = EKF::update(_ekf, _imuFilter.output, millis());
 
-                _stabilizerPid = StabilizerPid::run(
-                        _stabilizerPid,
-                        !rxdata.is_throttle_down,
-                        Timer::getDt(),
-                        _state,
-                        mksetpoint(rxdata.axes));
+            // Get vehicle state from EKF
+            _state = EKF::getVehicleState(_ekf);
 
-                return _stabilizerPid.setpoint;
-            } 
-
-            auto update(const msp_message_t & message, const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
-            {
-                update(message.is_armed, message.timestamp_msec, motorvals,
-                        motorcount);
-
-                return Setpoint(0, 0, 0, 0); // XXX
-            } 
-
-            auto isSafeToFly() -> bool
-            {
-                return _mode != MODE_PANIC;
+            // Periodically send telemetry
+            if (_telemetryTimer.ready()) {
+                sendTelemetry();
             }
 
-            auto isArmed() -> bool
-            {
-                return _mode != MODE_IDLE;
+            // Run safety checks
+            _mode = Safety::updateMode(millis(), _state, isGyroCalibrated,
+                    remote_is_armed, remote_message_msec, _imuFilter,
+                    _mode);
+
+            // Periodically run flying check to get status for EKF
+            if (_flyingCheckTimer.ready()) {
+                _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
+                        motorvals, motorcount);
             }
+        } 
 
-        private:
+        void sendTelemetry()
+        {
+            static MspSerializer _serializer;
 
-            // Vehicle state
-            VehicleState _state;
+            _serializer = MspSerializer::serializeFloats(
+                    _serializer, MSP_STATE, (float *)&_state, 10);
 
-            // Idle, armed, etc.
-            mode_e _mode;
+            Serial1.write(
+                    MspSerializer::payloadBytes(_serializer),
+                    MspSerializer::payloadSize(_serializer));
+        }
 
-            // Computation
-            ImuFilter _imuFilter;
-            EKF _ekf;
-            FlyingCheck _flyingCheck;
-
-            // Devices
-            IMU _imu;
-            LED _led = LED(LED_PIN);
-
-            // Timers
-            Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
-            Timer _flowdeckTimer = Timer(FLOWDECK_ACQUISITION_RATE_HZ);
-            Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
-
-            // PID control for stabilize-only
-            StabilizerPid _stabilizerPid;
-
-            void update(const bool remote_is_armed,
-                    const uint32_t remote_message_msec,
-                    const float * motorvals,
-                    const uint8_t motorcount)
-            {
-                const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
-
-                // Blink IMU to indicate status
-                _led.blink(isGyroCalibrated);
-
-                // Read the raw IMU data
-                const auto imuraw = _imu.read();
-
-                // Filter the raw IMU data
-                _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                        _imu.gyroRangeDps(), _imu.accelRangeGs());
-
-                // Periodically run the EKF prediction step
-                if (_ekfPredictionTimer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
-                }
-
-                // Do EKF fast-update with IMU readings
-                _ekf = EKF::update(_ekf, _imuFilter.output, millis());
-
-                // Get vehicle state from EKF
-                _state = EKF::getVehicleState(_ekf);
-
-                // Periodically send telemetry
-                if (_telemetryTimer.ready()) {
-                    sendTelemetry();
-                }
-
-                // Run safety checks
-                _mode = Safety::updateMode(millis(), _state, isGyroCalibrated,
-                        remote_is_armed, remote_message_msec, _imuFilter,
-                        _mode);
-
-                // Periodically run flying check to get status for EKF
-                if (_flyingCheckTimer.ready()) {
-                    _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
-                            motorvals, motorcount);
-                }
-            } 
-
-             void sendTelemetry()
-            {
-                static MspSerializer _serializer;
-
-                _serializer = MspSerializer::serializeFloats(
-                        _serializer, MSP_STATE, (float *)&_state, 10);
-
-                Serial1.write(
-                        MspSerializer::payloadBytes(_serializer),
-                        MspSerializer::payloadSize(_serializer));
-            }
-
-            static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
-            {
-                return Setpoint(
-                        (receiver_setpoint.thrust+1)/2,
-                        receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
-                        receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
-                        receiver_setpoint.yaw);
-            }
+        static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
+        {
+            return Setpoint(
+                    (receiver_setpoint.thrust+1)/2,
+                    receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
+                    receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+                    receiver_setpoint.yaw);
+        }
 
     }; // class FC
 
