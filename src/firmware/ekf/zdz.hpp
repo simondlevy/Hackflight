@@ -38,7 +38,6 @@ namespace hf {
             static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
             static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
 
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
             static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
             static constexpr float PROC_NOISE_VEL = 0;
             static constexpr float PROC_NOISE_POS = 0;
@@ -47,6 +46,9 @@ namespace hf {
             static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
 
             static constexpr float GRAVITY = 9.81;
+
+            //We do get the measurements in 10x the motion pixels (experimentally measured)
+            static constexpr float FLOW_RESOLUTION = 0.1;
 
             // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
             static constexpr float MAX_COVARIANCE = 100;
@@ -62,8 +64,6 @@ namespace hf {
             enum
             {
                 STATE_Z,
-                STATE_VX,
-                STATE_VY,
                 STATE_VZ,
                 STATE_D0,
                 STATE_D1,
@@ -106,8 +106,6 @@ namespace hf {
 
                     STDEV_INITIAL_POSITION_Z,
                     STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_ROLLPITCH,
                     STDEV_INITIAL_ATTITUDE_YAW
@@ -115,7 +113,7 @@ namespace hf {
 
                 core.P = addCovarianceNoise(matrix(), pinit);
 
-                didUpdateWithZRanger = false;
+                didUpdateWithHoverdeck = false;
                 lastProcessNoiseUpdateMsec = 0;
 
                 didPredict = false;
@@ -129,7 +127,7 @@ namespace hf {
                     const ThreeAxisSubSampler & accelSubSampler,
                     const ThreeAxisSubSampler & gyroSubSampler,
                     const Rotation & R,
-                    const bool didUpdateWithZRanger,
+                    const bool didUpdateWithHoverdeck,
                     const ZRangerFilter & zrangerFilterLatest,
                     const uint32_t lastProcessNoiseUpdateMsec,
                     const bool didPredict,
@@ -141,7 +139,7 @@ namespace hf {
                     accelSubSampler(accelSubSampler),
                     gyroSubSampler(gyroSubSampler),
                     R(R),
-                    didUpdateWithZRanger(didUpdateWithZRanger),
+                    didUpdateWithHoverdeck(didUpdateWithHoverdeck),
                     zrangerFilterLatest(zrangerFilterLatest),
                     lastProcessNoiseUpdateMsec(lastProcessNoiseUpdateMsec),
                     didPredict(didPredict),
@@ -169,35 +167,19 @@ namespace hf {
 
                 const auto dt2 = dt * dt;
 
-                // keep previous time step's state for the update
-                const auto tmpSPX = ekf.core.x[STATE_VX];
-                const auto tmpSPY = ekf.core.x[STATE_VY];
-                const auto tmpSPZ = ekf.core.x[STATE_VZ];
-
-                // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = ekf.core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
-
                 // thrust can only be produced in the body's Z direction
                 const auto dz = ekf.core.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
 
-                const auto accelx = isFlying ? 0 : accel.x;
-                const auto accely = isFlying ? 0 : accel.y;
+                printf("%f\n", dz);
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 auto x = vector();
-                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
-                    ekf.R.zz * dz - GRAVITY * dt2 / 2;
+                x[STATE_Z] = 0;//ekf.core.x[STATE_Z] + ekf.R.zz * dz - GRAVITY * dt2 / 2;
 
-                x[STATE_VX] = ekf.core.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
-                        gyro.y * tmpSPZ - GRAVITY * ekf.R.zx);
+                //printf("%f\n", ekf.R.zz * dz - GRAVITY * dt2 / 2);
 
-                x[STATE_VY] = ekf.core.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
-                        gyro.x * tmpSPZ - GRAVITY * ekf.R.zy);
-
-                x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
-                        gyro.x * tmpSPY - GRAVITY * ekf.R.zz);
+                x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z - GRAVITY * ekf.R.zz);
 
                 x[STATE_D0] = ekf.core.x[STATE_D0];
                 x[STATE_D1] = ekf.core.x[STATE_D1];
@@ -229,7 +211,7 @@ namespace hf {
                         accelSubSampler,
                         gyroSubSampler,
                         ekf.R,
-                        ekf.didUpdateWithZRanger,
+                        ekf.didUpdateWithHoverdeck,
                         ekf.zrangerFilterLatest,
                         ekf.lastProcessNoiseUpdateMsec,
                         true, // didPredict,
@@ -249,8 +231,6 @@ namespace hf {
 
                 const float noise[STATE_DIM] = {
                     PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
                     PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
                     MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
@@ -277,12 +257,12 @@ namespace hf {
                             enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
                     ekf.core;
 
-                const auto coreWithRange = rangeok && ekf.didUpdateWithZRanger ?
+                const auto coreWithRange = rangeok && ekf.didUpdateWithHoverdeck ?
                     updateWithRange(
                             coreWithNoise, ekf.zrangerFilterLatest, rzz) :
                     coreWithNoise;
 
-                const auto ready = ekf.didUpdateWithZRanger || ekf.didPredict;
+                const auto ready = ekf.didUpdateWithHoverdeck || ekf.didPredict;
 
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const auto v = ThreeAxis(
@@ -290,11 +270,8 @@ namespace hf {
 
                 // reset the attitude error
                 const auto x = vector{
-                    coreWithRange.x[0],
-                    coreWithRange.x[1],
-                    coreWithRange.x[2],
-                    coreWithRange.x[3],
-                    0, 0, 0};
+                    coreWithRange.x[0], coreWithRange.x[1], 0, 0, 0
+                };
 
                 const auto P = enforceSymmetry(coreWithRange.P);
 
@@ -326,7 +303,7 @@ namespace hf {
                         accelSubSampler,
                         gyroSubSampler,
                         R,
-                        false, // didUpdateWithZRanger
+                        false, // didUpateWithHoverdeck
                         ekf.zrangerFilterLatest,
                         lastProcessNoiseUpdateMsec,
                         false, // didPredict
@@ -345,7 +322,7 @@ namespace hf {
                         ekf.accelSubSampler,
                         ekf.gyroSubSampler,
                         ekf.R,
-                        true, // didUpdateWithZRanger,
+                        true, // didUpdateWithHoverdeck,
                         zrfilter,
                         ekf.lastProcessNoiseUpdateMsec,
                         ekf. didPredict,
@@ -356,23 +333,9 @@ namespace hf {
             {
                 const auto x = ekf.core.x;
 
-                const auto dx =
-                    ekf.R.xx*x[STATE_VX] +
-                    ekf.R.xy*x[STATE_VY] +
-                    ekf.R.xz*x[STATE_VZ];
-
-                // make right positive
-                const auto dy = -(
-                        ekf.R.yx*x[STATE_VX] +
-                        ekf.R.yy*x[STATE_VY] +
-                        ekf.R.yz*x[STATE_VZ]); 
-
                 const auto z = x[STATE_Z];
 
-                const auto dz =
-                    ekf.R.zx*x[STATE_VX] +
-                    ekf.R.zy*x[STATE_VY] +
-                    ekf.R.zz*x[STATE_VZ];
+                const auto dz = ekf.R.zz*x[STATE_VZ];
 
                 const auto q0 = ekf.q.w;
                 const auto q1 = ekf.q.x;
@@ -395,7 +358,7 @@ namespace hf {
 
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
-                        dx, dy, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
+                        0, 0, z, dz, phi, dphi, theta, dtheta, -psi, -dpsi);
             }
 
         private:
@@ -414,7 +377,7 @@ namespace hf {
             // updated by the finalization)
             Rotation R;
 
-            bool didUpdateWithZRanger;
+            bool didUpdateWithHoverdeck;
 
             ZRangerFilter zrangerFilterLatest;
 
@@ -433,8 +396,6 @@ namespace hf {
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = x[STATE_VX];
-                const auto vy = x[STATE_VY];
                 const auto vz = x[STATE_VZ];
 
                 const size_t N = STATE_DIM;
@@ -443,56 +404,30 @@ namespace hf {
 
                 // position
                 F[STATE_Z*N+STATE_Z] = 1;
-                F[STATE_Z*N+STATE_VX] = R.zx*dt;
-                F[STATE_Z*N+STATE_VY] = R.zy*dt;
                 F[STATE_Z*N+STATE_VZ] = R.zz*dt;
-                F[STATE_Z*N+STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-                F[STATE_Z*N+STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-                F[STATE_Z*N+STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
-
-                F[STATE_VX*N+STATE_Z] = 0; 
-                F[STATE_VX*N+STATE_VX] = 1; 
-                F[STATE_VX*N+STATE_VY] = gyro.z*dt;
-                F[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
-                F[STATE_VX*N+STATE_D0] =  0;
-                F[STATE_VX*N+STATE_D1] =  GRAVITY*R.zz*dt;
-                F[STATE_VX*N+STATE_D2] = -GRAVITY*R.zy*dt;
-
-                F[STATE_VY*N+STATE_Z] = 0; 
-                F[STATE_VY*N+STATE_VX] =-gyro.z*dt;
-                F[STATE_VY*N+STATE_VY] = 1; 
-                F[STATE_VY*N+STATE_VZ] = gyro.x*dt;
-                F[STATE_VY*N+STATE_D0] = -GRAVITY*R.zz*dt;
-                F[STATE_VY*N+STATE_D1] =  0;
-                F[STATE_VY*N+STATE_D2] =  GRAVITY*R.zx*dt;
+                F[STATE_Z*N+STATE_D0] = (-vz*R.zy)*dt;
+                F[STATE_Z*N+STATE_D1] = (vz*R.zx)*dt;
+                F[STATE_Z*N+STATE_D2] = 0;
 
                 F[STATE_VZ*N+STATE_Z] = 0; 
-                F[STATE_VZ*N+STATE_VX] = gyro.y*dt;
-                F[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
                 F[STATE_VZ*N+STATE_VZ] = 1; 
                 F[STATE_VZ*N+STATE_D0] =  GRAVITY*R.zy*dt;
                 F[STATE_VZ*N+STATE_D1] = -GRAVITY*R.zx*dt;
                 F[STATE_VZ*N+STATE_D2] =  0;
 
                 F[STATE_D0*N+STATE_Z] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
                 F[STATE_D0*N+STATE_VZ] = 0; 
                 F[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
                 F[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
                 F[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
 
                 F[STATE_D1*N+STATE_Z] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
                 F[STATE_D1*N+STATE_VZ] = 0; 
                 F[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
                 F[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
                 F[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
 
                 F[STATE_D2*N+STATE_Z] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
                 F[STATE_D2*N+STATE_VZ] = 0; 
                 F[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
                 F[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
@@ -514,11 +449,53 @@ namespace hf {
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
-                const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
+                const vector h = {1 / cosf(angle), 0, 0, 0, 0 };
 
                 return updateWithScalar(core, h,
                         measuredDistance-predictedDistance,
                         zrfilter.stdev);
+            }
+
+            static auto updateWithFlowAxis(
+                    const Core & core,
+                    const float dt,
+                    const float r22,
+                    const float dpixel,
+                    const float stdev,
+                    const uint8_t state_index,
+                    const float gyroval) -> Core
+            {
+                // [pixels] (same in x and y)
+                const float Npix = 35.0;                      
+
+                //float thetapix = Num::DEG2RAD * 4.0f;
+                // [rad]    (same in x and y)
+                // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
+                // corresponding ground length
+                const float thetapix = 0.71674f;
+
+                // Saturate elevation in prediction and correction to avoid
+                // singularities
+                const auto z_g  = max(core.x[STATE_Z], 0.1);
+
+                const auto dg = core.x[state_index];
+
+                const auto omegab = gyroval * Num::DEG2RAD;
+
+                vector h = {0, 0, 0, 0, 0};
+
+                const auto predictedN = (dt * Npix / thetapix ) * 
+                    ((dg * r22 / z_g) - omegab);
+
+                const auto measuredN = dpixel*FLOW_RESOLUTION;
+
+                h[STATE_Z] = (Npix * dt / thetapix) * 
+                    ((r22 * dg) / (-z_g * z_g));
+
+                h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
+
+                return updateWithScalar(core, h, measuredN-predictedN,
+                        stdev*FLOW_RESOLUTION);
             }
 
             static auto updateWithScalar(

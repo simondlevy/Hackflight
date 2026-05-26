@@ -18,7 +18,9 @@
 
 #include <espnow-transponder.h>
 
-static const uint8_t XIAO_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x94,0x4C};
+// static const uint8_t XIAO_ADDRESS[] = {0x8C,0xBF,0xEA,0xCB,0x94,0x4C};
+
+static const uint8_t XIAO_ADDRESS[] = {0x58,0xE6,0xC5,0x14,0x07,0xE8}; // Crazyflie
 
 void setup()
 {
@@ -31,4 +33,5 @@ void loop()
 {
     EspNowTransponder::step();
 }
+
 

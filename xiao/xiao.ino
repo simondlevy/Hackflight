@@ -24,6 +24,8 @@ static HardwareSerial serial(1);
 
 void setup(void)
 {
+    Serial.begin(115200);
+
     serial.begin(115200, SERIAL_8N1, 2, 1); 
     EspNowTransponder::begin(DONGLE_ADDRESS, &serial);
 }

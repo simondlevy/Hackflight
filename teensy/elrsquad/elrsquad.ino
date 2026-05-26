@@ -68,6 +68,8 @@ void loop()
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.update(_rxdata);
 
+    //static Debugger _debugger; _debugger.reportZ(_fc.getState());
+
     // Run motor mixer on setpoint
     _fc.runMotors(setpoint);
 }
