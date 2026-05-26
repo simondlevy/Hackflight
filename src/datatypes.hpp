@@ -91,5 +91,4 @@ namespace hf {
 
             Setpoint& operator=(const Setpoint& other) = default;
     };
-
 }
