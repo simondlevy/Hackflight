@@ -120,6 +120,8 @@ namespace hf {
                     // Run ekf to get vehicle state
                     getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
+                    //Serial.println(message.timestamp);
+
                     // Check for lost contact
                     if (message.timestamp > 0 &&
                             xTaskGetTickCount() - message.timestamp >

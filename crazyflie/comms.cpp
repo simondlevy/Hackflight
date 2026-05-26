@@ -31,6 +31,7 @@ bool hf::Comms::read_byte(uint8_t * byte)
 {
     if (serial.available()) {
         *byte = serial.read();
+        Serial.println(*byte);
         return true;
     }
 

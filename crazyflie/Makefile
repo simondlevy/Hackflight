@@ -1,6 +1,6 @@
 SKETCH = $(shell basename "`pwd`")
 
-ROOT = ../..
+ROOT = ../
 
 PORT = /dev/ttyACM0
 
@@ -13,8 +13,6 @@ SRC = $(ROOT)/src
 MSGS = $(SRC)/msp/__messages__.h
 
 HASKDIR = $(ROOT)/haskell
-
-include ../../snn_path.makefile
 
 DEPS = $(SKETCH).ino  *.cpp *.h $(SRC)/*.hpp $(SRC)/firmware/*.hpp \
 	   $(SRC)/firmware/*/*.hpp $(MSGS) 
