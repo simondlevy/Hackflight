@@ -24,6 +24,6 @@ namespace hf {
 
             void begin();
 
-            auto read() -> int16_t;
+            auto read() -> float;
     };
 }

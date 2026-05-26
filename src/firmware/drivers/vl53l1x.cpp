@@ -15,36 +15,34 @@
  */
 
 // Third-party libraries
-#include <Adafruit_VL53L1X.h>
+#include <VL53L1X.h>
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/zranger/sensor.hpp>
 using namespace hf;
 
-static Adafruit_VL53L1X _vl53l1x;
+static VL53L1X _vl53l1x;
 
 void ZRanger::begin()
 {
     Wire1.begin();
     Wire1.setClock(400000);
+    delay(100);
 
-    if (!_vl53l1x.begin(0x29, &Wire1)) {
+    _vl53l1x.setBus(&Wire1);
+
+    if (!_vl53l1x.init()) {
         Debugger::reportForever("Unable to initialize sensor");
     }
 
-    if (!_vl53l1x.startRanging()) {
-        Debugger::reportForever("Unable to start ranging");
-    }
+    _vl53l1x.setDistanceMode(VL53L1X::Medium);
+    _vl53l1x.setMeasurementTimingBudget(25000);
 
-    // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms!
-    _vl53l1x.setTimingBudget(50'000);
-
-    // Clear interrupt to get things started
-    _vl53l1x.clearInterrupt();
+    _vl53l1x.startContinuous(50);
 }
 
-auto ZRanger::read() -> int16_t
+auto ZRanger::read() -> float
 {
-    return _vl53l1x.distance();
+    return _vl53l1x.read();
 }
