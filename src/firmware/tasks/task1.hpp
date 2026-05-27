@@ -120,14 +120,11 @@ namespace hf {
                     // Run ekf to get vehicle state
                     getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
-                    Serial.print("dx=");
-                    Serial.print(_vehicleState.dx);
-                    Serial.print("  dy=");
-                    Serial.print(_vehicleState.dy);
-                    Serial.print("  z=");
-                    Serial.print(_vehicleState.z);
-                    Serial.print("  dz=");
-                    Serial.println(_vehicleState.dz);
+                    printfloat("dx", _vehicleState.dx);
+                    printfloat("dy", _vehicleState.dy);
+                    printfloat("z", _vehicleState.z);
+                    printfloat("dz", _vehicleState.dz);
+                    Serial.println();
 
                     // Check for lost contact
                     if (message.timestamp > 0 &&
@@ -185,6 +182,17 @@ namespace hf {
                             break;
                     }
                 }
+            }
+
+            static void printfloat(const char * label, const float value)
+            {
+                Serial.print(label);
+                Serial.print("=");
+                if (value > 0) {
+                    Serial.print("+");
+                }
+                Serial.print(value, 3);
+                Serial.print("  ");
             }
 
             static bool isFlippedAngle(float angle)
