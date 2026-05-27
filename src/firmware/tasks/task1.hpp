@@ -120,7 +120,14 @@ namespace hf {
                     // Run ekf to get vehicle state
                     getStateEstimate(isFlying, _vehicleState, didResetEstimation);
 
-                    //Serial.println(message.timestamp);
+                    Serial.print("dx=");
+                    Serial.print(_vehicleState.dx);
+                    Serial.print("  dy=");
+                    Serial.print(_vehicleState.dy);
+                    Serial.print("  z=");
+                    Serial.print(_vehicleState.z);
+                    Serial.print("  dz=");
+                    Serial.println(_vehicleState.dz);
 
                     // Check for lost contact
                     if (message.timestamp > 0 &&
