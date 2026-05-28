@@ -3,10 +3,10 @@
 # Secure M2 nylon machine screws
 
 Before soldering on any of the components, you'll need to decide how you're going to mount the PCB to your
-airframe.  I've also used [VHB tape](https://www.amazon.com/dp/B007Y7GIKI?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_3),
+airframe.  I've also used [VHB tape](https://www.amazon.com/dp/B007Y7GIKI),
 which doesn't require screws, but for a cleaner build the PCB provides four mounting holes in the popular
 26x26mm diamond configuration, for use with
-[M2 nylon machine screws](https://www.amazon.com/dp/B007Y7GIKI?ref_=ppx_hzsearch_conn_dt_b_fed_asin_title_3).
+[M2 nylon machine screws](https://www.amazon.com/dp/B07D78PFQL).
 You secure these screws temporarily with nuts before using a rubber grommit for vibration dampening.
 
 # BOM, in order of soldering
