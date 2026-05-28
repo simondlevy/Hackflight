@@ -23,7 +23,7 @@ soldering, and doing a continuity check for bridges/shorts after each step:
 using 0.2-0.8mm fine/conical tip.  To avoid soldering a bridge (short circuit), you should solder only the six indicated
 pins (3V3, GND, SCL0, GD, SDA0, 3V3).
 
-4. 28AWG silicone-insulates wires to 4-in-1 ESC, protruding from bottom, using 0.2-0.8mm fine/conical tip.
+4. 28AWG silicone-insulated wires to 4-in-1 ESC, protruding from bottom, using 0.2-0.8mm fine/conical tip.
 Most 4-in-1 ESCs come with this [connector](../../media/4-in-1-esc-wiring.jpg), or you can build one yourself
 using a kit like
 [this](https://www.amazon.com/Teansic-Connector-Pre-Crimped-Housing-Controller/dp/B0D5X6BY5Z/ref=sr_1_1_sspa?crid=1UNL8YQMAGJI0).
