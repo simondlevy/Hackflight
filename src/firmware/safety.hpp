@@ -75,29 +75,32 @@ namespace hf {
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
-                const auto wantArming = 
-
-                    // Disable arming while gyro is calibrating
-                    !isGyroCalibrated ? false :
-
-                    // Check receiver timeout
-                    checkFailsafe(msecCurr, message.timestamp_msec,
-                            message.is_armed);
+                const auto msecPrev = message.timestamp_msec;
 
                 // Run a little state-transition machine to update flight mode
                 return  
 
+                    // Transmission timed out; trigger failsafe
+                    msecPrev > 0 && msecCurr > msecPrev &&
+                    msecCurr - msecPrev > FAILSAFE_MSEC ? MODE_PANIC :
+
+                    // Vehicle flipped over: enter panic mode
+                    isFlipped(state) ? MODE_PANIC :
+
                     // Panic mode: can't recover
                     mode == MODE_PANIC ? MODE_PANIC :
 
-                    //  Vehicle flipped over: enter panic mode
-                    isFlipped(state) ? MODE_PANIC :
+                    // Disable arming while gyro is calibrating
+                    !isGyroCalibrated ? MODE_IDLE :
 
                     // Want arm and safe to arm: enter armed mode
-                    wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode ==  MODE_IDLE && message.is_armed ? MODE_ARMED :
 
-                    // Want disarm: enter idle mode
-                    mode != MODE_IDLE && !wantArming ? MODE_IDLE :
+                    mode == MODE_ARMED && message.is_hovering ? MODE_HOVERING :
+
+                    mode == MODE_HOVERING && !message.is_hovering ? MODE_ARMED :
+
+                    !message.is_armed ? MODE_IDLE :
 
                     //  Default: stay in current mode
                     mode;
