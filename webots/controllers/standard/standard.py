@@ -26,7 +26,7 @@ JOYSTICK_AXIS_MAP = {
     'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
-MODES = {'idle': 0, 'hovering': 2, 'autonomous': 3, 'landing': 4}
+MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3, 'landing': 4}
 
 ZDIST_LANDING_MAX_M = 0.01
 
@@ -55,7 +55,7 @@ def reportUnrecognizedJoystick(joystick):
 
 def switchMode(what, mode):
     return (
-        'hovering' if mode == 'idle' and what == 'hover' else
+        'hovering' if mode == 'armed' and what == 'hover' else
         'landing' if mode == 'hovering' and what == 'hover' else
         'autonomous' if mode == 'hovering' and what == 'auto' else
         'hovering' if mode == 'autonomous' and what == 'auto' else
@@ -171,7 +171,7 @@ def main():
 
     zstart = gps.getValues()[2]
 
-    cmdinfo = 'idle', 0, 0, 0, 0
+    cmdinfo = 'armed', 0, 0, 0, 0
 
     startMotor(robot, 'motor1', -1)
     startMotor(robot, 'motor2', +1)
@@ -190,10 +190,10 @@ def main():
 
         mode = cmdinfo[0]
 
-        # On descent, switch mode to idle when close enough to ground
+        # On descent, switch mode to armed when close enough to ground
         if (mode == 'landing' and
            (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
-            mode = 'idle'
+            mode = 'armed'
 
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
