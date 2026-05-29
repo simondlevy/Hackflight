@@ -96,10 +96,13 @@ namespace hf {
                     // Want arm and safe to arm: enter armed mode
                     mode ==  MODE_IDLE && message.is_armed ? MODE_ARMED :
 
+                    // Armed and want hover; enter hover mode
                     mode == MODE_ARMED && message.is_hovering ? MODE_HOVERING :
 
+                    // Hovering and want landing; enter landing mode
                     mode == MODE_HOVERING && !message.is_hovering ? MODE_ARMED :
 
+                    // Don't want arming; enter idle mode
                     !message.is_armed ? MODE_IDLE :
 
                     //  Default: stay in current mode

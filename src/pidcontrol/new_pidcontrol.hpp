@@ -79,8 +79,9 @@ namespace hf {
                 const auto altitude_pid = AltitudeController::run(pid._altitude_pid,
                         hovering, dt, new_altitude_target, state.z);
 
-                const auto climbrate_pid = ClimbRateController::run(pid._climbrate_pid,
-                        hovering, dt, altitude_pid.output, state.z, state.dz);
+                const auto climbrate_pid =
+                    ClimbRateController::run(pid._climbrate_pid, hovering, dt,
+                            altitude_pid.output, state.z, state.dz);
 
                 const auto thrust = climbrate_pid.output;
 
@@ -97,11 +98,13 @@ namespace hf {
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
-                const auto position_y_pid = PositionController::run(pid._position_y_pid,
-                        airborne, dt, setpoint_in.roll, dyb);
+                const auto position_y_pid =
+                    PositionController::run(pid._position_y_pid, airborne, dt,
+                            setpoint_in.roll, dyb);
 
-                const auto position_x_pid = PositionController::run(pid._position_x_pid,
-                        airborne, dt, setpoint_in.pitch, dxb);
+                const auto position_x_pid =
+                    PositionController::run(pid._position_x_pid, airborne, dt,
+                            setpoint_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
 
