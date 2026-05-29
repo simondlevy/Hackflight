@@ -19,12 +19,12 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
+#include <firmware/msp/message.h>
 #include <firmware/msp/__messages__.h>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
@@ -70,6 +70,11 @@ namespace hf {
         auto update(const ReceiverData & rxdata, const float * motorvals,
                 const uint8_t motorcount) -> Setpoint
         {
+            // Run safety checks
+            _mode = Safety::updateMode(millis(), _state, 
+                    _imuFilter.isGyroCalibrated, rxdata.is_armed,
+                    rxdata.timestamp_msec, _imuFilter, _mode);
+
             update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
                     motorcount, false);
 
@@ -86,8 +91,22 @@ namespace hf {
         auto update(const msp_message_t & message, const float * motorvals,
                 const uint8_t motorcount) -> Setpoint
         {
+            // Run safety checks
+            _mode = Safety::updateModeMsp(millis(), _state,
+                    _imuFilter.isGyroCalibrated, message, _imuFilter, _mode);
+
             update(message.is_armed, message.timestamp_msec, motorvals,
                     motorcount, true);
+
+            if (_mode == MODE_ARMED && message.is_hovering) {
+                _mode = MODE_HOVERING;
+            }
+
+            else if (_mode == MODE_HOVERING && message.is_hovering) {
+                _mode = MODE_LANDING;
+            }
+
+            _debugger.report(_mode);
 
             return Setpoint(0, 0, 0, 0); // XXX
         } 
@@ -132,16 +151,17 @@ namespace hf {
         // PID control for stabilize-only
         StabilizerPid _stabilizerPid;
 
+        // Debugging
+        Debugger _debugger;
+
         void update(const bool remote_is_armed,
                 const uint32_t remote_message_msec,
                 const float * motorvals,
                 const uint8_t motorcount,
                 const bool useHoverDeck)
         {
-            const auto isGyroCalibrated = _imuFilter.isGyroCalibrated;
-
             // Blink IMU to indicate status
-            _led.blink(isGyroCalibrated);
+            _led.blink(_imuFilter.isGyroCalibrated);
 
             // Read the raw IMU data
             const auto imuraw = _imu.read();
@@ -160,8 +180,10 @@ namespace hf {
 
             // Slower EKF update with range, optical flow
             if (useHoverDeck && _hoverDeckTimer.ready()) {
-                _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
-                _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
+                _zrangerFilter = ZRangerFilter::update(
+                        _zrangerFilter, _zranger.read());
+                _opticalFlowFilter = OpticalFlowFilter::update(
+                        _opticalFlowFilter,
                         micros(), _flowsensor.read());
                 _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
             }
@@ -173,11 +195,6 @@ namespace hf {
             if (_telemetryTimer.ready()) {
                 sendTelemetry();
             }
-
-            // Run safety checks
-            _mode = Safety::updateMode(millis(), _state, isGyroCalibrated,
-                    remote_is_armed, remote_message_msec, _imuFilter,
-                    _mode);
 
             // Periodically run flying check to get status for EKF
             if (_flyingCheckTimer.ready()) {
@@ -202,8 +219,10 @@ namespace hf {
         {
             return Setpoint(
                     (receiver_setpoint.thrust+1)/2,
-                    receiver_setpoint.roll * PositionController::MAX_DEMAND_DEG, 
-                    receiver_setpoint.pitch * PositionController::MAX_DEMAND_DEG, 
+                    receiver_setpoint.roll *
+                    PositionController::MAX_DEMAND_DEG,
+                    receiver_setpoint.pitch *
+                    PositionController::MAX_DEMAND_DEG, 
                     receiver_setpoint.yaw);
         }
 

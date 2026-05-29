@@ -67,6 +67,47 @@ namespace hf {
                     mode;
             }
 
+            static auto updateModeMsp(
+                    const uint32_t msecCurr,
+                    const VehicleState & state,
+                    const bool isGyroCalibrated,
+                    const msp_message_t & message,
+                    const ImuFilter & imufilt,
+                    const mode_e mode) -> mode_e
+            {
+                const auto wantArming = 
+
+                    // Disable arming while gyro is calibrating
+                    !isGyroCalibrated ? false :
+
+                    // Check receiver timeout
+                    checkFailsafe(msecCurr, message.timestamp_msec,
+                            message.is_armed);
+
+                (void)wantArming;
+
+                // Run a little state-transition machine to update flight mode
+                return  mode;
+
+                    /*
+                    // Panic mode: can't recover
+                    mode == MODE_PANIC ? MODE_PANIC :
+
+                    //  Vehicle flipped over: enter panic mode
+                    isFlipped(state) ? MODE_PANIC :
+
+                    // Want arm and safe to arm: enter armed mode
+                    wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+
+                    // Want disarm: enter idle mode
+                    mode == MODE_ARMED && !wantArming ? MODE_IDLE :
+
+                    //  Default: stay in current mode
+                    mode;
+
+                */
+            }
+
         private:
 
             static auto isFlipped(const VehicleState & state) -> bool
