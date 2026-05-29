@@ -160,11 +160,10 @@ namespace hf {
 
             // Slower EKF update with range, optical flow
             if (useHoverDeck && _hoverDeckTimer.ready()) {
-                /*
                 _zrangerFilter = ZRangerFilter::update(_zrangerFilter, _zranger.read());
                 _opticalFlowFilter = OpticalFlowFilter::update(_opticalFlowFilter,
                         micros(), _flowsensor.read());
-                _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);*/
+                _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
             }
 
             // Get vehicle state from EKF
