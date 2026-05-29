@@ -19,6 +19,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/debugging.hpp>
 #include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
@@ -97,14 +98,6 @@ namespace hf {
 
             update(message.is_armed, message.timestamp_msec, motorvals,
                     motorcount, true);
-
-            if (_mode == MODE_ARMED && message.is_hovering) {
-                _mode = MODE_HOVERING;
-            }
-
-            else if (_mode == MODE_HOVERING && message.is_hovering) {
-                _mode = MODE_LANDING;
-            }
 
             _debugger.report(_mode);
 

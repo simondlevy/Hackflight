@@ -18,7 +18,6 @@
  */
 
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
 #include <firmware/fcs/quad.hpp>
 #include <firmware/msp/parser.hpp>
 using namespace hf;

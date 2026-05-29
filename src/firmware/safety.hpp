@@ -84,12 +84,9 @@ namespace hf {
                     checkFailsafe(msecCurr, message.timestamp_msec,
                             message.is_armed);
 
-                (void)wantArming;
-
                 // Run a little state-transition machine to update flight mode
-                return  mode;
+                return  
 
-                    /*
                     // Panic mode: can't recover
                     mode == MODE_PANIC ? MODE_PANIC :
 
@@ -100,12 +97,10 @@ namespace hf {
                     wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
 
                     // Want disarm: enter idle mode
-                    mode == MODE_ARMED && !wantArming ? MODE_IDLE :
+                    mode != MODE_IDLE && !wantArming ? MODE_IDLE :
 
                     //  Default: stay in current mode
                     mode;
-
-                */
             }
 
         private:
