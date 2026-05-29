@@ -66,15 +66,6 @@ namespace hf {
             {
                 if (_helper.ready()) {
 
-                    static const char * MODENAMES[6] = {
-                        "IDLE",
-                        "ARMED",
-                        "HOVERING",
-                        "AUTONOMOUS",
-                        "LANDING",
-                        "PANIC"
-                    };
-
                     printf("%5lu | mode=%s\n", _helper.count, MODENAMES[mode]);
                 }
             }

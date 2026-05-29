@@ -72,6 +72,13 @@ namespace hf {
 
                 auto dynamics = sim.dynamics;
 
+                printf("t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f mode=%s\n",
+                        setpoint.thrust,
+                        setpoint.roll,
+                        setpoint.pitch,
+                        setpoint.yaw,
+                        MODENAMES[mode]);
+
                 // Run slow PID control in outer loop ----------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
 
