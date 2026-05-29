@@ -61,7 +61,7 @@ namespace hf {
 
             if (useHoverDeck) {
                 _zranger.begin();
-                //_flowsensor.begin();
+                _flowsensor.begin();
             }
 
             _mode = MODE_IDLE;

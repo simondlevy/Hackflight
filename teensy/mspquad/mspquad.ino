@@ -74,7 +74,7 @@ void loop()
     const auto setpoint = _fc.update(_message);
 
     static Debugger _debugger;
-    _debugger.reportZ(_fc.getState());
+    _debugger.reportHover(_fc.getState());
 
     // Run motor mixer on setpoint
     _fc.runMotors(setpoint);

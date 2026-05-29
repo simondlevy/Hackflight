@@ -100,16 +100,19 @@ namespace hf {
             {
                 if (_helper.ready()) {
 
-                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%3.3f yaw=%+3.3f\n",
+                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%3.3f "
+                            "yaw=%+3.3f\n",
                             _helper.count, setpoint.thrust, setpoint.roll,
                             setpoint.pitch, setpoint.yaw); }
             }
 
-            void reportZ(const VehicleState & state)
+            void reportHover(const VehicleState & state)
             {
                 if (_helper.ready()) {
-                    printf("%5lu | z=%6.3f dz=%+5.3f\n",
-                            _helper.count, state.z, state.dz);
+
+                    printf("%5lu | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
+                            _helper.count, state.dx, state.dy, state.z,
+                            state.dz);
                 }
             }
 
@@ -120,20 +123,19 @@ namespace hf {
                     if (full) {
                         printf("%5lu | "
                                 "dx=%+03.3f dy=%+03.3f z=%6.3f dz=%+5.3f "
-                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
-                                "psi=%+04.0f dpsi=%+04.0f\n",
-                                _helper.count, 
-                                state.dx, state.dy, state.z, state.dz,
-                                state.phi, state.dphi, state.theta, state.dtheta,
-                                state.psi, state.dpsi);
+                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f "
+                                " dtheta=%+04.0f psi=%+04.0f dpsi=%+04.0f\n",
+                                _helper.count, state.dx, state.dy, state.z,
+                                state.dz, state.phi, state.dphi, state.theta,
+                                state.dtheta, state.psi, state.dpsi);
                     }
                     else {
                         printf("%5lu | "
-                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f dtheta=%+04.0f "
-                                "psi=%+04.0f dpsi=%+04.0f\n",
-                                _helper.count, 
-                                state.phi, state.dphi, state.theta, state.dtheta,
-                                state.psi, state.dpsi);
+                                "phi=%+03.0f dphi=%+04.0f theta=%+03.0f "
+                                "dtheta=%+04.0f psi=%+04.0f dpsi=%+04.0f\n",
+                                _helper.count, state.phi, state.dphi,
+                                state.theta, state.dtheta, state.psi,
+                                state.dpsi);
                     }
                 }
             }
