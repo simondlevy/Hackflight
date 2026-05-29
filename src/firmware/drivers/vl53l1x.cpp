@@ -48,7 +48,7 @@ auto ZRanger::read() -> float
 {
     static float _distance;
 
-    if (_vl53l1x.dataReady()) {
+    if (_vl53l1x.dataReady())  {
 
         _distance = _vl53l1x.distance();
 
