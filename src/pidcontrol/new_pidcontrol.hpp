@@ -65,8 +65,6 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> PidControl
             {
-                static uint32_t _count;
-
                 // Altitude hold ---------------------------------------------
 
                 const auto  altitude_target =
@@ -88,6 +86,7 @@ namespace hf {
 
                 const auto thrust = climbrate_pid.output;
 
+                static uint32_t _count;
                 printf("%f,%f,%f,%f,%f,%f\n",
                         _count * dt,
                         new_altitude_target,
