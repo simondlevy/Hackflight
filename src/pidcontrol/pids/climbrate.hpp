@@ -69,32 +69,10 @@ namespace hf {
 
                 const auto thrust = KP * error + KI * integral;
 
-                const auto output = airborne ?
-                    Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                            THRUST_MIN, THRUST_MAX) : 0;
+                const auto output =
+                    airborne ? thrust * THRUST_SCALE + THRUST_BASE : 0;
 
                 return ClimbRateController(output, integral);
-            }
-
-            float run(
-                    const bool hovering,
-                    const float dt,
-                    const float target,
-                    const float z,
-                    const float dz)
-            {
-                const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
-
-                const auto error = target - dz;
-
-                _integral = airborne ? 
-                    Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
-
-                const auto thrust = KP * error + KI * _integral;
-
-                return airborne ?
-                    Num::fconstrain(thrust * THRUST_SCALE + THRUST_BASE,
-                            THRUST_MIN, THRUST_MAX) : 0;
             }
 
         private:
