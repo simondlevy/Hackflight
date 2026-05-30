@@ -28,7 +28,7 @@ JOYSTICK_AXIS_MAP = {
 
 MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3, 'landing': 4}
 
-ZDIST_LANDING_MAX_M = 0.015
+ZDIST_LANDING_MAX_M = 0.03
 
 
 def startMotor(robot, motor_name, direction):
