@@ -88,12 +88,13 @@ namespace hf {
 
                 const auto thrust = climbrate_pid.output;
 
-                printf("%f,%f,%f,%f,%f\n",
+                printf("%f,%f,%f,%f,%f,%f\n",
                         _count * dt,
                         new_altitude_target,
                         altitude_pid.output,
                         climbrate_pid.output,
-                        state.z
+                        state.z,
+                        state.dz
                         );
                 _count++;
 

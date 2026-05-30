@@ -25,21 +25,29 @@ def main():
 
     time = data[:, 0]
 
-    plt.subplot(3, 1, 1)
+    plt.subplot(5, 1, 1)
     plt.plot(time, data[:, 1], 'r')
-    plt.plot(time, data[:, 2], 'b')
     plt.plot(time, data[:, 4], 'g')
     plt.ylabel('Altitude (m)')
-    plt.legend(('Target', 'PID', 'Actual'))
+    plt.legend(('Target', 'Actual'))
 
-    plt.subplot(3, 1, 2)
+    plt.subplot(5, 1, 2)
+    plt.plot(time, data[:, 2], 'b')
+    plt.ylabel('Altitude PID (m/s)')
+
+    plt.subplot(5, 1, 3)
     plt.plot(time, data[:, 3], 'm')
     plt.ylabel('Climbrate PID')
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(5, 1, 4)
     plt.plot(time, data[:, 3], 'm')
-    plt.ylim((35686, 35690))
+    plt.ylim((35680, 35690))
     plt.ylabel('Climbrate PID (detail)')
+
+    plt.subplot(5, 1, 5)
+    plt.plot(time, data[:, 5], 'c')
+    plt.plot(time, np.zeros(len(time)), 'k--')
+    plt.ylabel('dZ/dt (m/s)')
 
     plt.show()
 
