@@ -23,6 +23,15 @@ namespace hf {
 
     class AltitudeController {
 
+        private:
+
+            static constexpr float KP = 2;
+            static constexpr float KI = 0.5;
+            static constexpr float ILIMIT = 5000;
+            static constexpr float VEL_MAX = 1;
+            static constexpr float VEL_MAX_OVERHEAD = 1.10;
+            static constexpr float LANDING_SPEED_MPS = 0.15;
+
         public:
 
             float output;
@@ -80,13 +89,6 @@ namespace hf {
             }
 
         private:
-
-            static constexpr float KP = 2;
-            static constexpr float KI = 0.5;
-            static constexpr float ILIMIT = 5000;
-            static constexpr float VEL_MAX = 1;
-            static constexpr float VEL_MAX_OVERHEAD = 1.10;
-            static constexpr float LANDING_SPEED_MPS = 0.15;
 
             float _integral;
 

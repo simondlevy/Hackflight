@@ -24,6 +24,14 @@ namespace hf {
 
     class ClimbRateController {
 
+        private:
+
+            static constexpr float KP = 25;
+            static constexpr float KI = 15;
+            static constexpr float ILIMIT = 5000;
+
+            static constexpr float ALTITUDE_LANDING_M = 0.03;
+
         public:
 
             float output;
@@ -90,12 +98,6 @@ namespace hf {
             }
 
         private:
-
-            static constexpr float KP = 25;
-            static constexpr float KI = 15;
-            static constexpr float ILIMIT = 5000;
-
-            static constexpr float ALTITUDE_LANDING_M = 0.03;
 
             float _integral;
     };
