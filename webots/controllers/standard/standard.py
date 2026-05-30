@@ -28,7 +28,7 @@ JOYSTICK_AXIS_MAP = {
 
 MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3, 'landing': 4}
 
-ZDIST_LANDING_MAX_M = 0.01
+ZDIST_LANDING_MAX_M = 0.015
 
 
 def startMotor(robot, motor_name, direction):
@@ -86,8 +86,7 @@ def readJoystickAxis(joystick, index):
     return normalizeJoystickAxis(readJoystickRaw(joystick, index))
 
 
-def getModeFromButton(
-        button, hover_button, auto_button, buttons_down, cmdinfo):
+def getMode(button, hover_button, auto_button, buttons_down, cmdinfo):
 
     mode = cmdinfo[0]
     mode = checkPressed(button, hover_button, 'hover', buttons_down, mode)
@@ -96,8 +95,7 @@ def getModeFromButton(
 
 def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
 
-    mode = getModeFromButton(joystick.getPressedButton(), 5, 4, buttons_down,
-                             cmdinfo)
+    mode = getMode(joystick.getPressedButton(), 5, 4, buttons_down, cmdinfo)
 
     axes = JOYSTICK_AXIS_MAP[joystick.model]
 
@@ -113,7 +111,7 @@ def getCommandInfoFromKeyboard(keyboard, keys_down, cmdinfo):
 
     key = keyboard.getKey()
 
-    mode = getModeFromButton(key, 4, 32, keys_down, cmdinfo)
+    mode = getMode(key, 4, 32, keys_down, cmdinfo)
 
     thrust = +1 if key == ord('W') else -1 if key == ord('S') else 0
 
@@ -190,10 +188,15 @@ def main():
 
         mode = cmdinfo[0]
 
+        print('cmdinfo[0] = ' + cmdinfo[0])
+
         # On descent, switch mode to armed when close enough to ground
         if (mode == 'landing' and
            (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
             mode = 'armed'
+            cmdinfo = 'armed', 0, 0, 0, 0
+
+        print('sending mode: ' + mode)
 
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
