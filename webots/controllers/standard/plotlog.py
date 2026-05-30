@@ -18,6 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pyplot as plt
 
+DETAIL_MIN = 35685
+DETAIL_MAX = 35695
+
 
 def main():
 
@@ -40,8 +43,13 @@ def main():
     plt.ylabel('Climbrate PID')
 
     plt.subplot(5, 1, 4)
-    plt.plot(time, data[:, 3], 'm')
-    plt.ylim((35680, 35690))
+    detail = data[:, 3]
+    detail[np.logical_or(detail < DETAIL_MIN, detail > DETAIL_MAX)] = 0
+    detail_pos = detail[detail > 0]
+    print((np.min(detail_pos), np.max(detail_pos)))
+    plt.plot(time, detail, 'm')
+    plt.ylim((np.min(detail_pos), np.max(detail_pos)))
+    plt.ylim((np.min(detail_pos), np.max(detail_pos)))
     plt.ylabel('Climbrate PID (detail)')
 
     plt.subplot(5, 1, 5)
