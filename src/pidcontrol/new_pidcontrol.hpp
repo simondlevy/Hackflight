@@ -65,6 +65,8 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> PidControl
             {
+                static uint32_t _count;
+
                 // Altitude hold ---------------------------------------------
 
                 const auto  altitude_target =
@@ -76,14 +78,24 @@ namespace hf {
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
-                const auto altitude_pid = AltitudeController::run(pid._altitude_pid,
-                        hovering, dt, new_altitude_target, state.z);
+                const auto altitude_pid =
+                    AltitudeController::run(pid._altitude_pid, hovering, dt,
+                            new_altitude_target, state.z);
 
                 const auto climbrate_pid =
                     ClimbRateController::run(pid._climbrate_pid, hovering, dt,
                             altitude_pid.output, state.z, state.dz);
 
                 const auto thrust = climbrate_pid.output;
+
+                printf("%f,%f,%f,%f,%f\n",
+                        _count * dt,
+                        new_altitude_target,
+                        altitude_pid.output,
+                        climbrate_pid.output,
+                        state.z
+                        );
+                _count++;
 
                 // Position hold ---------------------------------------------
 

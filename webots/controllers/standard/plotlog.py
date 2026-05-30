@@ -18,38 +18,31 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pyplot as plt
 
-ZMAX = 1.5
-VMAX = 2.0
-
-
-def plotvel(t, data, index, color, what):
-    plt.subplot(4, 1, index)
-    plt.plot(t, data[:, index], color)
-    plt.plot(t, np.zeros(len(t)), 'k')
-    plt.ylim((-VMAX, +VMAX))
-    plt.ylabel('d%s/dt (m/s)' % what)
-
 
 def main():
 
-    data = np.loadtxt('log.csv', delimiter=',', skiprows=1)
+    data = np.loadtxt('log.csv', delimiter=',')
 
-    t = data[:, 0] - data[0, 0]
+    time = data[:, 0]
 
-    plotvel(t, data, 1, 'g', 'X')
+    plt.subplot(3, 1, 1)
+    plt.plot(time, data[:, 1], 'r')
+    plt.plot(time, data[:, 2], 'b')
+    plt.plot(time, data[:, 4], 'g')
+    plt.ylabel('Altitude (m)')
+    plt.legend(('Target', 'PID', 'Actual'))
 
-    plotvel(t, data, 2, 'm', 'Y')
+    plt.subplot(3, 1, 2)
+    plt.plot(time, data[:, 3], 'm')
+    plt.ylabel('Climbrate PID')
 
-    plt.subplot(4, 1, 3)
-    plt.plot(t, data[:, 3], 'b')
-    plt.ylim((0, ZMAX))
-    plt.ylabel('Z (m)')
-
-    plotvel(t, data, 4, 'r', 'Z')
-
-    plt.xlabel('time (s)')
+    plt.subplot(3, 1, 3)
+    plt.plot(time, data[:, 3], 'm')
+    plt.ylim((35686, 35690))
+    plt.ylabel('Climbrate PID (detail)')
 
     plt.show()
+
 
 
 main()

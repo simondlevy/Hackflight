@@ -74,16 +74,6 @@ namespace hf {
 
     } mode_e;
 
-    // For debugging
-    static const char * MODENAMES[6] = {
-        "IDLE",
-        "ARMED",
-        "HOVERING",
-        "AUTONOMOUS",
-        "LANDING",
-        "PANIC"
-    };
-
     class Setpoint {
 
         public:
