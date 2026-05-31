@@ -40,9 +40,6 @@ namespace hf {
             static constexpr float PID_FAST_FREQ = 500; // 1024 Plank 
             static constexpr float PID_SLOW_FREQ = 100;
 
-            static constexpr float PITCH_ROLL_MOTOR_SCALE = 1e6;
-            static constexpr float YAW_MOTOR_SCALE = 2e4;
-
             static constexpr uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
         public:
@@ -90,10 +87,11 @@ namespace hf {
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            thrust == 0 ? 0 : 1000 * thrust + THRUST_BASE_RPM,
-                            pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
-                            pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
-                            pidControl.setpoint.yaw * YAW_MOTOR_SCALE
+                            thrust == 0 ? 0 :
+                                THRUST_BASE_RPM + thrust * THRUST_SCALE_RPM,
+                            pidControl.setpoint.roll * PITCH_ROLL_SCALE_RPM,
+                            pidControl.setpoint.pitch * PITCH_ROLL_SCALE_RPM,
+                            pidControl.setpoint.yaw * YAW_SCALE_RPM
                         };
 
                         // Get motor RPMS from mixer
