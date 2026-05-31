@@ -67,7 +67,7 @@ namespace hf {
 
             auto getState() -> VehicleState
             {
-                return _fc._state;
+                return _fc.getState();
             }
 
         private:
