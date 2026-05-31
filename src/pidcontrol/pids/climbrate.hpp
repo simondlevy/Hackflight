@@ -69,6 +69,11 @@ namespace hf {
 
                 const auto output = airborne ? thrust : 0;
 
+                if (airborne) {
+                    printf("tgt=%+3.3f dz=%+3.3f err=%+3.3f ki*int=%+3.3f thr=%+3.3f out=%+3.3f\n",
+                            target, dz, error, KI*integral, thrust, output);
+                }
+
                 return ClimbRateController(output, integral);
             }
 
