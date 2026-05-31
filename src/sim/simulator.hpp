@@ -63,9 +63,6 @@ namespace hf {
                     const Setpoint & setpoint,
                     const float framerate=32) -> Simulator 
             {
-                const auto hovering =
-                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
-
                 const auto dt = 1/(float)PID_FAST_FREQ;
 
                 auto pidControl = sim._pidControl;
@@ -85,7 +82,7 @@ namespace hf {
 
                         // Run PID control to get new setpoint
                         pidControl = PidControl::run(
-                                pidControl, dt, hovering, state, setpoint);
+                                pidControl, dt, mode, state, setpoint);
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {

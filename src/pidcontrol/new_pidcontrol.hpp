@@ -61,7 +61,7 @@ namespace hf {
             static auto run(
                     const PidControl & pid,
                     const float dt,
-                    const bool hovering,
+                    const mode_e mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> PidControl
             {
@@ -75,6 +75,9 @@ namespace hf {
                         altitude_target +
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
+
+                const auto hovering =
+                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
 
                 const auto altitude_pid =
                     AltitudeController::run(pid._altitude_pid, hovering, dt,
