@@ -20,10 +20,9 @@
 
 #include <sim/dynamics.hpp>
 
-// Approximate thrust needed when in perfect hover. More weight/older
-// battery can use a higher value
+// Approximate RPMS needed when in perfect hover. More weight/older battery can
+// use a higher value
 static constexpr float THRUST_BASE  = 36000;
-static constexpr float THRUST_SCALE = 1000;
 
 static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
 

@@ -86,6 +86,7 @@ namespace hf {
 
                 const auto thrust = climbrate_pid.output;
 
+                /*
                 static uint32_t _count;
                 printf("%f,%f,%f,%f,%f,%f\n",
                         _count * dt,
@@ -95,7 +96,7 @@ namespace hf {
                         state.z,
                         state.dz
                         );
-                _count++;
+                _count++;*/
 
                 // Position hold ---------------------------------------------
 

@@ -26,8 +26,8 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 25;
-            static constexpr float KI = 15;
+            static constexpr float KP = 25000;
+            static constexpr float KI = 15000;
             static constexpr float ILIMIT = 5000;
 
             static constexpr float ALTITUDE_LANDING_M = 0.03;
@@ -69,8 +69,7 @@ namespace hf {
 
                 const auto thrust = KP * error + KI * integral;
 
-                const auto output =
-                    airborne ? thrust * THRUST_SCALE + THRUST_BASE : 0;
+                const auto output = airborne ? thrust + THRUST_BASE : 0;
 
                 return ClimbRateController(output, integral);
             }
