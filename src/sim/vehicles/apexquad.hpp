@@ -21,14 +21,10 @@
 #include <sim/dynamics.hpp>
 
 
+static constexpr float SCALE_RPM = 1000;
+
 // Approximate thrust RPM needed when in perfect hover
-static constexpr float THRUST_BASE_RPM = 36000;
-
-static constexpr float THRUST_SCALE_RPM = 1000;
-
-static constexpr float PITCH_ROLL_SCALE_RPM = 1e6;
-static constexpr float YAW_SCALE_RPM = 1000;
-
+static constexpr float BASE_RPM = 36000;
 
 static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
 
@@ -36,10 +32,8 @@ static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
     9.0e-2,  // mass [kg]
     5.0e-2,  // arm length L [m]
 
-    // Estimated by using constants above: 
-    //   B, D increase in proportion to mass;
-    //   I decreases in proportion to mass;
+    // Reverse-engineered by observation:
     1.3e-8, // thrust coefficient B [F=b*w^2]
-    4.1e-4, // I [kg*m^2] for pitch, roll
-    3.9e-8  // drag coefficient D [T=d*w^2] for yaw
+    4.1e-7, // I [kg*m^2] for pitch, roll, yaw
+    3.9e-11 // drag coefficient D [T=d*w^2] for yaw
 };

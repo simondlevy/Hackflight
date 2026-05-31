@@ -87,11 +87,10 @@ namespace hf {
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            thrust == 0 ? 0 :
-                                THRUST_BASE_RPM + thrust * THRUST_SCALE_RPM,
-                            pidControl.setpoint.roll * PITCH_ROLL_SCALE_RPM,
-                            pidControl.setpoint.pitch * PITCH_ROLL_SCALE_RPM,
-                            pidControl.setpoint.yaw * YAW_SCALE_RPM
+                            thrust == 0 ? 0 : BASE_RPM + thrust * SCALE_RPM,
+                            pidControl.setpoint.roll * SCALE_RPM,
+                            pidControl.setpoint.pitch * SCALE_RPM,
+                            pidControl.setpoint.yaw * SCALE_RPM
                         };
 
                         // Get motor RPMS from mixer
