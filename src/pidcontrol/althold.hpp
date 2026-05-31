@@ -18,7 +18,6 @@
 
 #include <pidcontrol/pids/altitude.hpp>
 #include <pidcontrol/pids/climbrate.hpp>
-#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 namespace hf {
@@ -44,16 +43,12 @@ namespace hf {
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
-                    const PositionController & position_x_pid,
-                    const PositionController & position_y_pid,
                     const StabilizerPid & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
                 _altitude_target(altitude_target),
                 _altitude_pid(altitude_pid),
                 _climbrate_pid(climbrate_pid),
-                _position_x_pid(position_x_pid),
-                _position_y_pid(position_y_pid),
                 _stabilizer_pid(stabilizer_pid) {}
 
             static auto run(
@@ -101,37 +96,22 @@ namespace hf {
                         );
                 _count++;*/
 
-                // Position hold ---------------------------------------------
-
-                // Rotate world-coordinate velocities into body coordinates
-                const auto dxw = state.dx;
-                const auto dyw = state.dy;
-                const auto psi = Num::DEG2RAD * state.psi;
-                const auto cospsi = cos(psi);
-                const auto sinpsi = sin(psi);
-                const auto dxb =  dxw * cospsi + dyw * sinpsi;
-                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
-
-                const auto position_y_pid =
-                    PositionController::run(pid._position_y_pid, airborne, dt,
-                            setpoint_in.roll, dyb);
-
-                const auto position_x_pid =
-                    PositionController::run(pid._position_x_pid, airborne, dt,
-                            setpoint_in.pitch, dxb);
-
                 //  Stabilization ---------------------------------------------
 
                 const auto setpoint_mid = Setpoint(thrust,
-                        position_y_pid.output, position_x_pid.output,
+                        setpoint_in.roll,
+                        setpoint_in.pitch,
                         setpoint_in.yaw);
 
                 const auto stabilizer_pid = StabilizerPid::run(
                         pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
 
-                return PidControl(new_altitude_target, altitude_pid,
-                        climbrate_pid, position_x_pid, position_y_pid,
-                        stabilizer_pid, stabilizer_pid.setpoint);
+                return PidControl(
+                        new_altitude_target,
+                        altitude_pid,
+                        climbrate_pid,
+                        stabilizer_pid,
+                        stabilizer_pid.setpoint);
             }
 
         private:
@@ -141,9 +121,6 @@ namespace hf {
             AltitudeController _altitude_pid;
 
             ClimbRateController _climbrate_pid;
-
-            PositionController _position_x_pid;
-            PositionController _position_y_pid;
 
             StabilizerPid _stabilizer_pid;
     };

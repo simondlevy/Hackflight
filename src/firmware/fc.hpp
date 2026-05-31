@@ -36,7 +36,7 @@
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <firmware/timer.hpp>
-#include <pidcontrol/new_pidcontrol.hpp>
+#include <pidcontrol/hover.hpp>
 
 namespace hf {
 
