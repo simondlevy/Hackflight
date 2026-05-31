@@ -71,7 +71,7 @@ namespace hf {
 
                 auto dynamics = sim.dynamics;
 
-                // Run slow PID control in outer loop ----------------------------
+                // Run slow PID control in outer loop -------------------------
                 for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
 
                     // Get vehicle state from dynamics and convert state values
@@ -79,7 +79,7 @@ namespace hf {
                     // controllers
                     const auto state = SimStateToVehicleState(dynamics.state);
 
-                    // Run fast PID control and mixer in middle loop --------------
+                    // Run fast PID control and mixer in middle loop ----------
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
@@ -101,9 +101,9 @@ namespace hf {
                         // Convert motor values to double for dynamics
                         const auto rpms = motors2doubless(_mixer.motorvals, 4);
 
-                        // Run dynamics in inner loop -----------------------------
-                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
-
+                        // Run dynamics in inner loop -------------------------
+                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k)
+                        {
                             dynamics = Dynamics::update(dynamics,
                                     VPARAMS, 1 / DYNAMICS_FREQ, rpms, 4,
                                     _mixer.roll, _mixer.pitch, _mixer.yaw);

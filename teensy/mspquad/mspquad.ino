@@ -64,7 +64,10 @@ void serialEvent1()
 void setup()
 {
     // Start sensors and motors (this will also start Serial1)
-    _fc.begin(true);
+    _fc.begin();
+
+    // Start hover-deck
+    _fc.beginHover();
 }
 
 void loop()

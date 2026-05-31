@@ -34,11 +34,16 @@ namespace hf {
 
             FC _fc;
 
-            void begin(const bool useHoverDeck=false)
+            void begin()
             {
-                _fc.begin(useHoverDeck);
-
+                _fc.begin();
                 _motors.begin(); 
+            }
+
+            void beginHover()
+            {
+                begin();
+                _fc.beginHover();
             }
 
             auto update(const msp_message_t & message) -> Setpoint

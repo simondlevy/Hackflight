@@ -53,19 +53,20 @@ namespace hf {
         static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
         static constexpr float TELEMETRY_RATE_HZ = 50;
 
-        void begin(const bool useHoverDeck)
+        void begin()
         {
             Serial1.begin(115200);
 
             _imu.begin();
             _led.begin(); 
 
-            if (useHoverDeck) {
-                _zranger.begin();
-                _flowsensor.begin();
-            }
-
             _mode = MODE_IDLE;
+        }
+
+        void beginHover()
+        {
+            _zranger.begin();
+            _flowsensor.begin();
         }
 
         auto update(const ReceiverData & rxdata, const float * motorvals,
@@ -76,8 +77,7 @@ namespace hf {
                     _imuFilter.isGyroCalibrated, rxdata.is_armed,
                     rxdata.timestamp_msec, _imuFilter, _mode);
 
-            update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
-                    motorcount, false);
+            update(motorvals, motorcount, false);
 
             _stabilizerPid = StabilizerPidController::run(
                     _stabilizerPid,
@@ -96,8 +96,7 @@ namespace hf {
             _mode = Safety::updateModeMsp(millis(), _state,
                     _imuFilter.isGyroCalibrated, message, _imuFilter, _mode);
 
-            update(message.is_armed, message.timestamp_msec, motorvals,
-                    motorcount, true);
+            update(motorvals, motorcount, true);
 
             return Setpoint(0, 0, 0, 0); // XXX
         } 
@@ -148,8 +147,7 @@ namespace hf {
         // Debugging
         Debugger _debugger;
 
-        void update(const bool remote_is_armed,
-                const uint32_t remote_message_msec,
+        void update(
                 const float * motorvals,
                 const uint8_t motorcount,
                 const bool useHoverDeck)
