@@ -42,6 +42,8 @@ namespace hf {
 
             static constexpr uint8_t MAX_MOTOR_COUNT = 20; // whatevs
 
+            static constexpr float SCALE_RPM = 1000;
+
         public:
 
             Dynamics dynamics;
@@ -87,7 +89,8 @@ namespace hf {
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            thrust == 0 ? 0 : BASE_RPM + thrust * SCALE_RPM,
+                            thrust == 0 ? 0 :
+                                VEHICLE_BASE_RPM + thrust * SCALE_RPM,
                             pidControl.setpoint.roll * SCALE_RPM,
                             pidControl.setpoint.pitch * SCALE_RPM,
                             pidControl.setpoint.yaw * SCALE_RPM

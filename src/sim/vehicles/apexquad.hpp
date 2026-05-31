@@ -20,11 +20,8 @@
 
 #include <sim/dynamics.hpp>
 
-
-static constexpr float SCALE_RPM = 1000;
-
 // Approximate thrust RPM needed when in perfect hover
-static constexpr float BASE_RPM = 36000;
+static constexpr float VEHICLE_BASE_RPM = 36000;
 
 static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
 
