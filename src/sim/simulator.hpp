@@ -25,7 +25,7 @@
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <num.hpp>
-#include <pidcontrol/new_pidcontrol.hpp>
+#include <pidcontrol/hover.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/state.hpp>
 #include <vehicles/apexquad.hpp>

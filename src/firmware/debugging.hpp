@@ -69,7 +69,6 @@ namespace hf {
                     "ARMED",
                     "HOVERING",
                     "AUTONOMOUS",
-                    "LANDING",
                     "PANIC"
                 };
 
