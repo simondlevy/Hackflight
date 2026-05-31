@@ -18,11 +18,10 @@
 
 #include <pidcontrol/pids/altitude.hpp>
 #include <pidcontrol/pids/climbrate.hpp>
-#include <pidcontrol/stabilizer.hpp>
 
 namespace hf {
 
-    class AltHoldPidControl {
+    class AltHoldPidController {
 
         private:
 
@@ -33,30 +32,28 @@ namespace hf {
 
         public:
 
-            Setpoint setpoint;
+            float thrust;
 
-            AltHoldPidControl() = default;
+            AltHoldPidController() = default;
 
-            AltHoldPidControl& operator=(const AltHoldPidControl& other) = default;
+            AltHoldPidController& operator=(const AltHoldPidController& other) = default;
 
-            AltHoldPidControl(
+            AltHoldPidController(
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
-                    const StabilizerPid & stabilizer_pid,
-                    const Setpoint & setpoint)
-                : setpoint(setpoint),
+                    const float thrust)
+                : thrust(thrust),
                 _altitude_target(altitude_target),
                 _altitude_pid(altitude_pid),
-                _climbrate_pid(climbrate_pid),
-                _stabilizer_pid(stabilizer_pid) {}
+                _climbrate_pid(climbrate_pid) {}
 
             static auto run(
-                    const AltHoldPidControl & pid,
+                    const AltHoldPidController & pid,
                     const float dt,
                     const mode_e mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> AltHoldPidControl
+                    const Setpoint & setpoint_in) -> AltHoldPidController
             {
                 // Altitude hold ---------------------------------------------
 
@@ -80,10 +77,6 @@ namespace hf {
                     ClimbRateController::run(pid._climbrate_pid, hovering, dt,
                             altitude_pid.output, state.z, state.dz);
 
-                const auto thrust = climbrate_pid.output;
-
-                const auto airborne = thrust > 0;
-
                 /*
                 static uint32_t _count;
                 printf("%f,%f,%f,%f,%f,%f\n",
@@ -96,22 +89,11 @@ namespace hf {
                         );
                 _count++;*/
 
-                //  Stabilization ---------------------------------------------
-
-                const auto setpoint_mid = Setpoint(thrust,
-                        setpoint_in.roll,
-                        setpoint_in.pitch,
-                        setpoint_in.yaw);
-
-                const auto stabilizer_pid = StabilizerPid::run(
-                        pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
-
-                return AltHoldPidControl(
+                return AltHoldPidController(
                         new_altitude_target,
                         altitude_pid,
                         climbrate_pid,
-                        stabilizer_pid,
-                        stabilizer_pid.setpoint);
+                        climbrate_pid.output);
             }
 
         private:
@@ -121,7 +103,5 @@ namespace hf {
             AltitudeController _altitude_pid;
 
             ClimbRateController _climbrate_pid;
-
-            StabilizerPid _stabilizer_pid;
     };
 }

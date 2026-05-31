@@ -21,7 +21,7 @@
 
 namespace hf {
 
-    class StabilizerPid {
+    class StabilizerPidController {
 
         private:
 
@@ -31,11 +31,12 @@ namespace hf {
 
             Setpoint setpoint;
 
-            StabilizerPid() = default;
+            StabilizerPidController() = default;
 
-            StabilizerPid& operator=(const StabilizerPid& other) = default;
+            StabilizerPidController& operator=(
+                    const StabilizerPidController& other) = default;
 
-            StabilizerPid(
+            StabilizerPidController(
                     const RollPitchPid & pitch_pid,
                     const RollPitchPid & roll_pid,
                     const YawPid & yaw_pid,
@@ -46,11 +47,11 @@ namespace hf {
                 _yaw_pid(yaw_pid) {}
 
             static auto run(
-                    const StabilizerPid & s,
+                    const StabilizerPidController & s,
                     const bool airborne,
                     const float dt,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> StabilizerPid
+                    const Setpoint & setpoint_in) -> StabilizerPidController
             {
                 const auto roll_pid = RollPitchPid::run(s._roll_pid,
                         dt, airborne, setpoint_in.roll, state.phi, state.dphi);
@@ -67,7 +68,7 @@ namespace hf {
                         pitch_pid.output,
                         yaw_pid.output);
 
-                return StabilizerPid(
+                return StabilizerPidController(
                         roll_pid, pitch_pid, yaw_pid, setpoint_out);
              }
 

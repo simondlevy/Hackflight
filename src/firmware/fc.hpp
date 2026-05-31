@@ -79,7 +79,7 @@ namespace hf {
             update(rxdata.is_armed, rxdata.timestamp_msec, motorvals,
                     motorcount, false);
 
-            _stabilizerPid = StabilizerPid::run(
+            _stabilizerPid = StabilizerPidController::run(
                     _stabilizerPid,
                     !rxdata.is_throttle_down,
                     Timer::getDt(),
@@ -140,10 +140,10 @@ namespace hf {
         ZRangerFilter _zrangerFilter;
 
         // PID control for stabilize-only
-        StabilizerPid _stabilizerPid;
+        StabilizerPidController _stabilizerPid;
 
-        // PID control for altitude-hold and stabilize
-        PidControl _altHoldPid;
+        // PID control forhaltitude-hold and stabilize
+        AltHoldPidController _altHoldPid;
 
         // Debugging
         Debugger _debugger;

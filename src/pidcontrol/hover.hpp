@@ -16,90 +16,48 @@
 
 #pragma once
 
-#include <pidcontrol/pids/altitude.hpp>
-#include <pidcontrol/pids/climbrate.hpp>
+#include <pidcontrol/althold.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
 namespace hf {
 
-    class HoverPidControl {
-
-        private:
-
-            static constexpr float ALTITUDE_INIT_M = 0.4;
-            static constexpr float ALTITUDE_MAX_M = 1.0;
-            static constexpr float ALTITUDE_MIN_M = 0.2;
-            static constexpr float ALTITUDE_INC_MPS = 0.2;
+    class HoverPidController {
 
         public:
 
             Setpoint setpoint;
 
-            HoverPidControl() = default;
+            HoverPidController() = default;
 
-            HoverPidControl& operator=(const HoverPidControl& other) = default;
+            HoverPidController& operator=(
+                    const HoverPidController& other) = default;
 
-            HoverPidControl(
-                    const float altitude_target,
-                    const AltitudeController & altitude_pid,
-                    const ClimbRateController & climbrate_pid,
+            HoverPidController(
+                    const AltHoldPidController & althold_pid,
                     const PositionController & position_x_pid,
                     const PositionController & position_y_pid,
-                    const StabilizerPid & stabilizer_pid,
+                    const StabilizerPidController & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
-                _altitude_target(altitude_target),
-                _altitude_pid(altitude_pid),
-                _climbrate_pid(climbrate_pid),
+                _althold_pid(althold_pid),
                 _position_x_pid(position_x_pid),
                 _position_y_pid(position_y_pid),
                 _stabilizer_pid(stabilizer_pid) {}
 
             static auto run(
-                    const HoverPidControl & pid,
+                    const HoverPidController & pid,
                     const float dt,
                     const mode_e mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> HoverPidControl
+                    const Setpoint & setpoint_in) -> HoverPidController
             {
                 // Altitude hold ---------------------------------------------
 
-                const auto  altitude_target =
-                    pid._altitude_target == 0 ? ALTITUDE_INIT_M :
-                    pid._altitude_target;
+                const auto althold_pid = AltHoldPidController::run(
+                        pid._althold_pid, dt, mode, state, setpoint_in);
 
-                const auto new_altitude_target = Num::fconstrain(
-                        altitude_target +
-                        setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
-                        ALTITUDE_MIN_M, ALTITUDE_MAX_M);
-
-                const auto hovering =
-                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
-
-                const auto altitude_pid =
-                    AltitudeController::run(pid._altitude_pid, hovering, dt,
-                            new_altitude_target, state.z);
-
-                const auto climbrate_pid =
-                    ClimbRateController::run(pid._climbrate_pid, hovering, dt,
-                            altitude_pid.output, state.z, state.dz);
-
-                const auto thrust = climbrate_pid.output;
-
-                const auto airborne = thrust > 0;
-
-                /*
-                static uint32_t _count;
-                printf("%f,%f,%f,%f,%f,%f\n",
-                        _count * dt,
-                        new_altitude_target,
-                        altitude_pid.output,
-                        climbrate_pid.output,
-                        state.z,
-                        state.dz
-                        );
-                _count++;*/
+                const auto airborne = althold_pid.thrust > 0;
 
                 // Position hold ---------------------------------------------
 
@@ -122,29 +80,25 @@ namespace hf {
 
                 //  Stabilization ---------------------------------------------
 
-                const auto setpoint_mid = Setpoint(thrust,
+                const auto setpoint_mid = Setpoint(althold_pid.thrust,
                         position_y_pid.output, position_x_pid.output,
                         setpoint_in.yaw);
 
-                const auto stabilizer_pid = StabilizerPid::run(
+                const auto stabilizer_pid = StabilizerPidController::run(
                         pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
 
-                return HoverPidControl(new_altitude_target, altitude_pid,
-                        climbrate_pid, position_x_pid, position_y_pid,
+                return HoverPidController(althold_pid,
+                        position_x_pid, position_y_pid,
                         stabilizer_pid, stabilizer_pid.setpoint);
             }
 
         private:
 
-            float _altitude_target;
-
-            AltitudeController _altitude_pid;
-
-            ClimbRateController _climbrate_pid;
+            AltHoldPidController _althold_pid;
 
             PositionController _position_x_pid;
             PositionController _position_y_pid;
 
-            StabilizerPid _stabilizer_pid;
+            StabilizerPidController _stabilizer_pid;
     };
 }
