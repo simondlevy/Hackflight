@@ -22,11 +22,12 @@
 
 
 // Approximate thrust RPM needed when in perfect hover
-static constexpr float THRUST_BASE_RPM = 3.6e4;
+static constexpr float THRUST_BASE_RPM = 36000;
 
-static constexpr float THRUST_SCALE_RPM = 1e3;
+static constexpr float THRUST_SCALE_RPM = 1000;
+
 static constexpr float PITCH_ROLL_SCALE_RPM = 1e6;
-static constexpr float YAW_SCALE_RPM = 2e4;
+static constexpr float YAW_SCALE_RPM = 1000;
 
 
 static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
@@ -38,7 +39,7 @@ static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
     // Estimated by using constants above: 
     //   B, D increase in proportion to mass;
     //   I decreases in proportion to mass;
-    1.3e-8, // force coefficient B [F=b*w^2]
-    1.9e-9, // drag coefficient D [T=d*w^2]
-    4.1e-4  // I [kg*m^2]   // pitch, roll
+    1.3e-8, // thrust coefficient B [F=b*w^2]
+    4.1e-4, // I [kg*m^2] for pitch, roll
+    3.9e-8  // drag coefficient D [T=d*w^2] for yaw
 };

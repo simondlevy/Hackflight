@@ -66,8 +66,8 @@ namespace hf {
 
                 // These should be estimated to get realistic behavior
                 double b;  // thrust coefficient [F=b*w^2]
-                double d;  // drag coefficient [T=d*w^2]
-                double I;  // body inertia [kg*m^2]; we ignore x/y/z distinction
+                double I;  // body inertia [kg*m^2]  for roll, pitch
+                double d;  // drag coefficient [T=d*w^2] for yaw
 
             } vehicle_params_t; 
 
