@@ -28,7 +28,7 @@
 #include <pidcontrol/hover.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/state.hpp>
-#include <vehicles/apexquad.hpp>
+#include <sim/vehicles/apexquad.hpp>
 
 namespace hf {
 
@@ -86,9 +86,11 @@ namespace hf {
                         pidControl = HoverPidController::run(
                                 pidControl, dt, mode, state, setpoint);
 
+                        const auto thrust = pidControl.setpoint.thrust;
+
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            pidControl.setpoint.thrust,
+                            thrust == 0 ? 0 : thrust + THRUST_BASE_RPM,
                             pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
                             pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
                             pidControl.setpoint.yaw * YAW_MOTOR_SCALE

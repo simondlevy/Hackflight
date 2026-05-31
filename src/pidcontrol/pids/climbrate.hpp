@@ -18,7 +18,6 @@
 #pragma once
 
 #include <num.hpp>
-#include <vehicles/apexquad.hpp>
 
 namespace hf {
 
@@ -51,7 +50,6 @@ namespace hf {
              * arbitrary positive value to be scaled according to motor
              * characteristics.
              */
-
             static auto run(
                     const ClimbRateController & controller,
                     const bool hovering,
@@ -69,7 +67,7 @@ namespace hf {
 
                 const auto thrust = KP * error + KI * integral;
 
-                const auto output = airborne ? thrust + THRUST_BASE_RPM : 0;
+                const auto output = airborne ? thrust : 0;
 
                 return ClimbRateController(output, integral);
             }

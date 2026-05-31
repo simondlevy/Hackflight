@@ -57,7 +57,7 @@ namespace hf {
                 const auto althold_pid = AltHoldPidController::run(
                         pid._althold_pid, dt, mode, state, setpoint_in);
 
-                const auto airborne = althold_pid.thrust > 0;
+                const auto airborne = state.z > 0.03; // XXX
 
                 // Position hold ---------------------------------------------
 
