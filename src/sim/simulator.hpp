@@ -28,7 +28,7 @@
 #include <pidcontrol/new_pidcontrol.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/state.hpp>
-#include <vehicles/diyquad.hpp>
+#include <vehicles/apexquad.hpp>
 
 namespace hf {
 

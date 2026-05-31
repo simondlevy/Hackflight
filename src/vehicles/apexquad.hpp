@@ -1,5 +1,5 @@
 /* 
- * Vehicle parameters for simulated DIY quadcopter
+ * Vehicle parameters for 2S quadcopter on 2inch APEX frame
  *
  *  Copyright (C) 2025 Simon D. Levy
  *
@@ -20,20 +20,19 @@
 
 #include <sim/dynamics.hpp>
 
-// Approximate RPMS needed when in perfect hover. More weight/older battery can
-// use a higher value
+// Approximate RPMS needed when in perfect hover
 static constexpr float THRUST_BASE  = 36000;
 
 static constexpr hf::Dynamics::vehicle_params_t VPARAMS = {
 
     // Actual values
-    3.0e-2,  // mass [kg]
+    9.0e-2,  // mass [kg]
     5.0e-2,  // arm length L [m]
 
-    // Estimated by using thrust constants above: 
+    // Estimated by using constants above: 
     //   B, D increase in proportion to mass;
     //   I decreases in proportion to mass;
-    4.3e-9, // force coefficient B [F=b*w^2]
+    1.3e-8, // force coefficient B [F=b*w^2]
     1.9e-9, // drag coefficient D [T=d*w^2]
     4.1e-4  // I [kg*m^2]   // pitch, roll
 };
