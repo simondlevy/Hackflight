@@ -25,8 +25,8 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 25000;
-            static constexpr float KI = 15000;
+            static constexpr float KP = 25;
+            static constexpr float KI = 15;
             static constexpr float ILIMIT = 5000;
 
             static constexpr float ALTITUDE_LANDING_M = 0.03;
@@ -46,9 +46,9 @@ namespace hf {
             ClimbRateController& operator=(const ClimbRateController&) = default;
 
             /**
-             * Demand is input as altitude target in meters and output as 
-             * arbitrary positive value to be scaled according to motor
-             * characteristics.
+             * Demand is input as climbrate target in meters per second and
+             * output as arbitrary positive value to be scaled according to
+             * vehicle characteristics.
              */
             static auto run(
                     const ClimbRateController & controller,

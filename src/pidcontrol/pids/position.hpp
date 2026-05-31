@@ -46,10 +46,9 @@ namespace hf {
             PositionController& operator=(const PositionController&) = default;
 
             /**
-             * Demands is input as normalized interval [-1,+1] and output as
-             * angles in degrees.
+             * Demands is input as meters per second and output as angles in
+             * degrees.
              */
-
             static auto run(
                     const PositionController & c,
                     const bool airborne,

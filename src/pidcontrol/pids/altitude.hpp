@@ -50,7 +50,6 @@ namespace hf {
              * Demand is input as altitude target in meters and output as 
              * climb rate in meters per second.
              */
-
             static auto run(
                     const AltitudeController & controller,
                     const bool hovering,

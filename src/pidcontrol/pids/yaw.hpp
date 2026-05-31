@@ -30,9 +30,9 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 0.3;           
-            static constexpr float KI = 0.05;          
-            static constexpr float KD = 0.00015;       
+            static constexpr float KP = 0.003;           
+            static constexpr float KI = 0.0005;          
+            static constexpr float KD = 0.0000015;       
             static constexpr float ILIMIT = 25.0;     
 
         public:
@@ -49,7 +49,12 @@ namespace hf {
 
             YawPid& operator=(const YawPid&) = default;
 
-            static auto run(
+            /**
+             * Demand is input as target in degrees per second and output as
+             * arbitrary value to be scaled according to vehicle
+             * characteristics.
+             */
+             static auto run(
                     const YawPid & p,
                     const float dt,
                     const bool airborne,
@@ -63,7 +68,7 @@ namespace hf {
 
                 const auto derivative = dt > 0 ? (error - p._error) / dt : 0; 
 
-                const auto output = .01 * (KP*error + KI*integral + KD*derivative); 
+                const auto output = KP*error + KI*integral + KD*derivative; 
 
                 return YawPid(output, integral, error);
             }

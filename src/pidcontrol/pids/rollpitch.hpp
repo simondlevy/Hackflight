@@ -50,7 +50,12 @@ namespace hf {
 
             RollPitchPid& operator=(const RollPitchPid&) = default;
 
-            static auto run(
+            /**
+             * Demand is input as angles in degrees and output as arbitrary
+             * values to be scaled according to vehicle
+             * characteristics.
+             */
+             static auto run(
                     const RollPitchPid & p,
                     const float dt,
                     const bool airborne,

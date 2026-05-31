@@ -90,7 +90,7 @@ namespace hf {
 
                         // Scale up new setpoint for mixer
                         const Setpoint scaled_setpoint = {
-                            thrust == 0 ? 0 : thrust + THRUST_BASE_RPM,
+                            thrust == 0 ? 0 : 1000 * thrust + THRUST_BASE_RPM,
                             pidControl.setpoint.roll * PITCH_ROLL_MOTOR_SCALE,
                             pidControl.setpoint.pitch * PITCH_ROLL_MOTOR_SCALE,
                             pidControl.setpoint.yaw * YAW_MOTOR_SCALE
