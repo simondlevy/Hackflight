@@ -52,9 +52,9 @@ namespace hf {
             Simulator() = default;
 
             Simulator(const pose_t & pose)
-                : dynamics(Dynamics(pose)), _pidControl(PidControl()) {}
+                : dynamics(Dynamics(pose)), _pidControl(HoverPidControl()) {}
 
-            Simulator(const Dynamics & dynamics, const PidControl & pidControl)
+            Simulator(const Dynamics & dynamics, const HoverPidControl & pidControl)
                 : dynamics(dynamics), _pidControl(pidControl) {}
 
             static auto step(
@@ -81,7 +81,7 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
-                        pidControl = PidControl::run(
+                        pidControl = HoverPidControl::run(
                                 pidControl, dt, mode, state, setpoint);
 
                         // Scale up new setpoint for mixer
@@ -113,7 +113,7 @@ namespace hf {
 
         private:
 
-            PidControl _pidControl;
+            HoverPidControl _pidControl;
 
             static auto motors2doubless(const float * f,
                     const size_t n) -> double *

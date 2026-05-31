@@ -99,8 +99,6 @@ namespace hf {
             update(message.is_armed, message.timestamp_msec, motorvals,
                     motorcount, true);
 
-            _debugger.report(_mode);
-
             return Setpoint(0, 0, 0, 0); // XXX
         } 
 
@@ -143,6 +141,9 @@ namespace hf {
 
         // PID control for stabilize-only
         StabilizerPid _stabilizerPid;
+
+        // PID control for altitude-hold and stabilize
+        PidControl _altHoldPid;
 
         // Debugging
         Debugger _debugger;

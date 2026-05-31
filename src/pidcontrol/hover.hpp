@@ -23,7 +23,7 @@
 
 namespace hf {
 
-    class PidControl {
+    class HoverPidControl {
 
         private:
 
@@ -36,11 +36,11 @@ namespace hf {
 
             Setpoint setpoint;
 
-            PidControl() = default;
+            HoverPidControl() = default;
 
-            PidControl& operator=(const PidControl& other) = default;
+            HoverPidControl& operator=(const HoverPidControl& other) = default;
 
-            PidControl(
+            HoverPidControl(
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
@@ -57,11 +57,11 @@ namespace hf {
                 _stabilizer_pid(stabilizer_pid) {}
 
             static auto run(
-                    const PidControl & pid,
+                    const HoverPidControl & pid,
                     const float dt,
                     const mode_e mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> PidControl
+                    const Setpoint & setpoint_in) -> HoverPidControl
             {
                 // Altitude hold ---------------------------------------------
 
@@ -129,7 +129,7 @@ namespace hf {
                 const auto stabilizer_pid = StabilizerPid::run(
                         pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
 
-                return PidControl(new_altitude_target, altitude_pid,
+                return HoverPidControl(new_altitude_target, altitude_pid,
                         climbrate_pid, position_x_pid, position_y_pid,
                         stabilizer_pid, stabilizer_pid.setpoint);
             }

@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    class PidControl {
+    class AltHoldPidControl {
 
         private:
 
@@ -35,11 +35,11 @@ namespace hf {
 
             Setpoint setpoint;
 
-            PidControl() = default;
+            AltHoldPidControl() = default;
 
-            PidControl& operator=(const PidControl& other) = default;
+            AltHoldPidControl& operator=(const AltHoldPidControl& other) = default;
 
-            PidControl(
+            AltHoldPidControl(
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
@@ -52,11 +52,11 @@ namespace hf {
                 _stabilizer_pid(stabilizer_pid) {}
 
             static auto run(
-                    const PidControl & pid,
+                    const AltHoldPidControl & pid,
                     const float dt,
                     const mode_e mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> PidControl
+                    const Setpoint & setpoint_in) -> AltHoldPidControl
             {
                 // Altitude hold ---------------------------------------------
 
@@ -106,7 +106,7 @@ namespace hf {
                 const auto stabilizer_pid = StabilizerPid::run(
                         pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
 
-                return PidControl(
+                return AltHoldPidControl(
                         new_altitude_target,
                         altitude_pid,
                         climbrate_pid,
