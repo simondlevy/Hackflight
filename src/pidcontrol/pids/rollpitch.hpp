@@ -68,23 +68,6 @@ namespace hf {
                 return RollPitchPid(output, integral);
             }
 
-            float run(
-                    const float dt,
-                    const bool airborne,
-                    const float target,
-                    const float angle,
-                    const float dangle)
-            {
-                const auto error = target - angle;
-
-                const auto integral = airborne ? 
-                    Num::fconstrain(_integral + error * dt, I_LIMIT) : 0;
-
-                _integral = integral;
-
-                return 0.01 * (KP * error + KI * integral - KD * dangle); 
-            }
-
         private:
 
             float _integral;

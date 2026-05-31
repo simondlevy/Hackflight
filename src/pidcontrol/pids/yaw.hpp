@@ -69,24 +69,6 @@ namespace hf {
                 return YawPid(output, integral, error);
             }
 
-            float run(
-                    const float dt,
-                    const bool airborne,
-                    const float target,
-                    const float actual)
-            {
-                const auto error = target - actual;
-
-                _integral = airborne ? 
-                    Num::fconstrain(_integral + error * dt, I_LIMIT) : 0;
-
-                const auto derivative = dt > 0 ? (error - _error) / dt : 0; 
-
-                _error = error;
-
-                return .01 * (KP*error + KI*_integral + KD*derivative); 
-            }
-
         private:
 
             float _integral;

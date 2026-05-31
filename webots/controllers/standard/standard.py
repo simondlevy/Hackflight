@@ -190,8 +190,6 @@ def main():
 
         mode = cmdinfo[0]
 
-        print(mode)
-
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
 

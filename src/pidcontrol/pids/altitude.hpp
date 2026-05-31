@@ -71,23 +71,6 @@ namespace hf {
                 return AltitudeController(output, integral);
             }
 
-            float run(
-                    const bool hovering,
-                    const float dt,
-                    const float target,
-                    const float actual)
-            {
-                const auto error = target - actual;
-
-                _integral = hovering ?
-                    Num::fconstrain(_integral + error * dt, ILIMIT) : 0;
-
-                return hovering ? 
-                    Num::fconstrain(KP * error + KI * _integral,
-                            fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
-                    -LANDING_SPEED_MPS;
-            }
-
         private:
 
             float _integral;

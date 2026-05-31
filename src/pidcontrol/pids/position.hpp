@@ -70,23 +70,6 @@ namespace hf {
                 return PositionController(output, integral);
             }
 
-            float run(
-                    const bool airborne,
-                    const float dt,
-                    const float target,
-                    const float actual)
-            {
-                const auto error = target - actual;
-
-                _integral = airborne ? 
-                    Num::fconstrain(_integral + error * dt, ILIMIT) :
-                    0;
-
-                return airborne ?
-                    Num::fconstrain(KP * error + KI * _integral, MAX_DEMAND_DEG) :
-                    0;
-            }
-
         private:
 
             float _integral;
