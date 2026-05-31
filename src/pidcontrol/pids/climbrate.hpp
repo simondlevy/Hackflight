@@ -69,7 +69,7 @@ namespace hf {
 
                 const auto thrust = KP * error + KI * integral;
 
-                const auto output = airborne ? thrust + THRUST_BASE : 0;
+                const auto output = airborne ? thrust + THRUST_BASE_RPM : 0;
 
                 return ClimbRateController(output, integral);
             }
