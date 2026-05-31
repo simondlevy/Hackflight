@@ -69,7 +69,6 @@ namespace hf {
         MODE_ARMED,
         MODE_HOVERING,
         MODE_AUTONOMOUS,
-        MODE_LANDING,
         MODE_PANIC
 
     } mode_e;

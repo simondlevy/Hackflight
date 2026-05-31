@@ -190,14 +190,6 @@ def main():
 
         mode = cmdinfo[0]
 
-        # On descent, switch mode to armed when close enough to ground
-        '''
-        if (mode == 'landing' and
-           (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
-            mode = 'armed'
-            cmdinfo = 'armed', 0, 0, 0, 0
-        '''
-
         print(mode)
 
         # Send siminfo to fast thread
