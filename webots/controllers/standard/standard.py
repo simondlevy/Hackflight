@@ -26,7 +26,8 @@ JOYSTICK_AXIS_MAP = {
     'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
 }
 
-MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3, 'landing': 4}
+# These should agree with modes in hackflight/src/datatypes.hpp
+MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3}
 
 ZDIST_LANDING_MAX_M = 0.03
 
@@ -54,9 +55,10 @@ def reportUnrecognizedJoystick(joystick):
 
 
 def switchMode(what, mode):
+    '''A little state-transition machine'''
     return (
         'hovering' if mode == 'armed' and what == 'hover' else
-        'landing' if mode == 'hovering' and what == 'hover' else
+        'armed' if mode == 'hovering' and what == 'hover' else
         'autonomous' if mode == 'hovering' and what == 'auto' else
         'hovering' if mode == 'autonomous' and what == 'auto' else
         mode)
@@ -189,10 +191,14 @@ def main():
         mode = cmdinfo[0]
 
         # On descent, switch mode to armed when close enough to ground
+        '''
         if (mode == 'landing' and
            (gps.getValues()[2] - zstart) < ZDIST_LANDING_MAX_M):
             mode = 'armed'
             cmdinfo = 'armed', 0, 0, 0, 0
+        '''
+
+        print(mode)
 
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
