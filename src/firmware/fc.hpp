@@ -55,7 +55,7 @@ namespace hf {
 
         public:
 
-            void begin()
+            void beginCore()
             {
                 Serial1.begin(115200);
 
@@ -65,13 +65,15 @@ namespace hf {
                 _mode = MODE_IDLE;
             }
 
-            void beginHover()
+            void beginHoverDeck()
             {
                 _zranger.begin();
                 _flowsensor.begin();
             }
 
-            auto update(const ReceiverData & rxdata, const float * motorvals,
+            auto updateCore(
+                    const ReceiverData & rxdata,
+                    const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
                 // Run safety checks
@@ -93,7 +95,9 @@ namespace hf {
                 return _stabilizerPid.setpoint;
             } 
 
-            auto update(const msp_message_t & message, const float * motorvals,
+            auto updateCore(
+                    const msp_message_t & message,
+                    const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
                 // Run safety checks
@@ -102,6 +106,13 @@ namespace hf {
 
                 step1();
 
+                step2(motorvals, motorcount);
+
+                return Setpoint(0, 0, 0, 0); // XXX
+            } 
+
+            void updateHoverDeck()
+            {
                 // Slower EKF update with range, optical flow
                 if (_hoverDeckTimer.ready()) {
                     _zrangerFilter = ZRangerFilter::update(
@@ -111,11 +122,7 @@ namespace hf {
                             micros(), _flowsensor.read());
                     _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
                 }
-
-                step2(motorvals, motorcount);
-
-                return Setpoint(0, 0, 0, 0); // XXX
-            } 
+            }
 
             auto isSafeToFly() -> bool
             {

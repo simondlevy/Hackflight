@@ -73,10 +73,10 @@ void serialEvent1()
 void setup()
 {
     // Start core devices
-    _fc.begin();
+    _fc.beginCore();
 
     // Start hover-deck
-    _fc.beginHover();
+    _fc.beginHoverDeck();
 
     // Start motors
     _motors.begin();
@@ -85,7 +85,10 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_message, _mixer.motorvals, 4);
+    const auto setpoint = _fc.updateCore(_message, _mixer.motorvals, 4);
+
+    // Run sensor fusion on hover-deck
+    _fc.updateHoverDeck();
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);

@@ -62,10 +62,10 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start core devices
-    _fc.begin();
+    _fc.beginCore();
 
     // Start hoverdeck sensors
-    _fc.beginHover();
+    _fc.beginHoverDeck();
 
     // Start motors
     _motors.begin();
@@ -77,7 +77,10 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
+    const auto setpoint = _fc.updateCore(_rxdata, _mixer.motorvals, 4);
+
+    // Run sensor fusion on hover-deck
+    _fc.updateHoverDeck();
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
