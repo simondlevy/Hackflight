@@ -1,5 +1,5 @@
 /*
-   Hackflight core flight-control algorithm
+   Hackflight core flight-control class
 
    Copyright (C) 2026 Simon D. Levy
 
