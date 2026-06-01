@@ -107,8 +107,6 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                _debugger.report(_mode);
-
                 step(message.is_armed, message.is_hovering,
                         message.timestamp_msec, motorvals, motorcount);
 
@@ -193,10 +191,12 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount)
             {
-                // Run safety checks
+                // Safely update flight mode
                 _mode = updateMode(millis(), _state, 
                         _imuFilter.isGyroCalibrated, is_armed, is_hovering,
                         timestamp_msec, _imuFilter, _mode);
+
+                //_debugger.report(_mode);
 
                 // Blink IMU to indicate status
                 _led.blink(_imuFilter.isGyroCalibrated);
@@ -257,7 +257,7 @@ namespace hf {
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
-                const auto wantArming = 
+                const auto shouldArm = 
 
                     // Disable arming while gyro is calibrating
                     !isGyroCalibrated ? false :
@@ -275,58 +275,22 @@ namespace hf {
                     isFlipped(state) ? MODE_PANIC :
 
                     // Want arm and safe to arm: enter armed mode
-                    wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+                    mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
+                    ? MODE_ARMED :
 
                     // Want disarm: enter idle mode
-                    mode == MODE_ARMED && !wantArming ? MODE_IDLE :
+                    mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
+
+                    // Armed and requested hover; enter hover mode
+                    mode == MODE_ARMED && requestedHover ? MODE_HOVERING :
+
+                    // Hovering and requested no-hover; return to armed mode
+                    mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
 
                     //  Default: stay in current mode
                     mode;
             }
 
-            static auto updateModeMsp(
-                    const uint32_t msecCurr,
-                    const VehicleState & state,
-                    const bool isGyroCalibrated,
-                    const msp_message_t & message,
-                    const ImuFilter & imufilt,
-                    const mode_e mode) -> mode_e
-            {
-                const auto msecPrev = message.timestamp_msec;
-
-                // Run a little state-transition machine to update flight mode
-                return  
-
-                    // Transmission timed out; trigger failsafe
-                    msecPrev > 0 && msecCurr > msecPrev &&
-                    msecCurr - msecPrev > FAILSAFE_MSEC ? MODE_PANIC :
-
-                    // Vehicle flipped over: enter panic mode
-                    isFlipped(state) ? MODE_PANIC :
-
-                    // Panic mode: can't recover
-                    mode == MODE_PANIC ? MODE_PANIC :
-
-                    // Disable arming while gyro is calibrating
-                    !isGyroCalibrated ? MODE_IDLE :
-
-                    // Want arm and safe to arm: enter armed mode
-                    mode ==  MODE_IDLE && message.is_armed ? MODE_ARMED :
-
-                    // Armed and want hover; enter hover mode
-                    mode == MODE_ARMED && message.is_hovering ? MODE_HOVERING :
-
-                    // Hovering and want landing; enter landing mode
-                    mode == MODE_HOVERING && !message.is_hovering ? MODE_ARMED :
-
-                    // Don't want arming; enter idle mode
-                    !message.is_armed ? MODE_IDLE :
-
-                    //  Default: stay in current mode
-                    mode;
-            }
-
- 
             static auto isFlipped(const VehicleState & state) -> bool
             {
                 return isFlippedAngle(state.theta) ||

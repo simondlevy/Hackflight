@@ -54,6 +54,14 @@ namespace hf {
 
         public:
 
+            static constexpr char * MODENAMES[6] = {
+                (char *)"IDLE",
+                (char *)"ARMED",
+                (char *)"HOVERING",
+                (char *)"AUTONOMOUS",
+                (char *)"PANIC"
+            };
+
             static void reportForever(const char * errmsg)
             {
                 while (true) {
@@ -64,14 +72,6 @@ namespace hf {
 
             void report(const mode_e mode)
             {
-                static const char * MODENAMES[6] = {
-                    "IDLE",
-                    "ARMED",
-                    "HOVERING",
-                    "AUTONOMOUS",
-                    "PANIC"
-                };
-
                 if (_helper.ready()) {
 
                     printf("%5lu | mode=%s\n", _helper.count, MODENAMES[mode]);

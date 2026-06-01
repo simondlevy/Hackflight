@@ -91,8 +91,10 @@ void loop()
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
+    const float nospin[4] = {0, 0, 0, 0};
+
     // Run motors if safe
     if (_core.isSafeToFly()) {
-        _motors.run(_core.isArmed(), _mixer.motorvals);
+        _motors.run(_core.isArmed(), nospin); //_mixer.motorvals);
     }
 }
