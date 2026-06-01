@@ -25,20 +25,36 @@ def main():
 
     data = np.loadtxt('log.csv', delimiter=',', skiprows=1)
 
-    t = data[:,0] - data[0, 0]
+    time = data[:,0]
+    thrust = data[:,1]
+    roll = data[:,2]
+    pitch = data[:,3]
+    yaw = data[:,4]
+    dx = data[:,5]
+    dy = data[:,6]
+    z = data[:,7]
+    dz = data[:,8]
+    phi = data[:,9]
+    phi = data[:,10]
+    theta = data[:,12]
+    theta = data[:,12]
+    psi = data[:,13]
+    psi = data[:,14]
 
     plt.subplot(2, 1, 1)
-    plt.plot(t, data[:,3])
+    plt.plot(time, z)
     plt.ylim((0, ZMAX))
     plt.ylabel('Z (m)')
 
+    '''
     plt.subplot(2, 1, 2)
-    plt.plot(t, data[:,4], 'r')
-    plt.plot(t, np.zeros(len(t)), 'k')
+    plt.plot(time, data[:,7], 'r')
+    plt.plot(time, np.zeros(len(t)), 'k')
     plt.ylim((-DZMAX, +DZMAX))
     plt.ylabel('dZ/dt (m/s)')
 
     plt.xlabel('time (s)')
+    '''
 
     plt.show()
 
