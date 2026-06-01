@@ -25,6 +25,7 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
+#include <firmware/msp/__messages__.h>
 #include <firmware/msp/message.h>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
@@ -120,11 +121,6 @@ namespace hf {
                 }
             }
 
-            auto getState() -> VehicleState
-            {
-                return _state;
-            }
-
             auto isSafeToFly() -> bool
             {
                 return _mode != MODE_PANIC;
@@ -133,15 +129,6 @@ namespace hf {
             auto isArmed() -> bool
             {
                 return _mode != MODE_IDLE;
-            }
-
-            void sendTelemetry(const MspSerializer & serializer)
-            {
-                if (_telemetryTimer.ready()) {
-                    Serial1.write(
-                            MspSerializer::payloadBytes(serializer),
-                            MspSerializer::payloadSize(serializer));
-                }
             }
 
         private:
@@ -219,7 +206,17 @@ namespace hf {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
                             motorvals, motorcount);
                 }
-            } 
+
+                // Periodically send telemetry to client
+                if (_telemetryTimer.ready()) {
+                    static MspSerializer _serializer;
+                    _serializer = MspSerializer::serializeFloats(
+                            _serializer, MSP_TELEMETRY, (float *)&_state, 10);
+                    Serial1.write(
+                            MspSerializer::payloadBytes(_serializer),
+                            MspSerializer::payloadSize(_serializer));
+                }
+            }
 
     }; // class FC
 

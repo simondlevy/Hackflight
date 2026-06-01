@@ -23,8 +23,6 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <firmware/msp/__messages__.h>
-#include <firmware/msp/serializer.hpp>
 #include <firmware/receiver.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
@@ -38,8 +36,6 @@ static ReceiverData _rxdata;
 static Mixer _mixer;
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
-
-static MspSerializer _serializer;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
@@ -93,10 +89,4 @@ void loop()
     if (_fc.isSafeToFly()) {
         _motors.run(_fc.isArmed(), _mixer.motorvals);
     }
-
-    // Send telemetry to client
-    const auto state = _fc.getState();
-    _serializer = MspSerializer::serializeFloats(
-            _serializer, MSP_TELEMETRY, (float *)&state, 10);
-    _fc.sendTelemetry(_serializer);
 }
