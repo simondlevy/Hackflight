@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import matplotlib.pyplot as plt
 
+FILENAME = 'log.csv'
 ZMAX = 1.5
 VELMAX = 1.0
 THRUST_TAKEOFF = 0.01
@@ -30,7 +31,11 @@ def plotmid(time, value):
 
 def main():
 
-    data = np.loadtxt('log.csv', delimiter=',', skiprows=1)
+    try:
+        data = np.loadtxt(FILENAME, delimiter=',', skiprows=1)
+    except FileNotFoundError:
+        print('File %s not found' % FILENAME)
+        exit(1)
 
     thrust = data[:,1]
 
