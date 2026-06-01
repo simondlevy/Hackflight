@@ -210,13 +210,20 @@ namespace hf {
 
                 // Periodically send telemetry to client
                 if (_telemetryTimer.ready()) {
-                    static MspSerializer _serializer;
-                    _serializer = MspSerializer::serializeFloats(
-                            _serializer, MSP_TELEMETRY, (float *)&_state, 10);
-                    Serial1.write(
-                            MspSerializer::payloadBytes(_serializer),
-                            MspSerializer::payloadSize(_serializer));
+                    sendTelemetry(setpoint);
                 }
+            }
+
+            void sendTelemetry(const Setpoint & setpoint)
+            {
+                static MspSerializer _serializer;
+
+                _serializer = MspSerializer::serializeFloats(
+                        _serializer, MSP_TELEMETRY, (float *)&_state, 10);
+
+                Serial1.write(
+                        MspSerializer::payloadBytes(_serializer),
+                        MspSerializer::payloadSize(_serializer));
             }
 
     }; // class FC
