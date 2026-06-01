@@ -85,16 +85,14 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _core.updateCore(_message, _mixer.motorvals, 4);
-
-    // Run sensor fusion on hover-deck
-    _core.updateHoverDeck();
+    const auto setpoint = _core.updateCoreAndHoverDeck(
+            _message, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
     if (_core.isSafeToFly()) {
-        _motors.run(_core.isArmed(), _mixer.motorvals);
+        //_motors.run(_core.isArmed(), _mixer.motorvals);
     }
 }

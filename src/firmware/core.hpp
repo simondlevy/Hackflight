@@ -32,7 +32,6 @@
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/receiver.hpp>
-#include <firmware/safety.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <firmware/timer.hpp>
@@ -52,6 +51,10 @@ namespace hf {
             static constexpr float FLYING_CHECK_RATE_HZ   = 25;
             static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
             static constexpr float TELEMETRY_RATE_HZ = 50;
+
+            // Safety constants
+            static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
+            static constexpr uint32_t FAILSAFE_MSEC = 500;
 
         public:
 
@@ -99,19 +102,24 @@ namespace hf {
                 return _stabilizerPid.setpoint;
             } 
 
-            auto updateCore(
+            auto updateCoreAndHoverDeck(
                     const msp_message_t & message,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                _debugger.report(_mode);
+
                 step(message.is_armed, message.timestamp_msec,
                         motorvals, motorcount);
 
-                const auto setpoint = Setpoint(0, 0, 0, 0); // XXX
+                updateHoverDeck();
 
-                sendTelemetry(setpoint);
+                _hoverPid= HoverPidController::run(_hoverPid, Timer::getDt(),
+                        _mode, _state, message.setpoint);
 
-                return setpoint;
+                sendTelemetry(_hoverPid.setpoint);
+
+                return _hoverPid.setpoint;
             } 
 
             void updateHoverDeck()
@@ -169,8 +177,11 @@ namespace hf {
             // PID control for stabilize-only
             StabilizerPidController _stabilizerPid;
 
-            // PID control forhaltitude-hold and stabilize
+            // PID control for altitude-hold
             AltHoldPidController _altHoldPid;
+
+            // PID control for hover
+            HoverPidController _hoverPid;
 
             // Debugging
             Debugger _debugger;
@@ -182,7 +193,7 @@ namespace hf {
                     const uint8_t motorcount)
             {
                 // Run safety checks
-                _mode = Safety::updateMode(millis(), _state, 
+                _mode = updateMode(millis(), _state, 
                         _imuFilter.isGyroCalibrated, is_armed,
                         timestamp_msec, _imuFilter, _mode);
 
@@ -235,6 +246,108 @@ namespace hf {
                 }
             }
 
+            static auto updateMode(
+                    const uint32_t msecCurr,
+                    const VehicleState & state,
+                    const bool isGyroCalibrated,
+                    const bool rxRequestedArming,
+                    const uint32_t rxMsecPrev,
+                    const ImuFilter & imufilt,
+                    const mode_e mode) -> mode_e
+            {
+                const auto wantArming = 
+
+                    // Disable arming while gyro is calibrating
+                    !isGyroCalibrated ? false :
+
+                    // Check receiver timeout
+                    checkFailsafe(msecCurr, rxMsecPrev, rxRequestedArming);
+
+                // Run a little state-transition machine to update flight mode
+                return 
+
+                    // Panic mode: can't recover
+                    mode == MODE_PANIC ? MODE_PANIC :
+
+                    //  Vehicle flipped over: enter panic mode
+                    isFlipped(state) ? MODE_PANIC :
+
+                    // Want arm and safe to arm: enter armed mode
+                    wantArming && imufilt.isGyroCalibrated ? MODE_ARMED :
+
+                    // Want disarm: enter idle mode
+                    mode == MODE_ARMED && !wantArming ? MODE_IDLE :
+
+                    //  Default: stay in current mode
+                    mode;
+            }
+
+            static auto updateModeMsp(
+                    const uint32_t msecCurr,
+                    const VehicleState & state,
+                    const bool isGyroCalibrated,
+                    const msp_message_t & message,
+                    const ImuFilter & imufilt,
+                    const mode_e mode) -> mode_e
+            {
+                const auto msecPrev = message.timestamp_msec;
+
+                // Run a little state-transition machine to update flight mode
+                return  
+
+                    // Transmission timed out; trigger failsafe
+                    msecPrev > 0 && msecCurr > msecPrev &&
+                    msecCurr - msecPrev > FAILSAFE_MSEC ? MODE_PANIC :
+
+                    // Vehicle flipped over: enter panic mode
+                    isFlipped(state) ? MODE_PANIC :
+
+                    // Panic mode: can't recover
+                    mode == MODE_PANIC ? MODE_PANIC :
+
+                    // Disable arming while gyro is calibrating
+                    !isGyroCalibrated ? MODE_IDLE :
+
+                    // Want arm and safe to arm: enter armed mode
+                    mode ==  MODE_IDLE && message.is_armed ? MODE_ARMED :
+
+                    // Armed and want hover; enter hover mode
+                    mode == MODE_ARMED && message.is_hovering ? MODE_HOVERING :
+
+                    // Hovering and want landing; enter landing mode
+                    mode == MODE_HOVERING && !message.is_hovering ? MODE_ARMED :
+
+                    // Don't want arming; enter idle mode
+                    !message.is_armed ? MODE_IDLE :
+
+                    //  Default: stay in current mode
+                    mode;
+            }
+
+ 
+            static auto isFlipped(const VehicleState & state) -> bool
+            {
+                return isFlippedAngle(state.theta) ||
+                    isFlippedAngle(state.phi); 
+            }
+
+            static auto isFlippedAngle(const float angle) -> bool
+            {
+                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
+            }
+
+            static auto checkFailsafe(
+                    const uint32_t msec_curr,
+                    const uint32_t msec_prev,
+                    const bool is_armed) -> bool
+            {
+                const auto timed_out = 
+                    msec_prev > 0 &&
+                    msec_curr > msec_prev &&
+                    msec_curr - msec_prev > FAILSAFE_MSEC;
+
+                return timed_out ? false : is_armed;
+            } 
     }; // class Core
 
 } // namespace hf

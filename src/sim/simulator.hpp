@@ -87,7 +87,7 @@ namespace hf {
 
                         const auto thrust = pidControl.setpoint.thrust;
 
-                        // Scale up new setpoint for mixer
+                        // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
                             thrust == 0 ? 0 :
                                 VEHICLE_BASE_RPM + thrust * SCALE_RPM,
@@ -96,7 +96,7 @@ namespace hf {
                             pidControl.setpoint.yaw * SCALE_RPM
                         };
 
-                        // Get motor RPMS from mixer
+                        // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
                         _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
 
