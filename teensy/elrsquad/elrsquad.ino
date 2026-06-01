@@ -18,19 +18,24 @@
 
 // Third-party libraries
 #include <CRSFforArduino.hpp>
+#include <dshot-teensy4.hpp>  
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
-#include <firmware/fcs/quad.hpp>
+#include <firmware/fc.hpp>
 #include <firmware/receiver.hpp>
+#include <mixers/bfquadx.hpp>
 using namespace hf;
 
-static QuadFC _fc;
+static FC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
 static ReceiverData _rxdata;
+
+static Mixer _mixer;
+
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
@@ -56,8 +61,14 @@ void setup()
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
-    // Start core sensors and motors
+    // Start core devices
     _fc.begin();
+
+    // Start hoverdeck sensors
+    _fc.beginHover();
+
+    // Start motors
+    _motors.begin();
 }
 
 void loop()
@@ -66,8 +77,13 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_rxdata);
+    const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _fc.runMotors(setpoint);
+    _mixer = Mixer::run(_mixer, setpoint);
+
+    // Run motors if safe
+    if (_fc.isSafeToFly()) {
+        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    }
 }

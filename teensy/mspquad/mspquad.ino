@@ -17,14 +17,23 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Third-party libraries
+#include <dshot-teensy4.hpp>  
+
+// Hackflight library
 #include <hackflight.h>
-#include <firmware/fcs/quad.hpp>
+#include <firmware/fc.hpp>
 #include <firmware/msp/parser.hpp>
+#include <mixers/bfquadx.hpp>
 using namespace hf;
 
-static QuadFC _fc;
+static FC _fc;
 
 static msp_message_t _message;
+
+static Mixer _mixer;
+
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 void serialEvent1()
 {
@@ -63,18 +72,26 @@ void serialEvent1()
 
 void setup()
 {
-    // Start sensors and motors (this will also start Serial1)
+    // Start core devices
     _fc.begin();
 
     // Start hover-deck
     _fc.beginHover();
+
+    // Start motors
+    _motors.begin();
 }
 
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_message);
+    const auto setpoint = _fc.update(_message, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _fc.runMotors(setpoint);
+    _mixer = Mixer::run(_mixer, setpoint);
+
+    // Run motors if safe
+    if (_fc.isSafeToFly()) {
+        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    }
 }
