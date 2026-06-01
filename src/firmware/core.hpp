@@ -79,8 +79,8 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.is_armed, rxdata.timestamp_msec,
-                        motorvals, motorcount);
+                step(rxdata.is_armed, false, // false = no hover
+                        rxdata.timestamp_msec, motorvals, motorcount);
 
                 const auto rxaxes = rxdata.axes;
 
@@ -109,8 +109,8 @@ namespace hf {
             {
                 _debugger.report(_mode);
 
-                step(message.is_armed, message.timestamp_msec,
-                        motorvals, motorcount);
+                step(message.is_armed, message.is_hovering,
+                        message.timestamp_msec, motorvals, motorcount);
 
                 updateHoverDeck();
 
@@ -188,13 +188,14 @@ namespace hf {
 
             void step(
                     const bool is_armed,
+                    bool is_hovering,
                     const uint32_t timestamp_msec,
                     const float * motorvals,
                     const uint8_t motorcount)
             {
                 // Run safety checks
                 _mode = updateMode(millis(), _state, 
-                        _imuFilter.isGyroCalibrated, is_armed,
+                        _imuFilter.isGyroCalibrated, is_armed, is_hovering,
                         timestamp_msec, _imuFilter, _mode);
 
                 // Blink IMU to indicate status
@@ -250,8 +251,9 @@ namespace hf {
                     const uint32_t msecCurr,
                     const VehicleState & state,
                     const bool isGyroCalibrated,
-                    const bool rxRequestedArming,
-                    const uint32_t rxMsecPrev,
+                    const bool requestedArming,
+                    const bool requestedHover,
+                    const uint32_t msecPrev,
                     const ImuFilter & imufilt,
                     const mode_e mode) -> mode_e
             {
@@ -261,7 +263,7 @@ namespace hf {
                     !isGyroCalibrated ? false :
 
                     // Check receiver timeout
-                    checkFailsafe(msecCurr, rxMsecPrev, rxRequestedArming);
+                    checkFailsafe(msecCurr, msecPrev, requestedArming);
 
                 // Run a little state-transition machine to update flight mode
                 return 

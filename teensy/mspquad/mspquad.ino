@@ -93,6 +93,6 @@ void loop()
 
     // Run motors if safe
     if (_core.isSafeToFly()) {
-        //_motors.run(_core.isArmed(), _mixer.motorvals);
+        _motors.run(_core.isArmed(), _mixer.motorvals);
     }
 }
