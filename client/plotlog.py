@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 FILENAME = 'log.csv'
 ZMAX = 1.5
 VELMAX = 1.0
-THRUST_TAKEOFF = 0.01
+Z_TAKEOFF = 0.05
 MARGIN = 20
 
 
@@ -37,9 +37,9 @@ def main():
         print('File %s not found' % FILENAME)
         exit(1)
 
-    thrust = data[:,1]
+    z = data[:,7]
 
-    start = np.argmax(thrust > THRUST_TAKEOFF) - MARGIN
+    start = np.argmax(z > Z_TAKEOFF) - MARGIN
 
     time = data[start:,0]
     thrust = data[start:,1]
