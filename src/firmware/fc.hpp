@@ -113,6 +113,11 @@ namespace hf {
                 }
             }
 
+            auto getState() -> VehicleState
+            {
+                return _state;
+            }
+
             auto isSafeToFly() -> bool
             {
                 return _mode != MODE_PANIC;
@@ -121,6 +126,15 @@ namespace hf {
             auto isArmed() -> bool
             {
                 return _mode != MODE_IDLE;
+            }
+
+            void sendTelemetry(const MspSerializer & serializer)
+            {
+                if (_telemetryTimer.ready()) {
+                    Serial1.write(
+                            MspSerializer::payloadBytes(serializer),
+                            MspSerializer::payloadSize(serializer));
+                }
             }
 
         private:
@@ -193,35 +207,12 @@ namespace hf {
                 // Get vehicle state from EKF
                 _state = EKF::getVehicleState(_ekf);
 
-                // Periodically send telemetry
-                if (_telemetryTimer.ready()) {
-                    sendStateTelemetry();
-                }
-
                 // Periodically run flying check to get status for EKF
                 if (_flyingCheckTimer.ready()) {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
                             motorvals, motorcount);
                 }
             } 
-
-            void sendStateTelemetry()
-            {
-                static MspSerializer _serializer;
-
-                _serializer = MspSerializer::serializeFloats(
-                        _serializer, MSP_STATE, (float *)&_state, 10);
-
-                sendTelemetry(_serializer);
-
-            }
-
-            void sendTelemetry(const MspSerializer & serializer)
-            {
-                Serial1.write(
-                        MspSerializer::payloadBytes(serializer),
-                        MspSerializer::payloadSize(serializer));
-            }
 
             static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
             {
