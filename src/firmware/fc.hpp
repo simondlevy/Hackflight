@@ -218,8 +218,15 @@ namespace hf {
             {
                 static MspSerializer _serializer;
 
+                const float data[14] = {
+                    setpoint.thrust, setpoint.roll, setpoint.pitch,
+                    setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
+                    _state.phi, _state.dphi, _state.theta, _state.dtheta,
+                    _state.psi, _state.dpsi
+                };
+
                 _serializer = MspSerializer::serializeFloats(
-                        _serializer, MSP_TELEMETRY, (float *)&_state, 10);
+                        _serializer, MSP_TELEMETRY, data, 14);
 
                 Serial1.write(
                         MspSerializer::payloadBytes(_serializer),

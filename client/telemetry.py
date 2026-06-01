@@ -122,7 +122,8 @@ class Telemetry(MspParser):
         self.step()
         return self.plotter_data
 
-    def handle_TELEMETRY(self, dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+    def handle_TELEMETRY(self, thrust, roll, pitch, yaw,
+                         dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         if self.outfile is None and self.plotter is None:
 

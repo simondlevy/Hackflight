@@ -1,6 +1,10 @@
 {
   "TELEMETRY": 
   [{"ID": 100},
+   {"thrust": "float"},
+   {"roll":   "float"},
+   {"pitch":  "float"},
+   {"yaw":    "float"},
    {"dx":     "float"},
    {"dy":     "float"},
    {"z":      "float"},

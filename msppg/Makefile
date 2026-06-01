@@ -6,6 +6,9 @@ install: messages.json msppg.py
 edit:
 	vim msppg.py
 
+new:
+	vim messages.json
+
 clean:
 	rm -f msp.py messages.h MspParser.java
 
