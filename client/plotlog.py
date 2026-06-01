@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 
 ZMAX = 1.5
 VELMAX = 1.0
+THRUST_TAKEOFF = 0.01
+MARGIN = 20
 
 
 def plotmid(time, value):
@@ -30,21 +32,25 @@ def main():
 
     data = np.loadtxt('log.csv', delimiter=',', skiprows=1)
 
-    time = data[:,0]
     thrust = data[:,1]
-    roll = data[:,2]
-    pitch = data[:,3]
-    yaw = data[:,4]
-    dx = data[:,5]
-    dy = data[:,6]
-    z = data[:,7]
-    dz = data[:,8]
-    phi = data[:,9]
-    phi = data[:,10]
-    theta = data[:,12]
-    theta = data[:,12]
-    psi = data[:,13]
-    psi = data[:,14]
+
+    start = np.argmax(thrust > THRUST_TAKEOFF) - MARGIN
+
+    time = data[start:,0]
+    thrust = data[start:,1]
+    roll = data[start:,2]
+    pitch = data[start:,3]
+    yaw = data[start:,4]
+    dx = data[start:,5]
+    dy = data[start:,6]
+    z = data[start:,7]
+    dz = data[start:,8]
+    phi = data[start:,9]
+    phi = data[start:,10]
+    theta = data[start:,12]
+    theta = data[start:,12]
+    psi = data[start:,13]
+    psi = data[start:,14]
 
     plt.subplot(3, 1, 1)
     plt.plot(time, thrust, 'b')
