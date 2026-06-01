@@ -69,8 +69,8 @@ namespace hf {
             {
                 // Flip motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
-                const int16_t accpx = -rawdata.y;
-                const int16_t accpy = -rawdata.x;
+                const int16_t accpx = rawdata.y;
+                const int16_t accpy = rawdata.x;
 
                 return inlimit(accpx) && inlimit(accpy) ?
 
