@@ -76,14 +76,8 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                // Run safety checks
-                _mode = Safety::updateMode(millis(), _state, 
-                        _imuFilter.isGyroCalibrated, rxdata.is_armed,
-                        rxdata.timestamp_msec, _imuFilter, _mode);
-
-                step1();
-
-                step2(motorvals, motorcount);
+                step(rxdata.is_armed, rxdata.timestamp_msec,
+                        motorvals, motorcount);
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
@@ -100,13 +94,8 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                // Run safety checks
-                _mode = Safety::updateModeMsp(millis(), _state,
-                        _imuFilter.isGyroCalibrated, message, _imuFilter, _mode);
-
-                step1();
-
-                step2(motorvals, motorcount);
+                step(message.is_armed, message.timestamp_msec,
+                        motorvals, motorcount);
 
                 return Setpoint(0, 0, 0, 0); // XXX
             } 
@@ -172,8 +161,17 @@ namespace hf {
             // Debugging
             Debugger _debugger;
 
-            void step1()
+            void step(
+                    const bool is_armed,
+                    const uint32_t timestamp_msec,
+                    const float * motorvals,
+                    const uint8_t motorcount)
             {
+                // Run safety checks
+                _mode = Safety::updateMode(millis(), _state, 
+                        _imuFilter.isGyroCalibrated, is_armed,
+                        timestamp_msec, _imuFilter, _mode);
+
                 // Blink IMU to indicate status
                 _led.blink(_imuFilter.isGyroCalibrated);
 
@@ -191,10 +189,7 @@ namespace hf {
 
                 // Do EKF fast-update with IMU readings
                 _ekf = EKF::update(_ekf, _imuFilter.output, millis());
-            } 
-
-            void step2(const float * motorvals, const uint8_t motorcount)
-            {
+            
                 // Get vehicle state from EKF
                 _state = EKF::getVehicleState(_ekf);
 
