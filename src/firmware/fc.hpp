@@ -76,10 +76,10 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.is_armed, rxdata.timestamp_msec,
-                        motorvals, motorcount);
-
                 const auto rxaxes = rxdata.axes;
+
+                step(rxdata.is_armed, rxdata.timestamp_msec, rxaxes,
+                        motorvals, motorcount);
 
                 const auto setpoint = Setpoint(
                         (rxaxes.thrust+1)/2,
@@ -103,7 +103,7 @@ namespace hf {
                     const uint8_t motorcount) -> Setpoint
             {
                 step(message.is_armed, message.timestamp_msec,
-                        motorvals, motorcount);
+                        message.setpoint, motorvals, motorcount);
 
                 return Setpoint(0, 0, 0, 0); // XXX
             } 
@@ -172,6 +172,7 @@ namespace hf {
             void step(
                     const bool is_armed,
                     const uint32_t timestamp_msec,
+                    const Setpoint & setpoint,
                     const float * motorvals,
                     const uint8_t motorcount)
             {
