@@ -40,7 +40,7 @@
 
 namespace hf {
 
-    class FC {
+    class Core {
 
         private:
 
@@ -235,6 +235,6 @@ namespace hf {
                 }
             }
 
-    }; // class FC
+    }; // class Core
 
 } // namespace hf

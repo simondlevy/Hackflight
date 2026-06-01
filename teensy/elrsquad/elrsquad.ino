@@ -22,12 +22,12 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/fc.hpp>
+#include <firmware/core.hpp>
 #include <firmware/receiver.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
-static FC _fc;
+static Core _core;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
@@ -62,10 +62,10 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start core devices
-    _fc.beginCore();
+    _core.beginCore();
 
     // Start hoverdeck sensors
-    _fc.beginHoverDeck();
+    _core.beginHoverDeck();
 
     // Start motors
     _motors.begin();
@@ -77,16 +77,16 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.updateCore(_rxdata, _mixer.motorvals, 4);
+    const auto setpoint = _core.updateCore(_rxdata, _mixer.motorvals, 4);
 
     // Run sensor fusion on hover-deck
-    _fc.updateHoverDeck();
+    _core.updateHoverDeck();
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
-    if (_fc.isSafeToFly()) {
-        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    if (_core.isSafeToFly()) {
+        _motors.run(_core.isArmed(), _mixer.motorvals);
     }
 }

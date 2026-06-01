@@ -22,12 +22,12 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/fc.hpp>
+#include <firmware/core.hpp>
 #include <firmware/msp/parser.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
-static FC _fc;
+static Core _core;
 
 static msp_message_t _message;
 
@@ -73,10 +73,10 @@ void serialEvent1()
 void setup()
 {
     // Start core devices
-    _fc.beginCore();
+    _core.beginCore();
 
     // Start hover-deck
-    _fc.beginHoverDeck();
+    _core.beginHoverDeck();
 
     // Start motors
     _motors.begin();
@@ -85,16 +85,16 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.updateCore(_message, _mixer.motorvals, 4);
+    const auto setpoint = _core.updateCore(_message, _mixer.motorvals, 4);
 
     // Run sensor fusion on hover-deck
-    _fc.updateHoverDeck();
+    _core.updateHoverDeck();
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
-    if (_fc.isSafeToFly()) {
-        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    if (_core.isSafeToFly()) {
+        _motors.run(_core.isArmed(), _mixer.motorvals);
     }
 }
