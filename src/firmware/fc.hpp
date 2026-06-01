@@ -25,14 +25,14 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
-#include <firmware/msp/message.h>
 #include <firmware/msp/__messages__.h>
+#include <firmware/msp/message.h>
+#include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/safety.hpp>
-#include <firmware/msp/serializer.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <firmware/timer.hpp>
@@ -195,7 +195,7 @@ namespace hf {
 
                 // Periodically send telemetry
                 if (_telemetryTimer.ready()) {
-                    sendTelemetry();
+                    sendStateTelemetry();
                 }
 
                 // Periodically run flying check to get status for EKF
@@ -205,16 +205,22 @@ namespace hf {
                 }
             } 
 
-            void sendTelemetry()
+            void sendStateTelemetry()
             {
                 static MspSerializer _serializer;
 
                 _serializer = MspSerializer::serializeFloats(
                         _serializer, MSP_STATE, (float *)&_state, 10);
 
+                sendTelemetry(_serializer);
+
+            }
+
+            void sendTelemetry(const MspSerializer & serializer)
+            {
                 Serial1.write(
-                        MspSerializer::payloadBytes(_serializer),
-                        MspSerializer::payloadSize(_serializer));
+                        MspSerializer::payloadBytes(serializer),
+                        MspSerializer::payloadSize(serializer));
             }
 
             static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
