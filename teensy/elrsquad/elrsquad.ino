@@ -23,6 +23,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
+#include <firmware/msp/__messages__.h>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/receiver.hpp>
 #include <mixers/bfquadx.hpp>
@@ -96,6 +97,6 @@ void loop()
     // Send telemetry to client
     const auto state = _fc.getState();
     _serializer = MspSerializer::serializeFloats(
-            _serializer, MSP_STATE, (float *)&state, 10);
+            _serializer, MSP_TELEMETRY, (float *)&state, 10);
     _fc.sendTelemetry(_serializer);
 }

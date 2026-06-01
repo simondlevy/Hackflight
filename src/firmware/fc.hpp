@@ -25,7 +25,6 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
-#include <firmware/msp/__messages__.h>
 #include <firmware/msp/message.h>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
@@ -79,12 +78,20 @@ namespace hf {
                 step(rxdata.is_armed, rxdata.timestamp_msec,
                         motorvals, motorcount);
 
+                const auto rxaxes = rxdata.axes;
+
+                const auto setpoint = Setpoint(
+                        (rxaxes.thrust+1)/2,
+                        rxaxes.roll * PositionController::MAX_DEMAND_DEG,
+                        rxaxes.pitch * PositionController::MAX_DEMAND_DEG, 
+                        rxaxes.yaw);
+
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
                         !rxdata.is_throttle_down,
                         Timer::getDt(),
                         _state,
-                        mksetpoint(rxdata.axes));
+                        setpoint);
 
                 return _stabilizerPid.setpoint;
             } 
@@ -213,17 +220,6 @@ namespace hf {
                             motorvals, motorcount);
                 }
             } 
-
-            static auto mksetpoint(const Setpoint & receiver_setpoint) -> Setpoint
-            {
-                return Setpoint(
-                        (receiver_setpoint.thrust+1)/2,
-                        receiver_setpoint.roll *
-                        PositionController::MAX_DEMAND_DEG,
-                        receiver_setpoint.pitch *
-                        PositionController::MAX_DEMAND_DEG, 
-                        receiver_setpoint.yaw);
-            }
 
     }; // class FC
 
