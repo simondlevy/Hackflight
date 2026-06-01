@@ -67,6 +67,8 @@ class Telemetry(MspParser):
 
         self.outfile = None
 
+        self.start_time = time.time()
+
         if args.outfile is not None:
 
             try:
@@ -74,11 +76,12 @@ class Telemetry(MspParser):
                 self.outfile = open(args.outfile, 'w')
 
                 self.outfile.write(
+                        'time,thrust,roll,pitch,yaw,' +
                         'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
 
             except Exception as e:
                 print('Unable to open log file %s: %s' %
-                      (args.outfile, str(e)))
+                        (args.outfile, str(e)))
                 exit(1)
 
         self.plotter = None
@@ -103,9 +106,9 @@ class Telemetry(MspParser):
                         yticks=(
                             self.PLOTTER_Z_RANGE,
                             (self.PLOTTER_DZ_RANGE[0],
-                             0, self.PLOTTER_DZ_RANGE[1])),
-                        ylabels=('Z (m)', 'dZ/dt (m/s)'),
-                        styles=('b-', 'g-'))
+                                0, self.PLOTTER_DZ_RANGE[1])),
+                            ylabels=('Z (m)', 'dZ/dt (m/s)'),
+                            styles=('b-', 'g-'))
 
         self.running = True
 
@@ -123,23 +126,23 @@ class Telemetry(MspParser):
         return self.plotter_data
 
     def handle_TELEMETRY(self, thrust, roll, pitch, yaw,
-                         dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+            dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         if self.outfile is None and self.plotter is None:
 
             print(('thrust=%+3.3f roll=%+3.3f pitch=%+3.3f yaw=%+3.3f | ' +
-                   'dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-                   'psi=%+5.1f dpsi=%+5.1f') %
-                  (thrust, roll, pitch, yaw,
-                   dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+                'dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
+                'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
+                'psi=%+5.1f dpsi=%+5.1f') %
+                (thrust, roll, pitch, yaw,
+                    dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
         elif self.outfile is not None:
 
             self.outfile.write(
                     '%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
-                    (time.time(), thrust, roll, pitch, yaw,
-                     dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+                    (time.time() - self.start_time, thrust, roll, pitch, yaw,
+                        dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 

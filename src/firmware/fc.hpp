@@ -76,10 +76,10 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                const auto rxaxes = rxdata.axes;
-
-                step(rxdata.is_armed, rxdata.timestamp_msec, rxaxes,
+                step(rxdata.is_armed, rxdata.timestamp_msec,
                         motorvals, motorcount);
+
+                const auto rxaxes = rxdata.axes;
 
                 const auto setpoint = Setpoint(
                         (rxaxes.thrust+1)/2,
@@ -94,6 +94,8 @@ namespace hf {
                         _state,
                         setpoint);
 
+                sendTelemetry(_stabilizerPid.setpoint);
+
                 return _stabilizerPid.setpoint;
             } 
 
@@ -103,9 +105,13 @@ namespace hf {
                     const uint8_t motorcount) -> Setpoint
             {
                 step(message.is_armed, message.timestamp_msec,
-                        message.setpoint, motorvals, motorcount);
+                        motorvals, motorcount);
 
-                return Setpoint(0, 0, 0, 0); // XXX
+                const auto setpoint = Setpoint(0, 0, 0, 0); // XXX
+
+                sendTelemetry(setpoint);
+
+                return setpoint;
             } 
 
             void updateHoverDeck()
@@ -172,7 +178,6 @@ namespace hf {
             void step(
                     const bool is_armed,
                     const uint32_t timestamp_msec,
-                    const Setpoint & setpoint,
                     const float * motorvals,
                     const uint8_t motorcount)
             {
@@ -207,30 +212,27 @@ namespace hf {
                     _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
                             motorvals, motorcount);
                 }
-
-                // Periodically send telemetry to client
-                if (_telemetryTimer.ready()) {
-                    sendTelemetry(setpoint);
-                }
             }
 
             void sendTelemetry(const Setpoint & setpoint)
             {
-                static MspSerializer _serializer;
+                if (_telemetryTimer.ready()) {
+                    static MspSerializer _serializer;
 
-                const float data[14] = {
-                    setpoint.thrust, setpoint.roll, setpoint.pitch,
-                    setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
-                    _state.phi, _state.dphi, _state.theta, _state.dtheta,
-                    _state.psi, _state.dpsi
-                };
+                    const float data[14] = {
+                        setpoint.thrust, setpoint.roll, setpoint.pitch,
+                        setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
+                        _state.phi, _state.dphi, _state.theta, _state.dtheta,
+                        _state.psi, _state.dpsi
+                    };
 
-                _serializer = MspSerializer::serializeFloats(
-                        _serializer, MSP_TELEMETRY, data, 14);
+                    _serializer = MspSerializer::serializeFloats(
+                            _serializer, MSP_TELEMETRY, data, 14);
 
-                Serial1.write(
-                        MspSerializer::payloadBytes(_serializer),
-                        MspSerializer::payloadSize(_serializer));
+                    Serial1.write(
+                            MspSerializer::payloadBytes(_serializer),
+                            MspSerializer::payloadSize(_serializer));
+                }
             }
 
     }; // class FC
