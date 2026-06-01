@@ -21,6 +21,11 @@ import matplotlib.pyplot as plt
 ZMAX = 1.5
 DZMAX = 2.0
 
+
+def plotmid(time, value):
+    plt.plot(time, value * np.ones(len(time)), 'k-')
+
+
 def main():
 
     data = np.loadtxt('log.csv', delimiter=',', skiprows=1)
@@ -41,20 +46,24 @@ def main():
     psi = data[:,13]
     psi = data[:,14]
 
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.plot(time, z)
     plt.ylim((0, ZMAX))
     plt.ylabel('Z (m)')
 
-    '''
-    plt.subplot(2, 1, 2)
-    plt.plot(time, data[:,7], 'r')
-    plt.plot(time, np.zeros(len(t)), 'k')
+    plt.subplot(3, 1, 2)
+    plt.plot(time, dz, 'r')
+    plotmid(time, 0)
     plt.ylim((-DZMAX, +DZMAX))
     plt.ylabel('dZ/dt (m/s)')
 
+    plt.subplot(3, 1, 3)
+    plt.plot(time, thrust, 'b')
+    plt.ylim((0, 1))
+    plotmid(time, 0.5)
+    plt.ylabel('Thrust')
+
     plt.xlabel('time (s)')
-    '''
 
     plt.show()
 
