@@ -102,7 +102,7 @@ namespace hf {
                 return _stabilizerPid.setpoint;
             } 
 
-            auto updateCoreAndHoverDeck(
+            auto updateCoreAndHover(
                     const msp_message_t & message,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
@@ -112,12 +112,29 @@ namespace hf {
 
                 updateHoverDeck();
 
-                _hoverPid= HoverPidController::run(_hoverPid, Timer::getDt(),
-                        _mode, _state, message.setpoint);
+                const auto dt = Timer::getDt();
 
-                sendTelemetry(_hoverPid.setpoint);
+                _altHoldPid= AltHoldPidController::run(_altHoldPid,
+                        dt, _mode, _state, message.setpoint);
 
-                return _hoverPid.setpoint;
+                const auto rxaxes = message.setpoint;
+
+                const auto setpoint = Setpoint(
+                        rxaxes.thrust < 0 ? 0 : rxaxes.thrust,
+                        rxaxes.roll * PositionController::MAX_DEMAND_DEG,
+                        rxaxes.pitch * PositionController::MAX_DEMAND_DEG, 
+                        rxaxes.yaw);
+
+                _stabilizerPid = StabilizerPidController::run(
+                        _stabilizerPid,
+                        rxaxes.thrust > 0.01,
+                        dt,
+                        _state,
+                        setpoint);
+
+                sendTelemetry(_stabilizerPid.setpoint);
+
+                return _stabilizerPid.setpoint;
             } 
 
             void updateHoverDeck()

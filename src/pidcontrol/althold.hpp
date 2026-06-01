@@ -36,7 +36,8 @@ namespace hf {
 
             AltHoldPidController() = default;
 
-            AltHoldPidController& operator=(const AltHoldPidController& other) = default;
+            AltHoldPidController& operator=(
+                    const AltHoldPidController& other) = default;
 
             AltHoldPidController(
                     const float altitude_target,

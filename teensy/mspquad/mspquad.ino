@@ -85,7 +85,7 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _core.updateCoreAndHoverDeck(
+    const auto setpoint = _core.updateCoreAndHover(
             _message, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint

@@ -99,7 +99,7 @@ namespace hf {
             {
                 if (_helper.ready()) {
 
-                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%3.3f "
+                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
                             "yaw=%+3.3f\n",
                             _helper.count, setpoint.thrust, setpoint.roll,
                             setpoint.pitch, setpoint.yaw); }
