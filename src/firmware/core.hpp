@@ -26,7 +26,6 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
-#include <firmware/msp/message.h>
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
@@ -56,6 +55,15 @@ namespace hf {
             // Safety constants
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
             static constexpr uint32_t FAILSAFE_MSEC = 500;
+
+            typedef struct {
+
+                uint32_t timestamp_msec;
+                bool is_armed;
+                bool is_hovering;
+                Setpoint setpoint;
+
+            } msp_message_t;
 
         public:
 
