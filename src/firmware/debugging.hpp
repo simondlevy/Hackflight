@@ -184,6 +184,25 @@ namespace hf {
                 }
             }
 
+            void reportMotors(
+                    const float * vals,
+                    const uint8_t count,
+                    const char * fmt="%f")
+            {
+                if (_helper.ready()) {
+
+                    printf("%5lu | ", _helper.count);
+
+                    for (uint8_t k=0; k<count; ++k) {
+                        printf("m%d=", k+1);
+                        printf(fmt, vals[k]);
+                        printf("    ");
+                    }
+
+                    printf("\n");
+                }
+             }
+
         private:
 
             Helper _helper;
