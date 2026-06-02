@@ -56,15 +56,6 @@ namespace hf {
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
             static constexpr uint32_t FAILSAFE_MSEC = 500;
 
-            typedef struct {
-
-                uint32_t timestamp_msec;
-                bool is_armed;
-                bool is_hovering;
-                Setpoint setpoint;
-
-            } msp_message_t;
-
         public:
 
             void beginCore()
@@ -115,17 +106,17 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(_message.is_armed, _message.is_hovering,
-                        _message.timestamp_msec, motorvals, motorcount);
+                step(_message_requested_arming, _message_requested_hover,
+                        _message_timestamp_msec, motorvals, motorcount);
 
                 updateHoverDeck();
 
                 const auto dt = Timer::getDt();
 
                 _altHoldPid= AltHoldPidController::run(_altHoldPid,
-                        dt, _mode, _state, _message.setpoint);
+                        dt, _mode, _state, _message_setpoint);
 
-                const auto rxaxes = _message.setpoint;
+                const auto rxaxes = _message_setpoint;
 
                 const auto setpoint = Setpoint(
                         rxaxes.thrust < 0 ? 0 : rxaxes.thrust,
@@ -216,6 +207,12 @@ namespace hf {
 
             // Debugging
             Debugger _debugger;
+
+            // Incoming message contents
+            uint32_t _message_timestamp_msec;
+            bool _message_requested_arming;
+            bool _message_requested_hover;
+            Setpoint _message_setpoint;
 
             void step(
                     const bool is_armed,
@@ -324,8 +321,6 @@ namespace hf {
                     mode;
             }
 
-            msp_message_t _message;
-
             void handleIncomingByte(const uint8_t byte)
             {
                 static MspParser _parser;
@@ -335,22 +330,22 @@ namespace hf {
                 switch (MspParser::getid(_parser)) {
 
                     case MSP_SET_ARMING:
-                        _message.is_armed = !_message.is_armed;
-                        _message.timestamp_msec = millis();
+                        _message_requested_arming = !_message_requested_arming;
+                        _message_timestamp_msec = millis();
                         break;
 
                     case MSP_SET_IDLE:
-                        _message.is_hovering = false;
-                        _message.timestamp_msec = millis();
+                        _message_requested_hover = false;
+                        _message_timestamp_msec = millis();
                         break;
 
                     case MSP_SET_HOVER:
-                        _message.is_hovering = true;
-                        _message.setpoint.thrust = MspParser::getFloat(_parser, 0);
-                        _message.setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
-                        _message.setpoint.roll = MspParser::getFloat(_parser, 2); // vy
-                        _message.setpoint.yaw = MspParser::getFloat(_parser, 3);
-                        _message.timestamp_msec = millis();
+                        _message_requested_hover = true;
+                        _message_setpoint.thrust = MspParser::getFloat(_parser, 0);
+                        _message_setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
+                        _message_setpoint.roll = MspParser::getFloat(_parser, 2); // vy
+                        _message_setpoint.yaw = MspParser::getFloat(_parser, 3);
+                        _message_timestamp_msec = millis();
                         break;
 
                     default:
