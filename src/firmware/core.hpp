@@ -27,6 +27,7 @@
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/message.h>
+#include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
@@ -103,21 +104,20 @@ namespace hf {
             } 
 
             auto updateCoreAndHover(
-                    const msp_message_t & message,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(message.is_armed, message.is_hovering,
-                        message.timestamp_msec, motorvals, motorcount);
+                step(_message.is_armed, _message.is_hovering,
+                        _message.timestamp_msec, motorvals, motorcount);
 
                 updateHoverDeck();
 
                 const auto dt = Timer::getDt();
 
                 _altHoldPid= AltHoldPidController::run(_altHoldPid,
-                        dt, _mode, _state, message.setpoint);
+                        dt, _mode, _state, _message.setpoint);
 
-                const auto rxaxes = message.setpoint;
+                const auto rxaxes = _message.setpoint;
 
                 const auto setpoint = Setpoint(
                         rxaxes.thrust < 0 ? 0 : rxaxes.thrust,
@@ -147,6 +147,14 @@ namespace hf {
                             _opticalFlowFilter,
                             micros(), _flowsensor.read());
                     _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+                }
+            }
+
+            void handleSerial1Event()
+            {
+                while (Serial1.available()) {
+
+                    handleIncomingByte(Serial1.read());
                 }
             }
 
@@ -306,6 +314,40 @@ namespace hf {
 
                     //  Default: stay in current mode
                     mode;
+            }
+
+            msp_message_t _message;
+
+            void handleIncomingByte(const uint8_t byte)
+            {
+                static MspParser _parser;
+
+                _parser = MspParser::parse(_parser, byte);
+
+                switch (MspParser::getid(_parser)) {
+
+                    case MSP_SET_ARMING:
+                        _message.is_armed = !_message.is_armed;
+                        _message.timestamp_msec = millis();
+                        break;
+
+                    case MSP_SET_IDLE:
+                        _message.is_hovering = false;
+                        _message.timestamp_msec = millis();
+                        break;
+
+                    case MSP_SET_HOVER:
+                        _message.is_hovering = true;
+                        _message.setpoint.thrust = MspParser::getFloat(_parser, 0);
+                        _message.setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
+                        _message.setpoint.roll = MspParser::getFloat(_parser, 2); // vy
+                        _message.setpoint.yaw = MspParser::getFloat(_parser, 3);
+                        _message.timestamp_msec = millis();
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             static auto isFlipped(const VehicleState & state) -> bool

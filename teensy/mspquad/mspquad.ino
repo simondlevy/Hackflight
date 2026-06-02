@@ -23,13 +23,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/core.hpp>
-#include <firmware/msp/parser.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
 static Core _core;
-
-static msp_message_t _message;
 
 static Mixer _mixer;
 
@@ -37,37 +34,7 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 void serialEvent1()
 {
-    static MspParser _parser;
-
-    while (Serial1.available()) {
-
-        _parser = MspParser::parse(_parser, Serial1.read());
-
-        switch (MspParser::getid(_parser)) {
-
-            case MSP_SET_ARMING:
-                _message.is_armed = !_message.is_armed;
-                _message.timestamp_msec = millis();
-                break;
-
-            case MSP_SET_IDLE:
-                _message.is_hovering = false;
-                _message.timestamp_msec = millis();
-                break;
-
-            case MSP_SET_HOVER:
-                _message.is_hovering = true;
-                _message.setpoint.thrust = MspParser::getFloat(_parser, 0);
-                _message.setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
-                _message.setpoint.roll = MspParser::getFloat(_parser, 2); // vy
-                _message.setpoint.yaw = MspParser::getFloat(_parser, 3);
-                _message.timestamp_msec = millis();
-                break;
-
-            default:
-                break;
-        }
-    }
+    _core.handleSerial1Event();
 }
 
 void setup()
@@ -85,8 +52,7 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _core.updateCoreAndHover(
-            _message, _mixer.motorvals, 4);
+    const auto setpoint = _core.updateCoreAndHover(_mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
