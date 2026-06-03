@@ -44,7 +44,7 @@ namespace hf {
                     is_armed(is_armed),
                     is_hovering(is_hovering),
                     timestamp_msec(timestamp_msec),
-                    aux1(aux1) {}
+                    _aux1(aux1) {}
 
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
@@ -67,7 +67,7 @@ namespace hf {
 
                 // Push-button arming; ignores startup transient
                 const auto did_aux1_change =
-                    data.aux1 >= 988 && aux1 != data.aux1;
+                    data._aux1 >= 988 && aux1 != data._aux1;
 
                 const auto is_hovering = false;
 
@@ -92,7 +92,7 @@ namespace hf {
 
         private:
 
-            uint16_t aux1;
+            uint16_t _aux1;
 
             static auto scale(const uint16_t val) -> float
             {

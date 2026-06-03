@@ -48,7 +48,7 @@ namespace hf {
                     is_armed(is_armed),
                     is_throttle_down(is_throttle_down),
                     timestamp_msec(timestamp_msec),
-                    aux(aux) {}
+                    _aux(aux) {}
 
             TraditionalReceiver& operator=(
                     const TraditionalReceiver& other) = default;
@@ -72,8 +72,8 @@ namespace hf {
                     THROTTLE_DOWN_MAX;
 
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change = data.aux >= 988 && aux !=
-                    data.aux;
+                const auto did_aux_change = data._aux >= 988 && aux !=
+                    data._aux;
 
                 const auto is_armed = 
                     did_aux_change && data.is_armed ? false :
@@ -96,7 +96,7 @@ namespace hf {
 
         private:
 
-            uint16_t aux;
+            uint16_t _aux;
 
             static auto scale(const uint16_t val) -> float
             {
