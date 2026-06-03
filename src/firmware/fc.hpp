@@ -122,7 +122,7 @@ namespace hf {
                 const auto rxaxes = _message_setpoint;
 
                 const auto setpoint = Setpoint(
-                        rxaxes.thrust < 0 ? 0 : rxaxes.thrust,
+                        _altHoldPid.thrust,
                         rxaxes.roll * PositionController::MAX_DEMAND_DEG,
                         rxaxes.pitch * PositionController::MAX_DEMAND_DEG, 
                         rxaxes.yaw);
@@ -286,7 +286,8 @@ namespace hf {
                 if (_telemetryTimer.ready()) {
                     static MspSerializer _serializer;
 
-                    const float data[14] = {
+                    const float data[15] = {
+                        (float)_mode,
                         setpoint.thrust, setpoint.roll, setpoint.pitch,
                         setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
                         _state.phi, _state.dphi, _state.theta, _state.dtheta,
@@ -294,7 +295,7 @@ namespace hf {
                     };
 
                     _serializer = MspSerializer::serializeFloats(
-                            _serializer, MSP_TELEMETRY, data, 14);
+                            _serializer, MSP_TELEMETRY, data, 15);
 
                     Serial1.write(
                             MspSerializer::payloadBytes(_serializer),
@@ -323,17 +324,17 @@ namespace hf {
                 // Run a little state-transition machine to update flight mode
                 return 
 
-                    // Panic mode: can't recover
-                    mode == MODE_PANIC ? MODE_PANIC :
-
                     //  Vehicle flipped over: enter panic mode
                     isFlipped(state) ? MODE_PANIC :
+
+                    // Panic mode: can't recover
+                    mode == MODE_PANIC ? MODE_PANIC :
 
                     // Want arm and safe to arm: enter armed mode
                     mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
                     ? MODE_ARMED :
 
-                    // Want disarm: enter idle mode
+                    // Armed and requested disarm: enter idle mode
                     mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
 
                     // Armed and requested hover; enter hover mode
@@ -341,6 +342,9 @@ namespace hf {
 
                     // Hovering and requested no-hover; return to armed mode
                     mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
+
+                    // Hovering and requested disarm; enter idle mode
+                    mode == MODE_HOVERING && !requestedArming ? MODE_IDLE :
 
                     //  Default: stay in current mode
                     mode;

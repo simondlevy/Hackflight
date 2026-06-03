@@ -1,6 +1,8 @@
 {
   "TELEMETRY": 
   [{"ID": 100},
+   {"comment": "mode should be byte, but easier if float"},
+   {"mode":   "float"},
    {"thrust": "float"},
    {"roll":   "float"},
    {"pitch":  "float"},

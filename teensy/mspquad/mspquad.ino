@@ -22,7 +22,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/core.hpp>
+#include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
@@ -40,10 +40,7 @@ void serialEvent1()
 void setup()
 {
     // Start core devices
-    _fc.beginFC();
-
-    // Start hover-deck
-    _fc.beginHoverDeck();
+    _fc.begin();
 
     // Start motors
     _motors.begin();
@@ -52,15 +49,14 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.updateFCAndHover(_mixer.motorvals, 4);
+    const auto setpoint = _fc.update(_mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
-    const float nospin[4] = {0, 0, 0, 0};
-
     // Run motors if safe
     if (_fc.isSafeToFly()) {
+        const float nospin[4] = {0, 0, 0, 0};
         _motors.run(_fc.isArmed(), nospin); //_mixer.motorvals);
     }
 }
