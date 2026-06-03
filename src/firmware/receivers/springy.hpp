@@ -38,13 +38,15 @@ namespace hf {
                     const bool is_armed,
                     const bool is_hovering,
                     const uint32_t timestamp_msec,
-                    const uint16_t aux1)
+                    const uint16_t aux1,
+                    const uint16_t aux2)
                 :
                     axes(axes),
                     is_armed(is_armed),
                     is_hovering(is_hovering),
                     timestamp_msec(timestamp_msec),
-                    _aux1(aux1) {}
+                    _aux1(aux1),
+                    _aux2(aux2) {}
 
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
@@ -75,7 +77,7 @@ namespace hf {
                     did_aux1_change ? !data.is_armed : data.is_armed;
 
                 return SpringyReceiver(axes, is_armed, is_hovering, msec_curr,
-                        aux1);
+                        aux1, aux2);
             }
 
             static void report(const SpringyReceiver & data)
@@ -93,6 +95,7 @@ namespace hf {
         private:
 
             uint16_t _aux1;
+            uint16_t _aux2;
 
             static auto scale(const uint16_t val) -> float
             {
