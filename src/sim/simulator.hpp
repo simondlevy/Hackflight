@@ -90,11 +90,13 @@ namespace hf {
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
                             thrust == 0 ? 0 :
-                                VEHICLE_BASE_RPM + thrust * SCALE_RPM,
+                                VEHICLE_BASE_RPM + (thrust-0.5f) * SCALE_RPM,
                             pidControl.setpoint.roll * SCALE_RPM,
                             pidControl.setpoint.pitch * SCALE_RPM,
                             pidControl.setpoint.yaw * SCALE_RPM
                         };
+
+                        printf("thrust=%f => %f\n", thrust, scaled_setpoint.thrust);
 
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
