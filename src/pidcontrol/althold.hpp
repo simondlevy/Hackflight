@@ -25,12 +25,14 @@ namespace hf {
 
         private:
 
-            static constexpr float ALTITUDE_INIT_M = 0.4;
-            static constexpr float ALTITUDE_MAX_M = 1.0;
             static constexpr float ALTITUDE_MIN_M = 0.2;
+            static constexpr float ALTITUDE_MAX_M = 1.0;
+            static constexpr float ALTITUDE_INIT_M = 0.4;
             static constexpr float ALTITUDE_INC_MPS = 0.2;
 
         public:
+
+            static constexpr float ALTITUDE_LANDING_M = 0.03;
 
             float thrust;
 
@@ -70,13 +72,15 @@ namespace hf {
                 const auto hovering =
                     mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
 
+                const auto airborne = hovering || (state.z > ALTITUDE_LANDING_M);
+
                 const auto altitude_pid =
                     AltitudeController::run(pid._altitude_pid, hovering, dt,
                             new_altitude_target, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::run(pid._climbrate_pid, hovering, dt,
-                            altitude_pid.output, state.z, state.dz);
+                    ClimbRateController::run(pid._climbrate_pid, airborne, dt,
+                            altitude_pid.output, state.dz);
 
                 /*
                 static uint32_t _count;

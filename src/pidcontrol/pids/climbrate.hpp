@@ -23,10 +23,6 @@ namespace hf {
 
     class ClimbRateController {
 
-        public:
-
-            static constexpr float ALTITUDE_LANDING_M = 0.03;
-
         private:
 
             static constexpr float KP = 25;
@@ -54,14 +50,11 @@ namespace hf {
              */
             static auto run(
                     const ClimbRateController & controller,
-                    const bool hovering,
+                    const bool airborne,
                     const float dt,
                     const float target,
-                    const float z,
                     const float dz) -> ClimbRateController
             {
-                const auto airborne = hovering || (z > ALTITUDE_LANDING_M);
-
                 const auto error = target - dz;
 
                 const auto integral = airborne ? 
