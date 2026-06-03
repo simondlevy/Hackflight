@@ -1,5 +1,5 @@
 /**
- * Class for old-school R/C receiver data
+ * Class for R/C receivers using spring-throttle transmitter
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -67,9 +67,7 @@ namespace hf {
                     data.aux >= 988 && aux != data.aux;
 
                 const auto is_armed = 
-                    did_aux_change && data.is_armed ? false :
-                    did_aux_change ? true :
-                    data.is_armed;
+                    did_aux_change ? !data.is_armed : data.is_armed;
 
                 return SpringyReceiver(axes, is_armed, aux, msec_curr);
             }
