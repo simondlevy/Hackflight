@@ -30,7 +30,7 @@
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
-#include <firmware/receiver.hpp>
+#include <firmware/receivers/traditional.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <firmware/timer.hpp>
@@ -48,17 +48,17 @@ namespace hf {
             // Rate constants
             static constexpr float EKF_PREDICTION_RATE_HZ = 100;
             static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
-            static constexpr float TELEMETRY_RATE_HZ = 50;
+            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ =
+                100; static constexpr float TELEMETRY_RATE_HZ = 50;
 
             // Safety constants
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
             static constexpr uint32_t FAILSAFE_MSEC = 500;
 
-            // We say we are flying if one or more motors are running over the
-            // idle thrust.
-            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
-            static constexpr float MOTOR_IDLE_MAX = 0.05;
+            // We say we are flying if one or more motors are running
+            // over the idle thrust.
+            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC =
+                2000; static constexpr float MOTOR_IDLE_MAX = 0.05;
 
         public:
 
@@ -78,7 +78,7 @@ namespace hf {
             }
 
             auto update(
-                    const ReceiverData & rxdata,
+                    const TraditionalReceiver & rxdata,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
@@ -89,8 +89,10 @@ namespace hf {
 
                 const auto setpoint = Setpoint(
                         (rxaxes.thrust+1)/2,
-                        rxaxes.roll * PositionController::MAX_DEMAND_DEG,
-                        rxaxes.pitch * PositionController::MAX_DEMAND_DEG, 
+                        rxaxes.roll *
+                        PositionController::MAX_DEMAND_DEG,
+                        rxaxes.pitch *
+                        PositionController::MAX_DEMAND_DEG, 
                         rxaxes.yaw);
 
                 _stabilizerPid = StabilizerPidController::run(

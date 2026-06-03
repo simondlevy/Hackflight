@@ -23,7 +23,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <firmware/receiver.hpp>
+#include <firmware/receivers/traditional.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
@@ -31,7 +31,7 @@ static FC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static ReceiverData _rxdata;
+static TraditionalReceiver _rxdata;
 
 static Mixer _mixer;
 
@@ -41,7 +41,7 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
-        _rxdata = ReceiverData::update(
+        _rxdata = TraditionalReceiver::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),

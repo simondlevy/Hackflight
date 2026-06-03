@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    class ReceiverData {
+    class TraditionalReceiver {
 
         private:
 
@@ -36,9 +36,9 @@ namespace hf {
             uint16_t aux;
             uint32_t timestamp_msec;
 
-            ReceiverData() = default;
+            TraditionalReceiver() = default;
 
-            ReceiverData(
+            TraditionalReceiver(
                     const Setpoint & axes,
                     const bool is_armed,
                     const bool is_throttle_down,
@@ -51,16 +51,16 @@ namespace hf {
                     aux(aux),
                     timestamp_msec(timestamp_msec) {}
 
-            ReceiverData& operator=(const ReceiverData& other) = default;
+            TraditionalReceiver& operator=(const TraditionalReceiver& other) = default;
 
             static auto update(
-                    const ReceiverData & data,
+                    const TraditionalReceiver & data,
                     const uint16_t throttle,
                     const uint16_t roll,
                     const uint16_t pitch,
                     const uint16_t yaw,
                     const uint16_t aux,
-                    const uint32_t msec_curr) -> ReceiverData
+                    const uint32_t msec_curr) -> TraditionalReceiver
             {
                 const auto axes = Setpoint(
                         scale(throttle),
@@ -78,10 +78,10 @@ namespace hf {
                     did_aux_change && data.is_throttle_down ? true :
                     data.is_armed;
 
-                return ReceiverData(axes, is_armed, is_throttle_down, aux, msec_curr);
+                return TraditionalReceiver(axes, is_armed, is_throttle_down, aux, msec_curr);
             }
 
-            static void report(const ReceiverData & data)
+            static void report(const TraditionalReceiver & data)
             {
                 static uint32_t _count;
 
