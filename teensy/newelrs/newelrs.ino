@@ -23,7 +23,6 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <firmware/receivers/springy.hpp>
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 

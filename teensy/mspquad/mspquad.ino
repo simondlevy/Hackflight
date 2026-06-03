@@ -1,6 +1,6 @@
 /*
-   Hackflight main sketch for Teensy quadcopter using ESP32 receiver with MSP
-   protocol
+   Hackflight main sketch for Teensy quadcopter using ESP32 receiver
+   with MSP protocol
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -28,13 +28,15 @@ using namespace hf;
 
 static FC _fc;
 
+static GamepadReceiver _rx;
+
 static Mixer _mixer;
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 void serialEvent1()
 {
-    _fc.handleSerial1Event();
+    _rx.handleSerial1Event();
 }
 
 void setup()
@@ -49,7 +51,7 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_mixer.motorvals, 4);
+    const auto setpoint = _fc.update(_rx, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);

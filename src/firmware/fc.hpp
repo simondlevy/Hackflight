@@ -140,20 +140,21 @@ namespace hf {
             } 
 
             auto update(
+                    GamepadReceiver & rxdata,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(_message_requested_arming, _message_requested_hover,
-                        _message_timestamp_msec, motorvals, motorcount);
+                step(rxdata.requested_arming, rxdata.requested_hover,
+                        rxdata.timestamp_msec, motorvals, motorcount);
 
                 acquireHoverData();
 
                 const auto dt = Timer::getDt();
 
                 _altHoldPid= AltHoldPidController::run(_altHoldPid,
-                        dt, _mode, _state, _message_setpoint);
+                        dt, _mode, _state, rxdata.setpoint);
 
-                const auto rxaxes = _message_setpoint;
+                const auto rxaxes = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(
                         _altHoldPid.thrust,
@@ -183,14 +184,6 @@ namespace hf {
                             _opticalFlowFilter,
                             micros(), _flowsensor.read());
                     _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
-                }
-            }
-
-            void handleSerial1Event()
-            {
-                while (Serial1.available()) {
-
-                    handleIncomingByte(Serial1.read());
                 }
             }
 
@@ -245,12 +238,6 @@ namespace hf {
 
             // Debugging
             Debugger _debugger;
-
-            // Incoming message contents
-            uint32_t _message_timestamp_msec;
-            bool _message_requested_arming;
-            bool _message_requested_hover;
-            Setpoint _message_setpoint;
 
             void step(
                     const bool is_armed,
@@ -382,38 +369,6 @@ namespace hf {
 
                     //  Default: stay in current mode
                     mode;
-            }
-
-            void handleIncomingByte(const uint8_t byte)
-            {
-                static MspParser _parser;
-
-                _parser = MspParser::parse(_parser, byte);
-
-                switch (MspParser::getid(_parser)) {
-
-                    case MSP_SET_ARMING:
-                        _message_requested_arming = !_message_requested_arming;
-                        _message_timestamp_msec = millis();
-                        break;
-
-                    case MSP_SET_IDLE:
-                        _message_requested_hover = false;
-                        _message_timestamp_msec = millis();
-                        break;
-
-                    case MSP_SET_HOVER:
-                        _message_requested_hover = true;
-                        _message_setpoint.thrust = MspParser::getFloat(_parser, 0);
-                        _message_setpoint.pitch = MspParser::getFloat(_parser, 1); // vx
-                        _message_setpoint.roll = MspParser::getFloat(_parser, 2); // vy
-                        _message_setpoint.yaw = MspParser::getFloat(_parser, 3);
-                        _message_timestamp_msec = millis();
-                        break;
-
-                    default:
-                        break;
-                }
             }
 
             static auto isFlipped(const VehicleState & state) -> bool
