@@ -28,6 +28,7 @@ namespace hf {
 
             Setpoint axes;
             bool is_armed;
+            bool is_hovering;
             uint16_t aux;
             uint32_t timestamp_msec;
 
@@ -36,11 +37,13 @@ namespace hf {
             SpringyReceiver(
                     const Setpoint & axes,
                     const bool is_armed,
+                    const bool is_hovering,
                     const uint16_t aux,
                     const uint32_t timestamp_msec)
                 :
                     axes(axes),
                     is_armed(is_armed),
+                    is_hovering(is_hovering),
                     aux(aux),
                     timestamp_msec(timestamp_msec) {}
 
@@ -66,10 +69,13 @@ namespace hf {
                 const auto did_aux_change =
                     data.aux >= 988 && aux != data.aux;
 
+                const auto is_hovering = false;
+
                 const auto is_armed = 
                     did_aux_change ? !data.is_armed : data.is_armed;
 
-                return SpringyReceiver(axes, is_armed, aux, msec_curr);
+                return SpringyReceiver(axes, is_armed, is_hovering, aux,
+                        msec_curr);
             }
 
             static void report(const SpringyReceiver & data)
@@ -79,9 +85,9 @@ namespace hf {
                 const auto ax = data.axes;
 
                 printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f | "
-                        "armed=%d\n",
+                        "armed=%d hover=%d\n",
                         _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw,
-                        data.is_armed);
+                        data.is_armed, data.is_hovering);
             }
 
         private:
