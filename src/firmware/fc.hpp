@@ -128,7 +128,7 @@ namespace hf {
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
-                        !rxdata.is_throttle_down,
+                        true, // !rxdata.is_throttle_down,
                         Timer::getDt(),
                         _state,
                         setpoint);

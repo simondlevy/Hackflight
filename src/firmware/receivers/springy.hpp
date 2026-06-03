@@ -24,15 +24,10 @@ namespace hf {
 
     class SpringyReceiver {
 
-        private:
-
-            static constexpr float THROTTLE_DOWN_MAX = -0.95;
-
         public:
 
             Setpoint axes;
             bool is_armed;
-            bool is_throttle_down;
             uint16_t aux;
             uint32_t timestamp_msec;
 
@@ -41,17 +36,16 @@ namespace hf {
             SpringyReceiver(
                     const Setpoint & axes,
                     const bool is_armed,
-                    const bool is_throttle_down,
                     const uint16_t aux,
                     const uint32_t timestamp_msec)
                 :
                     axes(axes),
                     is_armed(is_armed),
-                    is_throttle_down(is_throttle_down),
                     aux(aux),
                     timestamp_msec(timestamp_msec) {}
 
-            SpringyReceiver& operator=(const SpringyReceiver& other) = default;
+            SpringyReceiver& operator=(
+                    const SpringyReceiver& other) = default;
 
             static auto update(
                     const SpringyReceiver & data,
@@ -68,17 +62,16 @@ namespace hf {
                         scale(pitch),
                         scale(yaw));
 
-                const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
-
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change = data.aux >= 988 && aux != data.aux;
+                const auto did_aux_change =
+                    data.aux >= 988 && aux != data.aux;
 
                 const auto is_armed = 
                     did_aux_change && data.is_armed ? false :
-                    did_aux_change && data.is_throttle_down ? true :
+                    did_aux_change ? true :
                     data.is_armed;
 
-                return SpringyReceiver(axes, is_armed, is_throttle_down, aux, msec_curr);
+                return SpringyReceiver(axes, is_armed, aux, msec_curr);
             }
 
             static void report(const SpringyReceiver & data)
@@ -87,8 +80,10 @@ namespace hf {
 
                 const auto ax = data.axes;
 
-                printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
-                        _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw);
+                printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f | "
+                        "armed=%d\n",
+                        _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw,
+                        data.is_armed);
             }
 
         private:

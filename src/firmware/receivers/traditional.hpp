@@ -51,7 +51,8 @@ namespace hf {
                     aux(aux),
                     timestamp_msec(timestamp_msec) {}
 
-            TraditionalReceiver& operator=(const TraditionalReceiver& other) = default;
+            TraditionalReceiver& operator=(
+                    const TraditionalReceiver& other) = default;
 
             static auto update(
                     const TraditionalReceiver & data,
@@ -68,18 +69,20 @@ namespace hf {
                         scale(pitch),
                         scale(yaw));
 
-                const auto is_throttle_down = axes.thrust < THROTTLE_DOWN_MAX;
+                const auto is_throttle_down = axes.thrust <
+                    THROTTLE_DOWN_MAX;
 
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change = data.aux >= 988 && aux != data.aux;
+                const auto did_aux_change = data.aux >= 988 && aux !=
+                    data.aux;
 
                 const auto is_armed = 
                     did_aux_change && data.is_armed ? false :
                     did_aux_change && data.is_throttle_down ? true :
                     data.is_armed;
 
-                return TraditionalReceiver(axes, is_armed, is_throttle_down, aux, msec_curr);
-            }
+                return TraditionalReceiver(axes, is_armed,
+                        is_throttle_down, aux, msec_curr); }
 
             static void report(const TraditionalReceiver & data)
             {

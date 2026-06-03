@@ -37,7 +37,8 @@ static Mixer _mixer;
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
-static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
+static void onReceiveRcChannels(
+        serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
@@ -72,6 +73,8 @@ void loop()
 {
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
+
+    SpringyReceiver::report(_rxdata);
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
