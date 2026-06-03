@@ -40,10 +40,6 @@ namespace hf {
             static constexpr float PID_FAST_FREQ = 500; // 1024 Plank 
             static constexpr float PID_SLOW_FREQ = 100;
 
-            static constexpr uint8_t MAX_MOTOR_COUNT = 20; // whatevs
-
-            static constexpr float SCALE_RPM = 1000;
-
         public:
 
             Dynamics dynamics;
@@ -87,7 +83,8 @@ namespace hf {
 
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
-                            1000 * (pidControl.setpoint.thrust - 0.5f + 35.546f),
+                            1000 * (pidControl.setpoint.thrust - 0.5f) +
+                                VEHICLE_BASE_RPM,
                             1000 * pidControl.setpoint.roll,
                             1000 * pidControl.setpoint.pitch,
                             1000 * pidControl.setpoint.yaw
@@ -101,8 +98,9 @@ namespace hf {
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k)
                         {
                             dynamics = Dynamics::update(dynamics,
-                                    VPARAMS, 1 / DYNAMICS_FREQ, _mixer.motorvals, 4,
-                                    _mixer.roll, _mixer.pitch, _mixer.yaw);
+                                    VPARAMS, 1 / DYNAMICS_FREQ,
+                                    _mixer.motorvals, 4, _mixer.roll,
+                                    _mixer.pitch, _mixer.yaw);
                         }
                     }
                 }
