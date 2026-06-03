@@ -30,6 +30,7 @@
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
+#include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
@@ -79,6 +80,36 @@ namespace hf {
 
             auto update(
                     const TraditionalReceiver & rxdata,
+                    const float * motorvals,
+                    const uint8_t motorcount) -> Setpoint
+            {
+                step(rxdata.is_armed, false, // false = no hover
+                        rxdata.timestamp_msec, motorvals, motorcount);
+
+                const auto rxaxes = rxdata.axes;
+
+                const auto setpoint = Setpoint(
+                        (rxaxes.thrust+1)/2,
+                        rxaxes.roll *
+                        PositionController::MAX_DEMAND_DEG,
+                        rxaxes.pitch *
+                        PositionController::MAX_DEMAND_DEG, 
+                        rxaxes.yaw);
+
+                _stabilizerPid = StabilizerPidController::run(
+                        _stabilizerPid,
+                        !rxdata.is_throttle_down,
+                        Timer::getDt(),
+                        _state,
+                        setpoint);
+
+                sendTelemetry(_stabilizerPid.setpoint);
+
+                return _stabilizerPid.setpoint;
+            } 
+
+            auto update(
+                    const SpringyReceiver & rxdata,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
