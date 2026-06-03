@@ -48,6 +48,7 @@ static void onReceiveRcChannels(
                 _crsf.readRcChannel(2),
                 _crsf.readRcChannel(4),
                 _crsf.readRcChannel(5),
+                _crsf.readRcChannel(6),
                 millis());
     }
 }
@@ -73,7 +74,7 @@ void loop()
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
 
-    SpringyReceiver::report(_rxdata);
+    //SpringyReceiver::report(_rxdata);
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);

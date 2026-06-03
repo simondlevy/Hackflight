@@ -29,7 +29,6 @@ namespace hf {
             Setpoint axes;
             bool is_armed;
             bool is_hovering;
-            uint16_t aux;
             uint32_t timestamp_msec;
 
             SpringyReceiver() = default;
@@ -38,14 +37,14 @@ namespace hf {
                     const Setpoint & axes,
                     const bool is_armed,
                     const bool is_hovering,
-                    const uint16_t aux,
-                    const uint32_t timestamp_msec)
+                    const uint32_t timestamp_msec,
+                    const uint16_t aux1)
                 :
                     axes(axes),
                     is_armed(is_armed),
                     is_hovering(is_hovering),
-                    aux(aux),
-                    timestamp_msec(timestamp_msec) {}
+                    timestamp_msec(timestamp_msec),
+                    aux1(aux1) {}
 
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
@@ -56,7 +55,8 @@ namespace hf {
                     const uint16_t roll,
                     const uint16_t pitch,
                     const uint16_t yaw,
-                    const uint16_t aux,
+                    const uint16_t aux1,
+                    const uint16_t aux2,
                     const uint32_t msec_curr) -> SpringyReceiver
             {
                 const auto axes = Setpoint(
@@ -66,16 +66,16 @@ namespace hf {
                         scale(yaw));
 
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change =
-                    data.aux >= 988 && aux != data.aux;
+                const auto did_aux1_change =
+                    data.aux1 >= 988 && aux1 != data.aux1;
 
                 const auto is_hovering = false;
 
                 const auto is_armed = 
-                    did_aux_change ? !data.is_armed : data.is_armed;
+                    did_aux1_change ? !data.is_armed : data.is_armed;
 
-                return SpringyReceiver(axes, is_armed, is_hovering, aux,
-                        msec_curr);
+                return SpringyReceiver(axes, is_armed, is_hovering, msec_curr,
+                        aux1);
             }
 
             static void report(const SpringyReceiver & data)
@@ -91,6 +91,8 @@ namespace hf {
             }
 
         private:
+
+            uint16_t aux1;
 
             static auto scale(const uint16_t val) -> float
             {

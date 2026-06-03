@@ -33,7 +33,6 @@ namespace hf {
             Setpoint axes;
             bool is_armed;
             bool is_throttle_down;
-            uint16_t aux;
             uint32_t timestamp_msec;
 
             TraditionalReceiver() = default;
@@ -42,14 +41,14 @@ namespace hf {
                     const Setpoint & axes,
                     const bool is_armed,
                     const bool is_throttle_down,
-                    const uint16_t aux,
-                    const uint32_t timestamp_msec)
+                    const uint32_t timestamp_msec,
+                    const uint16_t aux)
                 :
                     axes(axes),
                     is_armed(is_armed),
                     is_throttle_down(is_throttle_down),
-                    aux(aux),
-                    timestamp_msec(timestamp_msec) {}
+                    timestamp_msec(timestamp_msec),
+                    aux(aux) {}
 
             TraditionalReceiver& operator=(
                     const TraditionalReceiver& other) = default;
@@ -82,7 +81,8 @@ namespace hf {
                     data.is_armed;
 
                 return TraditionalReceiver(axes, is_armed,
-                        is_throttle_down, aux, msec_curr); }
+                        is_throttle_down, msec_curr, aux);
+            }
 
             static void report(const TraditionalReceiver & data)
             {
@@ -95,6 +95,8 @@ namespace hf {
             }
 
         private:
+
+            uint16_t aux;
 
             static auto scale(const uint16_t val) -> float
             {
