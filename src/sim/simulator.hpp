@@ -87,24 +87,21 @@ namespace hf {
 
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
-                            pidControl.setpoint.thrust -0.5f + 35.546f,
-                            pidControl.setpoint.roll,
-                            pidControl.setpoint.pitch,
-                            pidControl.setpoint.yaw
+                            1000 * (pidControl.setpoint.thrust - 0.5f + 35.546f),
+                            1000 * pidControl.setpoint.roll,
+                            1000 * pidControl.setpoint.pitch,
+                            1000 * pidControl.setpoint.yaw
                         };
 
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
                         _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
 
-                        // Convert motor values to double for dynamics
-                        const auto rpms = motors2rpms(_mixer.motorvals, 4);
-
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k)
                         {
                             dynamics = Dynamics::update(dynamics,
-                                    VPARAMS, 1 / DYNAMICS_FREQ, rpms, 4,
+                                    VPARAMS, 1 / DYNAMICS_FREQ, _mixer.motorvals, 4,
                                     _mixer.roll, _mixer.pitch, _mixer.yaw);
                         }
                     }
@@ -116,18 +113,6 @@ namespace hf {
         private:
 
             HoverPidController _pidControl;
-
-            static auto motors2rpms(const float * f,
-                    const size_t n) -> float *
-            {
-                static float d[MAX_MOTOR_COUNT];
-
-                for (size_t k=0; k<n; ++k) {
-                    d[k] = f[k] * 1000;
-                }
-
-                return d;
-            }
 
             static auto SimStateToVehicleState(
                     const SimState state) -> VehicleState 
