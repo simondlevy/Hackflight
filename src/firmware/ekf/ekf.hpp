@@ -79,7 +79,7 @@ namespace hf {
 
             typedef std::array<float, STATE_DIM> vector;
 
-            class Core {
+            class FC {
 
                 public:
 
@@ -89,15 +89,15 @@ namespace hf {
                     // Covariance matrix
                     matrix P;
 
-                    Core() = default;
+                    FC() = default;
 
-                    Core& operator=(const Core& other) = default;
+                    FC& operator=(const FC& other) = default;
 
-                    Core(const vector & x, const matrix & P) 
+                    FC(const vector & x, const matrix & P) 
                         : x(x), P(P) {}
             };
 
-            Core core;
+            FC core;
 
         public:
 
@@ -127,7 +127,7 @@ namespace hf {
             }
 
             EKF(
-                    const Core & core,
+                    const FC & core,
                     const Quaternion & q,
                     const ThreeAxis & gyroLatest,
                     const ThreeAxisSubSampler & accelSubSampler,
@@ -229,7 +229,7 @@ namespace hf {
                 const auto q = newtmpq / Quaternion::l2norm(newtmpq);
 
                 return EKF(
-                        Core(x, P),
+                        FC(x, P),
                         q,
                         ekf.gyroLatest,
                         accelSubSampler,
@@ -280,7 +280,7 @@ namespace hf {
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
                 const auto coreWithNoise = dtpositive ?
-                    Core(ekf.core.x, 
+                    FC(ekf.core.x, 
                             enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
                     ekf.core;
 
@@ -329,7 +329,7 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
 
-                const auto core = ready ? Core(x, P) : coreWithRangeAndFlow;
+                const auto core = ready ? FC(x, P) : coreWithRangeAndFlow;
 
                 return EKF(
                         core,
@@ -518,9 +518,9 @@ namespace hf {
             }
 
             static auto updateWithFlow(
-                    const Core & core,
+                    const FC & core,
                     const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro, const float r22) -> Core
+                    const ThreeAxis & gyro, const float r22) -> FC
             {
                 const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
                         offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
@@ -530,9 +530,9 @@ namespace hf {
             }
 
             static auto updateWithRange(
-                    const Core & core,
+                    const FC & core,
                     const ZRangerFilter & zrfilter,
-                    const float rzz) -> Core
+                    const float rzz) -> FC
             {
 
                 const auto angle = max(0, fabsf(acosf(rzz)) -
@@ -550,13 +550,13 @@ namespace hf {
             }
 
             static auto updateWithFlowAxis(
-                    const Core & core,
+                    const FC & core,
                     const float dt,
                     const float r22,
                     const float dpixel,
                     const float stdev,
                     const uint8_t state_index,
-                    const float gyroval) -> Core
+                    const float gyroval) -> FC
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
@@ -592,10 +592,10 @@ namespace hf {
             }
 
             static auto updateWithScalar(
-                    const Core & core,
+                    const FC & core,
                     const vector & h,
                     const float error,
-                    const float stdMeasNoise) -> Core
+                    const float stdMeasNoise) -> FC
             {
                 const auto R = stdMeasNoise*stdMeasNoise;
 
@@ -647,7 +647,7 @@ namespace hf {
                     }
                 }
 
-                return Core(x, P);
+                return FC(x, P);
             }
 
             static auto enforceSymmetry(const matrix & P) -> matrix

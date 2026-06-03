@@ -20,7 +20,6 @@
 
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
-#include <firmware/flying.hpp>
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
@@ -39,7 +38,7 @@
 
 namespace hf {
 
-    class Core {
+    class FC {
 
         private:
 
@@ -56,25 +55,29 @@ namespace hf {
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
             static constexpr uint32_t FAILSAFE_MSEC = 500;
 
+            // We say we are flying if one or more motors are running over the
+            // idle thrust.
+            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
+            static constexpr float MOTOR_IDLE_MAX = 0.05;
+
         public:
 
-            void beginCore()
+            void begin(const bool useHoverdeck=true)
             {
                 Serial1.begin(115200);
 
                 _imu.begin();
                 _led.begin(); 
 
+                if (useHoverdeck) {
+                    _zranger.begin();
+                    _flowsensor.begin();
+                }
+
                 _mode = MODE_IDLE;
             }
 
-            void beginHoverDeck()
-            {
-                _zranger.begin();
-                _flowsensor.begin();
-            }
-
-            auto updateCore(
+            auto update(
                     const ReceiverData & rxdata,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
@@ -102,14 +105,14 @@ namespace hf {
                 return _stabilizerPid.setpoint;
             } 
 
-            auto updateCoreAndHover(
+            auto update(
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
                 step(_message_requested_arming, _message_requested_hover,
                         _message_timestamp_msec, motorvals, motorcount);
 
-                updateHoverDeck();
+                acquireHoverData();
 
                 const auto dt = Timer::getDt();
 
@@ -136,7 +139,7 @@ namespace hf {
                 return _stabilizerPid.setpoint;
             } 
 
-            void updateHoverDeck()
+            void acquireHoverData()
             {
                 // Slower EKF update with range, optical flow
                 if (_hoverDeckTimer.ready()) {
@@ -175,10 +178,15 @@ namespace hf {
             // Idle, armed, etc.
             mode_e _mode;
 
-            // Computation
+            // Flying status based on motors
+            bool _isFlying;
+            uint32_t _flyingCheckMsec;
+
+            // Sensor fusion
             ImuFilter _imuFilter;
             EKF _ekf;
-            FlyingCheck _flyingCheck;
+            OpticalFlowFilter _opticalFlowFilter;
+            ZRangerFilter _zrangerFilter;
 
             // Devices
             IMU _imu;
@@ -191,10 +199,6 @@ namespace hf {
             Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
             Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
-
-            // Hover-deck support
-            OpticalFlowFilter _opticalFlowFilter;
-            ZRangerFilter _zrangerFilter;
 
             // PID control for stabilize-only
             StabilizerPidController _stabilizerPid;
@@ -240,7 +244,7 @@ namespace hf {
 
                 // Periodically run the EKF prediction step
                 if (_ekfPredictionTimer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _flyingCheck.isFlying); 
+                    _ekf = EKF::predict(_ekf, millis(), _isFlying); 
                 }
 
                 // Do EKF fast-update with IMU readings
@@ -251,9 +255,30 @@ namespace hf {
 
                 // Periodically run flying check to get status for EKF
                 if (_flyingCheckTimer.ready()) {
-                    _flyingCheck = FlyingCheck::run(_flyingCheck, millis(),
-                            motorvals, motorcount);
+                    checkFlyingStatus(motorvals, motorcount);
                 }
+            }
+
+            void checkFlyingStatus(
+                    const float * motorvals, const uint8_t motor_count)
+            {
+                auto isThrustOverIdle = false;
+
+                for (int i = 0; i < motor_count; ++i) {
+                    if (motorvals[i] > MOTOR_IDLE_MAX) {
+                        isThrustOverIdle = true;
+                        break;
+                    }
+                }
+
+                const auto msec_curr = millis();
+
+                _flyingCheckMsec = isThrustOverIdle ? msec_curr :
+                    _flyingCheckMsec;
+
+                _isFlying = _flyingCheckMsec > 0 &&
+                    (msec_curr - _flyingCheckMsec) <
+                    FLYING_HYSTERESIS_THRESHOLD_MSEC;
             }
 
             void sendTelemetry(const Setpoint & setpoint)
@@ -376,6 +401,6 @@ namespace hf {
 
                 return timed_out ? false : is_armed;
             } 
-    }; // class Core
+    }; // class FC
 
 } // namespace hf

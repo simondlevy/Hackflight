@@ -26,7 +26,7 @@
 #include <mixers/bfquadx.hpp>
 using namespace hf;
 
-static Core _core;
+static FC _fc;
 
 static Mixer _mixer;
 
@@ -34,16 +34,16 @@ static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 void serialEvent1()
 {
-    _core.handleSerial1Event();
+    _fc.handleSerial1Event();
 }
 
 void setup()
 {
     // Start core devices
-    _core.beginCore();
+    _fc.beginFC();
 
     // Start hover-deck
-    _core.beginHoverDeck();
+    _fc.beginHoverDeck();
 
     // Start motors
     _motors.begin();
@@ -52,7 +52,7 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _core.updateCoreAndHover(_mixer.motorvals, 4);
+    const auto setpoint = _fc.updateFCAndHover(_mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
@@ -60,7 +60,7 @@ void loop()
     const float nospin[4] = {0, 0, 0, 0};
 
     // Run motors if safe
-    if (_core.isSafeToFly()) {
-        _motors.run(_core.isArmed(), nospin); //_mixer.motorvals);
+    if (_fc.isSafeToFly()) {
+        _motors.run(_fc.isArmed(), nospin); //_mixer.motorvals);
     }
 }
