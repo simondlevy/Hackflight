@@ -95,8 +95,8 @@ namespace hf {
             static auto update(
                     const Dynamics & dyn,
                     const vehicle_params_t & vparams,
-                    const double dt,
-                    const double * rpms,
+                    const float dt,
+                    const float * rpms,
                     const uint8_t rotorCount,
                     const int8_t * roll,
                     const int8_t * pitch,

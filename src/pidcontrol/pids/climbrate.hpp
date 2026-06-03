@@ -45,7 +45,7 @@ namespace hf {
 
             /**
              * Demand is input as climbrate target in meters per second and
-             * output in [0,1].  Vehicle should hover at output = 0.5.
+             * output so that neutral (hover) = 0.5.
              */
             static auto run(
                     const ClimbRateController & controller,
@@ -59,9 +59,9 @@ namespace hf {
                 const auto integral = airborne ? 
                     Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
 
-                const auto thrust = 0.5 + KP * error + KI * integral;
+                const auto thrust = KP * error + KI * integral;
 
-                const auto output = airborne ? thrust : 0;
+                const auto output = airborne ? 0.5 + thrust : 0;
 
                 return ClimbRateController(output, integral);
             }

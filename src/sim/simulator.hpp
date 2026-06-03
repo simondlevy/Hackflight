@@ -85,25 +85,20 @@ namespace hf {
                         pidControl = HoverPidController::run(
                                 pidControl, dt, mode, state, setpoint);
 
-                        const auto thrust = pidControl.setpoint.thrust;
-
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
-                            thrust == 0 ? 0 :
-                                VEHICLE_BASE_RPM + (thrust-0.5f) * SCALE_RPM,
-                            pidControl.setpoint.roll * SCALE_RPM,
-                            pidControl.setpoint.pitch * SCALE_RPM,
-                            pidControl.setpoint.yaw * SCALE_RPM
+                            pidControl.setpoint.thrust -0.5f + 35.546f,
+                            pidControl.setpoint.roll,
+                            pidControl.setpoint.pitch,
+                            pidControl.setpoint.yaw
                         };
-
-                        printf("thrust=%f => %f\n", thrust, scaled_setpoint.thrust);
 
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
                         _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
 
                         // Convert motor values to double for dynamics
-                        const auto rpms = motors2doubless(_mixer.motorvals, 4);
+                        const auto rpms = motors2rpms(_mixer.motorvals, 4);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k)
@@ -122,13 +117,15 @@ namespace hf {
 
             HoverPidController _pidControl;
 
-            static auto motors2doubless(const float * f,
-                    const size_t n) -> double *
+            static auto motors2rpms(const float * f,
+                    const size_t n) -> float *
             {
-                static double d[MAX_MOTOR_COUNT];
+                static float d[MAX_MOTOR_COUNT];
+
                 for (size_t k=0; k<n; ++k) {
-                    d[k] = f[k];
+                    d[k] = f[k] * 1000;
                 }
+
                 return d;
             }
 
