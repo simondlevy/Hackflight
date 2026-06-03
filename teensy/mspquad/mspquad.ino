@@ -56,7 +56,6 @@ void loop()
 
     // Run motors if safe
     if (_fc.isSafeToFly()) {
-        const float nospin[4] = {0, 0, 0, 0};
-        _motors.run(_fc.isArmed(), nospin); //_mixer.motorvals);
+        _motors.run(_fc.isArmed(), _mixer.motorvals);
     }
 }

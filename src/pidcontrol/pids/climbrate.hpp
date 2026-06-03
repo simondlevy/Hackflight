@@ -25,9 +25,9 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 25;
-            static constexpr float KI = 15;
-            static constexpr float ILIMIT = 5000;
+            static constexpr float KP = 1;//25;
+            static constexpr float KI = 0;//15
+            static constexpr float ILIMIT = 0;//5;
 
         public:
 
@@ -57,11 +57,14 @@ namespace hf {
                 const auto error = target - dz;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
+                    Num::fconstrain(controller._integral + error * dt,
+                            ILIMIT) : 0;
 
                 const auto thrust = KP * error + KI * integral;
 
-                const auto output = airborne ? 0.5 + thrust : 0;
+                const auto output = airborne ?
+                    Num::fconstrain(0.5 + thrust, 0, 1) :
+                    0;
 
                 return ClimbRateController(output, integral);
             }

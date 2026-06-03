@@ -83,7 +83,7 @@ namespace hf {
 
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
-                            1000 * (pidControl.setpoint.thrust - 0.5f) +
+                            8000 * (pidControl.setpoint.thrust - 0.5f) +
                                 VEHICLE_HOVER_RPM,
                             1000 * pidControl.setpoint.roll,
                             1000 * pidControl.setpoint.pitch,
