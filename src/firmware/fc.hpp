@@ -30,6 +30,7 @@
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/profiling.hpp>
+#include <firmware/receivers/gamepad.hpp>
 #include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>
 #include <firmware/zranger/filter.hpp>
