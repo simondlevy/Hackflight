@@ -50,8 +50,6 @@ namespace hf {
 
         public:
 
-            static constexpr double ZMIN = 0.005;
-
             // Vehicle state (Equation 11)
             SimState state;
 
@@ -145,7 +143,7 @@ namespace hf {
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
                     ddz > 0 ? true :
-                    dyn._airborne && s.dz < 0 && s.z < ZMIN ? false :
+                    dyn._airborne && s.dz < 0 && s.z <= 0 ? false :
                     dyn._airborne;
 
                 // Compute state as first temporal integral of first temporal
@@ -181,13 +179,13 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
-                /*
-                printf("m1=%f m2=%f m3=%f m4=%f | z=%+3.3f airborne=%d\n",
-                        rpms[0], rpms[1], rpms[2], rpms[3],
-                        newstate.z, airborne);
-                        */
+                const pose_t pose = {s.x, s.y, s.z, s.phi, s.theta, s.psi};
 
-                return Dynamics(newstate, newdstate, airborne);
+                return dyn._airborne && !airborne ? // just landed
+
+                    Dynamics(pose) :
+
+                    Dynamics(newstate, newdstate, airborne);
 
             } // update
 
