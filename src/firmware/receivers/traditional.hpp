@@ -1,5 +1,5 @@
 /**
- * Class for old-school R/C receiver data
+ * Class for old-school R/C receiver (throttle must be down to arm)
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -60,7 +60,9 @@ namespace hf {
                     const uint16_t pitch,
                     const uint16_t yaw,
                     const uint16_t aux,
-                    const uint32_t msec_curr) -> TraditionalReceiver
+                    const uint32_t msec_curr,
+                    const bool require_throttle_down_to_arm=true
+                    ) -> TraditionalReceiver
             {
                 const auto axes = Setpoint(
                         scale(throttle),
@@ -71,27 +73,20 @@ namespace hf {
                 const auto is_throttle_down = axes.thrust <
                     THROTTLE_DOWN_MAX;
 
+                const auto safe_to_arm = require_throttle_down_to_arm ? 
+                    is_throttle_down : true;
+
                 // Push-button arming; ignores startup transient
                 const auto did_aux_change = data._aux >= 988 && aux !=
                     data._aux;
 
                 const auto is_armed = 
                     did_aux_change && data.is_armed ? false :
-                    did_aux_change && data.is_throttle_down ? true :
+                    did_aux_change && safe_to_arm ? true :
                     data.is_armed;
 
                 return TraditionalReceiver(axes, is_armed,
                         is_throttle_down, msec_curr, aux);
-            }
-
-            static void report(const TraditionalReceiver & data)
-            {
-                static uint32_t _count;
-
-                const auto ax = data.axes;
-
-                printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f\n",
-                        _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw);
             }
 
         private:

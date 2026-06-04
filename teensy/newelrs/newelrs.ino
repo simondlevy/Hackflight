@@ -30,7 +30,7 @@ static FC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static SpringyReceiver _rxdata;
+static NewSpringyReceiver _rxdata;
 
 static Mixer _mixer;
 
@@ -53,7 +53,7 @@ static void onReceiveRcChannels(
 
         _button_val = button_val;
 
-        _rxdata = SpringyReceiver::update(
+        _rxdata = NewSpringyReceiver::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -85,8 +85,6 @@ void loop()
 {
     // This will trigger onReceiveRcChannels() above
     _crsf.update();
-
-    //SpringyReceiver::report(_rxdata);
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
