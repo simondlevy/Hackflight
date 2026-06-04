@@ -86,7 +86,8 @@ namespace hf {
 
             Dynamics& operator=(const Dynamics& other) = default;
 
-            Dynamics(const pose_t & pose) : state(pose) {}
+            Dynamics(const pose_t & pose)
+                : state(pose), _airborne(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
@@ -179,6 +180,12 @@ namespace hf {
                             l / I * u3,
                             s.dpsi,
                             -l / I * u4);
+
+                /*
+                printf("m1=%f m2=%f m3=%f m4=%f | z=%+3.3f airborne=%d\n",
+                        rpms[0], rpms[1], rpms[2], rpms[3],
+                        newstate.z, airborne);
+                        */
 
                 return Dynamics(newstate, newdstate, airborne);
 

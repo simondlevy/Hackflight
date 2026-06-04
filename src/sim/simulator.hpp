@@ -95,8 +95,7 @@ namespace hf {
                         _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
 
                         // Run dynamics in inner loop -------------------------
-                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k)
-                        {
+                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
                             dynamics = Dynamics::update(dynamics,
                                     VPARAMS, 1 / DYNAMICS_FREQ,
                                     _mixer.motorvals, 4, _mixer.roll,
