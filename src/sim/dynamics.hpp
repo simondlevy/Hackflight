@@ -41,8 +41,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <sim/state.hpp>
-#include <sim/pose.h>
+#include <sim/datatypes.hpp>
 
 namespace hf {
 

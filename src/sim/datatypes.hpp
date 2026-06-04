@@ -1,6 +1,8 @@
 #pragma once
 
 /*
+ *   Datatypes for flight-control simulation
+ *
  *   Copyright (C) 2026 Simon D. Levy
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,9 +18,18 @@
  *   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/pose.h>
-
 namespace hf {
+
+    typedef struct {
+
+        double x;
+        double y;
+        double z;
+        double phi;
+        double theta;
+        double psi;
+
+    } pose_t;
 
     // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
     // We use ENU coordinates based on 
