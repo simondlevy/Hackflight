@@ -183,9 +183,9 @@ namespace hf {
 
                 return dyn._airborne && !airborne ? // just landed
 
-                    Dynamics(pose) :
+                    Dynamics(pose) : // reset dynamics, keeping pose
 
-                    Dynamics(newstate, newdstate, airborne);
+                    Dynamics(newstate, newdstate, airborne); // update dynamics
 
             } // update
 

@@ -1,7 +1,7 @@
 #VRML_SIM R2023b utf8
 
 PROTO DiyQuad [
-  field SFVec3f translation      0 0 0.015
+  field SFVec3f translation      0 0 0.0
   field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
   field SFFloat prop_fast_helix_radius 0.025
@@ -59,7 +59,7 @@ DEF ROBOT Robot {
       minRange 0.01
       maxRange 4.0
       noise 0.0 # should probably adjust this
-      translation 0.04 0 0.015
+      translation 0.04 0 0.0
       rotation 0 0 1 0
       name "VL53L5-forward"
     }
@@ -73,7 +73,7 @@ DEF ROBOT Robot {
       minRange 0.04
       maxRange 4.0
       noise 0.0 # should probably adjust this
-      translation 0.04 0 0.015
+      translation 0.04 0 0.0
       rotation 0 0 1 0
        name "VL53L1-forward"
     }
@@ -87,7 +87,7 @@ DEF ROBOT Robot {
       minRange 0.04
       maxRange 4.0
       noise 0.0 # should probably adjust this
-      translation 0.04 0 0.015
+      translation 0.04 0 0.0
       rotation 0 0 1 3.14
       name "VL53L1-backward"
     }
