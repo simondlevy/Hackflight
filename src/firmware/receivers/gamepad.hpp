@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
@@ -25,10 +26,7 @@ namespace hf {
 
         public:
 
-            Setpoint setpoint;
-            bool requested_arming;
-            bool requested_hover;
-            uint32_t timestamp_msec;
+            ReceiverData data;
 
             void handleSerial1Event()
             {
@@ -49,26 +47,26 @@ namespace hf {
                 switch (MspParser::getid(_parser)) {
 
                     case MSP_SET_ARMING:
-                        requested_arming = !requested_arming;
-                        timestamp_msec = millis();
+                        data.requested_arming = !data.requested_arming;
+                        data.timestamp_msec = millis();
                         break;
 
                     case MSP_SET_IDLE:
-                        requested_hover = false;
-                        timestamp_msec = millis();
+                        data.requested_hover = false;
+                        data.timestamp_msec = millis();
                         break;
 
                     case MSP_SET_HOVER:
-                        requested_hover = true;
-                        setpoint.thrust =
+                        data.requested_hover = true;
+                        data.setpoint.thrust =
                             MspParser::getFloat(_parser, 0);
-                        setpoint.pitch =
+                        data.setpoint.pitch =
                             MspParser::getFloat(_parser, 1); // vx
-                        setpoint.roll =
+                        data.setpoint.roll =
                             MspParser::getFloat(_parser, 2); // vy
-                        setpoint.yaw =
+                        data.setpoint.yaw =
                             MspParser::getFloat(_parser, 3);
-                        timestamp_msec = millis();
+                        data.timestamp_msec = millis();
                         break;
 
                     default:

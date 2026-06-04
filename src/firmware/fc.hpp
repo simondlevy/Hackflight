@@ -81,10 +81,12 @@ namespace hf {
             }
 
             auto update(
-                    const TraditionalReceiver & rxdata,
+                    const TraditionalReceiver & rx,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                const auto rxdata = rx.data;
+
                 step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motorvals, motorcount);
 
@@ -100,7 +102,7 @@ namespace hf {
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
-                        !rxdata.is_throttle_down,
+                        !rx.is_throttle_down,
                         Timer::getDt(),
                         _state,
                         setpoint);
@@ -111,10 +113,12 @@ namespace hf {
             } 
 
             auto update(
-                    const SpringyReceiver & rxdata,
+                    const SpringyReceiver & rx,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                const auto rxdata = rx.data;
+
                 return update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
                         motorvals, motorcount);
@@ -125,8 +129,10 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                return update(gamepad.setpoint, gamepad.requested_arming,
-                        gamepad.requested_hover, gamepad.timestamp_msec,
+                const auto gpdata = gamepad.data;
+
+                return update(gpdata.setpoint, gpdata.requested_arming,
+                        gpdata.requested_hover, gpdata.timestamp_msec,
                         motorvals, motorcount);
             } 
 

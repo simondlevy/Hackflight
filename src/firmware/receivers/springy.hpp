@@ -26,10 +26,7 @@ namespace hf {
 
         public:
 
-            Setpoint setpoint;
-            bool requested_arming;
-            bool requested_hover;
-            uint32_t timestamp_msec;
+            ReceiverData data;
 
             SpringyReceiver() = default;
 
@@ -39,23 +36,23 @@ namespace hf {
                     const bool requested_hover,
                     const uint32_t timestamp_msec,
                     const uint16_t aux1,
-                    const uint16_t aux2) :
-                setpoint(setpoint),
-                requested_arming(requested_arming),
-                requested_hover(requested_hover),
-                timestamp_msec(timestamp_msec),
-                _aux2(aux2)
+                    const uint16_t aux2) 
 
             {
-                _traditional = TraditionalReceiver(
-                        setpoint, requested_arming, true, timestamp_msec, aux1);
+                data = ReceiverData(setpoint, requested_arming,
+                        requested_hover,timestamp_msec);
+
+                _traditional = TraditionalReceiver( setpoint, requested_arming,
+                        true, timestamp_msec, aux1);
+
+                _aux2 = aux2;
             }
 
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
 
             static auto update(
-                    const SpringyReceiver & data,
+                    const SpringyReceiver & sdata,
                     const uint16_t throttle,
                     const uint16_t roll,
                     const uint16_t pitch,
@@ -65,14 +62,14 @@ namespace hf {
                     const uint32_t msec_curr) -> SpringyReceiver
             {
                 const auto traditional = TraditionalReceiver::update(
-                        data._traditional, throttle, roll, pitch, yaw, aux1,
+                        sdata._traditional, throttle, roll, pitch, yaw, aux1,
                         msec_curr, false);
-                        
+
                 const auto requested_hover = aux2 > 1500;
 
-                return SpringyReceiver(traditional.setpoint,
-                        traditional.requested_arming, requested_hover,
-                        traditional.timestamp_msec, aux1, aux2);
+                return SpringyReceiver(traditional.data.setpoint,
+                        traditional.data.requested_arming, requested_hover,
+                        traditional.data.timestamp_msec, aux1, aux2);
             }
 
         private:

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <datatypes.hpp>
+#include <firmware/datatypes.hpp>
 
 namespace hf {
 
@@ -30,9 +30,7 @@ namespace hf {
 
         public:
 
-            Setpoint setpoint;
-            bool requested_arming;
-            uint32_t timestamp_msec;
+            ReceiverData data;
 
             bool is_throttle_down;
 
@@ -45,9 +43,7 @@ namespace hf {
                     const bool is_throttle_down,
                     const uint16_t aux)
                 :
-                    setpoint(setpoint),
-                    requested_arming(requested_arming),
-                    timestamp_msec(timestamp_msec),
+                    data(setpoint, requested_arming, false, timestamp_msec),
                     is_throttle_down(is_throttle_down),
                     _aux(aux) {}
 
@@ -55,7 +51,7 @@ namespace hf {
                     const TraditionalReceiver& other) = default;
 
             static auto update(
-                    const TraditionalReceiver & data,
+                    const TraditionalReceiver & tdata,
                     const uint16_t throttle,
                     const uint16_t roll,
                     const uint16_t pitch,
@@ -78,13 +74,13 @@ namespace hf {
                     is_throttle_down : true;
 
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change = data._aux >= 988 && aux !=
-                    data._aux;
+                const auto did_aux_change = tdata._aux >= 988 && aux !=
+                    tdata._aux;
 
                 const auto requested_arming = 
-                    did_aux_change && data.requested_arming ? false :
+                    did_aux_change && tdata.data.requested_arming ? false :
                     did_aux_change && safe_to_arm ? true :
-                    data.requested_arming;
+                    tdata.data.requested_arming;
 
                 return TraditionalReceiver(setpoint, requested_arming,
                         msec_curr, is_throttle_down, aux);
