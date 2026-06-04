@@ -46,7 +46,7 @@ namespace hf {
 
             Simulator() = default;
 
-            Simulator(const pose_t & pose)
+            Simulator(const Pose & pose)
                 : dynamics(Dynamics(pose)),
                 _pidControl(HoverPidController()) {}
 

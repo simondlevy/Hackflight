@@ -51,7 +51,7 @@ class PluginHelper {
        
         PluginHelper() : PluginHelper({0, 0, 0, 0, 0, 0}) {}
 
-        PluginHelper(const hf::pose_t & startingPose)
+        PluginHelper(const hf::Pose & startingPose)
         {
             _simulator = hf::Simulator(startingPose);
 

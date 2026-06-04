@@ -83,7 +83,7 @@ namespace hf {
 
             Dynamics& operator=(const Dynamics& other) = default;
 
-            Dynamics(const pose_t & pose)
+            Dynamics(const Pose & pose)
                 : state(pose), _airborne(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
@@ -178,13 +178,13 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
-                const pose_t pose = {s.x, s.y, s.z, s.phi, s.theta, s.psi};
+                return dyn._airborne && !airborne ? // just landed ?
 
-                return dyn._airborne && !airborne ? // just landed
+                    // yes: reset dynamics, keeping current pose
+                    Dynamics(Pose(s.x, s.y, s.z, s.phi, s.theta, s.psi)) :
 
-                    Dynamics(pose) : // reset dynamics, keeping pose
-
-                    Dynamics(newstate, newdstate, airborne); // update dynamics
+                        // no: update dynamics as usual
+                        Dynamics(newstate, newdstate, airborne); 
 
             } // update
 

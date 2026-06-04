@@ -20,17 +20,6 @@
 
 namespace hf {
 
-    typedef struct {
-
-        double x;
-        double y;
-        double z;
-        double phi;
-        double theta;
-        double psi;
-
-    } pose_t;
-
     class Pose {
 
         public:
@@ -44,7 +33,7 @@ namespace hf {
 
             Pose() = default;
 
-            Pose(const pose_t & p) 
+            Pose(const Pose & p) 
                 : x(p.x), y(p.y), z(p.z),
                 phi(p.phi), theta(p.theta), psi(p.psi) {}
 
@@ -82,7 +71,7 @@ namespace hf {
 
             SimState() = default;
 
-            SimState(const pose_t & p) 
+            SimState(const Pose & p) 
                 : x(p.x), dx(0), y(p.y), dy(0), z(p.z), dz(0),
                 phi(p.phi), dphi(0), theta(p.theta), dtheta(0),
                 psi(p.psi), dpsi(0) {}
