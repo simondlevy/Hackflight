@@ -25,10 +25,10 @@ namespace hf {
 
         public:
 
-            uint32_t timestamp_msec;
+            Setpoint setpoint;
             bool requested_arming;
             bool requested_hover;
-            Setpoint setpoint;
+            uint32_t timestamp_msec;
 
             void handleSerial1Event()
             {
@@ -49,8 +49,7 @@ namespace hf {
                 switch (MspParser::getid(_parser)) {
 
                     case MSP_SET_ARMING:
-                        requested_arming =
-                            !requested_arming;
+                        requested_arming = !requested_arming;
                         timestamp_msec = millis();
                         break;
 

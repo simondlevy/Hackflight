@@ -84,18 +84,18 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.is_armed, false, // false = no hover
+                step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motorvals, motorcount);
 
-                const auto rxaxes = rxdata.axes;
+                const auto rxsetpoint = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(
-                        (rxaxes.thrust+1)/2,
-                        rxaxes.roll *
+                        (rxsetpoint.thrust+1)/2,
+                        rxsetpoint.roll *
                         PositionController::MAX_DEMAND_DEG,
-                        rxaxes.pitch *
+                        rxsetpoint.pitch *
                         PositionController::MAX_DEMAND_DEG, 
-                        rxaxes.yaw);
+                        rxsetpoint.yaw);
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
@@ -114,8 +114,8 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                return update(rxdata.axes, rxdata.is_armed,
-                        rxdata.is_hovering, rxdata.timestamp_msec,
+                return update(rxdata.setpoint, rxdata.requested_arming,
+                        rxdata.requested_hover, rxdata.timestamp_msec,
                         motorvals, motorcount);
             } 
 
@@ -231,15 +231,15 @@ namespace hf {
              } 
 
             void step(
-                    const bool is_armed,
-                    bool is_hovering,
+                    const bool requested_arming,
+                    bool requested_hover,
                     const uint32_t timestamp_msec,
                     const float * motorvals,
                     const uint8_t motorcount)
             {
                 // Safely update flight mode
                 _mode = updateMode(millis(), _state, 
-                        _imuFilter.isGyroCalibrated, is_armed, is_hovering,
+                        _imuFilter.isGyroCalibrated, requested_arming, requested_hover,
                         timestamp_msec, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
@@ -376,14 +376,14 @@ namespace hf {
             static auto checkFailsafe(
                     const uint32_t msec_curr,
                     const uint32_t msec_prev,
-                    const bool is_armed) -> bool
+                    const bool requested_arming) -> bool
             {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
                     msec_curr - msec_prev > FAILSAFE_MSEC;
 
-                return timed_out ? false : is_armed;
+                return timed_out ? false : requested_arming;
             } 
     }; // class FC
 

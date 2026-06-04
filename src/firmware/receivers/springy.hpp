@@ -26,29 +26,29 @@ namespace hf {
 
         public:
 
-            Setpoint axes;
-            bool is_armed;
-            bool is_hovering;
+            Setpoint setpoint;
+            bool requested_arming;
+            bool requested_hover;
             uint32_t timestamp_msec;
 
             SpringyReceiver() = default;
 
             SpringyReceiver(
-                    const Setpoint & axes,
-                    const bool is_armed,
-                    const bool is_hovering,
+                    const Setpoint & setpoint,
+                    const bool requested_arming,
+                    const bool requested_hover,
                     const uint32_t timestamp_msec,
                     const uint16_t aux1,
                     const uint16_t aux2) :
-                axes(axes),
-                is_armed(is_armed),
-                is_hovering(is_hovering),
+                setpoint(setpoint),
+                requested_arming(requested_arming),
+                requested_hover(requested_hover),
                 timestamp_msec(timestamp_msec),
                 _aux2(aux2)
 
             {
                 _traditional = TraditionalReceiver(
-                        axes, is_armed, true, timestamp_msec, aux1);
+                        setpoint, requested_arming, true, timestamp_msec, aux1);
             }
 
             SpringyReceiver& operator=(
@@ -68,10 +68,11 @@ namespace hf {
                         data._traditional, throttle, roll, pitch, yaw, aux1,
                         msec_curr, false);
                         
-                const auto is_hovering = aux2 > 1500;
+                const auto requested_hover = aux2 > 1500;
 
-                return SpringyReceiver( traditional.axes, traditional.is_armed,
-                        is_hovering, traditional.timestamp_msec, aux1, aux2);
+                return SpringyReceiver(traditional.setpoint,
+                        traditional.requested_arming, requested_hover,
+                        traditional.timestamp_msec, aux1, aux2);
             }
 
         private:

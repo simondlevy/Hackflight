@@ -30,24 +30,25 @@ namespace hf {
 
         public:
 
-            Setpoint axes;
-            bool is_armed;
-            bool is_throttle_down;
+            Setpoint setpoint;
+            bool requested_arming;
             uint32_t timestamp_msec;
+
+            bool is_throttle_down;
 
             TraditionalReceiver() = default;
 
             TraditionalReceiver(
-                    const Setpoint & axes,
-                    const bool is_armed,
-                    const bool is_throttle_down,
+                    const Setpoint & setpoint,
+                    const bool requested_arming,
                     const uint32_t timestamp_msec,
+                    const bool is_throttle_down,
                     const uint16_t aux)
                 :
-                    axes(axes),
-                    is_armed(is_armed),
-                    is_throttle_down(is_throttle_down),
+                    setpoint(setpoint),
+                    requested_arming(requested_arming),
                     timestamp_msec(timestamp_msec),
+                    is_throttle_down(is_throttle_down),
                     _aux(aux) {}
 
             TraditionalReceiver& operator=(
@@ -64,13 +65,13 @@ namespace hf {
                     const bool require_throttle_down_to_arm=true
                     ) -> TraditionalReceiver
             {
-                const auto axes = Setpoint(
+                const auto setpoint = Setpoint(
                         scale(throttle),
                         scale(roll),
                         scale(pitch),
                         scale(yaw));
 
-                const auto is_throttle_down = axes.thrust <
+                const auto is_throttle_down = setpoint.thrust <
                     THROTTLE_DOWN_MAX;
 
                 const auto safe_to_arm = require_throttle_down_to_arm ? 
@@ -80,13 +81,13 @@ namespace hf {
                 const auto did_aux_change = data._aux >= 988 && aux !=
                     data._aux;
 
-                const auto is_armed = 
-                    did_aux_change && data.is_armed ? false :
+                const auto requested_arming = 
+                    did_aux_change && data.requested_arming ? false :
                     did_aux_change && safe_to_arm ? true :
-                    data.is_armed;
+                    data.requested_arming;
 
-                return TraditionalReceiver(axes, is_armed,
-                        is_throttle_down, msec_curr, aux);
+                return TraditionalReceiver(setpoint, requested_arming,
+                        msec_curr, is_throttle_down, aux);
             }
 
         private:
