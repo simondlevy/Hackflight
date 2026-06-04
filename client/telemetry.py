@@ -133,7 +133,7 @@ class Telemetry(MspParser):
 
         if self.outfile is None and self.plotter is None:
 
-            print(('mode=%-6s | '+
+            print(('%-5s | '+
                    'thrust=%+3.3f roll=%+3.3f pitch=%+3.3f yaw=%+3.3f | ' +
                    'dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
                    'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
