@@ -114,64 +114,19 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.is_armed, rxdata.is_hovering,
-                        rxdata.timestamp_msec, motorvals, motorcount);
-
-                const auto rxaxes = rxdata.axes;
-
-                const auto setpoint = Setpoint(
-                        (rxaxes.thrust+1)/2,
-                        rxaxes.roll *
-                        PositionController::MAX_DEMAND_DEG,
-                        rxaxes.pitch *
-                        PositionController::MAX_DEMAND_DEG, 
-                        rxaxes.yaw);
-
-                _stabilizerPid = StabilizerPidController::run(
-                        _stabilizerPid,
-                        true, // !rxdata.is_throttle_down,
-                        Timer::getDt(),
-                        _state,
-                        setpoint);
-
-                sendTelemetry(_stabilizerPid.setpoint);
-
-                return _stabilizerPid.setpoint;
+                return update(rxdata.axes, rxdata.is_armed,
+                        rxdata.is_hovering, rxdata.timestamp_msec,
+                        motorvals, motorcount);
             } 
 
             auto update(
-                    GamepadReceiver & rxdata,
+                    GamepadReceiver & gamepad,
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.requested_arming, rxdata.requested_hover,
-                        rxdata.timestamp_msec, motorvals, motorcount);
-
-                acquireHoverData();
-
-                const auto dt = Timer::getDt();
-
-                _altHoldPid= AltHoldPidController::run(_altHoldPid,
-                        dt, _mode, _state, rxdata.setpoint);
-
-                const auto rxaxes = rxdata.setpoint;
-
-                const auto setpoint = Setpoint(
-                        _altHoldPid.thrust,
-                        rxaxes.roll * PositionController::MAX_DEMAND_DEG,
-                        rxaxes.pitch * PositionController::MAX_DEMAND_DEG, 
-                        rxaxes.yaw);
-
-                _stabilizerPid = StabilizerPidController::run(
-                        _stabilizerPid,
-                        rxaxes.thrust > 0.01,
-                        dt,
-                        _state,
-                        setpoint);
-
-                sendTelemetry(_stabilizerPid.setpoint);
-
-                return _stabilizerPid.setpoint;
+                return update(gamepad.setpoint, gamepad.requested_arming,
+                        gamepad.requested_hover, gamepad.timestamp_msec,
+                        motorvals, motorcount);
             } 
 
             void acquireHoverData()
@@ -238,6 +193,42 @@ namespace hf {
 
             // Debugging
             Debugger _debugger;
+
+            auto update(
+                    const Setpoint & setpoint_in,
+                    const bool requested_arming,
+                    const bool requested_hover,
+                    const uint32_t timestamp_msec,
+                    const float * motorvals,
+                    const uint8_t motorcount) -> Setpoint
+            {
+                step(requested_arming, requested_hover,
+                        timestamp_msec, motorvals, motorcount);
+
+                acquireHoverData();
+
+                const auto dt = Timer::getDt();
+
+                _altHoldPid= AltHoldPidController::run(_altHoldPid,
+                        dt, _mode, _state, setpoint_in);
+
+                const auto setpoint = Setpoint(
+                        _altHoldPid.thrust,
+                        setpoint_in.roll * PositionController::MAX_DEMAND_DEG,
+                        setpoint_in.pitch * PositionController::MAX_DEMAND_DEG,
+                        setpoint_in.yaw);
+
+                _stabilizerPid = StabilizerPidController::run(
+                        _stabilizerPid,
+                        setpoint.thrust > 0.01,
+                        dt,
+                        _state,
+                        setpoint);
+
+                sendTelemetry(_stabilizerPid.setpoint);
+
+                return _stabilizerPid.setpoint;
+             } 
 
             void step(
                     const bool is_armed,
