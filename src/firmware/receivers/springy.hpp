@@ -67,13 +67,11 @@ namespace hf {
                         scale(pitch),
                         scale(yaw));
 
-                printf("aux1=%d aux2=%d\n", aux1, aux2);
-
                 // Push-button arming; ignores startup transient
                 const auto did_aux1_change =
                     data._aux1 >= 988 && aux1 != data._aux1;
 
-                const auto is_hovering = false;
+                const auto is_hovering = aux2 > 1500;
 
                 const auto is_armed = 
                     did_aux1_change ? !data.is_armed : data.is_armed;

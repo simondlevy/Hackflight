@@ -114,7 +114,7 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
-                step(rxdata.is_armed, false, // false = no hover
+                step(rxdata.is_armed, rxdata.is_hovering,
                         rxdata.timestamp_msec, motorvals, motorcount);
 
                 const auto rxaxes = rxdata.axes;
