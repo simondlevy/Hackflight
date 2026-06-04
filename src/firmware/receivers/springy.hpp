@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <datatypes.hpp>
+#include <firmware/receivers/traditional.hpp>
 
 namespace hf {
 
@@ -39,14 +39,17 @@ namespace hf {
                     const bool is_hovering,
                     const uint32_t timestamp_msec,
                     const uint16_t aux1,
-                    const uint16_t aux2)
-                :
-                    axes(axes),
-                    is_armed(is_armed),
-                    is_hovering(is_hovering),
-                    timestamp_msec(timestamp_msec),
-                    _aux1(aux1),
-                    _aux2(aux2) {}
+                    const uint16_t aux2) :
+                axes(axes),
+                is_armed(is_armed),
+                is_hovering(is_hovering),
+                timestamp_msec(timestamp_msec),
+                _aux2(aux2)
+
+            {
+                _traditional = TraditionalReceiver(
+                        axes, is_armed, true, timestamp_msec, aux1);
+            }
 
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
@@ -61,46 +64,21 @@ namespace hf {
                     const uint16_t aux2,
                     const uint32_t msec_curr) -> SpringyReceiver
             {
-                const auto axes = Setpoint(
-                        scale(throttle),
-                        scale(roll),
-                        scale(pitch),
-                        scale(yaw));
-
-                // Push-button arming; ignores startup transient
-                const auto did_aux1_change =
-                    data._aux1 >= 988 && aux1 != data._aux1;
-
+                const auto traditional = TraditionalReceiver::update(
+                        data._traditional, throttle, roll, pitch, yaw, aux1,
+                        msec_curr, false);
+                        
                 const auto is_hovering = aux2 > 1500;
 
-                const auto is_armed = 
-                    did_aux1_change ? !data.is_armed : data.is_armed;
-
-                return SpringyReceiver(axes, is_armed, is_hovering, msec_curr,
-                        aux1, aux2);
-            }
-
-            static void report(const SpringyReceiver & data)
-            {
-                static uint32_t _count;
-
-                const auto ax = data.axes;
-
-                printf("%5lu | t=%+3.3f r=%+3.3f p=%3.3f y=%+3.3f | "
-                        "armed=%d hover=%d\n",
-                        _count++, ax.thrust, ax.roll, ax.pitch, ax.yaw,
-                        data.is_armed, data.is_hovering);
+                return SpringyReceiver( traditional.axes, traditional.is_armed,
+                        is_hovering, traditional.timestamp_msec, aux1, aux2);
             }
 
         private:
 
-            uint16_t _aux1;
             uint16_t _aux2;
 
-            static auto scale(const uint16_t val) -> float
-            {
-                return 2 * (val - 1500.f) / 1024;
-            }
+            TraditionalReceiver _traditional;
 
     };
 }

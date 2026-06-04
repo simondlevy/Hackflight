@@ -30,7 +30,7 @@ static FC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static NewSpringyReceiver _rxdata;
+static SpringyReceiver _rxdata;
 
 static Mixer _mixer;
 
@@ -53,7 +53,7 @@ static void onReceiveRcChannels(
 
         _button_val = button_val;
 
-        _rxdata = NewSpringyReceiver::update(
+        _rxdata = SpringyReceiver::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
