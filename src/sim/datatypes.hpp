@@ -31,6 +31,33 @@ namespace hf {
 
     } pose_t;
 
+    class Pose {
+
+        public:
+
+            double x;       // positive forward
+            double y;       // positive rightward
+            double z;       // positive upward
+            double phi;     // positive roll right
+            double theta;   // positive nose down
+            double psi;     // positive nose right
+
+            Pose() = default;
+
+            Pose(const pose_t & p) 
+                : x(p.x), y(p.y), z(p.z),
+                phi(p.phi), theta(p.theta), psi(p.psi) {}
+
+            Pose(
+                    const double x, 
+                    const double y,
+                    const double z, 
+                    const double phi, 
+                    const double theta,
+                    const double psi) 
+                : x(x), y(y), z(z), phi(phi), theta(theta), psi(psi) {}
+    };
+
     // From Eqn. (11) in Bouabdallah,  Murrieri, Siegwart (2004). 
     // We use ENU coordinates based on 
     // https://www.bitcraze.io/documentation/system/platform/cf2-coordinate-system
@@ -53,9 +80,7 @@ namespace hf {
             double psi;     // positive nose right
             double dpsi;    // positive nose right
 
-            SimState() 
-                : x(0), dx(0), y(0), dy(0), z(0), dz(0), phi(0),
-                dphi(0), theta(0), dtheta(0), psi(0), dpsi(0) {}
+            SimState() = default;
 
             SimState(const pose_t & p) 
                 : x(p.x), dx(0), y(p.y), dy(0), z(p.z), dz(0),
