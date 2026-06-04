@@ -41,19 +41,17 @@ static void onReceiveRcChannels(
 {
     if (!rcChannels->failsafe) {
 
-        const auto button = _crsf.readRcChannel(6);
+        const auto button_val = _crsf.readRcChannel(6);
 
-        static uint16_t _button;
+        static uint16_t _button_val;
 
-        static bool _on;
+        static bool _aux2_on;
 
-        if (button == 1000 && _button == 2000) {
-            _on = !_on;
+        if (button_val == 1000 && _button_val == 2000) {
+            _aux2_on = !_aux2_on;
         }
 
-        printf("hover=%d\n", _on);
-
-        _button = button;
+        _button_val = button_val;
 
         _rxdata = SpringyReceiver::update(
                 _rxdata,
@@ -62,7 +60,7 @@ static void onReceiveRcChannels(
                 _crsf.readRcChannel(2),
                 _crsf.readRcChannel(4),
                 _crsf.readRcChannel(5),
-                1000, 
+                _aux2_on ? 2000 : 1000, 
                 millis());
     }
 }
