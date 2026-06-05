@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 FILENAME = 'log.csv'
 ZMAX = 1.5
-VELMAX = 1.0
+VELMAX = 2.0
 Z_TAKEOFF = 0.05
 MARGIN = 20
 
@@ -37,25 +37,22 @@ def main():
         print('File %s not found' % FILENAME)
         exit(1)
 
-    z = data[:,7]
-
-    start = np.argmax(z > Z_TAKEOFF) - MARGIN
-
-    time = data[start:,0]
-    thrust = data[start:,1]
-    roll = data[start:,2]
-    pitch = data[start:,3]
-    yaw = data[start:,4]
-    dx = data[start:,5]
-    dy = data[start:,6]
-    z = data[start:,7]
-    dz = data[start:,8]
-    phi = data[start:,9]
-    phi = data[start:,10]
-    theta = data[start:,12]
-    theta = data[start:,12]
-    psi = data[start:,13]
-    psi = data[start:,14]
+    time = data[:, 0]
+    # mode = data[:, 1]
+    thrust = data[:, 2]
+    # roll = data[:, 3]
+    # pitch = data[:, 4]
+    # yaw = data[:, 5]
+    dx = data[:, 6]
+    dy = data[:, 7]
+    z = data[:, 8]
+    dz = data[:, 9]
+    # phi = data[:, 10]
+    # dphi = data[:, 11]
+    # theta = data[:, 12]
+    # dtheta = data[:, 13]
+    # psi = data[:, 14]
+    # dpsi = data[:, 15]
 
     plt.subplot(3, 1, 1)
     plt.plot(time, thrust, 'b')
@@ -76,7 +73,6 @@ def main():
     plt.ylim((-VELMAX, +VELMAX))
     plt.legend(('dx/dt', 'dy/dt', 'dz/dt'))
     plt.ylabel('Vel (m/s)')
-
 
     plt.xlabel('time (s)')
 
