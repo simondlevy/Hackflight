@@ -93,7 +93,7 @@ namespace hf {
                 const auto rxsetpoint = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(
-                        (rxsetpoint.thrust+1)/2,
+                        (rxsetpoint.thrust+1)/2, // [-1,+1] => [0,1]
                         rxsetpoint.roll *
                         PositionController::MAX_DEMAND_DEG,
                         rxsetpoint.pitch *
@@ -119,15 +119,7 @@ namespace hf {
             {
                 const auto rxdata = rx.data;
 
-                const auto rxsetpoint = rxdata.setpoint;
-
-                const auto setpoint = Setpoint(
-                        2 * rxsetpoint.thrust - 1, // [0,1] => [-1,+1]
-                        rxsetpoint.roll,
-                        rxsetpoint.pitch,
-                        rxsetpoint.yaw);
-
-                return update(setpoint, rxdata.requested_arming,
+                return update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
                         motorvals, motorcount);
             } 
