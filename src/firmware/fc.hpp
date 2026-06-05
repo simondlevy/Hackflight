@@ -117,6 +117,9 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                // Run sensor fusion on hover-deck
+                acquireHoverData();
+
                 const auto rxdata = rx.data;
 
                 return update(rxdata.setpoint, rxdata.requested_arming,
@@ -129,6 +132,9 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                // Run sensor fusion on hover-deck
+                acquireHoverData();
+
                 const auto gpdata = gamepad.data;
 
                 return update(gpdata.setpoint, gpdata.requested_arming,
@@ -245,9 +251,9 @@ namespace hf {
                     const uint8_t motorcount)
             {
                 // Safely update flight mode
-                _mode = updateMode(millis(), _state, 
-                        _imuFilter.isGyroCalibrated, requested_arming, requested_hover,
-                        timestamp_msec, _imuFilter, _mode);
+                _mode = updateMode(millis(), _state,
+                        _imuFilter.isGyroCalibrated, requested_arming,
+                        requested_hover, timestamp_msec, _imuFilter, _mode);
 
                 //_debugger.report(_mode);
 

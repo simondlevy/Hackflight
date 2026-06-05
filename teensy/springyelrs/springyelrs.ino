@@ -89,9 +89,6 @@ void loop()
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
 
-    // Run sensor fusion on hover-deck
-    _fc.acquireHoverData();
-
     // Run motor mixer on setpoint
     _mixer = Mixer::run(_mixer, setpoint);
 
