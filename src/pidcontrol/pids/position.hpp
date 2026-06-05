@@ -26,7 +26,7 @@ namespace hf {
         private:
 
             static constexpr float KP = 10;
-            static constexpr float KI = 0.4;
+            static constexpr float KI = 1;
             static constexpr float ILIMIT = 5000;
 
         public:

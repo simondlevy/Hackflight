@@ -79,6 +79,7 @@ def main():
     plt.plot(time, yaw, 'b')
     plotmid(time, 0)
     plt.legend(('roll', 'pitch', 'yaw'))
+    plt.ylabel('Setpoint')
 
     plt.xlabel('time (s)')
 
