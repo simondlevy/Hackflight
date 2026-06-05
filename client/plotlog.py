@@ -17,12 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
 import matplotlib.pyplot as plt
-
-FILENAME = 'log.csv'
-ZMAX = 1.5
-VELMAX = 2.0
-Z_TAKEOFF = 0.05
-MARGIN = 20
+import argparse
+from argparse import ArgumentDefaultsHelpFormatter
 
 
 def plotmid(time, value):
@@ -31,10 +27,33 @@ def plotmid(time, value):
 
 def main():
 
+    argparser = argparse.ArgumentParser(
+            formatter_class=ArgumentDefaultsHelpFormatter)
+
+    argparser.add_argument('-i', '--infile', default='log.csv',
+                           help='CSV input file')
+
+    argparser.add_argument('-b', '--begin', type=float, default=0,
+                           help='begin time in seconds')
+
+    argparser.add_argument('-e', '--end', type=float, default=None,
+                           help='end time in seconds')
+
+    argparser.add_argument('-z', '--zmax', type=float, default=1.0,
+                           help='maximum altitude (meters)')
+
+    argparser.add_argument('-v', '--vmax', type=float, default=1.5,
+                           help='maximum velocity (meters per second)')
+
+    argparser.add_argument('-s', '--smax', type=float, default=0.05,
+                           help='setpoint maximum')
+
+    args = argparser.parse_args()
+
     try:
-        data = np.loadtxt(FILENAME, delimiter=',', skiprows=1)
+        data = np.loadtxt(args.infile, delimiter=',', skiprows=1)
     except FileNotFoundError:
-        print('File %s not found' % FILENAME)
+        print('File %s not found' % args.infile)
         exit(1)
 
     time = data[:, 0]
@@ -54,31 +73,36 @@ def main():
     # psi = data[:, 14]
     # dpsi = data[:, 15]
 
+    beg = (time >= args.begin).argmax()
+
+    end = -1 if args.end is None else (time <= args.end).argmin() 
+
     plt.subplot(4, 1, 1)
-    plt.plot(time, thrust, 'b')
+    plt.plot(time[beg:end], thrust[beg:end], 'b')
     plt.ylim((0, 1))
-    plotmid(time, 0.5)
+    plotmid(time[beg:end], 0.5)
     plt.ylabel('Thrust')
 
     plt.subplot(4, 1, 2)
-    plt.plot(time, z)
-    plt.ylim((0, ZMAX))
+    plt.plot(time[beg:end], z[beg:end])
+    plt.ylim((0, args.zmax))
     plt.ylabel('Z (m)')
 
     plt.subplot(4, 1, 3)
-    plt.plot(time, dx, 'r')
-    plt.plot(time, dy, 'g')
-    plt.plot(time, dz, 'b')
-    plt.ylim((-VELMAX, +VELMAX))
+    plt.plot(time[beg:end], dx[beg:end], 'r')
+    plt.plot(time[beg:end], dy[beg:end], 'g')
+    plt.plot(time[beg:end], dz[beg:end], 'b')
+    plt.ylim((-args.vmax, +args.vmax))
     plt.legend(('dx/dt', 'dy/dt', 'dz/dt'))
     plt.ylabel('Vel (m/s)')
 
     plt.subplot(4, 1, 4)
-    plt.plot(time, roll, 'r')
-    plt.plot(time, pitch, 'g')
-    plt.plot(time, yaw, 'b')
-    plotmid(time, 0)
+    plt.plot(time[beg:end], roll[beg:end], 'r')
+    plt.plot(time[beg:end], pitch[beg:end], 'g')
+    plt.plot(time[beg:end], yaw[beg:end], 'b')
+    plotmid(time[beg:end], 0)
     plt.legend(('roll', 'pitch', 'yaw'))
+    plt.ylim((-args.smax, +args.smax))
     plt.ylabel('Setpoint')
 
     plt.xlabel('time (s)')
