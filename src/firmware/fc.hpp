@@ -194,9 +194,6 @@ namespace hf {
             // PID control for stabilize-only
             StabilizerPidController _stabilizerPid;
 
-            // PID control for altitude-hold
-            AltHoldPidController _altHoldPid;
-
             // PID control for hover
             HoverPidController _hoverPid;
 
@@ -216,23 +213,14 @@ namespace hf {
 
                 acquireHoverData();
 
-                const auto dt = Timer::getDt();
+                _hoverPid= HoverPidController::run(_hoverPid,
+                        Timer::getDt(), _mode, _state, setpoint_in);
 
-                _altHoldPid= AltHoldPidController::run(_altHoldPid,
-                        dt, _mode, _state, setpoint_in);
+                const auto setpoint_out = _hoverPid.setpoint;
 
-                const auto setpoint = Setpoint(
-                        _altHoldPid.thrust,
-                        setpoint_in.roll * PositionController::MAX_DEMAND_DEG,
-                        setpoint_in.pitch * PositionController::MAX_DEMAND_DEG,
-                        setpoint_in.yaw);
+                sendTelemetry(setpoint_out);
 
-                _stabilizerPid = StabilizerPidController::run( _stabilizerPid,
-                        _isFlying, dt, _state, setpoint);
-
-                sendTelemetry(_stabilizerPid.setpoint);
-
-                return _stabilizerPid.setpoint;
+                return setpoint_out;
              } 
 
             void step(

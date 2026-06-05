@@ -40,9 +40,9 @@ def main():
     time = data[:, 0]
     # mode = data[:, 1]
     thrust = data[:, 2]
-    # roll = data[:, 3]
-    # pitch = data[:, 4]
-    # yaw = data[:, 5]
+    roll = data[:, 3]
+    pitch = data[:, 4]
+    yaw = data[:, 5]
     dx = data[:, 6]
     dy = data[:, 7]
     z = data[:, 8]
@@ -54,25 +54,31 @@ def main():
     # psi = data[:, 14]
     # dpsi = data[:, 15]
 
-    plt.subplot(3, 1, 1)
+    plt.subplot(4, 1, 1)
     plt.plot(time, thrust, 'b')
     plt.ylim((0, 1))
     plotmid(time, 0.5)
     plt.ylabel('Thrust')
 
-    plt.subplot(3, 1, 2)
+    plt.subplot(4, 1, 2)
     plt.plot(time, z)
     plt.ylim((0, ZMAX))
     plt.ylabel('Z (m)')
 
-    plt.subplot(3, 1, 3)
+    plt.subplot(4, 1, 3)
     plt.plot(time, dx, 'r')
     plt.plot(time, dy, 'g')
     plt.plot(time, dz, 'b')
-    plotmid(time, 0)
     plt.ylim((-VELMAX, +VELMAX))
     plt.legend(('dx/dt', 'dy/dt', 'dz/dt'))
     plt.ylabel('Vel (m/s)')
+
+    plt.subplot(4, 1, 4)
+    plt.plot(time, roll, 'r')
+    plt.plot(time, pitch, 'g')
+    plt.plot(time, yaw, 'b')
+    plotmid(time, 0)
+    plt.legend(('roll', 'pitch', 'yaw'))
 
     plt.xlabel('time (s)')
 
