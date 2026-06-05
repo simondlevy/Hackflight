@@ -100,12 +100,8 @@ namespace hf {
                         PositionController::MAX_DEMAND_DEG, 
                         rxsetpoint.yaw);
 
-                _stabilizerPid = StabilizerPidController::run(
-                        _stabilizerPid,
-                        !_isFlying, // reset integral
-                        Timer::getDt(),
-                        _state,
-                        setpoint);
+                _stabilizerPid = StabilizerPidController::run( _stabilizerPid,
+                        _isFlying, Timer::getDt(), _state, setpoint);
 
                 sendTelemetry(_stabilizerPid.setpoint);
 
@@ -231,12 +227,8 @@ namespace hf {
                         setpoint_in.pitch * PositionController::MAX_DEMAND_DEG,
                         setpoint_in.yaw);
 
-                _stabilizerPid = StabilizerPidController::run(
-                        _stabilizerPid,
-                        !_isFlying, // reset integral
-                        dt,
-                        _state,
-                        setpoint);
+                _stabilizerPid = StabilizerPidController::run( _stabilizerPid,
+                        _isFlying, dt, _state, setpoint);
 
                 sendTelemetry(_stabilizerPid.setpoint);
 
