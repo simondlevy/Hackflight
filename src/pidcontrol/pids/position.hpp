@@ -25,13 +25,13 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 25; 
-            static constexpr float KI = 1;
+            static constexpr float KP = 5.0; 
+            static constexpr float KI = 0.2;
             static constexpr float ILIMIT = 5000;
 
         public:
 
-            static constexpr float MAX_DEMAND_DEG = 20;
+            static constexpr float MAX_DEMAND_DEG = 30;
 
             float output;
 
