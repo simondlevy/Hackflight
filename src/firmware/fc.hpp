@@ -60,8 +60,8 @@ namespace hf {
 
             // We say we are flying if one or more motors are running
             // over the idle thrust.
-            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC =
-                2000; static constexpr float MOTOR_IDLE_MAX = 0.05;
+            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
+            static constexpr float MOTOR_IDLE_MAX = 0.1;
 
         public:
 
@@ -102,7 +102,7 @@ namespace hf {
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
-                        !rx.is_throttle_down,
+                        !_isFlying, // reset integral
                         Timer::getDt(),
                         _state,
                         setpoint);
@@ -175,7 +175,7 @@ namespace hf {
 
             // Flying status based on motors
             bool _isFlying;
-            uint32_t _flyingCheckMsec;
+            uint32_t _motorCheckMsec;
 
             // Sensor fusion
             ImuFilter _imuFilter;
@@ -233,7 +233,7 @@ namespace hf {
 
                 _stabilizerPid = StabilizerPidController::run(
                         _stabilizerPid,
-                        setpoint.thrust > 0.01,
+                        !_isFlying, // reset integral
                         dt,
                         _state,
                         setpoint);
@@ -255,7 +255,15 @@ namespace hf {
                         _imuFilter.isGyroCalibrated, requested_arming,
                         requested_hover, timestamp_msec, _imuFilter, _mode);
 
-                //_debugger.report(_mode);
+                // Periodically run flying check to get status for EKF
+                _isFlying = 
+
+                    _mode == MODE_IDLE || _mode == MODE_PANIC  ? false :
+
+                    _flyingCheckTimer.ready() ?
+                    areMotorsAboveIdle(motorvals, motorcount) :
+
+                    _isFlying;
 
                 // Blink IMU to indicate status
                 _led.blink(_imuFilter.isGyroCalibrated);
@@ -274,22 +282,18 @@ namespace hf {
 
                 // Do EKF fast-update with IMU readings
                 _ekf = EKF::update(_ekf, _imuFilter.output, millis());
-            
+
                 // Get vehicle state from EKF
                 _state = EKF::getVehicleState(_ekf);
-
-                // Periodically run flying check to get status for EKF
-                if (_flyingCheckTimer.ready()) {
-                    checkFlyingStatus(motorvals, motorcount);
-                }
             }
 
-            void checkFlyingStatus(
-                    const float * motorvals, const uint8_t motor_count)
+            auto areMotorsAboveIdle(
+                    const float * motorvals,
+                    const uint8_t motorcount) -> bool
             {
                 auto isThrustOverIdle = false;
 
-                for (int i = 0; i < motor_count; ++i) {
+                for (int i = 0; i < motorcount; ++i) {
                     if (motorvals[i] > MOTOR_IDLE_MAX) {
                         isThrustOverIdle = true;
                         break;
@@ -298,11 +302,11 @@ namespace hf {
 
                 const auto msec_curr = millis();
 
-                _flyingCheckMsec = isThrustOverIdle ? msec_curr :
-                    _flyingCheckMsec;
+                _motorCheckMsec = isThrustOverIdle ? msec_curr :
+                    _motorCheckMsec;
 
-                _isFlying = _flyingCheckMsec > 0 &&
-                    (msec_curr - _flyingCheckMsec) <
+                return  _motorCheckMsec > 0 &&
+                    (msec_curr - _motorCheckMsec) <
                     FLYING_HYSTERESIS_THRESHOLD_MSEC;
             }
 
