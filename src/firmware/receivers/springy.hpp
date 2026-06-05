@@ -42,7 +42,7 @@ namespace hf {
                 data = ReceiverData(setpoint, requested_arming,
                         requested_hover,timestamp_msec);
 
-                _traditional = TraditionalReceiver( setpoint, requested_arming,
+                _traditional = TraditionalReceiver(setpoint, requested_arming,
                         true, timestamp_msec, aux1);
 
                 _aux2 = aux2;
@@ -65,7 +65,8 @@ namespace hf {
                         sdata._traditional, throttle, roll, pitch, yaw, aux1,
                         msec_curr, false);
 
-                const auto requested_hover = aux2 > 1500;
+                const auto requested_hover =
+                    traditional.data.requested_arming ? aux2 > 1500 : false;
 
                 return SpringyReceiver(traditional.data.setpoint,
                         traditional.data.requested_arming, requested_hover,

@@ -119,7 +119,15 @@ namespace hf {
             {
                 const auto rxdata = rx.data;
 
-                return update(rxdata.setpoint, rxdata.requested_arming,
+                const auto rxsetpoint = rxdata.setpoint;
+
+                const auto setpoint = Setpoint(
+                        2 * rxsetpoint.thrust - 1, // [0,1] => [-1,+1]
+                        rxsetpoint.roll,
+                        rxsetpoint.pitch,
+                        rxsetpoint.yaw);
+
+                return update(setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
                         motorvals, motorcount);
             } 
@@ -348,6 +356,9 @@ namespace hf {
 
                     // Panic mode: can't recover
                     mode == MODE_PANIC ? MODE_PANIC :
+
+                    // Disallow jumping directly from idle to hover
+                    mode == MODE_IDLE && requestedHover ? MODE_IDLE :
 
                     // Want arm and safe to arm: enter armed mode
                     mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
