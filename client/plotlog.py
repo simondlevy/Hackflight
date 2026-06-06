@@ -89,11 +89,11 @@ def main():
     plt.ylabel('Z (m)')
 
     plt.subplot(4, 1, 3)
-    plt.plot(time[beg:end], dx[beg:end], 'r')
-    plt.plot(time[beg:end], dy[beg:end], 'g')
+    plt.plot(time[beg:end], dy[beg:end], 'r')
+    plt.plot(time[beg:end], dx[beg:end], 'g')
     plt.plot(time[beg:end], dz[beg:end], 'b')
     plt.ylim((-args.vmax, +args.vmax))
-    plt.legend(('dx/dt', 'dy/dt', 'dz/dt'))
+    plt.legend(('dy/dt', 'dx/dt', 'dz/dt'))
     plt.ylabel('Vel (m/s)')
 
     plt.subplot(4, 1, 4)
