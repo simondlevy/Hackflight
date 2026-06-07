@@ -196,6 +196,9 @@ namespace hf {
             // PID control for hover
             HoverPidController _hoverPid;
 
+            // Telemetry serializer
+            static MspSerializer _telemetrySerializer;
+
             // Debugging
             Debugger _debugger;
 
@@ -292,7 +295,6 @@ namespace hf {
             void sendTelemetry(const Setpoint & setpoint)
             {
                 if (_telemetryTimer.ready()) {
-                    static MspSerializer _serializer;
 
                     const float data[15] = {
                         (float)_mode,
@@ -302,12 +304,12 @@ namespace hf {
                         _state.psi, _state.dpsi
                     };
 
-                    _serializer = MspSerializer::serializeFloats(
-                            _serializer, MSP_TELEMETRY, data, 15);
+                    _telemetrySerializer = MspSerializer::serializeFloats(
+                            _telemetrySerializer, MSP_TELEMETRY, data, 15);
 
                     Serial1.write(
-                            MspSerializer::payloadBytes(_serializer),
-                            MspSerializer::payloadSize(_serializer));
+                            MspSerializer::payloadBytes(_telemetrySerializer),
+                            MspSerializer::payloadSize(_telemetrySerializer));
                 }
             }
 
