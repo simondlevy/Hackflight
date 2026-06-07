@@ -50,10 +50,11 @@ namespace hf {
             static const uint8_t LED_PIN = 9;
 
             // Rate constants
+            static constexpr float CORE_LOOP_HZ = 1000;
             static constexpr float EKF_PREDICTION_RATE_HZ = 100;
             static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ =
-                100; static constexpr float TELEMETRY_RATE_HZ = 50;
+            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
+            static constexpr float TELEMETRY_RATE_HZ = 50;
 
             // Safety constants
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
@@ -290,7 +291,7 @@ namespace hf {
             HoverPidController _hoverPid;
 
             // Telemetry serializer
-            static MspSerializer _telemetrySerializer;
+            MspSerializer _telemetrySerializer;
 
             // Debugging
             Debugger _debugger;
@@ -308,6 +309,8 @@ namespace hf {
                     const float * motorvals,
                     const uint8_t motorcount) -> Setpoint
             {
+                runDelayLoop(micros(), CORE_LOOP_HZ);
+
                 step(requested_arming, requested_hover,
                         timestamp_msec, motorvals, motorcount);
 
