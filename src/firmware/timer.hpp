@@ -40,27 +40,6 @@ namespace hf {
                 return false;
             }
 
-            static auto getDt() -> float
-            {
-                const auto usec_curr = micros();      
-                static uint32_t _usec_prev;
-                const float dt = (usec_curr - _usec_prev)/1000000.0;
-                _usec_prev = usec_curr;
-
-                return dt;
-            }
-
-            static void runDelayLoop(const uint32_t usec_curr, 
-                    const uint32_t loop_freq_hz)
-            {
-                float invFreq = 1.0 / loop_freq_hz * 1000000.0;
-                uint32_t checker = micros();
-
-                while (invFreq > (checker - usec_curr)) {
-                    checker = micros();
-                }
-            }
-
         private:
 
             float _freq;
