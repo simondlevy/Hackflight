@@ -42,6 +42,8 @@ namespace hf {
 
     class FC {
 
+        // Constants ---------------------------------------------------------
+
         private:
 
             // Arbitrary
@@ -61,6 +63,8 @@ namespace hf {
             // over the idle thrust.
             static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
             static constexpr float MOTOR_IDLE_MAX = 0.1;
+
+        // Public instance methods --------------------------------------------
 
         public:
 
