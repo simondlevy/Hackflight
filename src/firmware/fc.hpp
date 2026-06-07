@@ -162,6 +162,95 @@ namespace hf {
 
         private:
 
+            // Static methods ------------------------------------------------
+
+            static auto updateMode(
+                    const uint32_t msecCurr,
+                    const VehicleState & state,
+                    const bool isGyroCalibrated,
+                    const bool requestedArming,
+                    const bool requestedHover,
+                    const uint32_t msecPrev,
+                    const ImuFilter & imufilt,
+                    const mode_e mode) -> mode_e
+            {
+                const auto shouldArm = 
+
+                    // Disable arming while gyro is calibrating
+                    !isGyroCalibrated ? false :
+
+                    // Check receiver timeout
+                    checkFailsafe(msecCurr, msecPrev, requestedArming);
+
+                // Run a little state-transition machine to update flight mode
+                return 
+
+                    //  Vehicle flipped over: enter panic mode
+                    isFlipped(state) ? MODE_PANIC :
+
+                    // Panic mode: can't recover
+                    mode == MODE_PANIC ? MODE_PANIC :
+
+                    // Disallow jumping directly from idle to hover
+                    mode == MODE_IDLE && requestedHover ? MODE_IDLE :
+
+                    // Want arm and safe to arm: enter armed mode
+                    mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
+                    ? MODE_ARMED :
+
+                    // Armed and requested disarm: enter idle mode
+                    mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
+
+                    // Armed and requested hover; enter hover mode
+                    mode == MODE_ARMED && requestedHover ? MODE_HOVERING :
+
+                    // Hovering and requested no-hover; return to armed mode
+                    mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
+
+                    // Hovering and requested disarm; enter idle mode
+                    mode == MODE_HOVERING && !requestedArming ? MODE_IDLE :
+
+                    //  Default: stay in current mode
+                    mode;
+            }
+
+            static auto isFlipped(const VehicleState & state) -> bool
+            {
+                return isFlippedAngle(state.theta) ||
+                    isFlippedAngle(state.phi); 
+            }
+
+            static auto isFlippedAngle(const float angle) -> bool
+            {
+                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
+            }
+
+            static auto checkFailsafe(
+                    const uint32_t msec_curr,
+                    const uint32_t msec_prev,
+                    const bool requested_arming) -> bool
+            {
+                const auto timed_out = 
+                    msec_prev > 0 &&
+                    msec_curr > msec_prev &&
+                    msec_curr - msec_prev > FAILSAFE_MSEC;
+
+                return timed_out ? false : requested_arming;
+            } 
+
+            static void runDelayLoop(const uint32_t usec_curr, 
+                    const uint32_t loop_freq_hz)
+            {
+                float invFreq = 1.0 / loop_freq_hz * 1000000.0;
+                uint32_t checker = micros();
+
+                while (invFreq > (checker - usec_curr)) {
+                    checker = micros();
+                }
+            }
+
+            // Instance variables ---------------------------------------------
+
             // Vehicle state
             VehicleState _state;
 
@@ -201,6 +290,11 @@ namespace hf {
 
             // Debugging
             Debugger _debugger;
+
+            // Support for getDt()
+            uint32_t _usec_prev;
+
+            // Instance methods ---------------------------------------------0
 
             auto update(
                     const Setpoint & setpoint_in,
@@ -313,99 +407,13 @@ namespace hf {
                 }
             }
 
-            static auto updateMode(
-                    const uint32_t msecCurr,
-                    const VehicleState & state,
-                    const bool isGyroCalibrated,
-                    const bool requestedArming,
-                    const bool requestedHover,
-                    const uint32_t msecPrev,
-                    const ImuFilter & imufilt,
-                    const mode_e mode) -> mode_e
-            {
-                const auto shouldArm = 
-
-                    // Disable arming while gyro is calibrating
-                    !isGyroCalibrated ? false :
-
-                    // Check receiver timeout
-                    checkFailsafe(msecCurr, msecPrev, requestedArming);
-
-                // Run a little state-transition machine to update flight mode
-                return 
-
-                    //  Vehicle flipped over: enter panic mode
-                    isFlipped(state) ? MODE_PANIC :
-
-                    // Panic mode: can't recover
-                    mode == MODE_PANIC ? MODE_PANIC :
-
-                    // Disallow jumping directly from idle to hover
-                    mode == MODE_IDLE && requestedHover ? MODE_IDLE :
-
-                    // Want arm and safe to arm: enter armed mode
-                    mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
-                    ? MODE_ARMED :
-
-                    // Armed and requested disarm: enter idle mode
-                    mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
-
-                    // Armed and requested hover; enter hover mode
-                    mode == MODE_ARMED && requestedHover ? MODE_HOVERING :
-
-                    // Hovering and requested no-hover; return to armed mode
-                    mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
-
-                    // Hovering and requested disarm; enter idle mode
-                    mode == MODE_HOVERING && !requestedArming ? MODE_IDLE :
-
-                    //  Default: stay in current mode
-                    mode;
-            }
-
-            static auto isFlipped(const VehicleState & state) -> bool
-            {
-                return isFlippedAngle(state.theta) ||
-                    isFlippedAngle(state.phi); 
-            }
-
-            static auto isFlippedAngle(const float angle) -> bool
-            {
-                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
-            }
-
-            static auto checkFailsafe(
-                    const uint32_t msec_curr,
-                    const uint32_t msec_prev,
-                    const bool requested_arming) -> bool
-            {
-                const auto timed_out = 
-                    msec_prev > 0 &&
-                    msec_curr > msec_prev &&
-                    msec_curr - msec_prev > FAILSAFE_MSEC;
-
-                return timed_out ? false : requested_arming;
-            } 
-
-            static auto getDt() -> float
+            auto getDt() -> float
             {
                 const auto usec_curr = micros();      
-                static uint32_t _usec_prev;
                 const float dt = (usec_curr - _usec_prev)/1000000.0;
                 _usec_prev = usec_curr;
 
                 return dt;
-            }
-
-            static void runDelayLoop(const uint32_t usec_curr, 
-                    const uint32_t loop_freq_hz)
-            {
-                float invFreq = 1.0 / loop_freq_hz * 1000000.0;
-                uint32_t checker = micros();
-
-                while (invFreq > (checker - usec_curr)) {
-                    checker = micros();
-                }
             }
 
     }; // class FC
