@@ -142,7 +142,7 @@ namespace hf {
                 :
                     core(core),
                     q(q),
-                    gyro_latest(gyro_latest),
+                    gyro_latest_(gyro_latest),
                     accel_subsampler(accel_subsampler),
                     gyro_subsampler(gyro_subsampler),
                     rmatrix(rmatrix),
@@ -231,7 +231,7 @@ namespace hf {
                 return EKF(
                         Core(x, P),
                         q,
-                        ekf.gyro_latest,
+                        ekf.gyro_latest_,
                         accel_subsampler,
                         gyro_subsampler,
                         ekf.rmatrix,
@@ -355,7 +355,7 @@ namespace hf {
                 return EKF(
                         ekf.core,
                         ekf.q,
-                        ekf.gyro_latest,
+                        ekf.gyro_latest_,
                         ekf.accel_subsampler,
                         ekf.gyro_subsampler,
                         ekf.rmatrix,
@@ -397,16 +397,16 @@ namespace hf {
                 const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
 
-                const auto dphi = ekf.gyro_latest.x;
+                const auto dphi = ekf.gyro_latest_.x;
 
                 const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
 
-                const auto dtheta = ekf.gyro_latest.y;
+                const auto dtheta = ekf.gyro_latest_.y;
 
                 const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
 
-                const auto dpsi = ekf.gyro_latest.z;
+                const auto dpsi = ekf.gyro_latest_.z;
 
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
@@ -420,7 +420,7 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Quaternion q;
 
-            ThreeAxis gyro_latest;
+            ThreeAxis gyro_latest_;
 
             ThreeAxisSubSampler accel_subsampler = ThreeAxisSubSampler(GRAVITY);
             ThreeAxisSubSampler gyro_subsampler = ThreeAxisSubSampler(Num::DEG2RAD);
