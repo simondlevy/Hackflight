@@ -87,14 +87,14 @@ namespace hf {
                     vector x;
 
                     // Covariance matrix
-                    matrix P;
+                    matrix p;
 
                     FC() = default;
 
                     FC& operator=(const FC& other) = default;
 
-                    FC(const vector & x, const matrix & P) 
-                        : x(x), P(P) {}
+                    FC(const vector & x, const matrix & p) 
+                        : x(x), p(p) {}
             };
 
             FC core;
@@ -117,7 +117,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                core.P = addCovarianceNoise(matrix(), pinit);
+                core.p = addCovarianceNoise(matrix(), pinit);
 
                 did_update_with_float_deck = false;
                 last_process_noise_update_msec = 0;
@@ -171,7 +171,7 @@ namespace hf {
                 const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.rmatrix);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-                const auto P = dot(dot(F, ekf.core.P), trans(F));
+                const auto P = dot(dot(F, ekf.core.p), trans(F));
 
                 const auto dt2 = dt * dt;
 
@@ -281,7 +281,7 @@ namespace hf {
 
                 const auto coreWithNoise = dtpositive ?
                     FC(ekf.core.x, 
-                            enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
+                            enforceSymmetry(addCovarianceNoise(ekf.core.p, noise))) :
                     ekf.core;
 
                 const auto coreWithRange = rangeok && ekf.did_update_with_float_deck ?
@@ -289,7 +289,7 @@ namespace hf {
                             coreWithNoise, ekf.zranger_filter_latest, rzz) :
                     coreWithNoise;
 
-                const auto coreWithRangeAndFlow = ekf.did_update_with_float_deck ?  
+                const auto core_with_range_and_flow = ekf.did_update_with_float_deck ?  
                     updateWithFlow(coreWithRange, ekf.optical_flow_filter_latest,
                             gyro_latest, rzz):
                     coreWithRange;
@@ -302,13 +302,13 @@ namespace hf {
 
                 // reset the attitude error
                 const auto x = vector{
-                    coreWithRangeAndFlow.x[0],
-                    coreWithRangeAndFlow.x[1],
-                    coreWithRangeAndFlow.x[2],
-                    coreWithRangeAndFlow.x[3],
+                    core_with_range_and_flow.x[0],
+                    core_with_range_and_flow.x[1],
+                    core_with_range_and_flow.x[2],
+                    core_with_range_and_flow.x[3],
                     0, 0, 0};
 
-                const auto P = enforceSymmetry(coreWithRangeAndFlow.P);
+                const auto P = enforceSymmetry(core_with_range_and_flow.p);
 
                 const auto q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
@@ -317,7 +317,7 @@ namespace hf {
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and accel
-                const auto R = ready ?
+                const auto r = ready ?
                     Rotation(
                             q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
                             2 * q.x * q.y - 2 * q.w * q.z,
@@ -329,7 +329,7 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.rmatrix;
 
-                const auto core = ready ? FC(x, P) : coreWithRangeAndFlow;
+                const auto core = ready ? FC(x, P) : core_with_range_and_flow;
 
                 return EKF(
                         core,
@@ -337,7 +337,7 @@ namespace hf {
                         gyro_latest,
                         accel_subsampler,
                         gyro_subsampler,
-                        R,
+                        r,
                         false, // didUpateWithFlowDeck
                         ekf.zranger_filter_latest,
                         ekf.optical_flow_filter_latest,
@@ -599,7 +599,7 @@ namespace hf {
             {
                 const auto r = std_meas_noise*std_meas_noise;
 
-                const auto pht = dot(core.P, h); // PH'
+                const auto pht = dot(core.p, h); // PH'
 
                 float hphr = r; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -622,7 +622,7 @@ namespace hf {
                 const auto gh_i = trans(gh);
 
                 // (GH - I)*P
-                const auto gh_i_p = dot(gh, core.P); 
+                const auto gh_i_p = dot(gh, core.p); 
 
                 // (GH - I)*P*(GH - I)'
                 auto p = dot(gh_i_p, gh_i);
