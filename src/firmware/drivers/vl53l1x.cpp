@@ -20,41 +20,44 @@
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/zranger/sensor.hpp>
-using namespace hf;
 
 static Adafruit_VL53L1X _vl53l1x;
 
-void ZRanger::begin()
-{
-    Wire1.begin();
-    Wire1.setClock(400000);
-    delay(100);
+namespace hf {
+
+    void ZRanger::begin()
+    {
+        Wire1.begin();
+        Wire1.setClock(400000);
+        delay(100);
 
 
-    if (!_vl53l1x.begin(0x29, &Wire1)) {
-        Debugger::reportForever("Unable to initialize VL53L1X");
+        if (!_vl53l1x.begin(0x29, &Wire1)) {
+            Debugger::reportForever("Unable to initialize VL53L1X");
+        }
+
+        if (!_vl53l1x.startRanging()) {
+            Debugger::reportForever("VL53L1X failed to start ranging");
+        }
+
+        // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms
+        _vl53l1x.setTimingBudget(50);
+
     }
 
-    if (!_vl53l1x.startRanging()) {
-        Debugger::reportForever("VL53L1X failed to start ranging");
+    auto ZRanger::read() -> float
+    {
+        static float _distance;
+
+        if (_vl53l1x.dataReady())  {
+
+            _distance = _vl53l1x.distance();
+
+            // Prepare for another reading
+            _vl53l1x.clearInterrupt();
+        }
+
+        return _distance;
     }
 
-    // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms
-    _vl53l1x.setTimingBudget(50);
-
-}
-
-auto ZRanger::read() -> float
-{
-    static float _distance;
-
-    if (_vl53l1x.dataReady())  {
-
-        _distance = _vl53l1x.distance();
-
-        // Prepare for another reading
-        _vl53l1x.clearInterrupt();
-    }
-
-    return _distance;
 }
