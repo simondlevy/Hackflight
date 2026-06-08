@@ -117,7 +117,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                core.p = addCovarianceNoise(Matrix(), pinit);
+                core.p = AddCovarianceNoise(Matrix(), pinit);
 
                 did_update_with_flow_deck_ = false;
                 last_process_noise_update_msec_ = 0;
@@ -171,7 +171,7 @@ namespace hf {
                 const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.r_);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-                const auto P = dot(dot(F, ekf.core.p), trans(F));
+                const auto P = Dot(Dot(F, ekf.core.p), Transpose(F));
 
                 const auto dt2 = dt * dt;
 
@@ -180,7 +180,7 @@ namespace hf {
                 const auto tmpSPY = ekf.core.x[STATE_VY];
                 const auto tmpSPZ = ekf.core.x[STATE_VZ];
 
-                // position updates in the body frame (will be rotated to inertial frame)
+                // position updates in the body frame (will be Rotated to inertial frame)
                 const auto dx = ekf.core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
                 const auto dy = ekf.core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
@@ -209,12 +209,12 @@ namespace hf {
                 x[STATE_D1] = ekf.core.x[STATE_D1];
                 x[STATE_D2] = ekf.core.x[STATE_D2];
 
-                // Attitude update (rotate by gyroscope): we do this in quaternions
+                // Attitude update (Rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, ekf.q_);
+                auto tmpq = Rotate(dtw, ekf.q_);
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
@@ -244,7 +244,7 @@ namespace hf {
 
             } // predict
 
-            static auto update(
+            static auto Update(
                     const EKF & ekf,
                     const ImuFilter::Data & imudata,
                     const uint32_t msec_curr) -> EKF
@@ -281,16 +281,16 @@ namespace hf {
 
                 const auto coreWithNoise = dtpositive ?
                     Core(ekf.core.x, 
-                            enforceSymmetry(addCovarianceNoise(ekf.core.p, noise))) :
+                            EnforceSymmetry(AddCovarianceNoise(ekf.core.p, noise))) :
                     ekf.core;
 
                 const auto coreWithRange = rangeok && ekf.did_update_with_flow_deck_ ?
-                    updateWithRange(
+                    UpdateWithRange(
                             coreWithNoise, ekf.zranger_filter_latest_, rzz) :
                     coreWithNoise;
 
                 const auto core_with_range_and_flow = ekf.did_update_with_flow_deck_ ?  
-                    updateWithFlow(coreWithRange, ekf.optical_flow_filter_latest_,
+                    UpdateWithFlow(coreWithRange, ekf.optical_flow_filter_latest_,
                             gyro_latest, rzz):
                     coreWithRange;
 
@@ -308,15 +308,15 @@ namespace hf {
                     core_with_range_and_flow.x[3],
                     0, 0, 0};
 
-                const auto p = enforceSymmetry(core_with_range_and_flow.p);
+                const auto p = EnforceSymmetry(core_with_range_and_flow.p);
 
                 const auto q = ready &&
-                    (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
-                    smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
-                    ekf.q_ / Quaternion::l2norm(rotate(v, ekf.q_)) : ekf.q_;
+                    (IsBigEnough(v.x) || IsBigEnough(v.y) || IsBigEnough(v.z)) &&
+                    IsSmallEnough(v.x) && IsSmallEnough(v.y) && IsSmallEnough(v.z) ?
+                    ekf.q_ / Quaternion::l2norm(Rotate(v, ekf.q_)) : ekf.q_;
 
                 // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and accel
+                // Rotate body-frame velocity and accel
                 const auto r = ready ?
 
                     Rotation(
@@ -350,7 +350,7 @@ namespace hf {
 
             } // update
 
-            static auto update(
+            static auto Update(
                     const EKF &ekf,
                     const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter) -> EKF
@@ -520,19 +520,19 @@ namespace hf {
                 return f;
             }
 
-            static auto updateWithFlow(
+            static auto UpdateWithFlow(
                     const Core & core,
                     const OpticalFlowFilter & offilter,
                     const ThreeAxis & gyro, const float r22) -> Core
             {
-                const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
+                const auto newcore = UpdateWithFlowAxis(core, offilter.dt, r22,
                         offilter.dpixelx, offilter.std_dev_x, STATE_VX, gyro.y);
 
-                return updateWithFlowAxis(newcore, offilter.dt, r22,
+                return UpdateWithFlowAxis(newcore, offilter.dt, r22,
                         offilter.dpixely, offilter.std_dev_y, STATE_VY, gyro.x);
             }
 
-            static auto updateWithRange(
+            static auto UpdateWithRange(
                     const Core & core,
                     const ZRangerFilter & zrfilter,
                     const float rzz) -> Core
@@ -547,12 +547,12 @@ namespace hf {
                 // updates are done in the scalar update function below
                 const Vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
-                return updateWithScalar(core, h,
+                return UpdateWithScalar(core, h,
                         measured_distance-predicted_distance,
                         zrfilter.stdev);
             }
 
-            static auto updateWithFlowAxis(
+            static auto UpdateWithFlowAxis(
                     const Core & core,
                     const float dt,
                     const float r22,
@@ -590,11 +590,11 @@ namespace hf {
 
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
-                return updateWithScalar(core, h, measured_n-predicted_n,
+                return UpdateWithScalar(core, h, measured_n-predicted_n,
                         stdev*FLOW_RESOLUTION);
             }
 
-            static auto updateWithScalar(
+            static auto UpdateWithScalar(
                     const Core & core,
                     const Vector & h,
                     const float error,
@@ -602,7 +602,7 @@ namespace hf {
             {
                 const auto r = std_meas_noise*std_meas_noise;
 
-                const auto pht = dot(core.p, h); // PH'
+                const auto pht = Dot(core.p, h); // PH'
 
                 float hphr = r; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -614,7 +614,7 @@ namespace hf {
                     g[i] = pht[i]/hphr; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                auto gh = outer(g, h);
+                auto gh = Outer(g, h);
 
                 // GH - I
                 for (size_t i=0; i<STATE_DIM; i++) { 
@@ -622,13 +622,13 @@ namespace hf {
                 }
 
                 // (GH - I)'
-                const auto gh_i = trans(gh);
+                const auto gh_i = Transpose(gh);
 
                 // (GH - I)*P
-                const auto gh_i_p = dot(gh, core.p); 
+                const auto gh_i_p = Dot(gh, core.p); 
 
                 // (GH - I)*P*(GH - I)'
-                auto p = dot(gh_i_p, gh_i);
+                auto p = Dot(gh_i_p, gh_i);
 
                 // State update
                 auto x = Vector();
@@ -645,7 +645,7 @@ namespace hf {
 
                         // add measurement noise
                         p[i*STATE_DIM+j] = p[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*p[i*STATE_DIM+j] + 0.5*p[j*STATE_DIM+i] + v,
+                            GetPval(i, j, 0.5*p[i*STATE_DIM+j] + 0.5*p[j*STATE_DIM+i] + v,
                                     MIN_COVARIANCE, MAX_COVARIANCE); 
                     }
                 }
@@ -653,7 +653,7 @@ namespace hf {
                 return Core(x, p);
             }
 
-            static auto enforceSymmetry(const Matrix & P) -> Matrix
+            static auto EnforceSymmetry(const Matrix & P) -> Matrix
             {
                 auto Pnew = P;
 
@@ -662,7 +662,7 @@ namespace hf {
                     for (int j=i; j<STATE_DIM; j++) {
 
                         Pnew[i*STATE_DIM+j] = Pnew[j*STATE_DIM+i] =
-                            get_pval(i, j,
+                            GetPval(i, j,
                                     0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
                                     MIN_COVARIANCE, MAX_COVARIANCE);
                     }
@@ -671,7 +671,7 @@ namespace hf {
                 return Pnew;
             }
 
-            static auto addCovarianceNoise(const Matrix & P,
+            static auto AddCovarianceNoise(const Matrix & P,
                     const float * noise) -> Matrix
             {
                 auto Pnew = P;
@@ -683,7 +683,7 @@ namespace hf {
                 return Pnew;
             }
 
-            static auto get_pval(const int i, const int j,
+            static auto GetPval(const int i, const int j,
                     const float pval, const float minval,
                     const float maxval) -> float
             {
@@ -693,8 +693,18 @@ namespace hf {
                     pval;
             }
 
+            static auto IsBigEnough(const float v) -> bool
+            {
+                return fabsf(v) > MIN_ANGLE;
+            }
+
+            static auto IsSmallEnough(const float v) -> bool
+            {
+                return fabsf(v) < MAX_ANGLE;
+            }
+
             // C = x * y
-            static auto outer(const Vector & x, const Vector & y) -> Matrix
+            static auto Outer(const Vector & x, const Vector & y) -> Matrix
             {
                 auto C = Matrix();
 
@@ -708,7 +718,7 @@ namespace hf {
             }
 
             // At = A^T
-            static auto trans(const Matrix & a) -> Matrix
+            static auto Transpose(const Matrix & a) -> Matrix
             {
                 auto at = Matrix();
 
@@ -722,7 +732,7 @@ namespace hf {
             }
 
             // C = A * B
-            static auto dot(const Matrix & a, const Matrix & b) -> Matrix
+            static auto Dot(const Matrix & a, const Matrix & b) -> Matrix
             {
                 auto c = Matrix();
 
@@ -739,7 +749,7 @@ namespace hf {
             }
 
             // y = A * x
-            static auto dot(const Matrix & a, const Vector & x) -> Vector
+            static auto Dot(const Matrix & a, const Vector & x) -> Vector
             {
                 auto y = Vector();
 
@@ -753,17 +763,7 @@ namespace hf {
                 return y;
             }
 
-            static auto bigenough(const float v) -> bool
-            {
-                return fabsf(v) > MIN_ANGLE;
-            }
-
-            static auto smallenough(const float v) -> bool
-            {
-                return fabsf(v) < MAX_ANGLE;
-            }
-
-            static auto rotate(
+            static auto Rotate(
                     const ThreeAxis & v, const Quaternion & q)-> Quaternion
             {
                 const auto angle = ThreeAxis::l2norm(v);

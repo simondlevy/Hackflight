@@ -60,7 +60,7 @@ namespace hf {
                     std_dev_y(std_dev_y),
                     dt(dt) {}
 
-            static auto update(
+            static auto Update(
                     const OpticalFlowFilter & filter,
                     const uint32_t usec_curr,
                     const OpticalFlowSensor::RawData & rawdata

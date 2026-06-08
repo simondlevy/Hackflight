@@ -51,7 +51,7 @@ namespace hf {
             SpringyReceiver& operator=(
                     const SpringyReceiver& other) = default;
 
-            static auto update(
+            static auto Update(
                     const SpringyReceiver & sdata,
                     const uint16_t throttle,
                     const uint16_t roll,
@@ -61,7 +61,7 @@ namespace hf {
                     const uint16_t aux2,
                     const uint32_t msec_curr) -> SpringyReceiver
             {
-                const auto traditional = TraditionalReceiver::update(
+                const auto traditional = TraditionalReceiver::Update(
                         sdata.traditional_, throttle, roll, pitch, yaw, aux1,
                         msec_curr, false);
 

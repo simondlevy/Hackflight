@@ -50,7 +50,7 @@ namespace hf {
             TraditionalReceiver& operator=(
                     const TraditionalReceiver& other) = default;
 
-            static auto update(
+            static auto Update(
                     const TraditionalReceiver & tdata,
                     const uint16_t throttle,
                     const uint16_t roll,

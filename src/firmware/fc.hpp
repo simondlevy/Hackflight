@@ -154,12 +154,12 @@ namespace hf {
             {
                 // Slower EKF update with range, optical flow
                 if (hover_deck_timer_.Ready()) {
-                    zranger_filter_ = ZRangerFilter::update(
+                    zranger_filter_ = ZRangerFilter::Update(
                             zranger_filter_, zranger_.Read());
-                    optical_flow_filter_ = OpticalFlowFilter::update(
+                    optical_flow_filter_ = OpticalFlowFilter::Update(
                             optical_flow_filter_,
                             micros(), flow_sensor_.Read());
-                    ekf_ = EKF::update(ekf_, zranger_filter_, optical_flow_filter_);
+                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }
 
@@ -383,7 +383,7 @@ namespace hf {
                 }
 
                 // Do EKF fast-update with IMU readings
-                ekf_ = EKF::update(ekf_, imu_filter_.output, millis());
+                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
 
                 // Get vehicle state from EKF
                 state_ = EKF::getVehicleState(ekf_);

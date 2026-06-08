@@ -52,7 +52,7 @@ static void onReceiveRcChannels(
 
         _button_val = button_val;
 
-        _rxdata = hf::SpringyReceiver::update(
+        _rxdata = hf::SpringyReceiver::Update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -83,7 +83,7 @@ void setup()
 void loop()
 {
     // This will trigger onReceiveRcChannels() above
-    _crsf.update();
+    _crsf.Update();
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
