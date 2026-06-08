@@ -90,7 +90,7 @@ namespace hf {
                     const bool airborne)
                 : state(state), dstate_(dstate), airborne_(airborne) {}
 
-            static auto update(
+            static auto Update(
                     const Dynamics & dyn,
                     const VehicleParams & vparams,
                     const float dt,

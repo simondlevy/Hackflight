@@ -96,7 +96,7 @@ namespace hf {
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
-                            dynamics = Dynamics::update(dynamics,
+                            dynamics = Dynamics::Update(dynamics,
                                     VPARAMS, 1 / DYNAMICS_FREQ,
                                     _mixer.motorvals, 4, _mixer.roll,
                                     _mixer.pitch, _mixer.yaw);
