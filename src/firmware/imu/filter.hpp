@@ -91,7 +91,7 @@ namespace hf {
              *   accel.y: positive roll-right
              *   accel.z: positive rightside-up
              */
-            static auto step(
+            static auto Step(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
                     const IMU::RawData & imuraw,
@@ -104,7 +104,7 @@ namespace hf {
 
                 const auto gyrovariance =
                     (filter.gyro_sum_of_squares_/GYRO_NBR_OF_SAMPLES) -
-                    square(gyromean);
+                    Square(gyromean);
 
                 const auto gyro_val = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
 
@@ -113,10 +113,10 @@ namespace hf {
 
                 const auto gyro_sum_of_squares = filter.is_gyro_calibrated ?
                     filter.gyro_sum_of_squares_ :
-                    filter.gyro_sum_of_squares_ + square(gyro_val);
+                    filter.gyro_sum_of_squares_ + Square(gyro_val);
 
                 const auto accel_raw = imuraw.accel;
-                const auto accel = scale(
+                const auto accel = Scale(
                         ThreeAxis(accel_raw.x, accel_raw.y, accel_raw.z),
                         accel_range_gs);
 
@@ -147,7 +147,7 @@ namespace hf {
                 const auto gyro_sample_count = is_buffer_filled ? 0 : new_buffer_index;
 
                 const auto gyro_unbiased =
-                    scale(gyro_val - gyro_bias, gyro_range_dps);
+                    Scale(gyro_val - gyro_bias, gyro_range_dps);
 
                 const auto gyro_lpf = filter.gyro_lpf_.apply(
                         filter.gyro_lpf_, gyro_unbiased, GYRO_LPF_CUTOFF_FREQ);
@@ -176,12 +176,12 @@ namespace hf {
             ThreeAxisLpf accel_lpf_;
             ThreeAxisLpf gyro_lpf_;
 
-            static auto square(const ThreeAxis & vec) -> ThreeAxis
+            static auto Square(const ThreeAxis & vec) -> ThreeAxis
             {
                 return vec * vec;
             }
 
-            static auto scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
+            static auto Scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
             {
                 return vec * 2 * (float)s / 65536;
             }

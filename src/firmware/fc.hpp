@@ -374,7 +374,7 @@ namespace hf {
                 const auto imuraw = imu_.Read();
 
                 // Filter the raw IMU data
-                imu_filter_ = ImuFilter::step(imu_filter_, millis(), imuraw,
+                imu_filter_ = ImuFilter::Step(imu_filter_, millis(), imuraw,
                         imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
 
                 // Periodically run the EKF prediction step
