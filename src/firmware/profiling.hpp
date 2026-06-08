@@ -27,22 +27,22 @@ namespace hf {
 
             void report()
             {
-                if (_timer.ready()) {
+                if (timer_.ready()) {
 
-                    if (_count > 0) {
-                        printf("count=%d\n", (int)_count);
+                    if (count_ > 0) {
+                        printf("count=%d\n", (int)count_);
                     }
 
-                    _count = 0;
+                    count_ = 0;
                 }
-                _count++;
+                count_++;
             }
 
         private:
 
-            Timer _timer = Timer(1); // 1 Hz reporting
+            Timer timer_ = Timer(1); // 1 Hz reporting
 
-            uint32_t _count;
+            uint32_t count_;
     };
 
 
