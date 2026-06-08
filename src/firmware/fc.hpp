@@ -47,21 +47,21 @@ namespace hf {
         private:
 
             // Voltage sensing
-            static constexpr uint8_t VOLTAGE_INPUT_PIN = A9;
-            static constexpr float VOLTAGE_SCALEUP = 4.29;
+            static constexpr uint8_t kVoltageInputPin = A9;
+            static constexpr float kVoltageScaleup = 4.29;
 
             // LED indicator
-            static const uint8_t LED_PIN = 9;
-            static constexpr float LED_HEARTBEAT_FREQ_HZ = 0.75;
-            static constexpr float LED_FASTBLINK_FREQ_HZ = 3;
-            static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
+            static const uint8_t kLedPin = 9;
+            static constexpr float kLedHeartbeat_Rate = 0.75;
+            static constexpr float kLedFastBlink_Rate = 3;
+            static constexpr uint32_t kLedPulseDurationMsec = 50;
 
             // Rate constants
-            static constexpr float CORE_LOOP_HZ = 1000;
-            static constexpr float EKF_PREDICTION_RATE_HZ = 100;
-            static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
-            static constexpr float TELEMETRY_RATE_HZ = 50;
+            static constexpr float kCoreLoopRate = 1000;
+            static constexpr float kEkfPredictionRate = 100;
+            static constexpr float kFlyingCheckRate   = 25;
+            static constexpr float kHoverDeckAcquisitionRate = 100;
+            static constexpr float kTelemetryRate = 50;
 
             // Safety constants
             static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
@@ -82,7 +82,7 @@ namespace hf {
 
                 imu_.Begin();
 
-                pinMode(LED_PIN, OUTPUT); 
+                pinMode(kLedPin, OUTPUT); 
 
                 if (use_hover_deck) {
                     zranger_.Begin();
@@ -290,10 +290,10 @@ namespace hf {
             OpticalFlowSensor flow_sensor_;
 
             // Timers
-            Timer ekf_prediction_timer_ = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer flying_check_timer_ = Timer(FLYING_CHECK_RATE_HZ);
-            Timer hover_deck_timer_ = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
-            Timer telemetry_timer_ = Timer(TELEMETRY_RATE_HZ);
+            Timer ekf_prediction_timer_ = Timer(kEkfPredictionRate);
+            Timer flying_check_timer_ = Timer(kFlyingCheckRate);
+            Timer hover_deck_timer_ = Timer(kHoverDeckAcquisitionRate);
+            Timer telemetry_timer_ = Timer(kTelemetryRate);
 
             // PID control for stabilize-only
             StabilizerPidController stabilizer_pid_;
@@ -315,8 +315,8 @@ namespace hf {
             uint32_t led_pulse_start_;
 
             // Support for LED blinking
-            Timer heartbeat_timer_ = Timer(LED_HEARTBEAT_FREQ_HZ);
-            Timer fast_blink_timer_ = Timer(LED_FASTBLINK_FREQ_HZ);
+            Timer heartbeat_timer_ = Timer(kLedHeartbeat_Rate);
+            Timer fast_blink_timer_ = Timer(kLedFastBlink_Rate);
 
             // Instance methods ---------------------------------------------0
 
@@ -328,7 +328,7 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                RunDelayLoop(micros(), CORE_LOOP_HZ);
+                RunDelayLoop(micros(), kCoreLoopRate);
 
                 Step(requested_arming, requested_hover,
                         timestamp_msec, motor_vals, motor_count);
@@ -448,14 +448,14 @@ namespace hf {
                     heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
                 
                 if (ready) {
-                    digitalWrite(LED_PIN, true);
+                    digitalWrite(kLedPin, true);
                     is_led_pusing_ = true;
                     led_pulse_start_ = millis();
                 }
 
                 else if (is_led_pusing_) {
-                    if (millis() - led_pulse_start_ > LED_PULSE_DURATION_MSEC) {
-                        digitalWrite(LED_PIN, false);
+                    if (millis() - led_pulse_start_ > kLedPulseDurationMsec) {
+                        digitalWrite(kLedPin, false);
                         is_led_pusing_ = false;
                     }
                 }
