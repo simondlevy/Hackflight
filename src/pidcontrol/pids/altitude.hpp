@@ -39,10 +39,10 @@ namespace hf {
             AltitudeController() = default;
 
             AltitudeController(const AltitudeController & other) 
-                : output(other.output), _integral(other._integral) {}
+                : output(other.output), integral_(other.integral_) {}
 
             AltitudeController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             AltitudeController& operator=(const AltitudeController&) = default;
 
@@ -60,7 +60,7 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = hovering ?
-                    Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
+                    Num::fconstrain(controller.integral_ + error * dt, ILIMIT) : 0;
 
                 const auto output = hovering ? 
                     Num::fconstrain(KP * error + KI * integral,
@@ -72,7 +72,7 @@ namespace hf {
 
         private:
 
-            float _integral;
+            float integral_;
 
     };
 }

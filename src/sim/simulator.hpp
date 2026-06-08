@@ -48,11 +48,11 @@ namespace hf {
 
             Simulator(const Pose & pose)
                 : dynamics(Dynamics(pose)),
-                _pid_controller(HoverPidController()) {}
+                pid_controller_(HoverPidController()) {}
 
             Simulator(const Dynamics & dynamics,
                     const HoverPidController & pidControl)
-                : dynamics(dynamics), _pid_controller(pidControl) {}
+                : dynamics(dynamics), pid_controller_(pidControl) {}
 
             static auto step(
                     const Simulator & sim,
@@ -62,7 +62,7 @@ namespace hf {
             {
                 const auto dt = 1/(float)PID_FAST_FREQ;
 
-                auto pidControl = sim._pid_controller;
+                auto pidControl = sim.pid_controller_;
 
                 auto dynamics = sim.dynamics;
 
@@ -109,7 +109,7 @@ namespace hf {
 
         private:
 
-            HoverPidController _pid_controller;
+            HoverPidController pid_controller_;
 
             static auto SimStateToVehicleState(
                     const SimState state) -> VehicleState 

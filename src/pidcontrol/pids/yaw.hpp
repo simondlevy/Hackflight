@@ -42,10 +42,10 @@ namespace hf {
             YawPid() = default;
 
             YawPid(const YawPid & a) 
-                : output(a.output), _integral(a._integral), _error(a._error) {}
+                : output(a.output), integral_(a.integral_), error_(a.error_) {}
 
             YawPid(const float output, const float error, const float integral)
-                : output(output), _integral(integral), _error(error) {}
+                : output(output), integral_(integral), error_(error) {}
 
             YawPid& operator=(const YawPid&) = default;
 
@@ -64,9 +64,9 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(p._integral + error * dt, ILIMIT) : 0;
+                    Num::fconstrain(p.integral_ + error * dt, ILIMIT) : 0;
 
-                const auto derivative = dt > 0 ? (error - p._error) / dt : 0; 
+                const auto derivative = dt > 0 ? (error - p.error_) / dt : 0; 
 
                 const auto output = KP*error + KI*integral + KD*derivative; 
 
@@ -75,8 +75,8 @@ namespace hf {
 
         private:
 
-            float _integral;
-            float _error;
+            float integral_;
+            float error_;
 
     };
 

@@ -43,10 +43,10 @@ namespace hf {
             RollPitchPid() = default;
 
             RollPitchPid(const RollPitchPid & a) 
-                : output(a.output), _integral(a._integral) {}
+                : output(a.output), integral_(a.integral_) {}
 
             RollPitchPid(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             RollPitchPid& operator=(const RollPitchPid&) = default;
 
@@ -66,7 +66,7 @@ namespace hf {
                 const auto error = target - angle;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(p._integral + error * dt, ILIMIT) : 0;
+                    Num::fconstrain(p.integral_ + error * dt, ILIMIT) : 0;
 
                 const auto output = KP * error + KI * integral - KD * dangle; 
 
@@ -75,7 +75,7 @@ namespace hf {
 
         private:
 
-            float _integral;
+            float integral_;
 
     };
 }

@@ -84,11 +84,11 @@ namespace hf {
             Dynamics& operator=(const Dynamics& other) = default;
 
             Dynamics(const Pose & pose)
-                : state(pose), _airborne(false) {}
+                : state(pose), airborne_(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
-                : state(state), _dstate(dstate), _airborne(airborne) {}
+                : state(state), dstate_(dstate), airborne_(airborne) {}
 
             static auto update(
                     const Dynamics & dyn,
@@ -116,7 +116,7 @@ namespace hf {
                 const auto m = vparams.m;
 
                 const auto s = dyn.state;
-                const auto ds = dyn._dstate;
+                const auto ds = dyn.dstate_;
 
                 // Equation 6 ---------------------------------------
 
@@ -142,8 +142,8 @@ namespace hf {
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
                     ddz > 0 ? true :
-                    dyn._airborne && s.dz < 0 && s.z <= 0 ? false :
-                    dyn._airborne;
+                    dyn.airborne_ && s.dz < 0 && s.z <= 0 ? false :
+                    dyn.airborne_;
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
@@ -178,7 +178,7 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
-                return dyn._airborne && !airborne ? // just landed ?
+                return dyn.airborne_ && !airborne ? // just landed ?
 
                     // yes: reset dynamics, keeping current pose
                     Dynamics(Pose(s.x, s.y, s.z, s.phi, s.theta, s.psi)) :
@@ -191,10 +191,10 @@ namespace hf {
         private:
 
             // Vehicle state first derivative (Equation 12)
-            SimState _dstate;
+            SimState dstate_;
 
             // Flag for whether we're airborne and can update dynamics
-            bool _airborne;
+            bool airborne_;
 
             static auto constrain_psi(const double psi) -> float
             {

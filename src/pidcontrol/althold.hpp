@@ -47,9 +47,9 @@ namespace hf {
                     const ClimbRateController & climbrate_pid,
                     const float thrust)
                 : thrust(thrust),
-                _altitude_target(altitude_target),
-                _altitude_pid(altitude_pid),
-                _climbrate_pid(climbrate_pid) {}
+                altitude_target_(altitude_target),
+                altitude_pid_(altitude_pid),
+                climbrate_pid_(climbrate_pid) {}
 
             static auto run(
                     const AltHoldPidController & pid,
@@ -61,10 +61,10 @@ namespace hf {
                 // Altitude hold ---------------------------------------------
 
                 const auto  altitude_target =
-                    pid._altitude_target == 0 ? ALTITUDE_INIT_M :
-                    pid._altitude_target;
+                    pid.altitude_target_ == 0 ? ALTITUDE_INIT_M :
+                    pid.altitude_target_;
 
-                const auto new_altitude_target = Num::fconstrain(
+                const auto newaltitude_target_ = Num::fconstrain(
                         altitude_target +
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
@@ -75,15 +75,15 @@ namespace hf {
                 const auto airborne = hovering || (state.z > ALTITUDE_LANDING_M);
 
                 const auto altitude_pid =
-                    AltitudeController::run(pid._altitude_pid, hovering, dt,
-                            new_altitude_target, state.z);
+                    AltitudeController::run(pid.altitude_pid_, hovering, dt,
+                            newaltitude_target_, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::run(pid._climbrate_pid, airborne, dt,
+                    ClimbRateController::run(pid.climbrate_pid_, airborne, dt,
                             altitude_pid.output, state.dz);
 
                 return AltHoldPidController(
-                        new_altitude_target,
+                        newaltitude_target_,
                         altitude_pid,
                         climbrate_pid,
                         climbrate_pid.output);
@@ -91,10 +91,10 @@ namespace hf {
 
         private:
 
-            float _altitude_target;
+            float altitude_target_;
 
-            AltitudeController _altitude_pid;
+            AltitudeController altitude_pid_;
 
-            ClimbRateController _climbrate_pid;
+            ClimbRateController climbrate_pid_;
     };
 }

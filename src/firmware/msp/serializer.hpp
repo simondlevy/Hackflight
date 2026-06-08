@@ -42,8 +42,8 @@ namespace hf {
                     const Payload & payload,
                     const uint8_t payloadSize) 
                 :
-                    _payload(payload),
-                    _payloadSize(payloadSize) {}
+                    payload_(payload),
+                    payload_size_(payloadSize) {}
 
             static auto serializeFloats(
                     const MspSerializer & serializer,
@@ -69,20 +69,20 @@ namespace hf {
             static auto payloadBytes(
                     const MspSerializer & serializer) -> uint8_t *
             {
-                return (uint8_t *)serializer._payload.data();
+                return (uint8_t *)serializer.payload_.data();
             }
 
             static auto payloadSize(
                     const MspSerializer & serializer) -> uint8_t
             {
-                return serializer._payloadSize;
+                return serializer.payload_size_;
             }
 
         private:
 
-            Payload _payload;
+            Payload payload_;
 
-            uint8_t _payloadSize;
+            uint8_t payload_size_;
 
             static void serialize32(
                     const uint8_t k,

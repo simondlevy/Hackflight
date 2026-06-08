@@ -36,10 +36,10 @@ namespace hf {
             ClimbRateController() = default;
 
             ClimbRateController(const ClimbRateController & a) 
-                : output(a.output), _integral(a._integral) {}
+                : output(a.output), integral_(a.integral_) {}
 
             ClimbRateController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             ClimbRateController& operator=(const ClimbRateController&) = default;
 
@@ -57,7 +57,7 @@ namespace hf {
                 const auto error = target - dz;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(controller._integral + error * dt,
+                    Num::fconstrain(controller.integral_ + error * dt,
                             ILIMIT) : 0;
 
                 const auto thrust = KP * error + KI * integral;
@@ -71,6 +71,6 @@ namespace hf {
 
         private:
 
-            float _integral;
+            float integral_;
     };
 }

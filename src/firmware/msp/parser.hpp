@@ -15,7 +15,7 @@
    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
    more details.
 
-   You should have received a copy of the GNU General Public License along with
+   You should have received_ a copy of the GNU General Public License along with
    Hackflight. If not, see <https://www.gnu.org/licenses/>.
  */
 
@@ -42,74 +42,74 @@ namespace hf {
                     const uint8_t b) -> MspParser
             {
 
-                const auto state = 
-                    p.state == 0 && b == '$' ? 1 :
-                    p.state == 1 && b == 'M' ? 2 :
-                    p.state == 1 ? 0 :
-                    p.state == 2 ? 3 :
-                    p.state == 3 ? 4 :
-                    p.state == 4 && p.expected > 0 ? 5 :
-                    p.state == 4 ? 6 :
-                    p.state == 5 && (p.received >= p.expected) ? 6 :
-                    p.state == 6 ? 0 :
-                    p.state;
+                const auto state_ = 
+                    p.state_ == 0 && b == '$' ? 1 :
+                    p.state_ == 1 && b == 'M' ? 2 :
+                    p.state_ == 1 ? 0 :
+                    p.state_ == 2 ? 3 :
+                    p.state_ == 3 ? 4 :
+                    p.state_ == 4 && p.expected_ > 0 ? 5 :
+                    p.state_ == 4 ? 6 :
+                    p.state_ == 5 && (p.received_ >= p.expected_) ? 6 :
+                    p.state_ == 6 ? 0 :
+                    p.state_;
 
-                const auto expected = p.state == 3 ? b : p.expected;
+                const auto expected_ = p.state_ == 3 ? b : p.expected_;
 
-                const auto checksum = p.state == 3 ? b : p.checksum ^ b;
+                const auto checksum_ = p.state_ == 3 ? b : p.checksum_ ^ b;
 
-                const auto received = p.state == 5 ? p.received + 1 : 0;
+                const auto received_ = p.state_ == 5 ? p.received_ + 1 : 0;
 
-                const auto id = p.state == 4 ? b : p.id;
+                const auto id = p.state_ == 4 ? b : p.id_;
 
-                const auto index =
-                    p.state == 3 ? 0 :
-                    p.state == 5 ? p.index + 1 :
-                    p.index;
+                const auto index_ =
+                    p.state_ == 3 ? 0 :
+                    p.state_ == 5 ? p.index_ + 1 :
+                    p.index_;
 
-                auto newbuf = p.buffer;
-                newbuf[p.index] = b;
-                const auto buffer = p.state == 5 ? newbuf : p.buffer;
+                auto newbuf = p.buffer_;
+                newbuf[p.index_] = b;
+                const auto buffer_ = p.state_ == 5 ? newbuf : p.buffer_;
 
-                return MspParser(state, buffer, expected, received, checksum,
-                        index, id);
+                return MspParser(state_, buffer_, expected_, received_, checksum_,
+                        index_, id);
             }
 
             static auto getid(const MspParser & p) -> uint8_t
             {
-                return p.id;
+                return p.id_;
             }
 
             static auto getFloat(const MspParser & p,
-                    const uint8_t index) -> float
+                    const uint8_t index_) -> float
             {
-                const uint8_t offset = 4 * index;
+                const uint8_t offset = 4 * index_;
                 uint32_t tmp = (uint32_t) (
-                        p.buffer[offset+3] << 24 |
-                        p.buffer[offset+2] << 16 |
-                        p.buffer[offset+1] << 8 |
-                        p.buffer[offset]);
+                        p.buffer_[offset+3] << 24 |
+                        p.buffer_[offset+2] << 16 |
+                        p.buffer_[offset+1] << 8 |
+                        p.buffer_[offset]);
                 float value = 0;
                 memcpy(&value, &tmp, 4);
                 return value;
             }
 
             static auto getUshort(const MspParser & p,
-                    const uint8_t index) -> uint16_t
+                    const uint8_t index_) -> uint16_t
             {
-                const uint8_t offset = 2 * index;
-                return (p.buffer[offset+1] << 8) | p.buffer[offset];
+                const uint8_t offset = 2 * index_;
+                return (p.buffer_[offset+1] << 8) | p.buffer_[offset];
             }
 
         private:
 
-            uint8_t state;
-            Buffer buffer;
-            uint8_t expected;
-            uint8_t received;
-            uint8_t checksum;
-            uint8_t index;
-            uint8_t id;
+            uint8_t state_;
+            Buffer buffer_;
+            uint8_t expected_;
+            uint8_t received_;
+            uint8_t checksum_;
+            uint8_t index_;
+            uint8_t id_;
 
             MspParser(
                     const uint8_t state,
@@ -120,13 +120,13 @@ namespace hf {
                     const uint8_t index,
                     const uint8_t id)
                 :
-                    state(state),
-                    buffer(buffer),
-                    expected(expected),
-                    received(received),
-                    checksum(checksum),
-                    index(index),
-                    id(id) {}
+                    state_(state),
+                    buffer_(buffer),
+                    expected_(expected),
+                    received_(received),
+                    checksum_(checksum),
+                    index_(index),
+                    id_(id) {}
     };
 
 }

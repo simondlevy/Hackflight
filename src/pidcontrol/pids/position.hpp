@@ -38,10 +38,10 @@ namespace hf {
             PositionController() = default;
 
             PositionController(const PositionController & a) 
-                : output(a.output), _integral(a._integral) {}
+                : output(a.output), integral_(a.integral_) {}
 
             PositionController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             PositionController& operator=(const PositionController&) = default;
 
@@ -59,7 +59,7 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(c._integral + error * dt, ILIMIT) :
+                    Num::fconstrain(c.integral_ + error * dt, ILIMIT) :
                     0;
 
                 const auto output = airborne ?
@@ -71,9 +71,7 @@ namespace hf {
 
         private:
 
-            float _integral;
-
-
+            float integral_;
     };
 
-}
+} // namspace hf

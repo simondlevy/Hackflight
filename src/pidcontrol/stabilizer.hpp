@@ -42,9 +42,9 @@ namespace hf {
                     const YawPid & yaw_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
-                _pitch_pid(pitch_pid),
-                _roll_pid(roll_pid),
-                _yaw_pid(yaw_pid) {}
+                pitch_pid_(pitch_pid),
+                roll_pid_(roll_pid),
+                yaw_pid_(yaw_pid) {}
 
             static auto run(
                     const StabilizerPidController & s,
@@ -53,13 +53,13 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> StabilizerPidController
             {
-                const auto roll_pid = RollPitchPid::run(s._roll_pid,
+                const auto roll_pid = RollPitchPid::run(s.roll_pid_,
                         dt, airborne, setpoint_in.roll, state.phi, state.dphi);
 
-                const auto pitch_pid = RollPitchPid::run(s._pitch_pid,
+                const auto pitch_pid = RollPitchPid::run(s.pitch_pid_,
                         dt, airborne, setpoint_in.pitch, state.theta, state.dtheta);
 
-                const auto yaw_pid = YawPid::run(s._yaw_pid,
+                const auto yaw_pid = YawPid::run(s.yaw_pid_,
                         dt, airborne, setpoint_in.yaw * YAW_MAX_DPS, state.dpsi);
 
                 const auto setpoint_out = Setpoint(
@@ -74,8 +74,8 @@ namespace hf {
 
         private:
 
-            RollPitchPid _pitch_pid;
-            RollPitchPid _roll_pid;
-            YawPid _yaw_pid;
+            RollPitchPid pitch_pid_;
+            RollPitchPid roll_pid_;
+            YawPid yaw_pid_;
     };
 }
