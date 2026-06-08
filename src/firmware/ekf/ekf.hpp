@@ -132,7 +132,7 @@ namespace hf {
                     const ThreeAxis & gyro_latest,
                     const ThreeAxisSubSampler & accel_subsampler,
                     const ThreeAxisSubSampler & gyro_subsampler,
-                    const Rotation & rmatrix,
+                    const Rotation & r,
                     const bool did_update_with_float_deck,
                     const ZRangerFilter & zranger_filter_latest,
                     const OpticalFlowFilter & optical_flow_filter_latest,
@@ -145,7 +145,7 @@ namespace hf {
                     gyro_latest_(gyro_latest),
                     accel_subsampler_(accel_subsampler),
                     gyro_subsampler_(gyro_subsampler),
-                    rmatrix(rmatrix),
+                    r_(r),
                     did_update_with_float_deck(did_update_with_float_deck),
                     zranger_filter_latest(zranger_filter_latest),
                     optical_flow_filter_latest(optical_flow_filter_latest),
@@ -168,7 +168,7 @@ namespace hf {
                 const auto gyro = gyro_subsampler.sub_sample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.rmatrix);
+                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.r_);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
                 const auto P = dot(dot(F, ekf.core.p), trans(F));
@@ -193,17 +193,17 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 auto x = Vector();
-                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.rmatrix.zx * dx + ekf.rmatrix.zy * dy +
-                    ekf.rmatrix.zz * dz - GRAVITY * dt2 / 2;
+                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.r_.zx * dx + ekf.r_.zy * dy +
+                    ekf.r_.zz * dz - GRAVITY * dt2 / 2;
 
                 x[STATE_VX] = ekf.core.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
-                        gyro.y * tmpSPZ - GRAVITY * ekf.rmatrix.zx);
+                        gyro.y * tmpSPZ - GRAVITY * ekf.r_.zx);
 
                 x[STATE_VY] = ekf.core.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
-                        gyro.x * tmpSPZ - GRAVITY * ekf.rmatrix.zy);
+                        gyro.x * tmpSPZ - GRAVITY * ekf.r_.zy);
 
                 x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
-                        gyro.x * tmpSPY - GRAVITY * ekf.rmatrix.zz);
+                        gyro.x * tmpSPY - GRAVITY * ekf.r_.zz);
 
                 x[STATE_D0] = ekf.core.x[STATE_D0];
                 x[STATE_D1] = ekf.core.x[STATE_D1];
@@ -234,7 +234,7 @@ namespace hf {
                         ekf.gyro_latest_,
                         accel_subsampler,
                         gyro_subsampler,
-                        ekf.rmatrix,
+                        ekf.r_,
                         ekf.did_update_with_float_deck,
                         ekf.zranger_filter_latest,
                         ekf.optical_flow_filter_latest,
@@ -275,7 +275,7 @@ namespace hf {
 
                 const auto gyro_latest = imudata.gyro_dps;
 
-                const auto rzz = ekf.rmatrix.zz;
+                const auto rzz = ekf.r_.zz;
 
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
@@ -330,7 +330,7 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) :
                         
-                        ekf.rmatrix;
+                        ekf.r_;
 
                 const auto core = ready ? Core(x, p) : core_with_range_and_flow;
 
@@ -361,7 +361,7 @@ namespace hf {
                         ekf.gyro_latest_,
                         ekf.accel_subsampler_,
                         ekf.gyro_subsampler_,
-                        ekf.rmatrix,
+                        ekf.r_,
                         true, // did_update_with_float_deck,
                         zrfilter,
                         offilter,
@@ -375,22 +375,22 @@ namespace hf {
                 const auto x = ekf.core.x;
 
                 const auto dx =
-                    ekf.rmatrix.xx*x[STATE_VX] +
-                    ekf.rmatrix.xy*x[STATE_VY] +
-                    ekf.rmatrix.xz*x[STATE_VZ];
+                    ekf.r_.xx*x[STATE_VX] +
+                    ekf.r_.xy*x[STATE_VY] +
+                    ekf.r_.xz*x[STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf.rmatrix.yx*x[STATE_VX] +
-                        ekf.rmatrix.yy*x[STATE_VY] +
-                        ekf.rmatrix.yz*x[STATE_VZ]); 
+                        ekf.r_.yx*x[STATE_VX] +
+                        ekf.r_.yy*x[STATE_VY] +
+                        ekf.r_.yz*x[STATE_VZ]); 
 
                 const auto z = x[STATE_Z];
 
                 const auto dz =
-                    ekf.rmatrix.zx*x[STATE_VX] +
-                    ekf.rmatrix.zy*x[STATE_VY] +
-                    ekf.rmatrix.zz*x[STATE_VZ];
+                    ekf.r_.zx*x[STATE_VX] +
+                    ekf.r_.zy*x[STATE_VY] +
+                    ekf.r_.zz*x[STATE_VZ];
 
                 const auto q0 = ekf.q_.w;
                 const auto q1 = ekf.q_.x;
@@ -430,7 +430,7 @@ namespace hf {
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Rotation rmatrix;
+            Rotation r_;
 
             bool did_update_with_float_deck;
 
@@ -446,7 +446,7 @@ namespace hf {
                     const float dt,
                     const ThreeAxis & gyro,
                     const Vector x,
-                    const Rotation & rmatrix) -> Matrix
+                    const Rotation & r) -> Matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -458,66 +458,66 @@ namespace hf {
 
                 const auto N = STATE_DIM;
 
-                auto fmatrix = Matrix();
+                auto f = Matrix();
 
                 // position
-                fmatrix[STATE_Z*N+STATE_Z] = 1;
-                fmatrix[STATE_Z*N+STATE_VX] = rmatrix.zx*dt;
-                fmatrix[STATE_Z*N+STATE_VY] = rmatrix.zy*dt;
-                fmatrix[STATE_Z*N+STATE_VZ] = rmatrix.zz*dt;
-                fmatrix[STATE_Z*N+STATE_D0] = (vy*rmatrix.zz - vz*rmatrix.zy)*dt;
-                fmatrix[STATE_Z*N+STATE_D1] = (-vx*rmatrix.zz + vz*rmatrix.zx)*dt;
-                fmatrix[STATE_Z*N+STATE_D2] = (vx*rmatrix.zy - vy*rmatrix.zx)*dt;
+                f[STATE_Z*N+STATE_Z] = 1;
+                f[STATE_Z*N+STATE_VX] = r.zx*dt;
+                f[STATE_Z*N+STATE_VY] = r.zy*dt;
+                f[STATE_Z*N+STATE_VZ] = r.zz*dt;
+                f[STATE_Z*N+STATE_D0] = (vy*r.zz - vz*r.zy)*dt;
+                f[STATE_Z*N+STATE_D1] = (-vx*r.zz + vz*r.zx)*dt;
+                f[STATE_Z*N+STATE_D2] = (vx*r.zy - vy*r.zx)*dt;
 
-                fmatrix[STATE_VX*N+STATE_Z] = 0; 
-                fmatrix[STATE_VX*N+STATE_VX] = 1; 
-                fmatrix[STATE_VX*N+STATE_VY] = gyro.z*dt;
-                fmatrix[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
-                fmatrix[STATE_VX*N+STATE_D0] =  0;
-                fmatrix[STATE_VX*N+STATE_D1] =  GRAVITY*rmatrix.zz*dt;
-                fmatrix[STATE_VX*N+STATE_D2] = -GRAVITY*rmatrix.zy*dt;
+                f[STATE_VX*N+STATE_Z] = 0; 
+                f[STATE_VX*N+STATE_VX] = 1; 
+                f[STATE_VX*N+STATE_VY] = gyro.z*dt;
+                f[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
+                f[STATE_VX*N+STATE_D0] =  0;
+                f[STATE_VX*N+STATE_D1] =  GRAVITY*r.zz*dt;
+                f[STATE_VX*N+STATE_D2] = -GRAVITY*r.zy*dt;
 
-                fmatrix[STATE_VY*N+STATE_Z] = 0; 
-                fmatrix[STATE_VY*N+STATE_VX] =-gyro.z*dt;
-                fmatrix[STATE_VY*N+STATE_VY] = 1; 
-                fmatrix[STATE_VY*N+STATE_VZ] = gyro.x*dt;
-                fmatrix[STATE_VY*N+STATE_D0] = -GRAVITY*rmatrix.zz*dt;
-                fmatrix[STATE_VY*N+STATE_D1] =  0;
-                fmatrix[STATE_VY*N+STATE_D2] =  GRAVITY*rmatrix.zx*dt;
+                f[STATE_VY*N+STATE_Z] = 0; 
+                f[STATE_VY*N+STATE_VX] =-gyro.z*dt;
+                f[STATE_VY*N+STATE_VY] = 1; 
+                f[STATE_VY*N+STATE_VZ] = gyro.x*dt;
+                f[STATE_VY*N+STATE_D0] = -GRAVITY*r.zz*dt;
+                f[STATE_VY*N+STATE_D1] =  0;
+                f[STATE_VY*N+STATE_D2] =  GRAVITY*r.zx*dt;
 
-                fmatrix[STATE_VZ*N+STATE_Z] = 0; 
-                fmatrix[STATE_VZ*N+STATE_VX] = gyro.y*dt;
-                fmatrix[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
-                fmatrix[STATE_VZ*N+STATE_VZ] = 1; 
-                fmatrix[STATE_VZ*N+STATE_D0] =  GRAVITY*rmatrix.zy*dt;
-                fmatrix[STATE_VZ*N+STATE_D1] = -GRAVITY*rmatrix.zx*dt;
-                fmatrix[STATE_VZ*N+STATE_D2] =  0;
+                f[STATE_VZ*N+STATE_Z] = 0; 
+                f[STATE_VZ*N+STATE_VX] = gyro.y*dt;
+                f[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
+                f[STATE_VZ*N+STATE_VZ] = 1; 
+                f[STATE_VZ*N+STATE_D0] =  GRAVITY*r.zy*dt;
+                f[STATE_VZ*N+STATE_D1] = -GRAVITY*r.zx*dt;
+                f[STATE_VZ*N+STATE_D2] =  0;
 
-                fmatrix[STATE_D0*N+STATE_Z] = 0; 
-                fmatrix[STATE_D0*N+STATE_VX] = 0; 
-                fmatrix[STATE_D0*N+STATE_VX] = 0; 
-                fmatrix[STATE_D0*N+STATE_VZ] = 0; 
-                fmatrix[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                fmatrix[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
-                fmatrix[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
+                f[STATE_D0*N+STATE_Z] = 0; 
+                f[STATE_D0*N+STATE_VX] = 0; 
+                f[STATE_D0*N+STATE_VX] = 0; 
+                f[STATE_D0*N+STATE_VZ] = 0; 
+                f[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                f[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
+                f[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
 
-                fmatrix[STATE_D1*N+STATE_Z] = 0; 
-                fmatrix[STATE_D1*N+STATE_VX] = 0; 
-                fmatrix[STATE_D1*N+STATE_VX] = 0; 
-                fmatrix[STATE_D1*N+STATE_VZ] = 0; 
-                fmatrix[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
-                fmatrix[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                fmatrix[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
+                f[STATE_D1*N+STATE_Z] = 0; 
+                f[STATE_D1*N+STATE_VX] = 0; 
+                f[STATE_D1*N+STATE_VX] = 0; 
+                f[STATE_D1*N+STATE_VZ] = 0; 
+                f[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
+                f[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                f[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
 
-                fmatrix[STATE_D2*N+STATE_Z] = 0; 
-                fmatrix[STATE_D2*N+STATE_VX] = 0; 
-                fmatrix[STATE_D2*N+STATE_VX] = 0; 
-                fmatrix[STATE_D2*N+STATE_VZ] = 0; 
-                fmatrix[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
-                fmatrix[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
-                fmatrix[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                f[STATE_D2*N+STATE_Z] = 0; 
+                f[STATE_D2*N+STATE_VX] = 0; 
+                f[STATE_D2*N+STATE_VX] = 0; 
+                f[STATE_D2*N+STATE_VZ] = 0; 
+                f[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
+                f[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
+                f[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                return fmatrix;
+                return f;
             }
 
             static auto updateWithFlow(
