@@ -29,13 +29,13 @@ namespace hf {
 
         private:
 
-            static constexpr float FREQ = 100;
+            static constexpr float kReportingRate = 100;
 
             class Helper {
 
                 private:
 
-                    Timer timer_ = Timer(FREQ);
+                    Timer timer_ = Timer(kReportingRate);
 
                 public:
 

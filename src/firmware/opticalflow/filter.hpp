@@ -25,8 +25,8 @@ namespace hf {
 
         private:
 
-            static constexpr int16_t OUTLIER_LIMIT = 100;
-            static constexpr float FLOW_STD_FIXED = 2.0;
+            static constexpr int16_t kOutlierLimit = 100;
+            static constexpr float kStandardDeviationFixed = 2.0;
 
         public:
 
@@ -78,8 +78,8 @@ namespace hf {
                             usec_curr,      // usec_prev
                             (float)accpx,   // dpixelx
                             (float)accpy,   // dpixely
-                            FLOW_STD_FIXED, // std_dev_x
-                            FLOW_STD_FIXED, // std_dev_y
+                            kStandardDeviationFixed, 
+                            kStandardDeviationFixed, 
                             (float)(usec_curr - filter.usec_prev) / 1e6 // dt
                             ) :
                     filter;
@@ -89,7 +89,7 @@ namespace hf {
 
             static auto IsInLimit(const int16_t accval) -> bool
             {
-                return abs(accval) < OUTLIER_LIMIT;
+                return abs(accval) < kOutlierLimit;
             }
 
     };

@@ -34,33 +34,33 @@ namespace hf {
 
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
-            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+            static constexpr float kStdevInitialPositionZ = 1;
+            static constexpr float kStdevInitialVelocity = 0.01;
+            static constexpr float kStdevInitialAttitudeRollPitch = 0.01;
+            static constexpr float kStdevInitialAttitudeYaw = 0.01;
 
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
-            static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
-            static constexpr float PROC_NOISE_VEL = 0;
-            static constexpr float PROC_NOISE_POS = 0;
-            static constexpr float PROC_NOISE_ATT = 0;
-            static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
-            static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
+            static constexpr float kProcessNoiseAccelXy = 0.5f;
+            static constexpr float kProcessNoiseAccelZ = 1.0f;
+            static constexpr float kProcessNoiseVelocity = 0;
+            static constexpr float kProcessNoisePosition = 0;
+            static constexpr float kProcessNoiseAttitude = 0;
+            static constexpr float kMeasurementNoiseGyroRollPitch = 0.1f; // radians per second
+            static constexpr float kMeasurementNoiseGyroYaw = 0.1f;       // radians per second
 
-            static constexpr float GRAVITY = 9.81;
+            static constexpr float kGravity = 9.81;
 
             //We do get the measurements in 10x the motion pixels (experimentally measured)
-            static constexpr float FLOW_RESOLUTION = 0.1;
+            static constexpr float kFlowResolution = 0.1;
 
             // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
-            static constexpr float MAX_COVARIANCE = 100;
-            static constexpr float MIN_COVARIANCE = 1e-6;
+            static constexpr float MaxCovariance = 100;
+            static constexpr float MinCovariance = 1e-6;
 
             // the reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
+            static constexpr float kRollPitchZeroReversion = 0.001;
 
-            static constexpr float MIN_ANGLE = 1e-4;
-            static constexpr float MAX_ANGLE = 10;
+            static constexpr float MinAngle = 1e-4;
+            static constexpr float MaxAngle = 10;
 
             // Indexes to acceless the vehicle's state, stored as a column vector
             enum
@@ -108,13 +108,13 @@ namespace hf {
                 // Add in the initial process noise 
                 const float pinit[kStateDim] = {
 
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
+                    kStdevInitialPositionZ,
+                    kStdevInitialVelocity,
+                    kStdevInitialVelocity,
+                    kStdevInitialVelocity,
+                    kStdevInitialAttitudeRollPitch,
+                    kStdevInitialAttitudeRollPitch,
+                    kStdevInitialAttitudeYaw
                 };
 
                 core.p = AddCovarianceNoise(Matrix(), pinit);
@@ -194,16 +194,16 @@ namespace hf {
                 // - gravity in body frame
                 auto x = Vector();
                 x[kStateZ] = ekf.core.x[kStateZ] + ekf.r_.zx * dx + ekf.r_.zy * dy +
-                    ekf.r_.zz * dz - GRAVITY * dt2 / 2;
+                    ekf.r_.zz * dz - kGravity * dt2 / 2;
 
                 x[kStateVx] = ekf.core.x[kStateVx] + dt * (accelx + gyro.z * tmpSPY -
-                        gyro.y * tmpSPZ - GRAVITY * ekf.r_.zx);
+                        gyro.y * tmpSPZ - kGravity * ekf.r_.zx);
 
                 x[kStateVy] = ekf.core.x[kStateVy] + dt * (accely - gyro.z * tmpSPX +
-                        gyro.x * tmpSPZ - GRAVITY * ekf.r_.zy);
+                        gyro.x * tmpSPZ - kGravity * ekf.r_.zy);
 
                 x[kStateVz] = ekf.core.x[kStateVz] + dt * (accel.z + gyro.y * tmpSPX -
-                        gyro.x * tmpSPY - GRAVITY * ekf.r_.zz);
+                        gyro.x * tmpSPY - kGravity * ekf.r_.zz);
 
                 x[kStateD0] = ekf.core.x[kStateD0];
                 x[kStateD1] = ekf.core.x[kStateD1];
@@ -216,11 +216,11 @@ namespace hf {
                 // compute the quaternion values in [w,x,y,z] order
                 auto tmpq = Rotate(dtw, ekf.q_);
 
-                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                const auto keep = 1.0f - kRollPitchZeroReversion;
 
                 const auto newtmpq = isFlying ? tmpq : 
                     Quaternion(
-                            tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION,
+                            tmpq.w = keep * tmpq.w + kRollPitchZeroReversion,
                             tmpq.x = keep * tmpq.x, 
                             tmpq.y = keep * tmpq.y, 
                             tmpq.z = keep * tmpq.z); 
@@ -255,13 +255,14 @@ namespace hf {
                 const auto dtpositive = dt > 0;
 
                 const float noise[kStateDim] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                    kProcessNoiseAccelZ*dt*dt + kProcessNoiseVelocity*dt +
+                        kProcessNoisePosition,
+                    kProcessNoiseAccelXy*dt + kProcessNoiseVelocity,
+                    kProcessNoiseAccelXy*dt + kProcessNoiseVelocity,
+                    kProcessNoiseAccelZ*dt + kProcessNoiseVelocity,
+                    kMeasurementNoiseGyroRollPitch * dt + kProcessNoiseAttitude,
+                    kMeasurementNoiseGyroRollPitch * dt + kProcessNoiseAttitude,
+                    kMeasurementNoiseGyroYaw * dt + kProcessNoiseAttitude
                 };
 
                 const auto last_process_noise_update_msec_ =
@@ -429,7 +430,7 @@ namespace hf {
 
             ThreeAxis gyro_latest_;
 
-            ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(GRAVITY);
+            ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(kGravity);
             ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::kDeg2Rad);
 
             bool did_update_with_flow_deck_;
@@ -474,23 +475,23 @@ namespace hf {
                 f[kStateVx*N+kStateVy] = gyro.z*dt;
                 f[kStateVx*N+kStateVz] =-gyro.y*dt;
                 f[kStateVx*N+kStateD0] =  0;
-                f[kStateVx*N+kStateD1] =  GRAVITY*r.zz*dt;
-                f[kStateVx*N+kStateD2] = -GRAVITY*r.zy*dt;
+                f[kStateVx*N+kStateD1] =  kGravity*r.zz*dt;
+                f[kStateVx*N+kStateD2] = -kGravity*r.zy*dt;
 
                 f[kStateVy*N+kStateZ] = 0; 
                 f[kStateVy*N+kStateVx] =-gyro.z*dt;
                 f[kStateVy*N+kStateVy] = 1; 
                 f[kStateVy*N+kStateVz] = gyro.x*dt;
-                f[kStateVy*N+kStateD0] = -GRAVITY*r.zz*dt;
+                f[kStateVy*N+kStateD0] = -kGravity*r.zz*dt;
                 f[kStateVy*N+kStateD1] =  0;
-                f[kStateVy*N+kStateD2] =  GRAVITY*r.zx*dt;
+                f[kStateVy*N+kStateD2] =  kGravity*r.zx*dt;
 
                 f[kStateVz*N+kStateZ] = 0; 
                 f[kStateVz*N+kStateVx] = gyro.y*dt;
                 f[kStateVz*N+kStateVy] =-gyro.x*dt;
                 f[kStateVz*N+kStateVz] = 1; 
-                f[kStateVz*N+kStateD0] =  GRAVITY*r.zy*dt;
-                f[kStateVz*N+kStateD1] = -GRAVITY*r.zx*dt;
+                f[kStateVz*N+kStateD0] =  kGravity*r.zy*dt;
+                f[kStateVz*N+kStateD1] = -kGravity*r.zx*dt;
                 f[kStateVz*N+kStateD2] =  0;
 
                 f[kStateD0*N+kStateZ] = 0; 
@@ -583,7 +584,7 @@ namespace hf {
                 const auto predicted_n = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
 
-                const auto measured_n = dpixel*FLOW_RESOLUTION;
+                const auto measured_n = dpixel*kFlowResolution;
 
                 h[kStateZ] = (Npix * dt / thetapix) * 
                     ((r22 * dg) / (-z_g * z_g));
@@ -591,7 +592,7 @@ namespace hf {
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
                 return UpdateWithScalar(core, h, measured_n-predicted_n,
-                        stdev*FLOW_RESOLUTION);
+                        stdev*kFlowResolution);
             }
 
             static auto UpdateWithScalar(
@@ -646,7 +647,7 @@ namespace hf {
                         // add measurement noise
                         p[i*kStateDim+j] = p[j*kStateDim+i] =
                             GetPval(i, j, 0.5*p[i*kStateDim+j] + 0.5*p[j*kStateDim+i] + v,
-                                    MIN_COVARIANCE, MAX_COVARIANCE); 
+                                    MinCovariance, MaxCovariance); 
                     }
                 }
 
@@ -664,7 +665,7 @@ namespace hf {
                         Pnew[i*kStateDim+j] = Pnew[j*kStateDim+i] =
                             GetPval(i, j,
                                     0.5*P[i*kStateDim+j] + 0.5*P[j*kStateDim+i],
-                                    MIN_COVARIANCE, MAX_COVARIANCE);
+                                    MinCovariance, MaxCovariance);
                     }
                 }
 
@@ -695,12 +696,12 @@ namespace hf {
 
             static auto IsBigEnough(const float v) -> bool
             {
-                return fabsf(v) > MIN_ANGLE;
+                return fabsf(v) > MinAngle;
             }
 
             static auto IsSmallEnough(const float v) -> bool
             {
-                return fabsf(v) < MAX_ANGLE;
+                return fabsf(v) < MaxAngle;
             }
 
             // C = x * y

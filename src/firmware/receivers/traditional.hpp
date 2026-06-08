@@ -26,7 +26,7 @@ namespace hf {
 
         private:
 
-            static constexpr float THROTTLE_DOWN_MAX = -0.95;
+            static constexpr float kThrottleDownMax = -0.95;
 
         public:
 
@@ -68,7 +68,7 @@ namespace hf {
                         scale(yaw));
 
                 const auto is_throttle_down = setpoint.thrust <
-                    THROTTLE_DOWN_MAX;
+                    kThrottleDownMax;
 
                 const auto safe_to_arm = require_throttle_down_to_arm ? 
                     is_throttle_down : true;
