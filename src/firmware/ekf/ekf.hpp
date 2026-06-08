@@ -75,29 +75,29 @@ namespace hf {
                 STATE_DIM
             };
 
-            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+            typedef std::array<float, STATE_DIM*STATE_DIM> Matrix;
 
-            typedef std::array<float, STATE_DIM> vector;
+            typedef std::array<float, STATE_DIM> Vector;
 
-            class FC {
+            class Core {
 
                 public:
 
                     // State vector
-                    vector x;
+                    Vector x;
 
                     // Covariance matrix
-                    matrix p;
+                    Matrix p;
 
-                    FC() = default;
+                    Core() = default;
 
-                    FC& operator=(const FC& other) = default;
+                    Core& operator=(const Core& other) = default;
 
-                    FC(const vector & x, const matrix & p) 
+                    Core(const Vector & x, const Matrix & p) 
                         : x(x), p(p) {}
             };
 
-            FC core;
+            Core core;
 
         public:
 
@@ -117,7 +117,7 @@ namespace hf {
                     STDEV_INITIAL_ATTITUDE_YAW
                 };
 
-                core.p = addCovarianceNoise(matrix(), pinit);
+                core.p = addCovarianceNoise(Matrix(), pinit);
 
                 did_update_with_float_deck = false;
                 last_process_noise_update_msec = 0;
@@ -127,7 +127,7 @@ namespace hf {
             }
 
             EKF(
-                    const FC & core,
+                    const Core & core,
                     const Quaternion & q,
                     const ThreeAxis & gyro_latest,
                     const ThreeAxisSubSampler & accel_subsampler,
@@ -192,7 +192,7 @@ namespace hf {
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                auto x = vector();
+                auto x = Vector();
                 x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.rmatrix.zx * dx + ekf.rmatrix.zy * dy +
                     ekf.rmatrix.zz * dz - GRAVITY * dt2 / 2;
 
@@ -229,7 +229,7 @@ namespace hf {
                 const auto q = newtmpq / Quaternion::l2norm(newtmpq);
 
                 return EKF(
-                        FC(x, P),
+                        Core(x, P),
                         q,
                         ekf.gyro_latest,
                         accel_subsampler,
@@ -280,7 +280,7 @@ namespace hf {
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
                 const auto coreWithNoise = dtpositive ?
-                    FC(ekf.core.x, 
+                    Core(ekf.core.x, 
                             enforceSymmetry(addCovarianceNoise(ekf.core.p, noise))) :
                     ekf.core;
 
@@ -301,7 +301,7 @@ namespace hf {
                         ekf.core.x[STATE_D0], ekf.core.x[STATE_D1], ekf.core.x[STATE_D2]);
 
                 // reset the attitude error
-                const auto x = vector{
+                const auto x = Vector{
                     core_with_range_and_flow.x[0],
                     core_with_range_and_flow.x[1],
                     core_with_range_and_flow.x[2],
@@ -329,7 +329,7 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.rmatrix;
 
-                const auto core = ready ? FC(x, p) : core_with_range_and_flow;
+                const auto core = ready ? Core(x, p) : core_with_range_and_flow;
 
                 return EKF(
                         core,
@@ -442,8 +442,8 @@ namespace hf {
             static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const vector x,
-                    const Rotation & rmatrix) -> matrix
+                    const Vector x,
+                    const Rotation & rmatrix) -> Matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -455,7 +455,7 @@ namespace hf {
 
                 const auto N = STATE_DIM;
 
-                auto fmatrix = matrix();
+                auto fmatrix = Matrix();
 
                 // position
                 fmatrix[STATE_Z*N+STATE_Z] = 1;
@@ -518,9 +518,9 @@ namespace hf {
             }
 
             static auto updateWithFlow(
-                    const FC & core,
+                    const Core & core,
                     const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro, const float r22) -> FC
+                    const ThreeAxis & gyro, const float r22) -> Core
             {
                 const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
                         offilter.dpixelx, offilter.std_dev_x, STATE_VX, gyro.y);
@@ -530,9 +530,9 @@ namespace hf {
             }
 
             static auto updateWithRange(
-                    const FC & core,
+                    const Core & core,
                     const ZRangerFilter & zrfilter,
-                    const float rzz) -> FC
+                    const float rzz) -> Core
             {
 
                 const auto angle = max(0, fabsf(acosf(rzz)) -
@@ -542,7 +542,7 @@ namespace hf {
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
-                const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
+                const Vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
                 return updateWithScalar(core, h,
                         measured_distance-predicted_distance,
@@ -550,13 +550,13 @@ namespace hf {
             }
 
             static auto updateWithFlowAxis(
-                    const FC & core,
+                    const Core & core,
                     const float dt,
                     const float r22,
                     const float dpixel,
                     const float stdev,
                     const uint8_t state_index,
-                    const float gyroval) -> FC
+                    const float gyroval) -> Core
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
@@ -575,7 +575,7 @@ namespace hf {
 
                 const auto omegab = gyroval * Num::DEG2RAD;
 
-                vector h = {0, 0, 0, 0, 0, 0, 0};
+                Vector h = {0, 0, 0, 0, 0, 0, 0};
 
                 const auto predicted_n = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
@@ -592,10 +592,10 @@ namespace hf {
             }
 
             static auto updateWithScalar(
-                    const FC & core,
-                    const vector & h,
+                    const Core & core,
+                    const Vector & h,
                     const float error,
-                    const float std_meas_noise) -> FC
+                    const float std_meas_noise) -> Core
             {
                 const auto r = std_meas_noise*std_meas_noise;
 
@@ -606,7 +606,7 @@ namespace hf {
                     hphr += h[i] * pht[i]; 
                 }
 
-                vector g;
+                Vector g;
                 for (size_t i=0; i<STATE_DIM; i++) {
                     g[i] = pht[i]/hphr; // kalman gain = (PH' (HPH' + R )^-1)
                 }
@@ -628,7 +628,7 @@ namespace hf {
                 auto p = dot(gh_i_p, gh_i);
 
                 // State update
-                auto x = vector();
+                auto x = Vector();
                 for (int i=0; i<STATE_DIM; i++) {
                     x[i] = core.x[i] + g[i] * error; 
                 }
@@ -647,10 +647,10 @@ namespace hf {
                     }
                 }
 
-                return FC(x, p);
+                return Core(x, p);
             }
 
-            static auto enforceSymmetry(const matrix & P) -> matrix
+            static auto enforceSymmetry(const Matrix & P) -> Matrix
             {
                 auto Pnew = P;
 
@@ -668,8 +668,8 @@ namespace hf {
                 return Pnew;
             }
 
-            static auto addCovarianceNoise(const matrix & P,
-                    const float * noise) -> matrix
+            static auto addCovarianceNoise(const Matrix & P,
+                    const float * noise) -> Matrix
             {
                 auto Pnew = P;
 
@@ -691,9 +691,9 @@ namespace hf {
             }
 
             // C = x * y
-            static auto outer(const vector & x, const vector & y) -> matrix
+            static auto outer(const Vector & x, const Vector & y) -> Matrix
             {
-                auto C = matrix();
+                auto C = Matrix();
 
                 for (size_t i=0; i<STATE_DIM; i++) {
                     for (size_t j=0; j<STATE_DIM; j++) {
@@ -705,9 +705,9 @@ namespace hf {
             }
 
             // At = A^T
-            static auto trans(const matrix & a) -> matrix
+            static auto trans(const Matrix & a) -> Matrix
             {
-                auto at = matrix();
+                auto at = Matrix();
 
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
@@ -719,9 +719,9 @@ namespace hf {
             }
 
             // C = A * B
-            static auto dot(const matrix & a, const matrix & b) -> matrix
+            static auto dot(const Matrix & a, const Matrix & b) -> Matrix
             {
-                auto c = matrix();
+                auto c = Matrix();
 
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
@@ -736,9 +736,9 @@ namespace hf {
             }
 
             // y = A * x
-            static auto dot(const matrix & a, const vector & x) -> vector
+            static auto dot(const Matrix & a, const Vector & x) -> Vector
             {
-                vector y = vector();
+                auto y = Vector();
 
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 

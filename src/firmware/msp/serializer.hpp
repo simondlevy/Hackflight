@@ -30,7 +30,7 @@ namespace hf {
 
         private:
 
-            typedef std::array<uint8_t, 256> payload_t;
+            typedef std::array<uint8_t, 256> Payload;
 
         public:
 
@@ -39,7 +39,7 @@ namespace hf {
             MspSerializer& operator=(const MspSerializer& other) = default;
 
             MspSerializer(
-                    const payload_t & payload,
+                    const Payload & payload,
                     const uint8_t payloadSize) 
                 :
                     _payload(payload),
@@ -51,7 +51,7 @@ namespace hf {
                     const float src[],
                     const uint8_t count)
             {
-                payload_t payload = {};
+                Payload payload = {};
 
                 uint8_t checksum = 0;
 
@@ -80,14 +80,14 @@ namespace hf {
 
         private:
 
-            payload_t _payload;
+            Payload _payload;
 
             uint8_t _payloadSize;
 
             static void serialize32(
                     const uint8_t k,
                     const int32_t a,
-                    payload_t & payload,
+                    Payload & payload,
                     uint8_t & checksum)
             {
                 serialize8(a & 0xFF, k, payload, checksum);
@@ -99,7 +99,7 @@ namespace hf {
             static void serialize8(
                     const uint8_t a,
                     const uint8_t k,
-                    payload_t & payload,
+                    Payload & payload,
                     uint8_t &checksum)
             {
                 payload[k] = a;
@@ -110,7 +110,7 @@ namespace hf {
                     const uint8_t id,
                     const uint8_t count,
                     const uint8_t size,
-                    payload_t & payload,
+                    Payload & payload,
                     uint8_t & checksum)
             {
                 payload[0] = '$';
@@ -125,7 +125,7 @@ namespace hf {
             static void serializeFloat(
                     const int k,
                     const float src,
-                    payload_t & payload,
+                    Payload & payload,
                     uint8_t & checksum)
             {
                 uint32_t a=0;

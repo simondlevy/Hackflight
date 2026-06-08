@@ -32,7 +32,7 @@ namespace hf {
 
         private:
 
-            typedef std::array<uint8_t, 256> buffer_t;
+            typedef std::array<uint8_t, 256> Buffer;
 
         public:
 
@@ -104,7 +104,7 @@ namespace hf {
         private:
 
             uint8_t state;
-            buffer_t buffer;
+            Buffer buffer;
             uint8_t expected;
             uint8_t received;
             uint8_t checksum;
@@ -113,7 +113,7 @@ namespace hf {
 
             MspParser(
                     const uint8_t state,
-                    const buffer_t buffer,
+                    const Buffer buffer,
                     const uint8_t expected,
                     const uint8_t received,
                     const uint8_t checksum,
