@@ -80,16 +80,16 @@ namespace hf {
             {
                 Serial1.begin(115200);
 
-                _imu.begin();
+                imu_.begin();
 
                 pinMode(LED_PIN, OUTPUT); 
 
                 if (use_hover_deck) {
-                    _zranger.begin();
-                    _flow_sensor.begin();
+                    zranger_.begin();
+                    flow_sensor_.begin();
                 }
 
-                _mode = MODE_IDLE;
+                mode_ = MODE_IDLE;
             }
 
             auto update(
@@ -112,12 +112,12 @@ namespace hf {
                         PositionController::MAX_DEMAND_DEG, 
                         rx_setpoint.yaw);
 
-                _stabiilizer_pid = StabilizerPidController::run( _stabiilizer_pid,
-                        _is_flying, getDt(), _state, setpoint);
+                stabilizer_pid_ = StabilizerPidController::run( stabilizer_pid_,
+                        is_flying_, getDt(), state_, setpoint);
 
-                sendTelemetry(_stabiilizer_pid.setpoint);
+                sendTelemetry(stabilizer_pid_.setpoint);
 
-                return _stabiilizer_pid.setpoint;
+                return stabilizer_pid_.setpoint;
             } 
 
             auto update(
@@ -153,24 +153,24 @@ namespace hf {
             void acquireHoverData()
             {
                 // Slower EKF update with range, optical flow
-                if (_hoverDeckTimer.ready()) {
-                    _zrangerFilter = ZRangerFilter::update(
-                            _zrangerFilter, _zranger.read());
-                    _optical_flow_filter = OpticalFlowFilter::update(
-                            _optical_flow_filter,
-                            micros(), _flow_sensor.read());
-                    _ekf = EKF::update(_ekf, _zrangerFilter, _optical_flow_filter);
+                if (hover_deck_timer_.ready()) {
+                    zranger_filter_ = ZRangerFilter::update(
+                            zranger_filter_, zranger_.read());
+                    optical_flow_filter_ = OpticalFlowFilter::update(
+                            optical_flow_filter_,
+                            micros(), flow_sensor_.read());
+                    ekf_ = EKF::update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }
 
             auto isSafeToFly() -> bool
             {
-                return _mode != MODE_PANIC;
+                return mode_ != MODE_PANIC;
             }
 
             auto isArmed() -> bool
             {
-                return _mode != MODE_IDLE;
+                return mode_ != MODE_IDLE;
             }
 
         private:
@@ -265,54 +265,54 @@ namespace hf {
             // Instance variables ---------------------------------------------
 
             // Vehicle state
-            VehicleState _state;
+            VehicleState state_;
 
             // Idle, armed, etc.
-            Mode _mode;
+            Mode mode_;
 
             // Flying status based on motors
-            bool _is_flying;
-            uint32_t _motor_check_msec;
+            bool is_flying_;
+            uint32_t motor_check_msec_;
 
             // Sensor fusion
-            ImuFilter _imu_filter;
-            EKF _ekf;
-            OpticalFlowFilter _optical_flow_filter;
-            ZRangerFilter _zrangerFilter;
+            ImuFilter imu_filter_;
+            EKF ekf_;
+            OpticalFlowFilter optical_flow_filter_;
+            ZRangerFilter zranger_filter_;
 
             // Devices
-            IMU _imu;
-            ZRanger _zranger;
-            OpticalFlowSensor _flow_sensor;
+            IMU imu_;
+            ZRanger zranger_;
+            OpticalFlowSensor flow_sensor_;
 
             // Timers
-            Timer _ekf_prediction_timer = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer _flying_check_timer = Timer(FLYING_CHECK_RATE_HZ);
-            Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
-            Timer _telemetry_time = Timer(TELEMETRY_RATE_HZ);
+            Timer ekf_prediction_timer_ = Timer(EKF_PREDICTION_RATE_HZ);
+            Timer flying_check_timer_ = Timer(FLYING_CHECK_RATE_HZ);
+            Timer hover_deck_timer_ = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
+            Timer telemetry_timer_ = Timer(TELEMETRY_RATE_HZ);
 
             // PID control for stabilize-only
-            StabilizerPidController _stabiilizer_pid;
+            StabilizerPidController stabilizer_pid_;
 
             // PID control for hover
-            HoverPidController _hover_pid;
+            HoverPidController hover_pid_;
 
             // Telemetry serializer
-            MspSerializer _telemetry_serializer;
+            MspSerializer telemetry_serializer_;
 
             // Debugging
-            Debugger _debugger;
+            Debugger debugger_;
 
             // Support for getDt()
-            uint32_t _usec_prev;
+            uint32_t usec_prev_;
 
             // Support for LED blink
-            bool _is_led_pulsing;
-            uint32_t _led_pulse_start;
+            bool is_led_pusing_;
+            uint32_t led_pulse_start_;
 
             // Support for LED blinking
-            Timer _heartbeat_timer = Timer(LED_HEARTBEAT_FREQ_HZ);
-            Timer _fast_blink_timer = Timer(LED_FASTBLINK_FREQ_HZ);
+            Timer heartbeat_timer_ = Timer(LED_HEARTBEAT_FREQ_HZ);
+            Timer fast_blink_timer_ = Timer(LED_FASTBLINK_FREQ_HZ);
 
             // Instance methods ---------------------------------------------0
 
@@ -331,10 +331,10 @@ namespace hf {
 
                 acquireHoverData();
 
-                _hover_pid= HoverPidController::run(_hover_pid,
-                        getDt(), _mode, _state, setpoint_in);
+                hover_pid_= HoverPidController::run(hover_pid_,
+                        getDt(), mode_, state_, setpoint_in);
 
-                const auto setpoint_out = _hover_pid.setpoint;
+                const auto setpoint_out = hover_pid_.setpoint;
 
                 sendTelemetry(setpoint_out);
 
@@ -349,40 +349,40 @@ namespace hf {
                     const uint8_t motor_count)
             {
                 // Safely update flight mode
-                _mode = updateMode(millis(), _state,
-                        _imu_filter.is_gyro_calibrated, requested_arming,
-                        requested_hover, timestamp_msec, _imu_filter, _mode);
+                mode_ = updateMode(millis(), state_,
+                        imu_filter_.is_gyro_calibrated, requested_arming,
+                        requested_hover, timestamp_msec, imu_filter_, mode_);
 
                 // Periodically run flying check to get status for EKF
-                _is_flying = 
+                is_flying_ = 
 
-                    _mode == MODE_IDLE || _mode == MODE_PANIC  ? false :
+                    mode_ == MODE_IDLE || mode_ == MODE_PANIC  ? false :
 
-                    _flying_check_timer.ready() ?
+                    flying_check_timer_.ready() ?
                     areMotorsAboveIdle(motor_vals, motor_count) :
 
-                    _is_flying;
+                    is_flying_;
 
                 // Blink LED to indicate status
-                blinkLed(_imu_filter.is_gyro_calibrated && _mode != MODE_PANIC);
+                blinkLed(imu_filter_.is_gyro_calibrated && mode_ != MODE_PANIC);
 
                 // Read the raw IMU data
-                const auto imuraw = _imu.read();
+                const auto imuraw = imu_.read();
 
                 // Filter the raw IMU data
-                _imu_filter = ImuFilter::step(_imu_filter, millis(), imuraw,
-                        _imu.gyroRangeDps(), _imu.accelRangeGs());
+                imu_filter_ = ImuFilter::step(imu_filter_, millis(), imuraw,
+                        imu_.gyroRangeDps(), imu_.accelRangeGs());
 
                 // Periodically run the EKF prediction step
-                if (_ekf_prediction_timer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _is_flying); 
+                if (ekf_prediction_timer_.ready()) {
+                    ekf_ = EKF::predict(ekf_, millis(), is_flying_); 
                 }
 
                 // Do EKF fast-update with IMU readings
-                _ekf = EKF::update(_ekf, _imu_filter.output, millis());
+                ekf_ = EKF::update(ekf_, imu_filter_.output, millis());
 
                 // Get vehicle state from EKF
-                _state = EKF::getVehicleState(_ekf);
+                state_ = EKF::getVehicleState(ekf_);
             }
 
             auto areMotorsAboveIdle(
@@ -400,59 +400,59 @@ namespace hf {
 
                 const auto msec_curr = millis();
 
-                _motor_check_msec = is_thrust_hover_idle ? msec_curr :
-                    _motor_check_msec;
+                motor_check_msec_ = is_thrust_hover_idle ? msec_curr :
+                    motor_check_msec_;
 
-                return  _motor_check_msec > 0 &&
-                    (msec_curr - _motor_check_msec) <
+                return  motor_check_msec_ > 0 &&
+                    (msec_curr - motor_check_msec_) <
                     FLYING_HYSTERESIS_THRESHOLD_MSEC;
             }
 
             void sendTelemetry(const Setpoint & setpoint)
             {
-                if (_telemetry_time.ready()) {
+                if (telemetry_timer_.ready()) {
 
                     const float data[15] = {
-                        (float)_mode,
+                        (float)mode_,
                         setpoint.thrust, setpoint.roll, setpoint.pitch,
-                        setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
-                        _state.phi, _state.dphi, _state.theta, _state.dtheta,
-                        _state.psi, _state.dpsi
+                        setpoint.yaw, state_.dx, state_.dy, state_.z, state_.dz,
+                        state_.phi, state_.dphi, state_.theta, state_.dtheta,
+                        state_.psi, state_.dpsi
                     };
 
-                    _telemetry_serializer = MspSerializer::serializeFloats(
-                            _telemetry_serializer, MSP_TELEMETRY, data, 15);
+                    telemetry_serializer_ = MspSerializer::serializeFloats(
+                            telemetry_serializer_, MSP_TELEMETRY, data, 15);
 
                     Serial1.write(
-                            MspSerializer::payloadBytes(_telemetry_serializer),
-                            MspSerializer::payloadSize(_telemetry_serializer));
+                            MspSerializer::payloadBytes(telemetry_serializer_),
+                            MspSerializer::payloadSize(telemetry_serializer_));
                 }
             }
 
             auto getDt() -> float
             {
                 const auto usec_curr = micros();      
-                const float dt = (usec_curr - _usec_prev)/1000000.0;
-                _usec_prev = usec_curr;
+                const float dt = (usec_curr - usec_prev_)/1000000.0;
+                usec_prev_ = usec_curr;
 
                 return dt;
             }
 
-            void blinkLed(const bool is_imu_calibrated)
+            void blinkLed(const bool isimu__calibrated)
             {
-                const auto ready = is_imu_calibrated ?
-                    _heartbeat_timer.ready() : _fast_blink_timer.ready();
+                const auto ready = isimu__calibrated ?
+                    heartbeat_timer_.ready() : fast_blink_timer_.ready();
                 
                 if (ready) {
                     digitalWrite(LED_PIN, true);
-                    _is_led_pulsing = true;
-                    _led_pulse_start = millis();
+                    is_led_pusing_ = true;
+                    led_pulse_start_ = millis();
                 }
 
-                else if (_is_led_pulsing) {
-                    if (millis() - _led_pulse_start > LED_PULSE_DURATION_MSEC) {
+                else if (is_led_pusing_) {
+                    if (millis() - led_pulse_start_ > LED_PULSE_DURATION_MSEC) {
                         digitalWrite(LED_PIN, false);
-                        _is_led_pulsing = false;
+                        is_led_pusing_ = false;
                     }
                 }
             }
