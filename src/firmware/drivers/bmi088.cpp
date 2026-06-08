@@ -24,9 +24,9 @@
 #include <hackflight.h>
 #include <firmware/imu/sensor.hpp>
 
-static constexpr Bmi088Gyro::Range GRANGE = Bmi088Gyro::RANGE_2000DPS;
+static constexpr Bmi088Gyro::Range KGyroRange = Bmi088Gyro::RANGE_2000DPS;
 
-static constexpr Bmi088Accel::Range ARANGE = Bmi088Accel::RANGE_24G;
+static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
@@ -50,7 +50,7 @@ namespace hf {
 
             okay(_gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-            okay(_gyro.setRange(GRANGE)) &&
+            okay(_gyro.setRange(KGyroRange)) &&
 
             okay(_gyro.pinModeInt3(
                         Bmi088Gyro::PIN_MODE_PUSH_PULL,
@@ -60,21 +60,21 @@ namespace hf {
 
             okay(_accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-            okay(_accel.setRange(ARANGE));
+            okay(_accel.setRange(kAccelRange));
     }
 
     auto IMU::GetGyroRangeDps() -> int16_t
     {
         static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
 
-        return granges[GRANGE];
+        return granges[KGyroRange];
     }
 
     auto IMU::GetAccelRangeGs() -> int16_t
     {
         static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
-        return aranges[ARANGE];
+        return aranges[kAccelRange];
     }
 
 

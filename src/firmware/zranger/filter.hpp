@@ -24,13 +24,13 @@ namespace hf {
 
         private:
 
-            static const uint16_t OUTLIER_LIMIT_MM = 4000;
+            static const uint16_t kOutlierLimitMm = 4000;
 
             // Measurement noise model
-            static constexpr float EXP_POINT_A = 2.5;
-            static constexpr float EXP_STD_A = 0.0025; 
-            static constexpr float EXP_POINT_B = 4.0;
-            static constexpr float EXP_STD_B = 0.2;   
+            static constexpr float kExpPointA = 2.5;
+            static constexpr float kExpStdA = 0.0025; 
+            static constexpr float kExpPointB = 4.0;
+            static constexpr float kExpStdB = 0.2;   
 
         public:
 
@@ -47,15 +47,15 @@ namespace hf {
             static auto Update(const ZRangerFilter& filter,
                     const uint16_t distance_mm) -> ZRangerFilter
             {
-                static constexpr float EXP_COEFF =
-                    logf(EXP_STD_B / EXP_STD_A) / (EXP_POINT_B - EXP_POINT_A);
+                static constexpr float kExpCOEFF =
+                    logf(kExpStdB / kExpStdA) / (kExpPointB - kExpPointA);
 
                 const auto distance_m = distance_mm / 1000.f;
 
-                const auto stdev = EXP_STD_A *
-                    ( 1 + expf(EXP_COEFF * (distance_m - EXP_POINT_A)));
+                const auto stdev = kExpStdA *
+                    ( 1 + expf(kExpCOEFF * (distance_m - kExpPointA)));
 
-                return distance_mm < OUTLIER_LIMIT_MM ?
+                return distance_mm < kOutlierLimitMm ?
                     ZRangerFilter(distance_m, stdev) :
                     filter;
             }
