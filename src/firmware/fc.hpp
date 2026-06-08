@@ -177,7 +177,7 @@ namespace hf {
 
             // Static methods ------------------------------------------------
 
-            static auto updateMode(
+            static auto UpdateMode(
                     const uint32_t msecCurr,
                     const VehicleState & state,
                     const bool is_gyro_calibrated,
@@ -193,13 +193,13 @@ namespace hf {
                     !is_gyro_calibrated ? false :
 
                     // Check receiver timeout
-                    checkFailsafe(msecCurr, msecPrev, requestedArming);
+                    CheckFailsafe(msecCurr, msecPrev, requestedArming);
 
                 // Run a little state-transition machine to update flight mode
                 return 
 
                     //  Vehicle flipped over: enter panic mode
-                    isFlipped(state) ? MODE_PANIC :
+                    IsFlipped(state) ? MODE_PANIC :
 
                     // Panic mode: can't recover
                     mode == MODE_PANIC ? MODE_PANIC :
@@ -227,18 +227,18 @@ namespace hf {
                     mode;
             }
 
-            static auto isFlipped(const VehicleState & state) -> bool
+            static auto IsFlipped(const VehicleState & state) -> bool
             {
-                return isFlippedAngle(state.theta) ||
-                    isFlippedAngle(state.phi); 
+                return IsFlippedAngle(state.theta) ||
+                    IsFlippedAngle(state.phi); 
             }
 
-            static auto isFlippedAngle(const float angle) -> bool
+            static auto IsFlippedAngle(const float angle) -> bool
             {
                 return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
             }
 
-            static auto checkFailsafe(
+            static auto CheckFailsafe(
                     const uint32_t msec_curr,
                     const uint32_t msec_prev,
                     const bool requested_arming) -> bool
@@ -251,7 +251,11 @@ namespace hf {
                 return timed_out ? false : requested_arming;
             } 
 
-            static void runDelayLoop(const uint32_t usec_curr, 
+            /* Adapted from github.com/nickrehm/dRehmFlight/blob/master/
+                 Versions/dRehmFlight_Teensy_BETA_1.3/
+                 dRehmFlight_Teensy_BETA_1.3.ino 
+               */
+            static void RunDelayLoop(const uint32_t usec_curr, 
                     const uint32_t loop_freq_hz)
             {
                 float invFreq = 1.0 / loop_freq_hz * 1000000.0;
@@ -324,7 +328,7 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                runDelayLoop(micros(), CORE_LOOP_HZ);
+                RunDelayLoop(micros(), CORE_LOOP_HZ);
 
                 step(requested_arming, requested_hover,
                         timestamp_msec, motor_vals, motor_count);
@@ -349,7 +353,7 @@ namespace hf {
                     const uint8_t motor_count)
             {
                 // Safely update flight mode
-                mode_ = updateMode(millis(), state_,
+                mode_ = UpdateMode(millis(), state_,
                         imu_filter_.is_gyro_calibrated, requested_arming,
                         requested_hover, timestamp_msec, imu_filter_, mode_);
 
