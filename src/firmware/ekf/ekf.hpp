@@ -397,16 +397,16 @@ namespace hf {
                 const auto q2 = ekf.q_.y;
                 const auto q3 = ekf.q_.z;
 
-                const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
+                const auto phi = Num::kRad2Deg * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
 
                 const auto dphi = ekf.gyro_latest_.x;
 
-                const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
+                const auto theta = Num::kRad2Deg * asinf(-2*(q1*q3 - q0*q2));
 
                 const auto dtheta = ekf.gyro_latest_.y;
 
-                const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
+                const auto psi = Num::kRad2Deg * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
 
                 const auto dpsi = ekf.gyro_latest_.z;
@@ -430,7 +430,7 @@ namespace hf {
             ThreeAxis gyro_latest_;
 
             ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(GRAVITY);
-            ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::DEG2RAD);
+            ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::kDeg2Rad);
 
             bool did_update_with_flow_deck_;
 
@@ -539,7 +539,7 @@ namespace hf {
             {
 
                 const auto angle = max(0, fabsf(acosf(rzz)) -
-                        Num::DEG2RAD * (15.0f / 2));
+                        Num::kDeg2Rad * (15.0f / 2));
                 const auto predicted_distance = core.x[kStateZ] / cosf(angle);
                 const auto measured_distance = zrfilter.distance_m;
 
@@ -564,7 +564,7 @@ namespace hf {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
 
-                //float thetapix = Num::DEG2RAD * 4.0f;
+                //float thetapix = Num::kDeg2Rad * 4.0f;
                 // [rad]    (same in x and y)
                 // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
                 // corresponding ground length
@@ -576,7 +576,7 @@ namespace hf {
 
                 const auto dg = core.x[state_index];
 
-                const auto omegab = gyroval * Num::DEG2RAD;
+                const auto omegab = gyroval * Num::kDeg2Rad;
 
                 Vector h = {0, 0, 0, 0, 0, 0, 0};
 

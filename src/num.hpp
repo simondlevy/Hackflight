@@ -27,10 +27,10 @@ class Num {
     public:
 
         // Small number epsilon, to prevent dividing by zero
-        static constexpr float EPSILON = 1e-6f;
+        static constexpr float kEpsilon = 1e-6f;
 
-        static constexpr float RAD2DEG = 180.0f / M_PI;
-        static constexpr float DEG2RAD = M_PI / 180.0f;
+        static constexpr float kRad2Deg = 180.0f / M_PI;
+        static constexpr float kDeg2Rad = M_PI / 180.0f;
 
         static auto ConstrainFloat(const float val, const float maxabs) -> float
         {

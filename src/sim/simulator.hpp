@@ -119,12 +119,12 @@ namespace hf {
                         (float)state.dy,
                         (float)state.z,
                         (float)state.dz,
-                        (float)(Num::RAD2DEG * state.phi),
-                        (float)(Num::RAD2DEG * state.dphi),
-                        (float)(Num::RAD2DEG * state.theta),
-                        (float)(Num::RAD2DEG * state.dtheta),
-                        (float)(Num::RAD2DEG * state.psi),
-                        (float)(Num::RAD2DEG * state.dpsi));
+                        (float)(Num::kRad2Deg * state.phi),
+                        (float)(Num::kRad2Deg * state.dphi),
+                        (float)(Num::kRad2Deg * state.theta),
+                        (float)(Num::kRad2Deg * state.dtheta),
+                        (float)(Num::kRad2Deg * state.psi),
+                        (float)(Num::kRad2Deg * state.dpsi));
             }
     };
 }

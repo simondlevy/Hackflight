@@ -65,7 +65,7 @@ namespace hf {
                 // Rotate world-coordinate velocities into body coordinates
                 const auto dxw = state.dx;
                 const auto dyw = state.dy;
-                const auto psi = Num::DEG2RAD * state.psi;
+                const auto psi = Num::kDeg2Rad * state.psi;
                 const auto cospsi = cos(psi);
                 const auto sinpsi = sin(psi);
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
