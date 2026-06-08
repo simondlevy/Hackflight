@@ -64,7 +64,7 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(p.integral_ + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(p.integral_ + error * dt, ILIMIT) : 0;
 
                 const auto derivative = dt > 0 ? (error - p.error_) / dt : 0; 
 

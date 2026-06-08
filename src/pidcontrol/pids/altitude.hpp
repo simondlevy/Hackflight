@@ -60,10 +60,10 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = hovering ?
-                    Num::fconstrain(controller.integral_ + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(controller.integral_ + error * dt, ILIMIT) : 0;
 
                 const auto output = hovering ? 
-                    Num::fconstrain(KP * error + KI * integral,
+                    Num::ConstrainFloat(KP * error + KI * integral,
                             fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
                     -LANDING_SPEED_MPS;
 

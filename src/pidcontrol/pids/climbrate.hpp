@@ -57,13 +57,13 @@ namespace hf {
                 const auto error = target - dz;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(controller.integral_ + error * dt,
+                    Num::ConstrainFloat(controller.integral_ + error * dt,
                             ILIMIT) : 0;
 
                 const auto thrust = KP * error + KI * integral;
 
                 const auto output = airborne ?
-                    Num::fconstrain(0.5 + thrust, 0, 1) :
+                    Num::ConstrainFloat(0.5 + thrust, 0, 1) :
                     0;
 
                 return ClimbRateController(output, integral);

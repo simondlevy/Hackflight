@@ -64,7 +64,7 @@ namespace hf {
                     pid.altitude_target_ == 0 ? ALTITUDE_INIT_M :
                     pid.altitude_target_;
 
-                const auto newaltitude_target_ = Num::fconstrain(
+                const auto newaltitude_target_ = Num::ConstrainFloat(
                         altitude_target +
                         setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);

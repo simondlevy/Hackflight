@@ -66,7 +66,7 @@ namespace hf {
                 const auto error = target - angle;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(p.integral_ + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(p.integral_ + error * dt, ILIMIT) : 0;
 
                 const auto output = KP * error + KI * integral - KD * dangle; 
 

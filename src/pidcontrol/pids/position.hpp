@@ -59,11 +59,11 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(c.integral_ + error * dt, ILIMIT) :
+                    Num::ConstrainFloat(c.integral_ + error * dt, ILIMIT) :
                     0;
 
                 const auto output = airborne ?
-                    Num::fconstrain(KP * error + KI * integral, MAX_DEMAND_DEG) :
+                    Num::ConstrainFloat(KP * error + KI * integral, MAX_DEMAND_DEG) :
                     0;
 
                 return PositionController(output, integral);
