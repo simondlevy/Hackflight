@@ -119,56 +119,56 @@ namespace hf {
 
                 core.P = addCovarianceNoise(matrix(), pinit);
 
-                didUpdateWithFlowDeck = false;
-                lastProcessNoiseUpdateMsec = 0;
+                did_update_with_float_deck = false;
+                last_process_noise_update_msec = 0;
 
-                didPredict = false;
-                lastPredictionMsec = 0;
+                did_predict = false;
+                last_prediction_msec = 0;
             }
 
             EKF(
                     const FC & core,
                     const Quaternion & q,
-                    const ThreeAxis & gyroLatest,
-                    const ThreeAxisSubSampler & accelSubSampler,
-                    const ThreeAxisSubSampler & gyroSubSampler,
-                    const Rotation & R,
-                    const bool didUpdateWithFlowDeck,
-                    const ZRangerFilter & zrangerFilterLatest,
-                    const OpticalFlowFilter & opticalFlowFilterLatest,
-                    const uint32_t lastProcessNoiseUpdateMsec,
-                    const bool didPredict,
-                    const uint32_t lastPredictionMsec)
+                    const ThreeAxis & gyro_latest,
+                    const ThreeAxisSubSampler & accel_subsampler,
+                    const ThreeAxisSubSampler & gyro_subsampler,
+                    const Rotation & rmatrix,
+                    const bool did_update_with_float_deck,
+                    const ZRangerFilter & zranger_filter_latest,
+                    const OpticalFlowFilter & optical_flow_filter_latest,
+                    const uint32_t last_process_noise_update_msec,
+                    const bool did_predict,
+                    const uint32_t last_prediction_msec)
                 :
                     core(core),
                     q(q),
-                    gyroLatest(gyroLatest),
-                    accelSubSampler(accelSubSampler),
-                    gyroSubSampler(gyroSubSampler),
-                    R(R),
-                    didUpdateWithFlowDeck(didUpdateWithFlowDeck),
-                    zrangerFilterLatest(zrangerFilterLatest),
-                    opticalFlowFilterLatest(opticalFlowFilterLatest),
-                    lastProcessNoiseUpdateMsec(lastProcessNoiseUpdateMsec),
-                    didPredict(didPredict),
-                    lastPredictionMsec(lastPredictionMsec) {}
+                    gyro_latest(gyro_latest),
+                    accel_subsampler(accel_subsampler),
+                    gyro_subsampler(gyro_subsampler),
+                    rmatrix(rmatrix),
+                    did_update_with_float_deck(did_update_with_float_deck),
+                    zranger_filter_latest(zranger_filter_latest),
+                    optical_flow_filter_latest(optical_flow_filter_latest),
+                    last_process_noise_update_msec(last_process_noise_update_msec),
+                    did_predict(did_predict),
+                    last_prediction_msec(last_prediction_msec) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
-                const auto accelSubSampler =
-                    ThreeAxisSubSampler::finalize(ekf.accelSubSampler);
+                const auto accel_subsampler =
+                    ThreeAxisSubSampler::finalize(ekf.accel_subsampler);
 
-                const auto gyroSubSampler =
-                    ThreeAxisSubSampler::finalize(ekf.gyroSubSampler);
+                const auto gyro_subsampler =
+                    ThreeAxisSubSampler::finalize(ekf.gyro_subsampler);
 
-                const auto dt = (msec_curr - ekf.lastPredictionMsec) / 1000.f;
+                const auto dt = (msec_curr - ekf.last_prediction_msec) / 1000.f;
 
-                const auto accel = accelSubSampler.subSample;
-                const auto gyro = gyroSubSampler.subSample;
+                const auto accel = accel_subsampler.subSample;
+                const auto gyro = gyro_subsampler.subSample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.R);
+                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.rmatrix);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
                 const auto P = dot(dot(F, ekf.core.P), trans(F));
@@ -193,17 +193,17 @@ namespace hf {
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
                 auto x = vector();
-                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
-                    ekf.R.zz * dz - GRAVITY * dt2 / 2;
+                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.rmatrix.zx * dx + ekf.rmatrix.zy * dy +
+                    ekf.rmatrix.zz * dz - GRAVITY * dt2 / 2;
 
                 x[STATE_VX] = ekf.core.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
-                        gyro.y * tmpSPZ - GRAVITY * ekf.R.zx);
+                        gyro.y * tmpSPZ - GRAVITY * ekf.rmatrix.zx);
 
                 x[STATE_VY] = ekf.core.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
-                        gyro.x * tmpSPZ - GRAVITY * ekf.R.zy);
+                        gyro.x * tmpSPZ - GRAVITY * ekf.rmatrix.zy);
 
                 x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
-                        gyro.x * tmpSPY - GRAVITY * ekf.R.zz);
+                        gyro.x * tmpSPY - GRAVITY * ekf.rmatrix.zz);
 
                 x[STATE_D0] = ekf.core.x[STATE_D0];
                 x[STATE_D1] = ekf.core.x[STATE_D1];
@@ -231,16 +231,16 @@ namespace hf {
                 return EKF(
                         FC(x, P),
                         q,
-                        ekf.gyroLatest,
-                        accelSubSampler,
-                        gyroSubSampler,
-                        ekf.R,
-                        ekf.didUpdateWithFlowDeck,
-                        ekf.zrangerFilterLatest,
-                        ekf.opticalFlowFilterLatest,
-                        ekf.lastProcessNoiseUpdateMsec,
-                        true, // didPredict,
-                        msec_curr);  // lastPredictionMsec
+                        ekf.gyro_latest,
+                        accel_subsampler,
+                        gyro_subsampler,
+                        ekf.rmatrix,
+                        ekf.did_update_with_float_deck,
+                        ekf.zranger_filter_latest,
+                        ekf.optical_flow_filter_latest,
+                        ekf.last_process_noise_update_msec,
+                        true, // did_predict,
+                        msec_curr);  // last_prediction_msec
 
             } // predict
 
@@ -250,7 +250,7 @@ namespace hf {
                     const uint32_t msec_curr) -> EKF
             {
                 const auto dt =
-                    (msec_curr - ekf.lastProcessNoiseUpdateMsec) / 1000.0f;
+                    (msec_curr - ekf.last_process_noise_update_msec) / 1000.0f;
 
                 const auto dtpositive = dt > 0;
 
@@ -264,18 +264,18 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                const auto lastProcessNoiseUpdateMsec =
-                    dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMsec;
+                const auto last_process_noise_update_msec =
+                    dtpositive ? msec_curr : ekf.last_process_noise_update_msec;
 
-                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.accelSubSampler, imudata.accel_gs);
+                const auto accel_subsampler = ThreeAxisSubSampler::accumulate(
+                        ekf.accel_subsampler, imudata.accel_gs);
 
-                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.gyroSubSampler, imudata.gyro_dps);
+                const auto gyro_subsampler = ThreeAxisSubSampler::accumulate(
+                        ekf.gyro_subsampler, imudata.gyro_dps);
 
-                const auto gyroLatest = imudata.gyro_dps;
+                const auto gyro_latest = imudata.gyro_dps;
 
-                const auto rzz = ekf.R.zz;
+                const auto rzz = ekf.rmatrix.zz;
 
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
@@ -284,17 +284,17 @@ namespace hf {
                             enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
                     ekf.core;
 
-                const auto coreWithRange = rangeok && ekf.didUpdateWithFlowDeck ?
+                const auto coreWithRange = rangeok && ekf.did_update_with_float_deck ?
                     updateWithRange(
-                            coreWithNoise, ekf.zrangerFilterLatest, rzz) :
+                            coreWithNoise, ekf.zranger_filter_latest, rzz) :
                     coreWithNoise;
 
-                const auto coreWithRangeAndFlow = ekf.didUpdateWithFlowDeck ?  
-                    updateWithFlow(coreWithRange, ekf.opticalFlowFilterLatest,
-                            gyroLatest, rzz):
+                const auto coreWithRangeAndFlow = ekf.did_update_with_float_deck ?  
+                    updateWithFlow(coreWithRange, ekf.optical_flow_filter_latest,
+                            gyro_latest, rzz):
                     coreWithRange;
 
-                const auto ready = ekf.didUpdateWithFlowDeck || ekf.didPredict;
+                const auto ready = ekf.did_update_with_float_deck || ekf.did_predict;
 
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const auto v = ThreeAxis(
@@ -327,23 +327,23 @@ namespace hf {
                             2 * q.y * q.z - 2 * q.w * q.x,
                             2 * q.x * q.z - 2 * q.w * q.y,
                             2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.rmatrix;
 
                 const auto core = ready ? FC(x, P) : coreWithRangeAndFlow;
 
                 return EKF(
                         core,
                         q,
-                        gyroLatest,
-                        accelSubSampler,
-                        gyroSubSampler,
+                        gyro_latest,
+                        accel_subsampler,
+                        gyro_subsampler,
                         R,
                         false, // didUpateWithFlowDeck
-                        ekf.zrangerFilterLatest,
-                        ekf.opticalFlowFilterLatest,
-                        lastProcessNoiseUpdateMsec,
-                        false, // didPredict
-                        ekf.lastPredictionMsec);
+                        ekf.zranger_filter_latest,
+                        ekf.optical_flow_filter_latest,
+                        last_process_noise_update_msec,
+                        false, // did_predict
+                        ekf.last_prediction_msec);
 
             } // update
 
@@ -355,16 +355,16 @@ namespace hf {
                 return EKF(
                         ekf.core,
                         ekf.q,
-                        ekf.gyroLatest,
-                        ekf.accelSubSampler,
-                        ekf.gyroSubSampler,
-                        ekf.R,
-                        true, // didUpdateWithFlowDeck,
+                        ekf.gyro_latest,
+                        ekf.accel_subsampler,
+                        ekf.gyro_subsampler,
+                        ekf.rmatrix,
+                        true, // did_update_with_float_deck,
                         zrfilter,
                         offilter,
-                        ekf.lastProcessNoiseUpdateMsec,
-                        ekf. didPredict,
-                        ekf. lastPredictionMsec);
+                        ekf.last_process_noise_update_msec,
+                        ekf. did_predict,
+                        ekf. last_prediction_msec);
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
@@ -372,22 +372,22 @@ namespace hf {
                 const auto x = ekf.core.x;
 
                 const auto dx =
-                    ekf.R.xx*x[STATE_VX] +
-                    ekf.R.xy*x[STATE_VY] +
-                    ekf.R.xz*x[STATE_VZ];
+                    ekf.rmatrix.xx*x[STATE_VX] +
+                    ekf.rmatrix.xy*x[STATE_VY] +
+                    ekf.rmatrix.xz*x[STATE_VZ];
 
                 // make right positive
                 const auto dy = -(
-                        ekf.R.yx*x[STATE_VX] +
-                        ekf.R.yy*x[STATE_VY] +
-                        ekf.R.yz*x[STATE_VZ]); 
+                        ekf.rmatrix.yx*x[STATE_VX] +
+                        ekf.rmatrix.yy*x[STATE_VY] +
+                        ekf.rmatrix.yz*x[STATE_VZ]); 
 
                 const auto z = x[STATE_Z];
 
                 const auto dz =
-                    ekf.R.zx*x[STATE_VX] +
-                    ekf.R.zy*x[STATE_VY] +
-                    ekf.R.zz*x[STATE_VZ];
+                    ekf.rmatrix.zx*x[STATE_VX] +
+                    ekf.rmatrix.zy*x[STATE_VY] +
+                    ekf.rmatrix.zz*x[STATE_VZ];
 
                 const auto q0 = ekf.q.w;
                 const auto q1 = ekf.q.x;
@@ -397,16 +397,16 @@ namespace hf {
                 const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
 
-                const auto dphi = ekf.gyroLatest.x;
+                const auto dphi = ekf.gyro_latest.x;
 
                 const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
 
-                const auto dtheta = ekf.gyroLatest.y;
+                const auto dtheta = ekf.gyro_latest.y;
 
                 const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
 
-                const auto dpsi = ekf.gyroLatest.z;
+                const auto dpsi = ekf.gyro_latest.z;
 
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
@@ -420,30 +420,30 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Quaternion q;
 
-            ThreeAxis gyroLatest;
+            ThreeAxis gyro_latest;
 
-            ThreeAxisSubSampler accelSubSampler = ThreeAxisSubSampler(GRAVITY);
-            ThreeAxisSubSampler gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
+            ThreeAxisSubSampler accel_subsampler = ThreeAxisSubSampler(GRAVITY);
+            ThreeAxisSubSampler gyro_subsampler = ThreeAxisSubSampler(Num::DEG2RAD);
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Rotation R;
+            Rotation rmatrix;
 
-            bool didUpdateWithFlowDeck;
+            bool did_update_with_float_deck;
 
-            ZRangerFilter zrangerFilterLatest;
-            OpticalFlowFilter opticalFlowFilterLatest;
+            ZRangerFilter zranger_filter_latest;
+            OpticalFlowFilter optical_flow_filter_latest;
 
-            uint32_t lastProcessNoiseUpdateMsec;
+            uint32_t last_process_noise_update_msec;
 
-            bool didPredict;
-            uint32_t lastPredictionMsec;
+            bool did_predict;
+            uint32_t last_prediction_msec;
 
             static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
                     const vector x,
-                    const Rotation &R) -> matrix
+                    const Rotation & rmatrix) -> matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
@@ -459,35 +459,35 @@ namespace hf {
 
                 // position
                 F[STATE_Z*N+STATE_Z] = 1;
-                F[STATE_Z*N+STATE_VX] = R.zx*dt;
-                F[STATE_Z*N+STATE_VY] = R.zy*dt;
-                F[STATE_Z*N+STATE_VZ] = R.zz*dt;
-                F[STATE_Z*N+STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-                F[STATE_Z*N+STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-                F[STATE_Z*N+STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
+                F[STATE_Z*N+STATE_VX] = rmatrix.zx*dt;
+                F[STATE_Z*N+STATE_VY] = rmatrix.zy*dt;
+                F[STATE_Z*N+STATE_VZ] = rmatrix.zz*dt;
+                F[STATE_Z*N+STATE_D0] = (vy*rmatrix.zz - vz*rmatrix.zy)*dt;
+                F[STATE_Z*N+STATE_D1] = (-vx*rmatrix.zz + vz*rmatrix.zx)*dt;
+                F[STATE_Z*N+STATE_D2] = (vx*rmatrix.zy - vy*rmatrix.zx)*dt;
 
                 F[STATE_VX*N+STATE_Z] = 0; 
                 F[STATE_VX*N+STATE_VX] = 1; 
                 F[STATE_VX*N+STATE_VY] = gyro.z*dt;
                 F[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
                 F[STATE_VX*N+STATE_D0] =  0;
-                F[STATE_VX*N+STATE_D1] =  GRAVITY*R.zz*dt;
-                F[STATE_VX*N+STATE_D2] = -GRAVITY*R.zy*dt;
+                F[STATE_VX*N+STATE_D1] =  GRAVITY*rmatrix.zz*dt;
+                F[STATE_VX*N+STATE_D2] = -GRAVITY*rmatrix.zy*dt;
 
                 F[STATE_VY*N+STATE_Z] = 0; 
                 F[STATE_VY*N+STATE_VX] =-gyro.z*dt;
                 F[STATE_VY*N+STATE_VY] = 1; 
                 F[STATE_VY*N+STATE_VZ] = gyro.x*dt;
-                F[STATE_VY*N+STATE_D0] = -GRAVITY*R.zz*dt;
+                F[STATE_VY*N+STATE_D0] = -GRAVITY*rmatrix.zz*dt;
                 F[STATE_VY*N+STATE_D1] =  0;
-                F[STATE_VY*N+STATE_D2] =  GRAVITY*R.zx*dt;
+                F[STATE_VY*N+STATE_D2] =  GRAVITY*rmatrix.zx*dt;
 
                 F[STATE_VZ*N+STATE_Z] = 0; 
                 F[STATE_VZ*N+STATE_VX] = gyro.y*dt;
                 F[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
                 F[STATE_VZ*N+STATE_VZ] = 1; 
-                F[STATE_VZ*N+STATE_D0] =  GRAVITY*R.zy*dt;
-                F[STATE_VZ*N+STATE_D1] = -GRAVITY*R.zx*dt;
+                F[STATE_VZ*N+STATE_D0] =  GRAVITY*rmatrix.zy*dt;
+                F[STATE_VZ*N+STATE_D1] = -GRAVITY*rmatrix.zx*dt;
                 F[STATE_VZ*N+STATE_D2] =  0;
 
                 F[STATE_D0*N+STATE_Z] = 0; 
