@@ -24,15 +24,15 @@ namespace hf {
 
         public:
 
-            Timer(const float freq) : _freq(freq) { }
+            Timer(const float freq) : freq_(freq) { }
 
             auto ready() -> bool
             {
                 const uint32_t msec_curr = millis();
 
-                if (msec_curr - _msec_prev > 1000 / _freq) {
+                if (msec_curr - msec_prev_ > 1000 / freq_) {
 
-                    _msec_prev = msec_curr;
+                    msec_prev_ = msec_curr;
 
                     return true;
                 }
@@ -42,9 +42,9 @@ namespace hf {
 
         private:
 
-            float _freq;
+            float freq_;
 
-            uint32_t _msec_prev;
+            uint32_t msec_prev_;
     };
 
 }
