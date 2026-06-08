@@ -76,7 +76,7 @@ namespace hf {
 
         public:
 
-            void begin(const bool use_hover_deck=true)
+            void Begin(const bool use_hover_deck=true)
             {
                 Serial1.begin(115200);
 
@@ -92,7 +92,7 @@ namespace hf {
                 mode_ = MODE_IDLE;
             }
 
-            auto update(
+            auto Update(
                     const TraditionalReceiver & rx,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
@@ -120,13 +120,13 @@ namespace hf {
                 return stabilizer_pid_.setpoint;
             } 
 
-            auto update(
+            auto Update(
                     const SpringyReceiver & rx,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                acquireHoverData();
+                AcquireHoverData();
 
                 const auto rxdata = rx.data;
 
@@ -135,13 +135,13 @@ namespace hf {
                         motor_vals, motor_count);
             } 
 
-            auto update(
+            auto Update(
                     GamepadReceiver & gamepad,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                acquireHoverData();
+                AcquireHoverData();
 
                 const auto gpdata = gamepad.data;
 
@@ -150,7 +150,7 @@ namespace hf {
                         motor_vals, motor_count);
             } 
 
-            void acquireHoverData()
+            void AcquireHoverData()
             {
                 // Slower EKF update with range, optical flow
                 if (hover_deck_timer_.Ready()) {
@@ -163,12 +163,12 @@ namespace hf {
                 }
             }
 
-            auto isSafeToFly() -> bool
+            auto IsSafeToFly() -> bool
             {
                 return mode_ != MODE_PANIC;
             }
 
-            auto isArmed() -> bool
+            auto IsArmed() -> bool
             {
                 return mode_ != MODE_IDLE;
             }
@@ -329,7 +329,7 @@ namespace hf {
                 step(requested_arming, requested_hover,
                         timestamp_msec, motor_vals, motor_count);
 
-                acquireHoverData();
+                AcquireHoverData();
 
                 hover_pid_= HoverPidController::run(hover_pid_,
                         getDt(), mode_, state_, setpoint_in);

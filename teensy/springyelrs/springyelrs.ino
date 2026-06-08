@@ -74,7 +74,7 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start flight control
-    _fc.begin();
+    _fc.Begin();
 
     // Start motors
     _motors.begin();
@@ -86,13 +86,13 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
+    const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = hf::Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
-    if (_fc.isSafeToFly()) {
-        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    if (_fc.IsSafeToFly()) {
+        _motors.run(_fc.IsArmed(), _mixer.motorvals);
     }
 }

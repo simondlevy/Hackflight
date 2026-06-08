@@ -41,7 +41,7 @@ void serialEvent1()
 void setup()
 {
     // Start core devices
-    _fc.begin();
+    _fc.Begin();
 
     // Start motors
     _motors.begin();
@@ -50,13 +50,13 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_rx, _mixer.motorvals, 4);
+    const auto setpoint = _fc.Update(_rx, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
     _mixer = hf::Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
-    if (_fc.isSafeToFly()) {
-        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    if (_fc.IsSafeToFly()) {
+        _motors.run(_fc.IsArmed(), _mixer.motorvals);
     }
 }
