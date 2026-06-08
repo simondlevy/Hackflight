@@ -42,10 +42,10 @@ namespace hf {
                 data = ReceiverData(setpoint, requested_arming,
                         requested_hover,timestamp_msec);
 
-                _traditional = TraditionalReceiver(setpoint, requested_arming,
+                traditional_ = TraditionalReceiver(setpoint, requested_arming,
                         true, timestamp_msec, aux1);
 
-                _aux2 = aux2;
+                aux2_ = aux2;
             }
 
             SpringyReceiver& operator=(
@@ -62,7 +62,7 @@ namespace hf {
                     const uint32_t msec_curr) -> SpringyReceiver
             {
                 const auto traditional = TraditionalReceiver::update(
-                        sdata._traditional, throttle, roll, pitch, yaw, aux1,
+                        sdata.traditional_, throttle, roll, pitch, yaw, aux1,
                         msec_curr, false);
 
                 const auto requested_hover =
@@ -75,9 +75,9 @@ namespace hf {
 
         private:
 
-            uint16_t _aux2;
+            uint16_t aux2_;
 
-            TraditionalReceiver _traditional;
+            TraditionalReceiver traditional_;
 
     };
 }
