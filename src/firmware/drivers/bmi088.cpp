@@ -40,7 +40,7 @@ static bool okay(const int status)
 
 namespace hf {
 
-    auto IMU::begin() -> bool
+    auto IMU::Begin() -> bool
     {
         return 
 
@@ -63,14 +63,14 @@ namespace hf {
             okay(_accel.setRange(ARANGE));
     }
 
-    auto IMU::gyroRangeDps() -> int16_t
+    auto IMU::GetGyroRangeDps() -> int16_t
     {
         static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
 
         return granges[GRANGE];
     }
 
-    auto IMU::accelRangeGs() -> int16_t
+    auto IMU::GetAccelRangeGs() -> int16_t
     {
         static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
@@ -78,7 +78,7 @@ namespace hf {
     }
 
 
-    auto IMU::read() -> IMU::RawData
+    auto IMU::Read() -> IMU::RawData
     {
         _gyro.readSensor();
 

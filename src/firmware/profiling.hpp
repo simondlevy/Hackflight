@@ -25,7 +25,7 @@ namespace hf {
 
         public:
 
-            void report()
+            void Report()
             {
                 if (timer_.Ready()) {
 

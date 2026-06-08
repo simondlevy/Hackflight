@@ -55,12 +55,12 @@ namespace hf {
                     RawData& operator=(const RawData& other) = default;
             };
 
-            auto begin() -> bool;
+            auto Begin() -> bool;
 
-            auto gyroRangeDps() -> int16_t;
+            auto GetGyroRangeDps() -> int16_t;
 
-            auto accelRangeGs() -> int16_t;
+            auto GetAccelRangeGs() -> int16_t;
 
-            auto read() -> RawData;
+            auto Read() -> RawData;
     };
 }

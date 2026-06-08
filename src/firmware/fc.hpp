@@ -80,7 +80,7 @@ namespace hf {
             {
                 Serial1.begin(115200);
 
-                imu_.begin();
+                imu_.Begin();
 
                 pinMode(LED_PIN, OUTPUT); 
 
@@ -371,11 +371,11 @@ namespace hf {
                 BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != MODE_PANIC);
 
                 // Read the raw IMU data
-                const auto imuraw = imu_.read();
+                const auto imuraw = imu_.Read();
 
                 // Filter the raw IMU data
                 imu_filter_ = ImuFilter::step(imu_filter_, millis(), imuraw,
-                        imu_.gyroRangeDps(), imu_.accelRangeGs());
+                        imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
 
                 // Periodically run the EKF prediction step
                 if (ekf_prediction_timer_.Ready()) {
