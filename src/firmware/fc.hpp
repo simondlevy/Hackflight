@@ -64,13 +64,13 @@ namespace hf {
             static constexpr float kTelemetryRate = 50;
 
             // Safety constants
-            static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
-            static constexpr uint32_t FAILSAFE_MSEC = 500;
+            static constexpr float kTiltAngleFlippedMinDeg = 75;
+            static constexpr uint32_t kFailsafeMsec = 500;
 
             // We say we are flying if one or more motors are running
             // over the idle thrust.
-            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
-            static constexpr float MOTOR_IDLE_MAX = 0.1;
+            static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
+            static constexpr float kMotorIdleMax = 0.1;
 
         // Public instance methods --------------------------------------------
 
@@ -235,7 +235,7 @@ namespace hf {
 
             static auto IsFlippedAngle(const float angle) -> bool
             {
-                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
+                return fabs(angle) > kTiltAngleFlippedMinDeg;
             }
 
             static auto CheckFailsafe(
@@ -246,7 +246,7 @@ namespace hf {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
-                    msec_curr - msec_prev > FAILSAFE_MSEC;
+                    msec_curr - msec_prev > kFailsafeMsec;
 
                 return timed_out ? false : requested_arming;
             } 
@@ -396,7 +396,7 @@ namespace hf {
                 auto is_thrust_hover_idle = false;
 
                 for (int i = 0; i < motor_count; ++i) {
-                    if (motor_vals[i] > MOTOR_IDLE_MAX) {
+                    if (motor_vals[i] > kMotorIdleMax) {
                         is_thrust_hover_idle = true;
                         break;
                     }
@@ -409,7 +409,7 @@ namespace hf {
 
                 return  motor_check_msec_ > 0 &&
                     (msec_curr - motor_check_msec_) <
-                    FLYING_HYSTERESIS_THRESHOLD_MSEC;
+                    kFlyingHysteresisThresholdMsec;
             }
 
             void SendTelemetry(const Setpoint & setpoint)
