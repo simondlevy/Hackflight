@@ -268,12 +268,12 @@ namespace hf {
                     dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMsec;
 
                 const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.accelSubSampler, imudata.accelGs);
+                        ekf.accelSubSampler, imudata.accel_gs);
 
                 const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.gyroSubSampler, imudata.gyroDps);
+                        ekf.gyroSubSampler, imudata.gyro_dps);
 
-                const auto gyroLatest = imudata.gyroDps;
+                const auto gyroLatest = imudata.gyro_dps;
 
                 const auto rzz = ekf.R.zz;
 

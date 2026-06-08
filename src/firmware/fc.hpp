@@ -180,7 +180,7 @@ namespace hf {
             static auto updateMode(
                     const uint32_t msecCurr,
                     const VehicleState & state,
-                    const bool isGyroCalibrated,
+                    const bool is_gyro_calibrated,
                     const bool requestedArming,
                     const bool requestedHover,
                     const uint32_t msecPrev,
@@ -190,7 +190,7 @@ namespace hf {
                 const auto shouldArm = 
 
                     // Disable arming while gyro is calibrating
-                    !isGyroCalibrated ? false :
+                    !is_gyro_calibrated ? false :
 
                     // Check receiver timeout
                     checkFailsafe(msecCurr, msecPrev, requestedArming);
@@ -208,7 +208,7 @@ namespace hf {
                     mode == MODE_IDLE && requestedHover ? MODE_IDLE :
 
                     // Want arm and safe to arm: enter armed mode
-                    mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
+                    mode == MODE_IDLE && shouldArm && imufilt.is_gyro_calibrated
                     ? MODE_ARMED :
 
                     // Armed and requested disarm: enter idle mode
@@ -350,7 +350,7 @@ namespace hf {
             {
                 // Safely update flight mode
                 _mode = updateMode(millis(), _state,
-                        _imu_filter.isGyroCalibrated, requested_arming,
+                        _imu_filter.is_gyro_calibrated, requested_arming,
                         requested_hover, timestamp_msec, _imu_filter, _mode);
 
                 // Periodically run flying check to get status for EKF
@@ -364,7 +364,7 @@ namespace hf {
                     _is_flying;
 
                 // Blink LED to indicate status
-                blinkLed(_imu_filter.isGyroCalibrated && _mode != MODE_PANIC);
+                blinkLed(_imu_filter.is_gyro_calibrated && _mode != MODE_PANIC);
 
                 // Read the raw IMU data
                 const auto imuraw = _imu.read();

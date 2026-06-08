@@ -161,8 +161,8 @@ namespace hf {
             {
                 if (_helper.ready()) {
 
-                    const auto g = imufilt.gyroDps;
-                    const auto a = imufilt.accelGs;
+                    const auto g = imufilt.gyro_dps;
+                    const auto a = imufilt.accel_gs;
 
                     printf("%5lu | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
                             "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n",
