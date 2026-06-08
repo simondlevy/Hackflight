@@ -95,7 +95,7 @@ namespace hf {
                     const vehicle_params_t & vparams,
                     const float dt,
                     const float * rpms,
-                    const uint8_t rotorCount,
+                    const uint8_t rotor_count,
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
@@ -122,7 +122,7 @@ namespace hf {
 
                 double u1=0, u2=0, u3=0, u4=0;
 
-                for (unsigned int i = 0; i < rotorCount; ++i) {
+                for (unsigned int i = 0; i < rotor_count; ++i) {
 
                     // RPM => rad/sec
                     const auto omega = rpms[i] * 2 * M_PI / 60;

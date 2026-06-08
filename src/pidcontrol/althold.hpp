@@ -82,18 +82,6 @@ namespace hf {
                     ClimbRateController::run(pid._climbrate_pid, airborne, dt,
                             altitude_pid.output, state.dz);
 
-                /*
-                static uint32_t _count;
-                printf("%f,%f,%f,%f,%f,%f\n",
-                        _count * dt,
-                        new_altitude_target,
-                        altitude_pid.output,
-                        climbrate_pid.output,
-                        state.z,
-                        state.dz
-                        );
-                _count++;*/
-
                 return AltHoldPidController(
                         new_altitude_target,
                         altitude_pid,

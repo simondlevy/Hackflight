@@ -90,7 +90,7 @@ class AutopilotHelper {
 
             // Stop if we detected a collision
             if (world.collided({pose.x, pose.y, pose.z})) {
-                dBodySetGravityMode(_helper->robotBody, 1);
+                dBodySetGravityMode(_helper->robot_body, 1);
                 _collided = true;
             }
 

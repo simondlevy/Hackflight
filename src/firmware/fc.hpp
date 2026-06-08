@@ -76,7 +76,7 @@ namespace hf {
 
         public:
 
-            void begin(const bool useHoverdeck=true)
+            void begin(const bool use_hover_deck=true)
             {
                 Serial1.begin(115200);
 
@@ -84,9 +84,9 @@ namespace hf {
 
                 pinMode(LED_PIN, OUTPUT); 
 
-                if (useHoverdeck) {
+                if (use_hover_deck) {
                     _zranger.begin();
-                    _flowsensor.begin();
+                    _flow_sensor.begin();
                 }
 
                 _mode = MODE_IDLE;
@@ -94,36 +94,36 @@ namespace hf {
 
             auto update(
                     const TraditionalReceiver & rx,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 const auto rxdata = rx.data;
 
                 step(rxdata.requested_arming, false, // false = no hover
-                        rxdata.timestamp_msec, motorvals, motorcount);
+                        rxdata.timestamp_msec, motor_vals, motor_count);
 
-                const auto rxsetpoint = rxdata.setpoint;
+                const auto rx_setpoint = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(
-                        (rxsetpoint.thrust+1)/2, // [-1,+1] => [0,1]
-                        rxsetpoint.roll *
+                        (rx_setpoint.thrust+1)/2, // [-1,+1] => [0,1]
+                        rx_setpoint.roll *
                         PositionController::MAX_DEMAND_DEG,
-                        rxsetpoint.pitch *
+                        rx_setpoint.pitch *
                         PositionController::MAX_DEMAND_DEG, 
-                        rxsetpoint.yaw);
+                        rx_setpoint.yaw);
 
-                _stabilizerPid = StabilizerPidController::run( _stabilizerPid,
-                        _isFlying, getDt(), _state, setpoint);
+                _stabiilizer_pid = StabilizerPidController::run( _stabiilizer_pid,
+                        _is_flying, getDt(), _state, setpoint);
 
-                sendTelemetry(_stabilizerPid.setpoint);
+                sendTelemetry(_stabiilizer_pid.setpoint);
 
-                return _stabilizerPid.setpoint;
+                return _stabiilizer_pid.setpoint;
             } 
 
             auto update(
                     const SpringyReceiver & rx,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
                 acquireHoverData();
@@ -132,13 +132,13 @@ namespace hf {
 
                 return update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
-                        motorvals, motorcount);
+                        motor_vals, motor_count);
             } 
 
             auto update(
                     GamepadReceiver & gamepad,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
                 acquireHoverData();
@@ -147,7 +147,7 @@ namespace hf {
 
                 return update(gpdata.setpoint, gpdata.requested_arming,
                         gpdata.requested_hover, gpdata.timestamp_msec,
-                        motorvals, motorcount);
+                        motor_vals, motor_count);
             } 
 
             void acquireHoverData()
@@ -156,10 +156,10 @@ namespace hf {
                 if (_hoverDeckTimer.ready()) {
                     _zrangerFilter = ZRangerFilter::update(
                             _zrangerFilter, _zranger.read());
-                    _opticalFlowFilter = OpticalFlowFilter::update(
-                            _opticalFlowFilter,
-                            micros(), _flowsensor.read());
-                    _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+                    _optical_flow_filter = OpticalFlowFilter::update(
+                            _optical_flow_filter,
+                            micros(), _flow_sensor.read());
+                    _ekf = EKF::update(_ekf, _zrangerFilter, _optical_flow_filter);
                 }
             }
 
@@ -271,19 +271,19 @@ namespace hf {
             mode_e _mode;
 
             // Flying status based on motors
-            bool _isFlying;
-            uint32_t _motorCheckMsec;
+            bool _is_flying;
+            uint32_t _motor_check_msec;
 
             // Sensor fusion
-            ImuFilter _imuFilter;
+            ImuFilter _imu_filter;
             EKF _ekf;
-            OpticalFlowFilter _opticalFlowFilter;
+            OpticalFlowFilter _optical_flow_filter;
             ZRangerFilter _zrangerFilter;
 
             // Devices
             IMU _imu;
             ZRanger _zranger;
-            OpticalFlowSensor _flowsensor;
+            OpticalFlowSensor _flow_sensor;
 
             // Timers
             Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
@@ -292,7 +292,7 @@ namespace hf {
             Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
 
             // PID control for stabilize-only
-            StabilizerPidController _stabilizerPid;
+            StabilizerPidController _stabiilizer_pid;
 
             // PID control for hover
             HoverPidController _hoverPid;
@@ -321,13 +321,13 @@ namespace hf {
                     const bool requested_arming,
                     const bool requested_hover,
                     const uint32_t timestamp_msec,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 runDelayLoop(micros(), CORE_LOOP_HZ);
 
                 step(requested_arming, requested_hover,
-                        timestamp_msec, motorvals, motorcount);
+                        timestamp_msec, motor_vals, motor_count);
 
                 acquireHoverData();
 
@@ -345,66 +345,66 @@ namespace hf {
                     const bool requested_arming,
                     bool requested_hover,
                     const uint32_t timestamp_msec,
-                    const float * motorvals,
-                    const uint8_t motorcount)
+                    const float * motor_vals,
+                    const uint8_t motor_count)
             {
                 // Safely update flight mode
                 _mode = updateMode(millis(), _state,
-                        _imuFilter.isGyroCalibrated, requested_arming,
-                        requested_hover, timestamp_msec, _imuFilter, _mode);
+                        _imu_filter.isGyroCalibrated, requested_arming,
+                        requested_hover, timestamp_msec, _imu_filter, _mode);
 
                 // Periodically run flying check to get status for EKF
-                _isFlying = 
+                _is_flying = 
 
                     _mode == MODE_IDLE || _mode == MODE_PANIC  ? false :
 
                     _flyingCheckTimer.ready() ?
-                    areMotorsAboveIdle(motorvals, motorcount) :
+                    areMotorsAboveIdle(motor_vals, motor_count) :
 
-                    _isFlying;
+                    _is_flying;
 
                 // Blink LED to indicate status
-                blinkLed(_imuFilter.isGyroCalibrated && _mode != MODE_PANIC);
+                blinkLed(_imu_filter.isGyroCalibrated && _mode != MODE_PANIC);
 
                 // Read the raw IMU data
                 const auto imuraw = _imu.read();
 
                 // Filter the raw IMU data
-                _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
+                _imu_filter = ImuFilter::step(_imu_filter, millis(), imuraw,
                         _imu.gyroRangeDps(), _imu.accelRangeGs());
 
                 // Periodically run the EKF prediction step
                 if (_ekfPredictionTimer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _isFlying); 
+                    _ekf = EKF::predict(_ekf, millis(), _is_flying); 
                 }
 
                 // Do EKF fast-update with IMU readings
-                _ekf = EKF::update(_ekf, _imuFilter.output, millis());
+                _ekf = EKF::update(_ekf, _imu_filter.output, millis());
 
                 // Get vehicle state from EKF
                 _state = EKF::getVehicleState(_ekf);
             }
 
             auto areMotorsAboveIdle(
-                    const float * motorvals,
-                    const uint8_t motorcount) -> bool
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> bool
             {
-                auto isThrustOverIdle = false;
+                auto is_thrust_hover_idle = false;
 
-                for (int i = 0; i < motorcount; ++i) {
-                    if (motorvals[i] > MOTOR_IDLE_MAX) {
-                        isThrustOverIdle = true;
+                for (int i = 0; i < motor_count; ++i) {
+                    if (motor_vals[i] > MOTOR_IDLE_MAX) {
+                        is_thrust_hover_idle = true;
                         break;
                     }
                 }
 
                 const auto msec_curr = millis();
 
-                _motorCheckMsec = isThrustOverIdle ? msec_curr :
-                    _motorCheckMsec;
+                _motor_check_msec = is_thrust_hover_idle ? msec_curr :
+                    _motor_check_msec;
 
-                return  _motorCheckMsec > 0 &&
-                    (msec_curr - _motorCheckMsec) <
+                return  _motor_check_msec > 0 &&
+                    (msec_curr - _motor_check_msec) <
                     FLYING_HYSTERESIS_THRESHOLD_MSEC;
             }
 

@@ -47,24 +47,24 @@ class PluginHelper {
 
         } message_t;
 
-        dBodyID robotBody;
+        dBodyID robot_body;
        
         PluginHelper() : PluginHelper({0, 0, 0, 0, 0, 0}) {}
 
-        PluginHelper(const hf::Pose & startingPose)
+        PluginHelper(const hf::Pose & starting_pose)
         {
-            _simulator = hf::Simulator(startingPose);
+            _simulator = hf::Simulator(starting_pose);
 
-            robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+            robot_body = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
-            if (robotBody == NULL) {
+            if (robot_body == NULL) {
 
                 dWebotsConsolePrintf("webots_physics_init :: ");
                 dWebotsConsolePrintf("error : could not get body of robot.\r\n");
             }
             else {
 
-                dBodySetGravityMode(robotBody, 0);
+                dBodySetGravityMode(robot_body, 0);
             }
         }
 
@@ -97,7 +97,7 @@ class PluginHelper {
         auto set_dbody_from_state(const hf::SimState & state)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(robotBody, state.x, -state.y, state.z);
+            dBodySetPosition(robot_body, state.x, -state.y, state.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
@@ -116,6 +116,6 @@ class PluginHelper {
                 cr * cp * sy - sr * sp * cy
             };
 
-            dBodySetQuaternion(robotBody, q);
+            dBodySetQuaternion(robot_body, q);
         }
 };
