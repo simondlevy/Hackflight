@@ -379,7 +379,7 @@ namespace hf {
 
                 // Periodically run the EKF prediction step
                 if (ekf_prediction_timer_.Ready()) {
-                    ekf_ = EKF::predict(ekf_, millis(), is_flying_); 
+                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
                 }
 
                 // Do EKF fast-update with IMU readings

@@ -153,7 +153,7 @@ namespace hf {
                     did_predict_(did_predict),
                     last_prediction_msec_(last_prediction_msec) {}
 
-            static auto predict(const EKF & ekf, const uint32_t msec_curr,
+            static auto Predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
                 const auto accel_subsampler =
