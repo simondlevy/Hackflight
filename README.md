@@ -41,7 +41,7 @@ and relying on existing Arduino libraries for sensors and actuators,
 Hackflight supports a
 [composable](https://www.progress.com/blogs/what-composability-why-should-you-care)
 approach to taming the complexity of flight control. The Hackflight [codebase](src/) is
-around 3,000 lines of code.
+under 3,000 lines of code.
 
 # Hardware
 

@@ -46,10 +46,12 @@ namespace hf {
 
         private:
 
-            // Pins
-            static const uint8_t LED_PIN = 9;
+            // Voltage sensing
+            static constexpr uint8_t VOLTAGE_INPUT_PIN = A9;
+            static constexpr float VOLTAGE_SCALEUP = 4.29;
 
             // LED indicator
+            static const uint8_t LED_PIN = 9;
             static constexpr float LED_HEARTBEAT_FREQ_HZ = 0.75;
             static constexpr float LED_FASTBLINK_FREQ_HZ = 3;
             static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
@@ -358,7 +360,7 @@ namespace hf {
                     _isFlying;
 
                 // Blink LED to indicate status
-                blink(_imuFilter.isGyroCalibrated);
+                blinkLed(_imuFilter.isGyroCalibrated && _mode != MODE_PANIC);
 
                 // Read the raw IMU data
                 const auto imuraw = _imu.read();
@@ -432,7 +434,7 @@ namespace hf {
                 return dt;
             }
 
-            void blink(const bool is_imu_calibrated)
+            void blinkLed(const bool is_imu_calibrated)
             {
                 static bool _pulsing;
                 static uint32_t _pulse_start;
