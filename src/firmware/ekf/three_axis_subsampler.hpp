@@ -75,7 +75,7 @@ namespace hf {
                                 sum.x * conversion_factor / count,
                                 sum.y * conversion_factor / count,
                                 sum.z * conversion_factor / count),
-                            0) :              // count
+                            0) :        // count
 
                         sub_sampler;
             }

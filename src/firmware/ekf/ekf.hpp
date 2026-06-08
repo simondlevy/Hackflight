@@ -523,10 +523,10 @@ namespace hf {
                     const ThreeAxis & gyro, const float r22) -> FC
             {
                 const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
+                        offilter.dpixelx, offilter.std_dev_x, STATE_VX, gyro.y);
 
                 return updateWithFlowAxis(newcore, offilter.dt, r22,
-                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
+                        offilter.dpixely, offilter.std_dev_y, STATE_VY, gyro.x);
             }
 
             static auto updateWithRange(
