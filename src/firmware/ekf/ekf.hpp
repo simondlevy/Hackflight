@@ -143,8 +143,8 @@ namespace hf {
                     core(core),
                     q_(q),
                     gyro_latest_(gyro_latest),
-                    accel_subsampler(accel_subsampler),
-                    gyro_subsampler(gyro_subsampler),
+                    accel_subsampler_(accel_subsampler),
+                    gyro_subsampler_(gyro_subsampler),
                     rmatrix(rmatrix),
                     did_update_with_float_deck(did_update_with_float_deck),
                     zranger_filter_latest(zranger_filter_latest),
@@ -157,10 +157,10 @@ namespace hf {
                     const bool isFlying) -> EKF
             {
                 const auto accel_subsampler =
-                    ThreeAxisSubSampler::finalize(ekf.accel_subsampler);
+                    ThreeAxisSubSampler::finalize(ekf.accel_subsampler_);
 
                 const auto gyro_subsampler =
-                    ThreeAxisSubSampler::finalize(ekf.gyro_subsampler);
+                    ThreeAxisSubSampler::finalize(ekf.gyro_subsampler_);
 
                 const auto dt = (msec_curr - ekf.last_prediction_msec) / 1000.f;
 
@@ -268,10 +268,10 @@ namespace hf {
                     dtpositive ? msec_curr : ekf.last_process_noise_update_msec;
 
                 const auto accel_subsampler = ThreeAxisSubSampler::accumulate(
-                        ekf.accel_subsampler, imudata.accel_gs);
+                        ekf.accel_subsampler_, imudata.accel_gs);
 
                 const auto gyro_subsampler = ThreeAxisSubSampler::accumulate(
-                        ekf.gyro_subsampler, imudata.gyro_dps);
+                        ekf.gyro_subsampler_, imudata.gyro_dps);
 
                 const auto gyro_latest = imudata.gyro_dps;
 
@@ -359,8 +359,8 @@ namespace hf {
                         ekf.core,
                         ekf.q_,
                         ekf.gyro_latest_,
-                        ekf.accel_subsampler,
-                        ekf.gyro_subsampler,
+                        ekf.accel_subsampler_,
+                        ekf.gyro_subsampler_,
                         ekf.rmatrix,
                         true, // did_update_with_float_deck,
                         zrfilter,
@@ -425,8 +425,8 @@ namespace hf {
 
             ThreeAxis gyro_latest_;
 
-            ThreeAxisSubSampler accel_subsampler = ThreeAxisSubSampler(GRAVITY);
-            ThreeAxisSubSampler gyro_subsampler = ThreeAxisSubSampler(Num::DEG2RAD);
+            ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(GRAVITY);
+            ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::DEG2RAD);
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
