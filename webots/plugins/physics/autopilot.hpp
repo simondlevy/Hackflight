@@ -32,9 +32,9 @@ class AutopilotHelper {
 
         static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
 
-        FILE * _logfile;
+        FILE * logfile_;
 
-        PluginHelper * _helper;
+        PluginHelper * helper_;
 
     public:
 
@@ -59,29 +59,29 @@ class AutopilotHelper {
 
             char log_path[256] = {};
             sprintf(log_path, "%s/%s.csv", pwd, worldname);
-            fprintf(_logfile, "%s\n", worldname);
+            fprintf(logfile_, "%s\n", worldname);
 
             _collided = false;
             
             const auto p = world.robotPose;
-            _helper = new PluginHelper({p.x, p.y, p.z, p.phi, p.theta, p.psi});
+            helper_ = new PluginHelper({p.x, p.y, p.z, p.phi, p.theta, p.psi});
         }
 
         ~AutopilotHelper()
         {
-            delete _helper;
+            delete helper_;
         }
 
         auto get_state(const PluginHelper::message_t & message) -> hf::SimState
         {
-            return _helper->run_simulator(message.mode, message.setpoint);
+            return helper_->run_simulator(message.mode, message.setpoint);
         }
 
         auto get_pose(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> simsens::Pose
         {
             // Use setpoint to get new state
-            const auto state = _helper->run_simulator(mode, setpoint);
+            const auto state = helper_->run_simulator(mode, setpoint);
 
             // Extract pose from state
             const simsens::Pose pose = {
@@ -90,12 +90,12 @@ class AutopilotHelper {
 
             // Stop if we detected a collision
             if (world.collided({pose.x, pose.y, pose.z})) {
-                dBodySetGravityMode(_helper->robot_body, 1);
+                dBodySetGravityMode(helper_->robot_body, 1);
                 _collided = true;
             }
 
             // Otherwise, set normally
-            _helper->set_dbody_from_state(state);
+            helper_->set_dbody_from_state(state);
 
             return pose;
         }
@@ -105,14 +105,14 @@ class AutopilotHelper {
                 const int * rangefinder_distances,
                 const int n_distances)
         {       
-            fprintf(_logfile,
+            fprintf(logfile_,
                     "%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f,%+3.3f",
                     pose.x, pose.y, pose.z, pose.phi, pose.theta, pose.psi);
 
             for (int k=0; k<n_distances; ++k) {
-                fprintf(_logfile, ",%d", rangefinder_distances[k]);
+                fprintf(logfile_, ",%d", rangefinder_distances[k]);
             }
 
-            fprintf(_logfile, "\n");
+            fprintf(logfile_, "\n");
         }
 };

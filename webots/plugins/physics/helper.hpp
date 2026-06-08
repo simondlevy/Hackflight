@@ -36,7 +36,7 @@ class PluginHelper {
         static constexpr char ROBOT_NAME[] = "diyquad";
 
         // Platform-independent simulator simulator loop
-        hf::Simulator _simulator;
+        hf::Simulator simulator_;
 
     public:
 
@@ -53,7 +53,7 @@ class PluginHelper {
 
         PluginHelper(const hf::Pose & starting_pose)
         {
-            _simulator = hf::Simulator(starting_pose);
+            simulator_ = hf::Simulator(starting_pose);
 
             robot_body = dWebotsGetBodyFromDEF(ROBOT_NAME);
 
@@ -89,9 +89,9 @@ class PluginHelper {
         auto run_simulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
-            _simulator = hf::Simulator::step(_simulator, mode, setpoint);
+            simulator_ = hf::Simulator::step(simulator_, mode, setpoint);
 
-            return _simulator.dynamics.state;
+            return simulator_.dynamics.state;
         }
 
         auto set_dbody_from_state(const hf::SimState & state)
