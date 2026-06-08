@@ -306,6 +306,10 @@ namespace hf {
             // Support for getDt()
             uint32_t _usec_prev;
 
+            // Support for LED blink
+            bool _is_led_pulsing;
+            uint32_t _led_pulse_start;
+
             // Support for LED blinking
             Timer _heartbeatTimer = Timer(LED_HEARTBEAT_FREQ_HZ);
             Timer _fastblinkTimer = Timer(LED_FASTBLINK_FREQ_HZ);
@@ -436,22 +440,19 @@ namespace hf {
 
             void blinkLed(const bool is_imu_calibrated)
             {
-                static bool _pulsing;
-                static uint32_t _pulse_start;
-
                 const auto ready = is_imu_calibrated ?
                     _heartbeatTimer.ready() : _fastblinkTimer.ready();
                 
                 if (ready) {
                     digitalWrite(LED_PIN, true);
-                    _pulsing = true;
-                    _pulse_start = millis();
+                    _is_led_pulsing = true;
+                    _led_pulse_start = millis();
                 }
 
-                else if (_pulsing) {
-                    if (millis() - _pulse_start > LED_PULSE_DURATION_MSEC) {
+                else if (_is_led_pulsing) {
+                    if (millis() - _led_pulse_start > LED_PULSE_DURATION_MSEC) {
                         digitalWrite(LED_PIN, false);
-                        _pulsing = false;
+                        _is_led_pulsing = false;
                     }
                 }
             }
