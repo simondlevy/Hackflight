@@ -2656,16 +2656,6 @@
 	)
 	(wire
 		(pts
-			(xy 199.39 55.88) (xy 203.2 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "19bf4893-a44a-479d-b3d3-cbfb0d8f9f71")
-	)
-	(wire
-		(pts
 			(xy 147.32 96.52) (xy 152.4 96.52)
 		)
 		(stroke
@@ -2996,7 +2986,7 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 64.77) (xy 215.9 64.77)
+			(xy 194.31 55.88) (xy 203.2 55.88)
 		)
 		(stroke
 			(width 0)
@@ -3086,7 +3076,7 @@
 	)
 	(wire
 		(pts
-			(xy 199.39 64.77) (xy 203.2 64.77)
+			(xy 182.88 55.88) (xy 186.69 55.88)
 		)
 		(stroke
 			(width 0)
@@ -3153,16 +3143,6 @@
 			(justify left bottom)
 		)
 		(uuid "0d561b67-8e9d-45b3-b897-b820768ef1c3")
-	)
-	(label "R2_IN"
-		(at 210.82 64.77 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1311613f-0849-4d51-bb78-9913e244d522")
 	)
 	(label "GND"
 		(at 147.32 139.7 0)
@@ -3285,7 +3265,7 @@
 		(uuid "317ecb92-7da4-45f9-bf66-767682182a66")
 	)
 	(label "GND"
-		(at 199.39 64.77 0)
+		(at 182.88 55.88 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3293,16 +3273,6 @@
 			(justify left bottom)
 		)
 		(uuid "3c8a80c9-c41f-4aba-b8ab-43b855494a9a")
-	)
-	(label "R2_IN"
-		(at 198.12 55.88 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "3cec34e2-ade6-4430-b752-3989e478b390")
 	)
 	(label "3V3"
 		(at 147.32 137.16 0)
@@ -3563,6 +3533,16 @@
 			(justify left bottom)
 		)
 		(uuid "c0c54083-827c-43ba-a376-a2e6feeb0c7d")
+	)
+	(label "A9"
+		(at 196.85 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c745397e-7382-49ae-be34-74dbb030e1da")
 	)
 	(label "MISO"
 		(at 147.32 147.32 0)
@@ -4348,7 +4328,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 207.01 64.77 90)
+		(at 190.5 55.88 90)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4359,7 +4339,7 @@
 		(fields_autoplaced yes)
 		(uuid "77f08b25-46b9-4304-b762-bbd78ab6f922")
 		(property "Reference" "R3"
-			(at 207.01 58.42 90)
+			(at 190.5 49.53 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4370,7 +4350,7 @@
 			)
 		)
 		(property "Value" "R2"
-			(at 207.01 60.96 90)
+			(at 190.5 52.07 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -4380,7 +4360,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P7.62mm_Horizontal"
-			(at 207.01 66.548 90)
+			(at 190.5 57.658 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4391,7 +4371,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 207.01 64.77 0)
+			(at 190.5 55.88 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4402,7 +4382,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 207.01 64.77 0)
+			(at 190.5 55.88 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
