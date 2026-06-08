@@ -455,66 +455,66 @@ namespace hf {
 
                 const size_t N = STATE_DIM;
 
-                auto F = matrix();
+                auto fmatrix = matrix();
 
                 // position
-                F[STATE_Z*N+STATE_Z] = 1;
-                F[STATE_Z*N+STATE_VX] = rmatrix.zx*dt;
-                F[STATE_Z*N+STATE_VY] = rmatrix.zy*dt;
-                F[STATE_Z*N+STATE_VZ] = rmatrix.zz*dt;
-                F[STATE_Z*N+STATE_D0] = (vy*rmatrix.zz - vz*rmatrix.zy)*dt;
-                F[STATE_Z*N+STATE_D1] = (-vx*rmatrix.zz + vz*rmatrix.zx)*dt;
-                F[STATE_Z*N+STATE_D2] = (vx*rmatrix.zy - vy*rmatrix.zx)*dt;
+                fmatrix[STATE_Z*N+STATE_Z] = 1;
+                fmatrix[STATE_Z*N+STATE_VX] = rmatrix.zx*dt;
+                fmatrix[STATE_Z*N+STATE_VY] = rmatrix.zy*dt;
+                fmatrix[STATE_Z*N+STATE_VZ] = rmatrix.zz*dt;
+                fmatrix[STATE_Z*N+STATE_D0] = (vy*rmatrix.zz - vz*rmatrix.zy)*dt;
+                fmatrix[STATE_Z*N+STATE_D1] = (-vx*rmatrix.zz + vz*rmatrix.zx)*dt;
+                fmatrix[STATE_Z*N+STATE_D2] = (vx*rmatrix.zy - vy*rmatrix.zx)*dt;
 
-                F[STATE_VX*N+STATE_Z] = 0; 
-                F[STATE_VX*N+STATE_VX] = 1; 
-                F[STATE_VX*N+STATE_VY] = gyro.z*dt;
-                F[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
-                F[STATE_VX*N+STATE_D0] =  0;
-                F[STATE_VX*N+STATE_D1] =  GRAVITY*rmatrix.zz*dt;
-                F[STATE_VX*N+STATE_D2] = -GRAVITY*rmatrix.zy*dt;
+                fmatrix[STATE_VX*N+STATE_Z] = 0; 
+                fmatrix[STATE_VX*N+STATE_VX] = 1; 
+                fmatrix[STATE_VX*N+STATE_VY] = gyro.z*dt;
+                fmatrix[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
+                fmatrix[STATE_VX*N+STATE_D0] =  0;
+                fmatrix[STATE_VX*N+STATE_D1] =  GRAVITY*rmatrix.zz*dt;
+                fmatrix[STATE_VX*N+STATE_D2] = -GRAVITY*rmatrix.zy*dt;
 
-                F[STATE_VY*N+STATE_Z] = 0; 
-                F[STATE_VY*N+STATE_VX] =-gyro.z*dt;
-                F[STATE_VY*N+STATE_VY] = 1; 
-                F[STATE_VY*N+STATE_VZ] = gyro.x*dt;
-                F[STATE_VY*N+STATE_D0] = -GRAVITY*rmatrix.zz*dt;
-                F[STATE_VY*N+STATE_D1] =  0;
-                F[STATE_VY*N+STATE_D2] =  GRAVITY*rmatrix.zx*dt;
+                fmatrix[STATE_VY*N+STATE_Z] = 0; 
+                fmatrix[STATE_VY*N+STATE_VX] =-gyro.z*dt;
+                fmatrix[STATE_VY*N+STATE_VY] = 1; 
+                fmatrix[STATE_VY*N+STATE_VZ] = gyro.x*dt;
+                fmatrix[STATE_VY*N+STATE_D0] = -GRAVITY*rmatrix.zz*dt;
+                fmatrix[STATE_VY*N+STATE_D1] =  0;
+                fmatrix[STATE_VY*N+STATE_D2] =  GRAVITY*rmatrix.zx*dt;
 
-                F[STATE_VZ*N+STATE_Z] = 0; 
-                F[STATE_VZ*N+STATE_VX] = gyro.y*dt;
-                F[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
-                F[STATE_VZ*N+STATE_VZ] = 1; 
-                F[STATE_VZ*N+STATE_D0] =  GRAVITY*rmatrix.zy*dt;
-                F[STATE_VZ*N+STATE_D1] = -GRAVITY*rmatrix.zx*dt;
-                F[STATE_VZ*N+STATE_D2] =  0;
+                fmatrix[STATE_VZ*N+STATE_Z] = 0; 
+                fmatrix[STATE_VZ*N+STATE_VX] = gyro.y*dt;
+                fmatrix[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
+                fmatrix[STATE_VZ*N+STATE_VZ] = 1; 
+                fmatrix[STATE_VZ*N+STATE_D0] =  GRAVITY*rmatrix.zy*dt;
+                fmatrix[STATE_VZ*N+STATE_D1] = -GRAVITY*rmatrix.zx*dt;
+                fmatrix[STATE_VZ*N+STATE_D2] =  0;
 
-                F[STATE_D0*N+STATE_Z] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
-                F[STATE_D0*N+STATE_VZ] = 0; 
-                F[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
-                F[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
+                fmatrix[STATE_D0*N+STATE_Z] = 0; 
+                fmatrix[STATE_D0*N+STATE_VX] = 0; 
+                fmatrix[STATE_D0*N+STATE_VX] = 0; 
+                fmatrix[STATE_D0*N+STATE_VZ] = 0; 
+                fmatrix[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
+                fmatrix[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
+                fmatrix[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
 
-                F[STATE_D1*N+STATE_Z] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
-                F[STATE_D1*N+STATE_VZ] = 0; 
-                F[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
-                F[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
+                fmatrix[STATE_D1*N+STATE_Z] = 0; 
+                fmatrix[STATE_D1*N+STATE_VX] = 0; 
+                fmatrix[STATE_D1*N+STATE_VX] = 0; 
+                fmatrix[STATE_D1*N+STATE_VZ] = 0; 
+                fmatrix[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
+                fmatrix[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
+                fmatrix[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
 
-                F[STATE_D2*N+STATE_Z] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
-                F[STATE_D2*N+STATE_VZ] = 0; 
-                F[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
-                F[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
-                F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                fmatrix[STATE_D2*N+STATE_Z] = 0; 
+                fmatrix[STATE_D2*N+STATE_VX] = 0; 
+                fmatrix[STATE_D2*N+STATE_VX] = 0; 
+                fmatrix[STATE_D2*N+STATE_VZ] = 0; 
+                fmatrix[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
+                fmatrix[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
+                fmatrix[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
 
-                return F;
+                return fmatrix;
             }
 
             static auto updateWithFlow(
@@ -537,15 +537,15 @@ namespace hf {
 
                 const auto angle = max(0, fabsf(acosf(rzz)) -
                         Num::DEG2RAD * (15.0f / 2));
-                const auto predictedDistance = core.x[STATE_Z] / cosf(angle);
-                const auto measuredDistance = zrfilter.distance_m;
+                const auto predicted_distance = core.x[STATE_Z] / cosf(angle);
+                const auto measured_distance = zrfilter.distance_m;
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
                 const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
                 return updateWithScalar(core, h,
-                        measuredDistance-predictedDistance,
+                        measured_distance-predicted_distance,
                         zrfilter.stdev);
             }
 
@@ -577,17 +577,17 @@ namespace hf {
 
                 vector h = {0, 0, 0, 0, 0, 0, 0};
 
-                const auto predictedN = (dt * Npix / thetapix ) * 
+                const auto predicted_n = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
 
-                const auto measuredN = dpixel*FLOW_RESOLUTION;
+                const auto measured_n = dpixel*FLOW_RESOLUTION;
 
                 h[STATE_Z] = (Npix * dt / thetapix) * 
                     ((r22 * dg) / (-z_g * z_g));
 
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
-                return updateWithScalar(core, h, measuredN-predictedN,
+                return updateWithScalar(core, h, measured_n-predicted_n,
                         stdev*FLOW_RESOLUTION);
             }
 
@@ -595,42 +595,42 @@ namespace hf {
                     const FC & core,
                     const vector & h,
                     const float error,
-                    const float stdMeasNoise) -> FC
+                    const float std_meas_noise) -> FC
             {
-                const auto R = stdMeasNoise*stdMeasNoise;
+                const auto r = std_meas_noise*std_meas_noise;
 
-                const auto PHt = dot(core.P, h); // PH'
+                const auto pht = dot(core.P, h); // PH'
 
-                float HPHR = R; // HPH' + R
+                float hphr = r; // HPH' + R
                 for (size_t i=0; i<STATE_DIM; i++) { 
-                    HPHR += h[i] * PHt[i]; 
+                    hphr += h[i] * pht[i]; 
                 }
 
-                vector G;
+                vector g;
                 for (size_t i=0; i<STATE_DIM; i++) {
-                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                    g[i] = pht[i]/hphr; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                auto GH = outer(G, h);
+                auto gh = outer(g, h);
 
                 // GH - I
                 for (size_t i=0; i<STATE_DIM; i++) { 
-                    GH[i*STATE_DIM+i] -= 1; 
+                    gh[i*STATE_DIM+i] -= 1; 
                 }
 
                 // (GH - I)'
-                const auto GH_I = trans(GH);
+                const auto gh_i = trans(gh);
 
                 // (GH - I)*P
-                const auto GH_I_P = dot(GH, core.P); 
+                const auto gh_i_p = dot(gh, core.P); 
 
                 // (GH - I)*P*(GH - I)'
-                auto P = dot(GH_I_P, GH_I);
+                auto p = dot(gh_i_p, gh_i);
 
                 // State update
                 auto x = vector();
                 for (int i=0; i<STATE_DIM; i++) {
-                    x[i] = core.x[i] + G[i] * error; 
+                    x[i] = core.x[i] + g[i] * error; 
                 }
 
                 // Add the measurement variance and ensure boundedness and symmetry
@@ -638,16 +638,16 @@ namespace hf {
 
                     for (int j=i; j<STATE_DIM; j++) {
 
-                        const auto v = G[i] * R * G[j];
+                        const auto v = g[i] * r * g[j];
 
                         // add measurement noise
-                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
+                        p[i*STATE_DIM+j] = p[j*STATE_DIM+i] =
+                            get_pval(i, j, 0.5*p[i*STATE_DIM+j] + 0.5*p[j*STATE_DIM+i] + v,
                                     MIN_COVARIANCE, MAX_COVARIANCE); 
                     }
                 }
 
-                return FC(x, P);
+                return FC(x, p);
             }
 
             static auto enforceSymmetry(const matrix & P) -> matrix
@@ -705,45 +705,45 @@ namespace hf {
             }
 
             // At = A^T
-            static auto trans(const matrix & A) -> matrix
+            static auto trans(const matrix & a) -> matrix
             {
-                auto At = matrix();
+                auto at = matrix();
 
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
-                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
+                        at[i*STATE_DIM+j] = a[j*STATE_DIM+i];
                     }
                 }
 
-                return At;
+                return at;
             }
 
             // C = A * B
-            static auto dot(const matrix & A, const matrix & B) -> matrix
+            static auto dot(const matrix & a, const matrix & b) -> matrix
             {
-                auto C = matrix();
+                auto c = matrix();
 
                 for (int i=0; i<STATE_DIM; ++i) {
                     for (int j=0; j<STATE_DIM; ++j) {
-                        C[i*STATE_DIM+j] = 0;
+                        c[i*STATE_DIM+j] = 0;
                         for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                            c[i*STATE_DIM+j] += a[i*STATE_DIM+k] * b[k*STATE_DIM+j];
                         }
                     }
                 }
 
-                return C;
+                return c;
             }
 
             // y = A * x
-            static auto dot(const matrix & A, const vector & x) -> vector
+            static auto dot(const matrix & a, const vector & x) -> vector
             {
                 vector y = vector();
 
                 for (int i=0; i<STATE_DIM; i++) {
                     y[i] = 0; 
                     for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i*STATE_DIM+j] * x[j];
+                        y[i] += a[i*STATE_DIM+j] * x[j];
                     }
                 }
 
