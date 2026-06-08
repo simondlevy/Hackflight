@@ -69,7 +69,7 @@ void setup()
     // Start receiver
     if (!_crsf.begin()) {
         _crsf.end();
-        hf::Debugger::reportForever("Unable to start ELRS receiver");
+        hf::Debugger::ReportForever("Unable to start ELRS receiver");
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 

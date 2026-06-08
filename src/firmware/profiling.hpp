@@ -27,7 +27,7 @@ namespace hf {
 
             void report()
             {
-                if (timer_.ready()) {
+                if (timer_.Ready()) {
 
                     if (count_ > 0) {
                         printf("count=%d\n", (int)count_);

@@ -33,11 +33,11 @@ namespace hf {
 
 
         if (!_vl53l1x.begin(0x29, &Wire1)) {
-            Debugger::reportForever("Unable to initialize VL53L1X");
+            Debugger::ReportForever("Unable to initialize VL53L1X");
         }
 
         if (!_vl53l1x.startRanging()) {
-            Debugger::reportForever("VL53L1X failed to start ranging");
+            Debugger::ReportForever("VL53L1X failed to start ranging");
         }
 
         // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms

@@ -41,9 +41,9 @@ namespace hf {
 
                     uint32_t count;
 
-                    bool ready()
+                    bool Ready()
                     {
-                        if (timer_.ready()) {
+                        if (timer_.Ready()) {
                             count++;
                             return true;
                         }
@@ -62,7 +62,7 @@ namespace hf {
                 (char *)"PANIC"
             };
 
-            static void reportForever(const char * errmsg)
+            static void ReportForever(const char * errmsg)
             {
                 while (true) {
                     printf("%s\n", errmsg);
@@ -70,34 +70,34 @@ namespace hf {
                 }
             }
 
-            void report(const Mode mode)
+            void Report(const Mode mode)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | mode=%s\n", helper_.count, MODENAMES[mode]);
                 }
             }
 
-            void reportFloat(const char * label, const float value)
+            void ReportFloat(const char * label, const float value)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | %s=%f\n", helper_.count, label, value);
                 }
             }
 
-            void reportBool(const char * label, const bool flag)
+            void ReportBool(const char * label, const bool flag)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | %s=%s\n",
                             helper_.count, label, flag ? "true" : "false");
                 }
             }
 
-            void report(const Setpoint & setpoint)
+            void Report(const Setpoint & setpoint)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
                             "yaw=%+3.3f\n",
@@ -105,9 +105,9 @@ namespace hf {
                             setpoint.pitch, setpoint.yaw); }
             }
 
-            void reportHover(const VehicleState & state)
+            void ReportHover(const VehicleState & state)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
                             helper_.count, state.dx, state.dy, state.z,
@@ -115,9 +115,9 @@ namespace hf {
                 }
             }
 
-            void report(const VehicleState & state, const bool full=false)
+            void Report(const VehicleState & state, const bool full=false)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     if (full) {
                         printf("%5lu | "
@@ -139,27 +139,27 @@ namespace hf {
                 }
             }
 
-            void report(const IMU::ThreeAxisRaw & raw)
+            void Report(const IMU::ThreeAxisRaw & raw)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | x=%+05d y=%+05d z=%+05d\n",
                             helper_.count, raw.x, raw.y, raw.z);
                 }
             }
 
-            void report(const ThreeAxis & vec)
+            void Report(const ThreeAxis & vec)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | x=%+04.0f y=%+04.0f z=%+04.0f\n",
                             helper_.count, vec.x, vec.y, vec.z);
                 }
             }
 
-            void report(const ImuFilter::Data & imufilt)
+            void Report(const ImuFilter::Data & imufilt)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     const auto g = imufilt.gyro_dps;
                     const auto a = imufilt.accel_gs;
@@ -170,9 +170,9 @@ namespace hf {
                 }
             }
 
-            void report(const IMU::RawData & imuraw)
+            void Report(const IMU::RawData & imuraw)
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     const auto gyro = imuraw.gyro;
                     const auto accel = imuraw.accel;
@@ -184,12 +184,12 @@ namespace hf {
                 }
             }
 
-            void reportMotors(
+            void ReportMotors(
                     const float * vals,
                     const uint8_t count,
                     const char * fmt="%f")
             {
-                if (helper_.ready()) {
+                if (helper_.Ready()) {
 
                     printf("%5lu | ", helper_.count);
 

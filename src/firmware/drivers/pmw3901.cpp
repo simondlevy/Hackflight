@@ -35,7 +35,7 @@ namespace hf {
         SPI.begin();
 
         if (!_pmw3901.begin()) {
-            Debugger::reportForever("Unable to initialize PMW3901");
+            Debugger::ReportForever("Unable to initialize PMW3901");
         }
     }
 

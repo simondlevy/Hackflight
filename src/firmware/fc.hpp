@@ -153,7 +153,7 @@ namespace hf {
             void acquireHoverData()
             {
                 // Slower EKF update with range, optical flow
-                if (hover_deck_timer_.ready()) {
+                if (hover_deck_timer_.Ready()) {
                     zranger_filter_ = ZRangerFilter::update(
                             zranger_filter_, zranger_.read());
                     optical_flow_filter_ = OpticalFlowFilter::update(
@@ -358,7 +358,7 @@ namespace hf {
 
                     mode_ == MODE_IDLE || mode_ == MODE_PANIC  ? false :
 
-                    flying_check_timer_.ready() ?
+                    flying_check_timer_.Ready() ?
                     areMotorsAboveIdle(motor_vals, motor_count) :
 
                     is_flying_;
@@ -374,7 +374,7 @@ namespace hf {
                         imu_.gyroRangeDps(), imu_.accelRangeGs());
 
                 // Periodically run the EKF prediction step
-                if (ekf_prediction_timer_.ready()) {
+                if (ekf_prediction_timer_.Ready()) {
                     ekf_ = EKF::predict(ekf_, millis(), is_flying_); 
                 }
 
@@ -410,7 +410,7 @@ namespace hf {
 
             void sendTelemetry(const Setpoint & setpoint)
             {
-                if (telemetry_timer_.ready()) {
+                if (telemetry_timer_.Ready()) {
 
                     const float data[15] = {
                         (float)mode_,
@@ -441,7 +441,7 @@ namespace hf {
             void blinkLed(const bool isimu__calibrated)
             {
                 const auto ready = isimu__calibrated ?
-                    heartbeat_timer_.ready() : fast_blink_timer_.ready();
+                    heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
                 
                 if (ready) {
                     digitalWrite(LED_PIN, true);

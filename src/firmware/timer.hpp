@@ -26,7 +26,7 @@ namespace hf {
 
             Timer(const float freq) : freq_(freq) { }
 
-            auto ready() -> bool
+            auto Ready() -> bool
             {
                 const uint32_t msec_curr = millis();
 
