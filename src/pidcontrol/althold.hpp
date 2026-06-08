@@ -70,7 +70,7 @@ namespace hf {
                         ALTITUDE_MIN_M, ALTITUDE_MAX_M);
 
                 const auto hovering =
-                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
+                    mode == kModeHovering || mode == kModeAutonomous;
 
                 const auto airborne = hovering || (state.z > ALTITUDE_LANDING_M);
 

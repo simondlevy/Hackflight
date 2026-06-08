@@ -89,7 +89,7 @@ namespace hf {
                     flow_sensor_.Begin();
                 }
 
-                mode_ = MODE_IDLE;
+                mode_ = kModeIdle;
             }
 
             auto Update(
@@ -165,12 +165,12 @@ namespace hf {
 
             auto IsSafeToFly() -> bool
             {
-                return mode_ != MODE_PANIC;
+                return mode_ != kModePanic;
             }
 
             auto IsArmed() -> bool
             {
-                return mode_ != MODE_IDLE;
+                return mode_ != kModeIdle;
             }
 
         private:
@@ -199,29 +199,29 @@ namespace hf {
                 return 
 
                     //  Vehicle flipped over: enter panic mode
-                    IsFlipped(state) ? MODE_PANIC :
+                    IsFlipped(state) ? kModePanic :
 
                     // Panic mode: can't recover
-                    mode == MODE_PANIC ? MODE_PANIC :
+                    mode == kModePanic ? kModePanic :
 
                     // Disallow jumping directly from idle to hover
-                    mode == MODE_IDLE && requestedHover ? MODE_IDLE :
+                    mode == kModeIdle && requestedHover ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
-                    mode == MODE_IDLE && shouldArm && imufilt.is_gyro_calibrated
-                    ? MODE_ARMED :
+                    mode == kModeIdle && shouldArm && imufilt.is_gyro_calibrated
+                    ? kModeArmed :
 
                     // Armed and requested disarm: enter idle mode
-                    mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
+                    mode == kModeArmed && !shouldArm ? kModeIdle :
 
                     // Armed and requested hover; enter hover mode
-                    mode == MODE_ARMED && requestedHover ? MODE_HOVERING :
+                    mode == kModeArmed && requestedHover ? kModeHovering :
 
                     // Hovering and requested no-hover; return to armed mode
-                    mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
+                    mode == kModeHovering && !requestedHover ? kModeArmed :
 
                     // Hovering and requested disarm; enter idle mode
-                    mode == MODE_HOVERING && !requestedArming ? MODE_IDLE :
+                    mode == kModeHovering && !requestedArming ? kModeIdle :
 
                     //  Default: stay in current mode
                     mode;
@@ -360,7 +360,7 @@ namespace hf {
                 // Periodically run flying check to get status for EKF
                 is_flying_ = 
 
-                    mode_ == MODE_IDLE || mode_ == MODE_PANIC  ? false :
+                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
 
                     flying_check_timer_.Ready() ?
                     AreMotorsAboveIdle(motor_vals, motor_count) :
@@ -368,7 +368,7 @@ namespace hf {
                     is_flying_;
 
                 // Blink LED to indicate status
-                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != MODE_PANIC);
+                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
                 // Read the raw IMU data
                 const auto imuraw = imu_.Read();
