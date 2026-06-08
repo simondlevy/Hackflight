@@ -226,7 +226,7 @@ namespace hf {
                             tmpq.z = keep * tmpq.z); 
 
                 // normalize and store the result
-                const auto q = newtmpq / Quaternion::l2norm(newtmpq);
+                const auto q = newtmpq / Quaternion::L2Norm(newtmpq);
 
                 return EKF(
                         Core(x, P),
@@ -313,7 +313,7 @@ namespace hf {
                 const auto q = ready &&
                     (IsBigEnough(v.x) || IsBigEnough(v.y) || IsBigEnough(v.z)) &&
                     IsSmallEnough(v.x) && IsSmallEnough(v.y) && IsSmallEnough(v.z) ?
-                    ekf.q_ / Quaternion::l2norm(Rotate(v, ekf.q_)) : ekf.q_;
+                    ekf.q_ / Quaternion::L2Norm(Rotate(v, ekf.q_)) : ekf.q_;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // Rotate body-frame velocity and accel
@@ -766,7 +766,7 @@ namespace hf {
             static auto Rotate(
                     const ThreeAxis & v, const Quaternion & q)-> Quaternion
             {
-                const auto angle = ThreeAxis::l2norm(v);
+                const auto angle = ThreeAxis::L2Norm(v);
                 const auto ca = cos(angle / 2);
                 const auto sa = sin(angle / 2);
                 const auto dq = Quaternion(
