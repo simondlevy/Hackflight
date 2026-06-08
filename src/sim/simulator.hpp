@@ -54,7 +54,7 @@ namespace hf {
                     const HoverPidController & pidControl)
                 : dynamics(dynamics), pid_controller_(pidControl) {}
 
-            static auto step(
+            static auto Step(
                     const Simulator & sim,
                     const Mode mode,
                     const Setpoint & setpoint,

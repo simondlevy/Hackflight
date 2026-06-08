@@ -89,7 +89,7 @@ class PluginHelper {
         auto run_simulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
-            simulator_ = hf::Simulator::step(simulator_, mode, setpoint);
+            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint);
 
             return simulator_.dynamics.state;
         }
