@@ -2363,26 +2363,6 @@
 		(uuid "ba896b81-c6a7-49a0-87d4-6a8ee7f67bf5")
 	)
 	(gr_line
-		(start 132.7 86)
-		(end 132.7 87.9)
-		(stroke
-			(width 0.1)
-			(type default)
-		)
-		(layer "B.SilkS")
-		(uuid "515435e5-83a3-46b3-abb9-0ca82376fbe1")
-	)
-	(gr_line
-		(start 132.75 82.75)
-		(end 132.75 84.65)
-		(stroke
-			(width 0.1)
-			(type default)
-		)
-		(layer "B.SilkS")
-		(uuid "57a7813e-022b-48fd-879d-a6aae165b386")
-	)
-	(gr_line
 		(start 125 74)
 		(end 125 94)
 		(stroke
@@ -3134,8 +3114,8 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "R"
-		(at 133.1 84.9 90)
+	(gr_text "R 100Ω"
+		(at 133.15 82.95 90)
 		(layer "B.SilkS")
 		(uuid "127ad248-ddb9-4ede-b089-db24502fb266")
 		(effects
