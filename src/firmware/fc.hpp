@@ -24,7 +24,6 @@
 #include <firmware/ekf/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
-#include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
@@ -34,6 +33,7 @@
 #include <firmware/receivers/gamepad.hpp>
 #include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>
+#include <firmware/timer.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <pidcontrol/hover.hpp>
@@ -46,8 +46,13 @@ namespace hf {
 
         private:
 
-            // Arbitrary
+            // Pins
             static const uint8_t LED_PIN = 9;
+
+            // LED indicator
+            static constexpr float LED_HEARTBEAT_FREQ_HZ = 0.75;
+            static constexpr float LED_FASTBLINK_FREQ_HZ = 3;
+            static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
 
             // Rate constants
             static constexpr float CORE_LOOP_HZ = 1000;
@@ -74,7 +79,8 @@ namespace hf {
                 Serial1.begin(115200);
 
                 _imu.begin();
-                _led.begin(); 
+
+                pinMode(LED_PIN, OUTPUT); 
 
                 if (useHoverdeck) {
                     _zranger.begin();
@@ -274,7 +280,6 @@ namespace hf {
 
             // Devices
             IMU _imu;
-            LED _led = LED(LED_PIN);
             ZRanger _zranger;
             OpticalFlowSensor _flowsensor;
 
@@ -298,6 +303,10 @@ namespace hf {
 
             // Support for getDt()
             uint32_t _usec_prev;
+
+            // Support for LED blinking
+            Timer _heartbeatTimer = Timer(LED_HEARTBEAT_FREQ_HZ);
+            Timer _fastblinkTimer = Timer(LED_FASTBLINK_FREQ_HZ);
 
             // Instance methods ---------------------------------------------0
 
@@ -348,8 +357,8 @@ namespace hf {
 
                     _isFlying;
 
-                // Blink IMU to indicate status
-                _led.blink(_imuFilter.isGyroCalibrated);
+                // Blink LED to indicate status
+                blink(_imuFilter.isGyroCalibrated);
 
                 // Read the raw IMU data
                 const auto imuraw = _imu.read();
@@ -421,6 +430,28 @@ namespace hf {
                 _usec_prev = usec_curr;
 
                 return dt;
+            }
+
+            void blink(const bool is_imu_calibrated)
+            {
+                static bool _pulsing;
+                static uint32_t _pulse_start;
+
+                const auto ready = is_imu_calibrated ?
+                    _heartbeatTimer.ready() : _fastblinkTimer.ready();
+                
+                if (ready) {
+                    digitalWrite(LED_PIN, true);
+                    _pulsing = true;
+                    _pulse_start = millis();
+                }
+
+                else if (_pulsing) {
+                    if (millis() - _pulse_start > LED_PULSE_DURATION_MSEC) {
+                        digitalWrite(LED_PIN, false);
+                        _pulsing = false;
+                    }
+                }
             }
 
     }; // class FC
