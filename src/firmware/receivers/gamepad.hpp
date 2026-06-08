@@ -42,9 +42,9 @@ namespace hf {
             {
                 static MspParser _parser;
 
-                _parser = MspParser::parse(_parser, byte);
+                _parser = MspParser::Parse(_parser, byte);
 
-                switch (MspParser::getid(_parser)) {
+                switch (MspParser::GetId(_parser)) {
 
                     case MSP_SET_ARMING:
                         data.requested_arming = !data.requested_arming;
@@ -59,13 +59,13 @@ namespace hf {
                     case MSP_SET_HOVER:
                         data.requested_hover = true;
                         data.setpoint.thrust =
-                            MspParser::getFloat(_parser, 0);
+                            MspParser::GetFloat(_parser, 0);
                         data.setpoint.pitch =
-                            MspParser::getFloat(_parser, 1); // vx
+                            MspParser::GetFloat(_parser, 1); // vx
                         data.setpoint.roll =
-                            MspParser::getFloat(_parser, 2); // vy
+                            MspParser::GetFloat(_parser, 2); // vy
                         data.setpoint.yaw =
-                            MspParser::getFloat(_parser, 3);
+                            MspParser::GetFloat(_parser, 3);
                         data.timestamp_msec = millis();
                         break;
 

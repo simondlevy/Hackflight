@@ -38,7 +38,7 @@ namespace hf {
 
             MspParser() = default;
 
-            static auto parse(const MspParser & p,
+            static auto Parse(const MspParser & p,
                     const uint8_t b) -> MspParser
             {
 
@@ -75,12 +75,12 @@ namespace hf {
                         index_, id);
             }
 
-            static auto getid(const MspParser & p) -> uint8_t
+            static auto GetId(const MspParser & p) -> uint8_t
             {
                 return p.id_;
             }
 
-            static auto getFloat(const MspParser & p,
+            static auto GetFloat(const MspParser & p,
                     const uint8_t index_) -> float
             {
                 const uint8_t offset = 4 * index_;
@@ -92,13 +92,6 @@ namespace hf {
                 float value = 0;
                 memcpy(&value, &tmp, 4);
                 return value;
-            }
-
-            static auto getUshort(const MspParser & p,
-                    const uint8_t index_) -> uint16_t
-            {
-                const uint8_t offset = 2 * index_;
-                return (p.buffer_[offset+1] << 8) | p.buffer_[offset];
             }
 
         private:

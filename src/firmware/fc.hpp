@@ -424,12 +424,12 @@ namespace hf {
                         state_.psi, state_.dpsi
                     };
 
-                    telemetry_serializer_ = MspSerializer::serializeFloats(
+                    telemetry_serializer_ = MspSerializer::SerializeFloat(
                             telemetry_serializer_, MSP_TELEMETRY, data, 15);
 
                     Serial1.write(
-                            MspSerializer::payloadBytes(telemetry_serializer_),
-                            MspSerializer::payloadSize(telemetry_serializer_));
+                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
+                            MspSerializer::GetPayloadSize(telemetry_serializer_));
                 }
             }
 

@@ -45,7 +45,7 @@ namespace hf {
                     payload_(payload),
                     payload_size_(payloadSize) {}
 
-            static auto serializeFloats(
+            static auto SerializeFloat(
                     const MspSerializer & serializer,
                     const uint8_t id,
                     const float src[],
@@ -55,10 +55,10 @@ namespace hf {
 
                 uint8_t checksum = 0;
 
-                prepareToSerialize(id, count, 4, payload, checksum);
+                PrepareToSerialize(id, count, 4, payload, checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
-                    serializeFloat(5 + k*4, src[k], payload, checksum);
+                    SerializeFloat(5 + k*4, src[k], payload, checksum);
                 }
 
                 payload[5 + 4 * count] = checksum;
@@ -66,13 +66,13 @@ namespace hf {
                 return MspSerializer(payload, 6 + 4 * count);
             }
 
-            static auto payloadBytes(
+            static auto GetPayloadBytes(
                     const MspSerializer & serializer) -> uint8_t *
             {
                 return (uint8_t *)serializer.payload_.data();
             }
 
-            static auto payloadSize(
+            static auto GetPayloadSize(
                     const MspSerializer & serializer) -> uint8_t
             {
                 return serializer.payload_size_;
@@ -90,13 +90,13 @@ namespace hf {
                     Payload & payload,
                     uint8_t & checksum)
             {
-                serialize8(a & 0xFF, k, payload, checksum);
-                serialize8((a >> 8) & 0xFF, k+1, payload, checksum);
-                serialize8((a >> 16) & 0xFF, k+2, payload, checksum);
-                serialize8((a >> 24) & 0xFF, k+3, payload, checksum);
+                Serialize8(a & 0xFF, k, payload, checksum);
+                Serialize8((a >> 8) & 0xFF, k+1, payload, checksum);
+                Serialize8((a >> 16) & 0xFF, k+2, payload, checksum);
+                Serialize8((a >> 24) & 0xFF, k+3, payload, checksum);
             }
 
-            static void serialize8(
+            static void Serialize8(
                     const uint8_t a,
                     const uint8_t k,
                     Payload & payload,
@@ -106,7 +106,7 @@ namespace hf {
                 checksum ^= a;
             }
 
-            static void prepareToSerialize(
+            static void PrepareToSerialize(
                     const uint8_t id,
                     const uint8_t count,
                     const uint8_t size,
@@ -117,12 +117,12 @@ namespace hf {
                 payload[1] = 'M';
                 payload[2] = '>';
 
-                serialize8(count*size, 3, payload, checksum);
+                Serialize8(count*size, 3, payload, checksum);
 
-                serialize8(id, 4, payload, checksum);
+                Serialize8(id, 4, payload, checksum);
             }
 
-            static void serializeFloat(
+            static void SerializeFloat(
                     const int k,
                     const float src,
                     Payload & payload,

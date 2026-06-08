@@ -34,12 +34,12 @@ namespace hf {
 
             ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-            static auto apply(const ThreeAxisLpf & lpf, const ThreeAxis & in,
+            static auto Apply(const ThreeAxisLpf & lpf, const ThreeAxis & in,
                     const float cutoff_freq) -> ThreeAxisLpf
             {
-                const auto x = LPF::apply(lpf.x_, in.x, cutoff_freq);
-                const auto y = LPF::apply(lpf.y_, in.y, cutoff_freq);
-                const auto z = LPF::apply(lpf.z_, in.z, cutoff_freq);
+                const auto x = LPF::Apply(lpf.x_, in.x, cutoff_freq);
+                const auto y = LPF::Apply(lpf.y_, in.y, cutoff_freq);
+                const auto z = LPF::Apply(lpf.z_, in.z, cutoff_freq);
 
                 const auto output = ThreeAxis(x.output, y.output, z.output);
 

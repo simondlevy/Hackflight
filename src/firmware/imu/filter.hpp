@@ -149,12 +149,12 @@ namespace hf {
                 const auto gyro_unbiased =
                     Scale(gyro_val - gyro_bias, gyro_range_dps);
 
-                const auto gyro_lpf = filter.gyro_lpf_.apply(
+                const auto gyro_lpf = filter.gyro_lpf_.Apply(
                         filter.gyro_lpf_, gyro_unbiased, GYRO_LPF_CUTOFF_FREQ);
 
                 const auto gyro_filtered = gyro_lpf.output;
 
-                const auto accel_lpf = filter.accel_lpf_.apply(filter.accel_lpf_,
+                const auto accel_lpf = filter.accel_lpf_.Apply(filter.accel_lpf_,
                         accel, ACCEL_LPF_CUTOFF_FREQ);
 
                 const auto accel_filtered = filter.accel_lpf_.output;

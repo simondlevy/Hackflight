@@ -29,7 +29,7 @@ namespace hf {
 
             LPF& operator=(const LPF& other) = default;
 
-            static auto apply(
+            static auto Apply(
                     const LPF & lpf,
                     const float sample,
                     const float cutoff_freq,
