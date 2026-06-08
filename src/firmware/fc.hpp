@@ -286,19 +286,19 @@ namespace hf {
             OpticalFlowSensor _flow_sensor;
 
             // Timers
-            Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
+            Timer _ekf_prediction_timer = Timer(EKF_PREDICTION_RATE_HZ);
+            Timer _flying_check_timer = Timer(FLYING_CHECK_RATE_HZ);
             Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
-            Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
+            Timer _telemetry_time = Timer(TELEMETRY_RATE_HZ);
 
             // PID control for stabilize-only
             StabilizerPidController _stabiilizer_pid;
 
             // PID control for hover
-            HoverPidController _hoverPid;
+            HoverPidController _hover_pid;
 
             // Telemetry serializer
-            MspSerializer _telemetrySerializer;
+            MspSerializer _telemetry_serializer;
 
             // Debugging
             Debugger _debugger;
@@ -311,8 +311,8 @@ namespace hf {
             uint32_t _led_pulse_start;
 
             // Support for LED blinking
-            Timer _heartbeatTimer = Timer(LED_HEARTBEAT_FREQ_HZ);
-            Timer _fastblinkTimer = Timer(LED_FASTBLINK_FREQ_HZ);
+            Timer _heartbeat_timer = Timer(LED_HEARTBEAT_FREQ_HZ);
+            Timer _fast_blink_timer = Timer(LED_FASTBLINK_FREQ_HZ);
 
             // Instance methods ---------------------------------------------0
 
@@ -331,10 +331,10 @@ namespace hf {
 
                 acquireHoverData();
 
-                _hoverPid= HoverPidController::run(_hoverPid,
+                _hover_pid= HoverPidController::run(_hover_pid,
                         getDt(), _mode, _state, setpoint_in);
 
-                const auto setpoint_out = _hoverPid.setpoint;
+                const auto setpoint_out = _hover_pid.setpoint;
 
                 sendTelemetry(setpoint_out);
 
@@ -358,7 +358,7 @@ namespace hf {
 
                     _mode == MODE_IDLE || _mode == MODE_PANIC  ? false :
 
-                    _flyingCheckTimer.ready() ?
+                    _flying_check_timer.ready() ?
                     areMotorsAboveIdle(motor_vals, motor_count) :
 
                     _is_flying;
@@ -374,7 +374,7 @@ namespace hf {
                         _imu.gyroRangeDps(), _imu.accelRangeGs());
 
                 // Periodically run the EKF prediction step
-                if (_ekfPredictionTimer.ready()) {
+                if (_ekf_prediction_timer.ready()) {
                     _ekf = EKF::predict(_ekf, millis(), _is_flying); 
                 }
 
@@ -410,7 +410,7 @@ namespace hf {
 
             void sendTelemetry(const Setpoint & setpoint)
             {
-                if (_telemetryTimer.ready()) {
+                if (_telemetry_time.ready()) {
 
                     const float data[15] = {
                         (float)_mode,
@@ -420,12 +420,12 @@ namespace hf {
                         _state.psi, _state.dpsi
                     };
 
-                    _telemetrySerializer = MspSerializer::serializeFloats(
-                            _telemetrySerializer, MSP_TELEMETRY, data, 15);
+                    _telemetry_serializer = MspSerializer::serializeFloats(
+                            _telemetry_serializer, MSP_TELEMETRY, data, 15);
 
                     Serial1.write(
-                            MspSerializer::payloadBytes(_telemetrySerializer),
-                            MspSerializer::payloadSize(_telemetrySerializer));
+                            MspSerializer::payloadBytes(_telemetry_serializer),
+                            MspSerializer::payloadSize(_telemetry_serializer));
                 }
             }
 
@@ -441,7 +441,7 @@ namespace hf {
             void blinkLed(const bool is_imu_calibrated)
             {
                 const auto ready = is_imu_calibrated ?
-                    _heartbeatTimer.ready() : _fastblinkTimer.ready();
+                    _heartbeat_timer.ready() : _fast_blink_timer.ready();
                 
                 if (ready) {
                     digitalWrite(LED_PIN, true);
