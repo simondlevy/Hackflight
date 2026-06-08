@@ -99,7 +99,7 @@ namespace hf {
             {
                 const auto rxdata = rx.data;
 
-                step(rxdata.requested_arming, false, // false = no hover
+                Step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motor_vals, motor_count);
 
                 const auto rx_setpoint = rxdata.setpoint;
@@ -113,9 +113,9 @@ namespace hf {
                         rx_setpoint.yaw);
 
                 stabilizer_pid_ = StabilizerPidController::run( stabilizer_pid_,
-                        is_flying_, getDt(), state_, setpoint);
+                        is_flying_, GetDt(), state_, setpoint);
 
-                sendTelemetry(stabilizer_pid_.setpoint);
+                SendTelemetry(stabilizer_pid_.setpoint);
 
                 return stabilizer_pid_.setpoint;
             } 
@@ -130,7 +130,7 @@ namespace hf {
 
                 const auto rxdata = rx.data;
 
-                return update(rxdata.setpoint, rxdata.requested_arming,
+                return Update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
                         motor_vals, motor_count);
             } 
@@ -145,7 +145,7 @@ namespace hf {
 
                 const auto gpdata = gamepad.data;
 
-                return update(gpdata.setpoint, gpdata.requested_arming,
+                return Update(gpdata.setpoint, gpdata.requested_arming,
                         gpdata.requested_hover, gpdata.timestamp_msec,
                         motor_vals, motor_count);
             } 
@@ -307,7 +307,7 @@ namespace hf {
             // Debugging
             Debugger debugger_;
 
-            // Support for getDt()
+            // Support for GetDt()
             uint32_t usec_prev_;
 
             // Support for LED blink
@@ -320,7 +320,7 @@ namespace hf {
 
             // Instance methods ---------------------------------------------0
 
-            auto update(
+            auto Update(
                     const Setpoint & setpoint_in,
                     const bool requested_arming,
                     const bool requested_hover,
@@ -330,22 +330,22 @@ namespace hf {
             {
                 RunDelayLoop(micros(), CORE_LOOP_HZ);
 
-                step(requested_arming, requested_hover,
+                Step(requested_arming, requested_hover,
                         timestamp_msec, motor_vals, motor_count);
 
                 AcquireHoverData();
 
                 hover_pid_= HoverPidController::run(hover_pid_,
-                        getDt(), mode_, state_, setpoint_in);
+                        GetDt(), mode_, state_, setpoint_in);
 
                 const auto setpoint_out = hover_pid_.setpoint;
 
-                sendTelemetry(setpoint_out);
+                SendTelemetry(setpoint_out);
 
                 return setpoint_out;
              } 
 
-            void step(
+            void Step(
                     const bool requested_arming,
                     bool requested_hover,
                     const uint32_t timestamp_msec,
@@ -363,12 +363,12 @@ namespace hf {
                     mode_ == MODE_IDLE || mode_ == MODE_PANIC  ? false :
 
                     flying_check_timer_.Ready() ?
-                    areMotorsAboveIdle(motor_vals, motor_count) :
+                    AreMotorsAboveIdle(motor_vals, motor_count) :
 
                     is_flying_;
 
                 // Blink LED to indicate status
-                blinkLed(imu_filter_.is_gyro_calibrated && mode_ != MODE_PANIC);
+                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != MODE_PANIC);
 
                 // Read the raw IMU data
                 const auto imuraw = imu_.read();
@@ -389,7 +389,7 @@ namespace hf {
                 state_ = EKF::getVehicleState(ekf_);
             }
 
-            auto areMotorsAboveIdle(
+            auto AreMotorsAboveIdle(
                     const float * motor_vals,
                     const uint8_t motor_count) -> bool
             {
@@ -412,7 +412,7 @@ namespace hf {
                     FLYING_HYSTERESIS_THRESHOLD_MSEC;
             }
 
-            void sendTelemetry(const Setpoint & setpoint)
+            void SendTelemetry(const Setpoint & setpoint)
             {
                 if (telemetry_timer_.Ready()) {
 
@@ -433,7 +433,7 @@ namespace hf {
                 }
             }
 
-            auto getDt() -> float
+            auto GetDt() -> float
             {
                 const auto usec_curr = micros();      
                 const float dt = (usec_curr - usec_prev_)/1000000.0;
@@ -442,7 +442,7 @@ namespace hf {
                 return dt;
             }
 
-            void blinkLed(const bool isimu__calibrated)
+            void BlinkLed(const bool isimu__calibrated)
             {
                 const auto ready = isimu__calibrated ?
                     heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
