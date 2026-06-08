@@ -141,7 +141,7 @@ namespace hf {
                     const uint32_t last_prediction_msec)
                 :
                     core(core),
-                    q(q),
+                    q_(q),
                     gyro_latest_(gyro_latest),
                     accel_subsampler(accel_subsampler),
                     gyro_subsampler(gyro_subsampler),
@@ -214,7 +214,7 @@ namespace hf {
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, ekf.q);
+                auto tmpq = rotate(dtw, ekf.q_);
 
                 const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
 
@@ -313,11 +313,12 @@ namespace hf {
                 const auto q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
                     smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
-                    ekf.q / Quaternion::l2norm(rotate(v, ekf.q)) : ekf.q;
+                    ekf.q_ / Quaternion::l2norm(rotate(v, ekf.q_)) : ekf.q_;
 
                 // Convert the new attitude to a rotation matrix, such that we can
                 // rotate body-frame velocity and accel
                 const auto r = ready ?
+
                     Rotation(
                             q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
                             2 * q.x * q.y - 2 * q.w * q.z,
@@ -327,7 +328,9 @@ namespace hf {
                             2 * q.y * q.z - 2 * q.w * q.x,
                             2 * q.x * q.z - 2 * q.w * q.y,
                             2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.rmatrix;
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) :
+                        
+                        ekf.rmatrix;
 
                 const auto core = ready ? Core(x, p) : core_with_range_and_flow;
 
@@ -354,7 +357,7 @@ namespace hf {
             {
                 return EKF(
                         ekf.core,
-                        ekf.q,
+                        ekf.q_,
                         ekf.gyro_latest_,
                         ekf.accel_subsampler,
                         ekf.gyro_subsampler,
@@ -389,10 +392,10 @@ namespace hf {
                     ekf.rmatrix.zy*x[STATE_VY] +
                     ekf.rmatrix.zz*x[STATE_VZ];
 
-                const auto q0 = ekf.q.w;
-                const auto q1 = ekf.q.x;
-                const auto q2 = ekf.q.y;
-                const auto q3 = ekf.q.z;
+                const auto q0 = ekf.q_.w;
+                const auto q1 = ekf.q_.x;
+                const auto q2 = ekf.q_.y;
+                const auto q3 = ekf.q_.z;
 
                 const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
@@ -418,7 +421,7 @@ namespace hf {
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
-            Quaternion q;
+            Quaternion q_;
 
             ThreeAxis gyro_latest_;
 
