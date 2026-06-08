@@ -1,5 +1,6 @@
 /*
-   Hackflight main sketch for Teensy quadcopter using ELRS receiver
+   Hackflight main sketch for Teensy quadcopter using ELRS receiver without
+   hover
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -24,23 +25,22 @@
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
-using namespace hf;
-
-static FC _fc;
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static TraditionalReceiver _rxdata;
-
-static Mixer _mixer;
-
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+
+static hf::FC _fc;
+
+static hf::TraditionalReceiver _rxdata;
+
+static hf::Mixer _mixer;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
-        _rxdata = TraditionalReceiver::update(
+        _rxdata = hf::TraditionalReceiver::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -56,7 +56,7 @@ void setup()
     // Start receiver
     if (!_crsf.begin()) {
         _crsf.end();
-        Debugger::reportForever("Unable to start ELRS receiver");
+        hf::Debugger::reportForever("Unable to start ELRS receiver");
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
@@ -79,7 +79,7 @@ void loop()
     _fc.acquireHoverData();
 
     // Run motor mixer on setpoint
-    _mixer = Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
     if (_fc.isSafeToFly()) {

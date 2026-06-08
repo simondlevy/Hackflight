@@ -24,15 +24,14 @@
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
-using namespace hf;
-
-static FC _fc;
-
-static GamepadReceiver _rx;
-
-static Mixer _mixer;
 
 static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+
+static hf::FC _fc;
+
+static hf::GamepadReceiver _rx;
+
+static hf::Mixer _mixer;
 
 void serialEvent1()
 {
@@ -54,7 +53,7 @@ void loop()
     const auto setpoint = _fc.update(_rx, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _mixer = Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
     if (_fc.isSafeToFly()) {

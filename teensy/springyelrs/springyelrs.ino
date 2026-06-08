@@ -24,17 +24,16 @@
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
-using namespace hf;
 
-static FC _fc;
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static SpringyReceiver _rxdata;
+static hf::FC _fc;
 
-static Mixer _mixer;
+static hf::SpringyReceiver _rxdata;
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static hf::Mixer _mixer;
 
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels)
@@ -53,7 +52,7 @@ static void onReceiveRcChannels(
 
         _button_val = button_val;
 
-        _rxdata = SpringyReceiver::update(
+        _rxdata = hf::SpringyReceiver::update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -70,7 +69,7 @@ void setup()
     // Start receiver
     if (!_crsf.begin()) {
         _crsf.end();
-        Debugger::reportForever("Unable to start ELRS receiver");
+        hf::Debugger::reportForever("Unable to start ELRS receiver");
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
@@ -90,7 +89,7 @@ void loop()
     const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _mixer = Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::run(_mixer, setpoint);
 
     // Run motors if safe
     if (_fc.isSafeToFly()) {
