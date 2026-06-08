@@ -129,10 +129,10 @@ namespace hf {
             EKF(
                     const Core & core,
                     const Quaternion & q,
+                    const Rotation & r,
                     const ThreeAxis & gyro_latest,
                     const ThreeAxisSubSampler & accel_subsampler,
                     const ThreeAxisSubSampler & gyro_subsampler,
-                    const Rotation & r,
                     const bool did_update_with_float_deck,
                     const ZRangerFilter & zranger_filter_latest,
                     const OpticalFlowFilter & optical_flow_filter_latest,
@@ -142,10 +142,10 @@ namespace hf {
                 :
                     core(core),
                     q_(q),
+                    r_(r),
                     gyro_latest_(gyro_latest),
                     accel_subsampler_(accel_subsampler),
                     gyro_subsampler_(gyro_subsampler),
-                    r_(r),
                     did_update_with_float_deck(did_update_with_float_deck),
                     zranger_filter_latest(zranger_filter_latest),
                     optical_flow_filter_latest(optical_flow_filter_latest),
@@ -231,10 +231,10 @@ namespace hf {
                 return EKF(
                         Core(x, P),
                         q,
+                        ekf.r_,
                         ekf.gyro_latest_,
                         accel_subsampler,
                         gyro_subsampler,
-                        ekf.r_,
                         ekf.did_update_with_float_deck,
                         ekf.zranger_filter_latest,
                         ekf.optical_flow_filter_latest,
@@ -337,10 +337,10 @@ namespace hf {
                 return EKF(
                         core,
                         q,
+                        r,
                         gyro_latest,
                         accel_subsampler,
                         gyro_subsampler,
-                        r,
                         false, // didUpateWithFlowDeck
                         ekf.zranger_filter_latest,
                         ekf.optical_flow_filter_latest,
@@ -358,10 +358,10 @@ namespace hf {
                 return EKF(
                         ekf.core,
                         ekf.q_,
+                        ekf.r_,
                         ekf.gyro_latest_,
                         ekf.accel_subsampler_,
                         ekf.gyro_subsampler_,
-                        ekf.r_,
                         true, // did_update_with_float_deck,
                         zrfilter,
                         offilter,
@@ -423,14 +423,14 @@ namespace hf {
             // while also being robust against singularities (in comparison to euler angles)
             Quaternion q_;
 
+            // The vehicle's attitude as a rotation matrix (used by the prediction,
+            // updated by the finalization)
+            Rotation r_;
+
             ThreeAxis gyro_latest_;
 
             ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(GRAVITY);
             ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::DEG2RAD);
-
-            // The vehicle's attitude as a rotation matrix (used by the prediction,
-            // updated by the finalization)
-            Rotation r_;
 
             bool did_update_with_float_deck;
 
