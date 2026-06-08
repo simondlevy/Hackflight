@@ -71,7 +71,7 @@ namespace hf {
                 const int16_t accpx = rawdata.y;
                 const int16_t accpy = rawdata.x;
 
-                return inlimit(accpx) && inlimit(accpy) ?
+                return IsInLimit(accpx) && IsInLimit(accpy) ?
 
                     OpticalFlowFilter(
                             true,           // got motion
@@ -87,7 +87,7 @@ namespace hf {
 
         private:
 
-            static auto inlimit(const int16_t accval) -> bool
+            static auto IsInLimit(const int16_t accval) -> bool
             {
                 return abs(accval) < OUTLIER_LIMIT;
             }

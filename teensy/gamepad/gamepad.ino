@@ -35,7 +35,7 @@ static hf::Mixer _mixer;
 
 void serialEvent1()
 {
-    _rx.handleSerial1Event();
+    _rx.HandleSerial1Event();
 }
 
 void setup()

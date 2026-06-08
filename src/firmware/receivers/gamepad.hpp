@@ -28,17 +28,17 @@ namespace hf {
 
             ReceiverData data;
 
-            void handleSerial1Event()
+            void HandleSerial1Event()
             {
                 while (Serial1.available()) {
 
-                    handleIncomingByte(Serial1.read());
+                    HandleIncomingByte(Serial1.read());
                 }
             }
 
         private:
 
-            void handleIncomingByte(const uint8_t byte)
+            void HandleIncomingByte(const uint8_t byte)
             {
                 static MspParser _parser;
 
