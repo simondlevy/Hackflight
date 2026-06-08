@@ -21,9 +21,9 @@
 #include <sim/dynamics.hpp>
 
 // Approximate thrust RPM needed when in perfect hover
-static constexpr float VEHICLE_HOVER_RPM = 35546;
+static constexpr float kVehicleHoverRpm = 35546;
 
-static constexpr hf::Dynamics::VehicleParams VPARAMS = {
+static constexpr hf::Dynamics::VehicleParams kVehicleParams = {
 
     // Actual values
     9.0e-2,  // mass [kg]
