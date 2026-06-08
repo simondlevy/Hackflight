@@ -164,8 +164,8 @@ namespace hf {
 
                 const auto dt = (msec_curr - ekf.last_prediction_msec) / 1000.f;
 
-                const auto accel = accel_subsampler.subSample;
-                const auto gyro = gyro_subsampler.subSample;
+                const auto accel = accel_subsampler.sub_sample;
+                const auto gyro = gyro_subsampler.sub_sample;
 
                 // The linearized Jacobean matrix
                 const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.rmatrix);
@@ -308,7 +308,7 @@ namespace hf {
                     core_with_range_and_flow.x[3],
                     0, 0, 0};
 
-                const auto P = enforceSymmetry(core_with_range_and_flow.p);
+                const auto p = enforceSymmetry(core_with_range_and_flow.p);
 
                 const auto q = ready &&
                     (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
@@ -329,7 +329,7 @@ namespace hf {
                             2 * q.y * q.z + 2 * q.w * q.x,
                             q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.rmatrix;
 
-                const auto core = ready ? FC(x, P) : core_with_range_and_flow;
+                const auto core = ready ? FC(x, p) : core_with_range_and_flow;
 
                 return EKF(
                         core,
@@ -453,7 +453,7 @@ namespace hf {
                 const auto vy = x[STATE_VY];
                 const auto vz = x[STATE_VZ];
 
-                const size_t N = STATE_DIM;
+                const auto N = STATE_DIM;
 
                 auto fmatrix = matrix();
 
