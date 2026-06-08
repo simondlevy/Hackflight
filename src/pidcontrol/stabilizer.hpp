@@ -25,7 +25,7 @@ namespace hf {
 
         private:
 
-            static constexpr float YAW_MAX_DPS = 160;     
+            static constexpr float kYawMaxDps = 160;     
 
         public:
 
@@ -60,7 +60,7 @@ namespace hf {
                         dt, airborne, setpoint_in.pitch, state.theta, state.dtheta);
 
                 const auto yaw_pid = YawPid::Run(s.yaw_pid_,
-                        dt, airborne, setpoint_in.yaw * YAW_MAX_DPS, state.dpsi);
+                        dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
 
                 const auto setpoint_out = Setpoint(
                         setpoint_in.thrust,

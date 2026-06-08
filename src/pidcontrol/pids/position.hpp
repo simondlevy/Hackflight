@@ -25,9 +25,10 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 10;
-            static constexpr float KI = 1;
-            static constexpr float ILIMIT = 5000;
+            static constexpr float kP = 10;
+            static constexpr float kI = 1;
+
+            static constexpr float kIntegralLimit = 5000;
 
         public:
 
@@ -59,11 +60,11 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::ConstrainFloat(c.integral_ + error * dt, ILIMIT) :
+                    Num::ConstrainFloat(c.integral_ + error * dt, kIntegralLimit) :
                     0;
 
                 const auto output = airborne ?
-                    Num::ConstrainFloat(KP * error + KI * integral, MAX_DEMAND_DEG) :
+                    Num::ConstrainFloat(kP * error + kI * integral, MAX_DEMAND_DEG) :
                     0;
 
                 return PositionController(output, integral);

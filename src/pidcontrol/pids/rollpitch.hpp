@@ -31,10 +31,11 @@ namespace hf {
         private:
 
 
-            static constexpr float KP = 0.002;    
-            static constexpr float KI = 0.003;    
-            static constexpr float KD = 0.0005;   
-            static constexpr float ILIMIT = 25.0;     
+            static constexpr float kP = 0.002;    
+            static constexpr float kI = 0.003;    
+            static constexpr float kD = 0.0005;   
+
+            static constexpr float kIntegralLimit = 25.0;     
 
         public:
 
@@ -66,9 +67,9 @@ namespace hf {
                 const auto error = target - angle;
 
                 const auto integral = airborne ? 
-                    Num::ConstrainFloat(p.integral_ + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(p.integral_ + error * dt, kIntegralLimit) : 0;
 
-                const auto output = KP * error + KI * integral - KD * dangle; 
+                const auto output = kP * error + kI * integral - kD * dangle; 
 
                 return RollPitchPid(output, integral);
             }
