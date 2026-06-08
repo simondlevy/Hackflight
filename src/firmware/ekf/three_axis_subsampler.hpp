@@ -44,7 +44,7 @@ namespace hf {
                     sub_sample(sub_sample),
                     count(count) {}
 
-            static auto accumulate(const ThreeAxisSubSampler & sub_sampler,
+            static auto Accumulate(const ThreeAxisSubSampler & sub_sampler,
                     const ThreeAxis & sample) -> ThreeAxisSubSampler
             {
                 const auto sum = sub_sampler.sum;
@@ -59,7 +59,7 @@ namespace hf {
                         sub_sampler.count + 1);
             }
 
-            static auto finalize (const ThreeAxisSubSampler & sub_sampler
+            static auto Finalize(const ThreeAxisSubSampler & sub_sampler
                     )-> ThreeAxisSubSampler
             {
                 const auto count = sub_sampler.count;

@@ -157,10 +157,10 @@ namespace hf {
                     const bool isFlying) -> EKF
             {
                 const auto accel_subsampler =
-                    ThreeAxisSubSampler::finalize(ekf.accel_subsampler_);
+                    ThreeAxisSubSampler::Finalize(ekf.accel_subsampler_);
 
                 const auto gyro_subsampler =
-                    ThreeAxisSubSampler::finalize(ekf.gyro_subsampler_);
+                    ThreeAxisSubSampler::Finalize(ekf.gyro_subsampler_);
 
                 const auto dt = (msec_curr - ekf.last_prediction_msec_) / 1000.f;
 
@@ -267,10 +267,10 @@ namespace hf {
                 const auto last_process_noise_update_msec_ =
                     dtpositive ? msec_curr : ekf.last_process_noise_update_msec_;
 
-                const auto accel_subsampler = ThreeAxisSubSampler::accumulate(
+                const auto accel_subsampler = ThreeAxisSubSampler::Accumulate(
                         ekf.accel_subsampler_, imudata.accel_gs);
 
-                const auto gyro_subsampler = ThreeAxisSubSampler::accumulate(
+                const auto gyro_subsampler = ThreeAxisSubSampler::Accumulate(
                         ekf.gyro_subsampler_, imudata.gyro_dps);
 
                 const auto gyro_latest = imudata.gyro_dps;
