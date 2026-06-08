@@ -24,17 +24,17 @@ namespace hf {
 
         private:
 
-            static const uint32_t ACC_SCALE_SAMPLES = 200;
+            static const uint32_t kAccelScaleSamples = 200;
 
-            static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
-            static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
+            static constexpr float kGyroLpfCuttofFreq  = 80;
+            static constexpr float kAccelLpfCutoffFreq = 30;
 
-            static constexpr float GYRO_RAW_VARIANCE_BASE = 100;
-            static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
+            static constexpr float kGyroRawVarianceBase = 100;
+            static const uint32_t kGyroMinBiasTimeoutMsec = 1000;
 
             // Number of samples used in variance calculation. Changing this
             // affects the threshold
-            static const uint16_t GYRO_NBR_OF_SAMPLES = 512;
+            static const uint16_t kGyroNumberOfSamples = 512;
 
         public:
 
@@ -100,10 +100,10 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
-                const auto gyromean = filter.gyro_sum_ / GYRO_NBR_OF_SAMPLES;
+                const auto gyromean = filter.gyro_sum_ / kGyroNumberOfSamples;
 
                 const auto gyrovariance =
-                    (filter.gyro_sum_of_squares_/GYRO_NBR_OF_SAMPLES) -
+                    (filter.gyro_sum_of_squares_/kGyroNumberOfSamples) -
                     Square(gyromean);
 
                 const auto gyro_val = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
@@ -123,15 +123,15 @@ namespace hf {
                 const auto new_buffer_index = filter.gyro_sample_count_ + 1;
 
                 const auto is_buffer_filled =
-                    new_buffer_index == GYRO_NBR_OF_SAMPLES;
+                    new_buffer_index == kGyroNumberOfSamples;
 
                 const auto want_update =!filter.is_gyro_calibrated &&
                     is_buffer_filled;
 
-                const bool is_gyro_variance_low = gyrovariance < GYRO_RAW_VARIANCE_BASE;
+                const bool is_gyro_variance_low = gyrovariance < kGyroRawVarianceBase;
 
                 const bool in_sample_window = (filter.gyro_variance_sample_time_msec_ +
-                        GYRO_MIN_BIAS_TIMEOUT_MS) < msec_curr;
+                        kGyroMinBiasTimeoutMsec) < msec_curr;
 
                 const auto should_update =
                     want_update && is_gyro_variance_low && in_sample_window;
@@ -150,12 +150,12 @@ namespace hf {
                     Scale(gyro_val - gyro_bias, gyro_range_dps);
 
                 const auto gyro_lpf = filter.gyro_lpf_.Apply(
-                        filter.gyro_lpf_, gyro_unbiased, GYRO_LPF_CUTOFF_FREQ);
+                        filter.gyro_lpf_, gyro_unbiased, kGyroLpfCuttofFreq);
 
                 const auto gyro_filtered = gyro_lpf.output;
 
                 const auto accel_lpf = filter.accel_lpf_.Apply(filter.accel_lpf_,
-                        accel, ACCEL_LPF_CUTOFF_FREQ);
+                        accel, kAccelLpfCutoffFreq);
 
                 const auto accel_filtered = filter.accel_lpf_.output;
 
