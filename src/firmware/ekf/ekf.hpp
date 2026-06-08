@@ -119,11 +119,11 @@ namespace hf {
 
                 core.p = addCovarianceNoise(Matrix(), pinit);
 
-                did_update_with_float_deck = false;
-                last_process_noise_update_msec = 0;
+                did_update_with_flow_deck_ = false;
+                last_process_noise_update_msec_ = 0;
 
-                did_predict = false;
-                last_prediction_msec = 0;
+                did_predict_ = false;
+                last_prediction_msec_ = 0;
             }
 
             EKF(
@@ -133,10 +133,10 @@ namespace hf {
                     const ThreeAxis & gyro_latest,
                     const ThreeAxisSubSampler & accel_subsampler,
                     const ThreeAxisSubSampler & gyro_subsampler,
-                    const bool did_update_with_float_deck,
-                    const ZRangerFilter & zranger_filter_latest,
-                    const OpticalFlowFilter & optical_flow_filter_latest,
-                    const uint32_t last_process_noise_update_msec,
+                    const bool did_update_with_flow_deck,
+                    const ZRangerFilter & zranger_filter_latest_,
+                    const OpticalFlowFilter & optical_flow_filter_latest_,
+                    const uint32_t last_process_noise_update_msec_,
                     const bool did_predict,
                     const uint32_t last_prediction_msec)
                 :
@@ -146,12 +146,12 @@ namespace hf {
                     gyro_latest_(gyro_latest),
                     accel_subsampler_(accel_subsampler),
                     gyro_subsampler_(gyro_subsampler),
-                    did_update_with_float_deck(did_update_with_float_deck),
-                    zranger_filter_latest(zranger_filter_latest),
-                    optical_flow_filter_latest(optical_flow_filter_latest),
-                    last_process_noise_update_msec(last_process_noise_update_msec),
-                    did_predict(did_predict),
-                    last_prediction_msec(last_prediction_msec) {}
+                    did_update_with_flow_deck_(did_update_with_flow_deck),
+                    zranger_filter_latest_(zranger_filter_latest_),
+                    optical_flow_filter_latest_(optical_flow_filter_latest_),
+                    last_process_noise_update_msec_(last_process_noise_update_msec_),
+                    did_predict_(did_predict),
+                    last_prediction_msec_(last_prediction_msec) {}
 
             static auto predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
@@ -162,7 +162,7 @@ namespace hf {
                 const auto gyro_subsampler =
                     ThreeAxisSubSampler::finalize(ekf.gyro_subsampler_);
 
-                const auto dt = (msec_curr - ekf.last_prediction_msec) / 1000.f;
+                const auto dt = (msec_curr - ekf.last_prediction_msec_) / 1000.f;
 
                 const auto accel = accel_subsampler.sub_sample;
                 const auto gyro = gyro_subsampler.sub_sample;
@@ -235,10 +235,10 @@ namespace hf {
                         ekf.gyro_latest_,
                         accel_subsampler,
                         gyro_subsampler,
-                        ekf.did_update_with_float_deck,
-                        ekf.zranger_filter_latest,
-                        ekf.optical_flow_filter_latest,
-                        ekf.last_process_noise_update_msec,
+                        ekf.did_update_with_flow_deck_,
+                        ekf.zranger_filter_latest_,
+                        ekf.optical_flow_filter_latest_,
+                        ekf.last_process_noise_update_msec_,
                         true, // did_predict,
                         msec_curr);  // last_prediction_msec
 
@@ -250,7 +250,7 @@ namespace hf {
                     const uint32_t msec_curr) -> EKF
             {
                 const auto dt =
-                    (msec_curr - ekf.last_process_noise_update_msec) / 1000.0f;
+                    (msec_curr - ekf.last_process_noise_update_msec_) / 1000.0f;
 
                 const auto dtpositive = dt > 0;
 
@@ -264,8 +264,8 @@ namespace hf {
                     MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
                 };
 
-                const auto last_process_noise_update_msec =
-                    dtpositive ? msec_curr : ekf.last_process_noise_update_msec;
+                const auto last_process_noise_update_msec_ =
+                    dtpositive ? msec_curr : ekf.last_process_noise_update_msec_;
 
                 const auto accel_subsampler = ThreeAxisSubSampler::accumulate(
                         ekf.accel_subsampler_, imudata.accel_gs);
@@ -284,17 +284,17 @@ namespace hf {
                             enforceSymmetry(addCovarianceNoise(ekf.core.p, noise))) :
                     ekf.core;
 
-                const auto coreWithRange = rangeok && ekf.did_update_with_float_deck ?
+                const auto coreWithRange = rangeok && ekf.did_update_with_flow_deck_ ?
                     updateWithRange(
-                            coreWithNoise, ekf.zranger_filter_latest, rzz) :
+                            coreWithNoise, ekf.zranger_filter_latest_, rzz) :
                     coreWithNoise;
 
-                const auto core_with_range_and_flow = ekf.did_update_with_float_deck ?  
-                    updateWithFlow(coreWithRange, ekf.optical_flow_filter_latest,
+                const auto core_with_range_and_flow = ekf.did_update_with_flow_deck_ ?  
+                    updateWithFlow(coreWithRange, ekf.optical_flow_filter_latest_,
                             gyro_latest, rzz):
                     coreWithRange;
 
-                const auto ready = ekf.did_update_with_float_deck || ekf.did_predict;
+                const auto ready = ekf.did_update_with_flow_deck_ || ekf.did_predict_;
 
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const auto v = ThreeAxis(
@@ -342,11 +342,11 @@ namespace hf {
                         accel_subsampler,
                         gyro_subsampler,
                         false, // didUpateWithFlowDeck
-                        ekf.zranger_filter_latest,
-                        ekf.optical_flow_filter_latest,
-                        last_process_noise_update_msec,
+                        ekf.zranger_filter_latest_,
+                        ekf.optical_flow_filter_latest_,
+                        last_process_noise_update_msec_,
                         false, // did_predict
-                        ekf.last_prediction_msec);
+                        ekf.last_prediction_msec_);
 
             } // update
 
@@ -362,12 +362,12 @@ namespace hf {
                         ekf.gyro_latest_,
                         ekf.accel_subsampler_,
                         ekf.gyro_subsampler_,
-                        true, // did_update_with_float_deck,
+                        true, // did_update_with_flow_deck,
                         zrfilter,
                         offilter,
-                        ekf.last_process_noise_update_msec,
-                        ekf. did_predict,
-                        ekf. last_prediction_msec);
+                        ekf.last_process_noise_update_msec_,
+                        ekf. did_predict_,
+                        ekf. last_prediction_msec_);
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
@@ -432,15 +432,15 @@ namespace hf {
             ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(GRAVITY);
             ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::DEG2RAD);
 
-            bool did_update_with_float_deck;
+            bool did_update_with_flow_deck_;
 
-            ZRangerFilter zranger_filter_latest;
-            OpticalFlowFilter optical_flow_filter_latest;
+            ZRangerFilter zranger_filter_latest_;
+            OpticalFlowFilter optical_flow_filter_latest_;
 
-            uint32_t last_process_noise_update_msec;
+            uint32_t last_process_noise_update_msec_;
 
-            bool did_predict;
-            uint32_t last_prediction_msec;
+            bool did_predict_;
+            uint32_t last_prediction_msec_;
 
             static auto makeJacobian(
                     const float dt,
