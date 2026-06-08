@@ -66,7 +66,7 @@ namespace hf {
                 double I;  // body inertia [kg*m^2]  for roll, pitch
                 double d;  // drag coefficient [T=d*w^2] for yaw
 
-            } vehicle_params_t; 
+            } VehicleParams; 
 
             /**
              *  World parameters
@@ -77,7 +77,7 @@ namespace hf {
                 double g;   // gravitational constant [m/s/s]
                 double rho; // air density [kg/m^3]
 
-            } world_params_t; 
+            } WorldParams; 
 
             Dynamics() = default;
 
@@ -92,14 +92,14 @@ namespace hf {
 
             static auto update(
                     const Dynamics & dyn,
-                    const vehicle_params_t & vparams,
+                    const VehicleParams & vparams,
                     const float dt,
                     const float * rpms,
                     const uint8_t rotor_count,
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
-                    const world_params_t wparams = { 9.807, 1.225 }) -> Dynamics
+                    const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
                 const auto cphi = cos(dyn.state.phi);
                 const auto cnphi = cos(-dyn.state.phi);
