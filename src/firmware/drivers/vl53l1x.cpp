@@ -25,7 +25,7 @@ static Adafruit_VL53L1X _vl53l1x;
 
 namespace hf {
 
-    void ZRanger::begin()
+    void ZRanger::Begin()
     {
         Wire1.begin();
         Wire1.setClock(400000);
@@ -45,7 +45,7 @@ namespace hf {
 
     }
 
-    auto ZRanger::read() -> float
+    auto ZRanger::Read() -> float
     {
         static float _distance;
 

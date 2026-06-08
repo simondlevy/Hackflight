@@ -85,8 +85,8 @@ namespace hf {
                 pinMode(LED_PIN, OUTPUT); 
 
                 if (use_hover_deck) {
-                    zranger_.begin();
-                    flow_sensor_.begin();
+                    zranger_.Begin();
+                    flow_sensor_.Begin();
                 }
 
                 mode_ = MODE_IDLE;
@@ -155,10 +155,10 @@ namespace hf {
                 // Slower EKF update with range, optical flow
                 if (hover_deck_timer_.Ready()) {
                     zranger_filter_ = ZRangerFilter::update(
-                            zranger_filter_, zranger_.read());
+                            zranger_filter_, zranger_.Read());
                     optical_flow_filter_ = OpticalFlowFilter::update(
                             optical_flow_filter_,
-                            micros(), flow_sensor_.read());
+                            micros(), flow_sensor_.Read());
                     ekf_ = EKF::update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }

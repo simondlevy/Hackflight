@@ -22,8 +22,8 @@ namespace hf {
 
         public:
 
-            void begin();
+            void Begin();
 
-            auto read() -> float;
+            auto Read() -> float;
     };
 }

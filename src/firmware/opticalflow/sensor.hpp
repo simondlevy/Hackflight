@@ -40,8 +40,8 @@ namespace hf {
                     RawData& operator=(const RawData& other) = default;
             };
 
-            void begin();
+            void Begin();
 
-            auto read() -> RawData;
+            auto Read() -> RawData;
     };
 }
