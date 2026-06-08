@@ -42,7 +42,7 @@ class PluginHelper {
 
         typedef struct {
 
-            hf::mode_e mode;
+            hf::Mode mode;
             hf::Setpoint setpoint;
 
         } message_t;
@@ -86,7 +86,7 @@ class PluginHelper {
             return message;
         }
 
-        auto run_simulator(const hf::mode_e mode, const hf::Setpoint & setpoint)
+        auto run_simulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
             _simulator = hf::Simulator::step(_simulator, mode, setpoint);

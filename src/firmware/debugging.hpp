@@ -70,7 +70,7 @@ namespace hf {
                 }
             }
 
-            void report(const mode_e mode)
+            void report(const Mode mode)
             {
                 if (_helper.ready()) {
 

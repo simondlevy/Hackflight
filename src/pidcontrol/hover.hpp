@@ -48,7 +48,7 @@ namespace hf {
             static auto run(
                     const HoverPidController & pid,
                     const float dt,
-                    const mode_e mode,
+                    const Mode mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> HoverPidController
             {

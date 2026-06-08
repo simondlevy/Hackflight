@@ -185,7 +185,7 @@ namespace hf {
                     const bool requestedHover,
                     const uint32_t msecPrev,
                     const ImuFilter & imufilt,
-                    const mode_e mode) -> mode_e
+                    const Mode mode) -> Mode
             {
                 const auto shouldArm = 
 
@@ -268,7 +268,7 @@ namespace hf {
             VehicleState _state;
 
             // Idle, armed, etc.
-            mode_e _mode;
+            Mode _mode;
 
             // Flying status based on motors
             bool _is_flying;

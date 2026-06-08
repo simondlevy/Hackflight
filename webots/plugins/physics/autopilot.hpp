@@ -77,7 +77,7 @@ class AutopilotHelper {
             return _helper->run_simulator(message.mode, message.setpoint);
         }
 
-        auto get_pose(const hf::mode_e mode, const hf::Setpoint & setpoint)
+        auto get_pose(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> simsens::Pose
         {
             // Use setpoint to get new state

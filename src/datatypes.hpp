@@ -71,7 +71,7 @@ namespace hf {
         MODE_AUTONOMOUS,
         MODE_PANIC
 
-    } mode_e;
+    } Mode;
 
     class Setpoint {
 

@@ -56,7 +56,7 @@ namespace hf {
 
             static auto step(
                     const Simulator & sim,
-                    const mode_e mode,
+                    const Mode mode,
                     const Setpoint & setpoint,
                     const float framerate=32) -> Simulator 
             {
