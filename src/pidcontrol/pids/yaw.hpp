@@ -54,7 +54,7 @@ namespace hf {
              * arbitrary value to be scaled according to vehicle
              * characteristics.
              */
-             static auto run(
+             static auto Run(
                     const YawPid & p,
                     const float dt,
                     const bool airborne,

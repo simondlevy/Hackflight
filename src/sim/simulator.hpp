@@ -78,7 +78,7 @@ namespace hf {
                     for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
 
                         // Run PID control to get new setpoint
-                        pidControl = HoverPidController::run(
+                        pidControl = HoverPidController::Run(
                                 pidControl, dt, mode, state, setpoint);
 
                         // Scale up new setpoint to RPMs
@@ -92,7 +92,7 @@ namespace hf {
 
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
-                        _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
+                        _mixer = hf::Mixer::Run(_mixer, scaled_setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {

@@ -53,10 +53,10 @@ void loop()
     const auto setpoint = _fc.Update(_rx, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _mixer = hf::Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::Run(_mixer, setpoint);
 
     // Run motors if safe
     if (_fc.IsSafeToFly()) {
-        _motors.run(_fc.IsArmed(), _mixer.motorvals);
+        _motors.Run(_fc.IsArmed(), _mixer.motorvals);
     }
 }

@@ -83,13 +83,13 @@ void setup()
 void loop()
 {
     // This will trigger onReceiveRcChannels() above
-    _crsf.Update();
+    _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _mixer = hf::Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::Run(_mixer, setpoint);
 
     // Run motors if safe
     if (_fc.IsSafeToFly()) {

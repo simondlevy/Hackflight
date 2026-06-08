@@ -49,7 +49,7 @@ namespace hf {
              * Demands is input as meters per second and output as angles in
              * degrees.
              */
-            static auto run(
+            static auto Run(
                     const PositionController & c,
                     const bool airborne,
                     const float dt,

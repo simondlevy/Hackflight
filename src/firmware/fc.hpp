@@ -112,7 +112,7 @@ namespace hf {
                         PositionController::MAX_DEMAND_DEG, 
                         rx_setpoint.yaw);
 
-                stabilizer_pid_ = StabilizerPidController::run( stabilizer_pid_,
+                stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
 
                 SendTelemetry(stabilizer_pid_.setpoint);
@@ -335,7 +335,7 @@ namespace hf {
 
                 AcquireHoverData();
 
-                hover_pid_= HoverPidController::run(hover_pid_,
+                hover_pid_= HoverPidController::Run(hover_pid_,
                         GetDt(), mode_, state_, setpoint_in);
 
                 const auto setpoint_out = hover_pid_.setpoint;

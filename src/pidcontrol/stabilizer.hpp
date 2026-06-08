@@ -46,20 +46,20 @@ namespace hf {
                 roll_pid_(roll_pid),
                 yaw_pid_(yaw_pid) {}
 
-            static auto run(
+            static auto Run(
                     const StabilizerPidController & s,
                     const bool airborne,
                     const float dt,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> StabilizerPidController
             {
-                const auto roll_pid = RollPitchPid::run(s.roll_pid_,
+                const auto roll_pid = RollPitchPid::Run(s.roll_pid_,
                         dt, airborne, setpoint_in.roll, state.phi, state.dphi);
 
-                const auto pitch_pid = RollPitchPid::run(s.pitch_pid_,
+                const auto pitch_pid = RollPitchPid::Run(s.pitch_pid_,
                         dt, airborne, setpoint_in.pitch, state.theta, state.dtheta);
 
-                const auto yaw_pid = YawPid::run(s.yaw_pid_,
+                const auto yaw_pid = YawPid::Run(s.yaw_pid_,
                         dt, airborne, setpoint_in.yaw * YAW_MAX_DPS, state.dpsi);
 
                 const auto setpoint_out = Setpoint(

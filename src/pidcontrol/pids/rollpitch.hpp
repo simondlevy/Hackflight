@@ -55,7 +55,7 @@ namespace hf {
              * values to be scaled according to vehicle
              * characteristics.
              */
-             static auto run(
+             static auto Run(
                     const RollPitchPid & p,
                     const float dt,
                     const bool airborne,

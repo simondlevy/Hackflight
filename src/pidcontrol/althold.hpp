@@ -51,7 +51,7 @@ namespace hf {
                 altitude_pid_(altitude_pid),
                 climbrate_pid_(climbrate_pid) {}
 
-            static auto run(
+            static auto Run(
                     const AltHoldPidController & pid,
                     const float dt,
                     const Mode mode,
@@ -75,11 +75,11 @@ namespace hf {
                 const auto airborne = hovering || (state.z > ALTITUDE_LANDING_M);
 
                 const auto altitude_pid =
-                    AltitudeController::run(pid.altitude_pid_, hovering, dt,
+                    AltitudeController::Run(pid.altitude_pid_, hovering, dt,
                             newaltitude_target_, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::run(pid.climbrate_pid_, airborne, dt,
+                    ClimbRateController::Run(pid.climbrate_pid_, airborne, dt,
                             altitude_pid.output, state.dz);
 
                 return AltHoldPidController(

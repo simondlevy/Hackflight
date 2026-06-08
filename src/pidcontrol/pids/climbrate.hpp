@@ -47,7 +47,7 @@ namespace hf {
              * Demand is input as climbrate target in meters per second and
              * output so that neutral (hover) = 0.5.
              */
-            static auto run(
+            static auto Run(
                     const ClimbRateController & controller,
                     const bool airborne,
                     const float dt,
