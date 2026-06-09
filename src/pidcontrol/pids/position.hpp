@@ -32,7 +32,7 @@ namespace hf {
 
         public:
 
-            static constexpr float MAX_DEMAND_DEG = 30;
+            static constexpr float kMaxDemandDegrees = 30;
 
             float output;
 
@@ -64,7 +64,7 @@ namespace hf {
                     0;
 
                 const auto output = airborne ?
-                    Num::ConstrainFloat(kP * error + kI * integral, MAX_DEMAND_DEG) :
+                    Num::ConstrainFloat(kP * error + kI * integral, kMaxDemandDegrees) :
                     0;
 
                 return PositionController(output, integral);

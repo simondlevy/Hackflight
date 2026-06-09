@@ -54,7 +54,7 @@ namespace hf {
 
         public:
 
-            static constexpr char * MODENAMES[6] = {
+            static constexpr char * kModeNames[6] = {
                 (char *)"IDLE",
                 (char *)"ARMED",
                 (char *)"HOVERING",
@@ -74,7 +74,7 @@ namespace hf {
             {
                 if (helper_.Ready()) {
 
-                    printf("%5lu | mode=%s\n", helper_.count, MODENAMES[mode]);
+                    printf("%5lu | mode=%s\n", helper_.count, kModeNames[mode]);
                 }
             }
 

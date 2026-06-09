@@ -57,6 +57,6 @@ void loop()
 
     // Run motors if safe
     if (_fc.IsSafeToFly()) {
-        _motors.Run(_fc.IsArmed(), _mixer.motorvals);
+        _motors.run(_fc.IsArmed(), _mixer.motorvals);
     }
 }

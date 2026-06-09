@@ -47,13 +47,13 @@ namespace hf {
             static auto Update(const ZRangerFilter& filter,
                     const uint16_t distance_mm) -> ZRangerFilter
             {
-                static constexpr float kExpCOEFF =
+                static constexpr float kExpCoeff =
                     logf(kExpStdB / kExpStdA) / (kExpPointB - kExpPointA);
 
                 const auto distance_m = distance_mm / 1000.f;
 
                 const auto stdev = kExpStdA *
-                    ( 1 + expf(kExpCOEFF * (distance_m - kExpPointA)));
+                    ( 1 + expf(kExpCoeff * (distance_m - kExpPointA)));
 
                 return distance_mm < kOutlierLimitMm ?
                     ZRangerFilter(distance_m, stdev) :
