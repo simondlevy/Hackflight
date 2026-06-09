@@ -25,12 +25,14 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 2;
-            static constexpr float KI = 0.5;
-            static constexpr float ILIMIT = 5000;
-            static constexpr float VEL_MAX = 1;
-            static constexpr float VEL_MAX_OVERHEAD = 1.10;
-            static constexpr float LANDING_SPEED_MPS = 0.15;
+            static constexpr float kP = 2;
+            static constexpr float kI = 0.5;
+
+            static constexpr float kIntegralLimit = 5000;
+
+            static constexpr float kVelMax = 1;
+            static constexpr float kVelMaxOverhead = 1.10;
+            static constexpr float kLandingSpeedMps = 0.15;
 
         public:
 
@@ -39,10 +41,10 @@ namespace hf {
             AltitudeController() = default;
 
             AltitudeController(const AltitudeController & other) 
-                : output(other.output), _integral(other._integral) {}
+                : output(other.output), integral_(other.integral_) {}
 
             AltitudeController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             AltitudeController& operator=(const AltitudeController&) = default;
 
@@ -50,7 +52,7 @@ namespace hf {
              * Demand is input as altitude target in meters and output as 
              * climb rate in meters per second.
              */
-            static auto run(
+            static auto Run(
                     const AltitudeController & controller,
                     const bool hovering,
                     const float dt,
@@ -60,19 +62,19 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = hovering ?
-                    Num::fconstrain(controller._integral + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(controller.integral_ + error * dt, kIntegralLimit) : 0;
 
                 const auto output = hovering ? 
-                    Num::fconstrain(KP * error + KI * integral,
-                            fmaxf(VEL_MAX, 0.5f)  * VEL_MAX_OVERHEAD) :
-                    -LANDING_SPEED_MPS;
+                    Num::ConstrainFloat(kP * error + kI * integral,
+                            fmaxf(kVelMax, 0.5f)  * kVelMaxOverhead) :
+                    -kLandingSpeedMps;
 
                 return AltitudeController(output, integral);
             }
 
         private:
 
-            float _integral;
+            float integral_;
 
     };
 }

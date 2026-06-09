@@ -25,14 +25,14 @@ namespace hf {
 
         private:
 
-            static constexpr float ALTITUDE_MIN_M = 0.2;
-            static constexpr float ALTITUDE_MAX_M = 1.0;
-            static constexpr float ALTITUDE_INIT_M = 0.4;
-            static constexpr float ALTITUDE_INC_MPS = 0.2;
+            static constexpr float kMinM = 0.2;
+            static constexpr float kMaxM = 1.0;
+            static constexpr float kInitM = 0.4;
+            static constexpr float kIncMps = 0.2;
 
         public:
 
-            static constexpr float ALTITUDE_LANDING_M = 0.03;
+            static constexpr float kLandingM = 0.03;
 
             float thrust;
 
@@ -47,55 +47,43 @@ namespace hf {
                     const ClimbRateController & climbrate_pid,
                     const float thrust)
                 : thrust(thrust),
-                _altitude_target(altitude_target),
-                _altitude_pid(altitude_pid),
-                _climbrate_pid(climbrate_pid) {}
+                altitude_target_(altitude_target),
+                altitude_pid_(altitude_pid),
+                climbrate_pid_(climbrate_pid) {}
 
-            static auto run(
+            static auto Run(
                     const AltHoldPidController & pid,
                     const float dt,
-                    const mode_e mode,
+                    const Mode mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> AltHoldPidController
             {
                 // Altitude hold ---------------------------------------------
 
                 const auto  altitude_target =
-                    pid._altitude_target == 0 ? ALTITUDE_INIT_M :
-                    pid._altitude_target;
+                    pid.altitude_target_ == 0 ? kInitM :
+                    pid.altitude_target_;
 
-                const auto new_altitude_target = Num::fconstrain(
+                const auto newaltitude_target_ = Num::ConstrainFloat(
                         altitude_target +
-                        setpoint_in.thrust * ALTITUDE_INC_MPS * dt,
-                        ALTITUDE_MIN_M, ALTITUDE_MAX_M);
+                        setpoint_in.thrust * kIncMps * dt,
+                        kMinM, kMaxM);
 
                 const auto hovering =
-                    mode == MODE_HOVERING || mode == MODE_AUTONOMOUS;
+                    mode == kModeHovering || mode == kModeAutonomous;
 
-                const auto airborne = hovering || (state.z > ALTITUDE_LANDING_M);
+                const auto airborne = hovering || (state.z > kLandingM);
 
                 const auto altitude_pid =
-                    AltitudeController::run(pid._altitude_pid, hovering, dt,
-                            new_altitude_target, state.z);
+                    AltitudeController::Run(pid.altitude_pid_, hovering, dt,
+                            newaltitude_target_, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::run(pid._climbrate_pid, airborne, dt,
+                    ClimbRateController::Run(pid.climbrate_pid_, airborne, dt,
                             altitude_pid.output, state.dz);
 
-                /*
-                static uint32_t _count;
-                printf("%f,%f,%f,%f,%f,%f\n",
-                        _count * dt,
-                        new_altitude_target,
-                        altitude_pid.output,
-                        climbrate_pid.output,
-                        state.z,
-                        state.dz
-                        );
-                _count++;*/
-
                 return AltHoldPidController(
-                        new_altitude_target,
+                        newaltitude_target_,
                         altitude_pid,
                         climbrate_pid,
                         climbrate_pid.output);
@@ -103,10 +91,10 @@ namespace hf {
 
         private:
 
-            float _altitude_target;
+            float altitude_target_;
 
-            AltitudeController _altitude_pid;
+            AltitudeController altitude_pid_;
 
-            ClimbRateController _climbrate_pid;
+            ClimbRateController climbrate_pid_;
     };
 }

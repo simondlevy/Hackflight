@@ -33,38 +33,38 @@ class PluginHelper {
 
     private:
 
-        static constexpr char ROBOT_NAME[] = "diyquad";
+        static constexpr char kRobotName[] = "diyquad";
 
         // Platform-independent simulator simulator loop
-        hf::Simulator _simulator;
+        hf::Simulator simulator_;
 
     public:
 
         typedef struct {
 
-            hf::mode_e mode;
+            hf::Mode mode;
             hf::Setpoint setpoint;
 
         } message_t;
 
-        dBodyID robotBody;
+        dBodyID robot_body;
        
         PluginHelper() : PluginHelper({0, 0, 0, 0, 0, 0}) {}
 
-        PluginHelper(const hf::Pose & startingPose)
+        PluginHelper(const hf::Pose & starting_pose)
         {
-            _simulator = hf::Simulator(startingPose);
+            simulator_ = hf::Simulator(starting_pose);
 
-            robotBody = dWebotsGetBodyFromDEF(ROBOT_NAME);
+            robot_body = dWebotsGetBodyFromDEF(kRobotName);
 
-            if (robotBody == NULL) {
+            if (robot_body == NULL) {
 
                 dWebotsConsolePrintf("webots_physics_init :: ");
                 dWebotsConsolePrintf("error : could not get body of robot.\r\n");
             }
             else {
 
-                dBodySetGravityMode(robotBody, 0);
+                dBodySetGravityMode(robot_body, 0);
             }
         }
 
@@ -86,18 +86,18 @@ class PluginHelper {
             return message;
         }
 
-        auto run_simulator(const hf::mode_e mode, const hf::Setpoint & setpoint)
+        auto run_simulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
-            _simulator = hf::Simulator::step(_simulator, mode, setpoint);
+            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint);
 
-            return _simulator.dynamics.state;
+            return simulator_.dynamics.state;
         }
 
         auto set_dbody_from_state(const hf::SimState & state)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(robotBody, state.x, -state.y, state.z);
+            dBodySetPosition(robot_body, state.x, -state.y, state.z);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
@@ -116,6 +116,6 @@ class PluginHelper {
                 cr * cp * sy - sr * sp * cy
             };
 
-            dBodySetQuaternion(robotBody, q);
+            dBodySetQuaternion(robot_body, q);
         }
 };

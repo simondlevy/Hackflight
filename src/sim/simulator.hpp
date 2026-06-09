@@ -36,9 +36,9 @@ namespace hf {
 
         private:
 
-            static constexpr float DYNAMICS_FREQ = 1e5; // Hz
-            static constexpr float PID_FAST_FREQ = 500; // 1024 Plank 
-            static constexpr float PID_SLOW_FREQ = 100;
+            static constexpr float kDynamicsFreq = 1e5; // Hz
+            static constexpr float kPidFastFreq = 500; // 1024 Plank 
+            static constexpr float kPidSlowFreq = 100;
 
         public:
 
@@ -48,26 +48,26 @@ namespace hf {
 
             Simulator(const Pose & pose)
                 : dynamics(Dynamics(pose)),
-                _pidControl(HoverPidController()) {}
+                pid_controller_(HoverPidController()) {}
 
             Simulator(const Dynamics & dynamics,
                     const HoverPidController & pidControl)
-                : dynamics(dynamics), _pidControl(pidControl) {}
+                : dynamics(dynamics), pid_controller_(pidControl) {}
 
-            static auto step(
+            static auto Step(
                     const Simulator & sim,
-                    const mode_e mode,
+                    const Mode mode,
                     const Setpoint & setpoint,
                     const float framerate=32) -> Simulator 
             {
-                const auto dt = 1/(float)PID_FAST_FREQ;
+                const auto dt = 1/(float)kPidFastFreq;
 
-                auto pidControl = sim._pidControl;
+                auto pidControl = sim.pid_controller_;
 
                 auto dynamics = sim.dynamics;
 
                 // Run slow PID control in outer loop -------------------------
-                for (uint32_t i=0; i<PID_SLOW_FREQ/framerate; ++i) {
+                for (uint32_t i=0; i<kPidSlowFreq/framerate; ++i) {
 
                     // Get vehicle state from dynamics and convert state values
                     // from doubles/radians to floats/degrees for PID
@@ -75,16 +75,16 @@ namespace hf {
                     const auto state = SimStateToVehicleState(dynamics.state);
 
                     // Run fast PID control and mixer in middle loop ----------
-                    for (uint32_t j=0; j<PID_FAST_FREQ/PID_SLOW_FREQ; ++j) {
+                    for (uint32_t j=0; j<kPidFastFreq/kPidSlowFreq; ++j) {
 
                         // Run PID control to get new setpoint
-                        pidControl = HoverPidController::run(
+                        pidControl = HoverPidController::Run(
                                 pidControl, dt, mode, state, setpoint);
 
                         // Scale up new setpoint to RPMs
                         const Setpoint scaled_setpoint = {
                             8000 * (pidControl.setpoint.thrust - 0.5f) +
-                                VEHICLE_HOVER_RPM,
+                                kVehicleHoverRpm,
                             1000 * pidControl.setpoint.roll,
                             1000 * pidControl.setpoint.pitch,
                             1000 * pidControl.setpoint.yaw
@@ -92,12 +92,12 @@ namespace hf {
 
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
-                        _mixer = hf::Mixer::run(_mixer, scaled_setpoint);
+                        _mixer = hf::Mixer::Run(_mixer, scaled_setpoint);
 
                         // Run dynamics in inner loop -------------------------
-                        for (uint32_t k=0; k<DYNAMICS_FREQ/PID_FAST_FREQ; ++k) {
-                            dynamics = Dynamics::update(dynamics,
-                                    VPARAMS, 1 / DYNAMICS_FREQ,
+                        for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
+                            dynamics = Dynamics::Update(dynamics,
+                                    kVehicleParams, 1 / kDynamicsFreq,
                                     _mixer.motorvals, 4, _mixer.roll,
                                     _mixer.pitch, _mixer.yaw);
                         }
@@ -109,7 +109,7 @@ namespace hf {
 
         private:
 
-            HoverPidController _pidControl;
+            HoverPidController pid_controller_;
 
             static auto SimStateToVehicleState(
                     const SimState state) -> VehicleState 
@@ -119,12 +119,12 @@ namespace hf {
                         (float)state.dy,
                         (float)state.z,
                         (float)state.dz,
-                        (float)(Num::RAD2DEG * state.phi),
-                        (float)(Num::RAD2DEG * state.dphi),
-                        (float)(Num::RAD2DEG * state.theta),
-                        (float)(Num::RAD2DEG * state.dtheta),
-                        (float)(Num::RAD2DEG * state.psi),
-                        (float)(Num::RAD2DEG * state.dpsi));
+                        (float)(Num::kRad2Deg * state.phi),
+                        (float)(Num::kRad2Deg * state.dphi),
+                        (float)(Num::kRad2Deg * state.theta),
+                        (float)(Num::kRad2Deg * state.dtheta),
+                        (float)(Num::kRad2Deg * state.psi),
+                        (float)(Num::kRad2Deg * state.dpsi));
             }
     };
 }

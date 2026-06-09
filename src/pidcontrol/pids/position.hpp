@@ -25,23 +25,24 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 10;
-            static constexpr float KI = 1;
-            static constexpr float ILIMIT = 5000;
+            static constexpr float kP = 10;
+            static constexpr float kI = 1;
+
+            static constexpr float kIntegralLimit = 5000;
 
         public:
 
-            static constexpr float MAX_DEMAND_DEG = 30;
+            static constexpr float kMaxDemandDegrees = 30;
 
             float output;
 
             PositionController() = default;
 
             PositionController(const PositionController & a) 
-                : output(a.output), _integral(a._integral) {}
+                : output(a.output), integral_(a.integral_) {}
 
             PositionController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             PositionController& operator=(const PositionController&) = default;
 
@@ -49,7 +50,7 @@ namespace hf {
              * Demands is input as meters per second and output as angles in
              * degrees.
              */
-            static auto run(
+            static auto Run(
                     const PositionController & c,
                     const bool airborne,
                     const float dt,
@@ -59,11 +60,11 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(c._integral + error * dt, ILIMIT) :
+                    Num::ConstrainFloat(c.integral_ + error * dt, kIntegralLimit) :
                     0;
 
                 const auto output = airborne ?
-                    Num::fconstrain(KP * error + KI * integral, MAX_DEMAND_DEG) :
+                    Num::ConstrainFloat(kP * error + kI * integral, kMaxDemandDegrees) :
                     0;
 
                 return PositionController(output, integral);
@@ -71,9 +72,7 @@ namespace hf {
 
         private:
 
-            float _integral;
-
-
+            float integral_;
     };
 
-}
+} // namspace hf

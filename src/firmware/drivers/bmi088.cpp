@@ -23,11 +23,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/imu/sensor.hpp>
-using namespace hf;
 
-static constexpr Bmi088Gyro::Range GRANGE = Bmi088Gyro::RANGE_2000DPS;
+static constexpr Bmi088Gyro::Range KGyroRange = Bmi088Gyro::RANGE_2000DPS;
 
-static constexpr Bmi088Accel::Range ARANGE = Bmi088Accel::RANGE_24G;
+static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
@@ -39,59 +38,63 @@ static bool okay(const int status)
     return status >= 0;
 }
 
-auto IMU::begin() -> bool
-{
-    return 
+namespace hf {
 
-        okay(_gyro.begin()) &&
+    auto IMU::Begin() -> bool
+    {
+        return 
 
-        okay(_accel.begin()) &&
+            okay(_gyro.begin()) &&
 
-        okay(_gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+            okay(_accel.begin()) &&
 
-        okay(_gyro.setRange(GRANGE)) &&
+            okay(_gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-        okay(_gyro.pinModeInt3(
-                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+            okay(_gyro.setRange(KGyroRange)) &&
 
-        okay(_gyro.mapDrdyInt3(true)) &&
+            okay(_gyro.pinModeInt3(
+                        Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                        Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
 
-        okay(_accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+            okay(_gyro.mapDrdyInt3(true)) &&
 
-        okay(_accel.setRange(ARANGE));
-}
+            okay(_accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-auto IMU::gyroRangeDps() -> int16_t
-{
-    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
+            okay(_accel.setRange(kAccelRange));
+    }
 
-    return granges[GRANGE];
-}
+    auto IMU::GetGyroRangeDps() -> int16_t
+    {
+        static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
 
-auto IMU::accelRangeGs() -> int16_t
-{
-    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+        return granges[KGyroRange];
+    }
 
-    return aranges[ARANGE];
-}
+    auto IMU::GetAccelRangeGs() -> int16_t
+    {
+        static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+
+        return aranges[kAccelRange];
+    }
 
 
-auto IMU::read() -> IMU::RawData
-{
-    _gyro.readSensor();
+    auto IMU::Read() -> IMU::RawData
+    {
+        _gyro.readSensor();
 
-    _accel.readSensor();
+        _accel.readSensor();
 
-    return IMU::RawData(
-            IMU::ThreeAxisRaw(
-                _gyro.getGyroX_raw(),
-                _gyro.getGyroY_raw(),
-                _gyro.getGyroZ_raw()
-                ),
-            IMU::ThreeAxisRaw(
-                _accel.getAccelX_raw(),
-                _accel.getAccelY_raw(),
-                _accel.getAccelZ_raw()
-                ));
-}
+        return IMU::RawData(
+                IMU::ThreeAxisRaw(
+                    _gyro.getGyroX_raw(),
+                    _gyro.getGyroY_raw(),
+                    _gyro.getGyroZ_raw()
+                    ),
+                IMU::ThreeAxisRaw(
+                    _accel.getAccelX_raw(),
+                    _accel.getAccelY_raw(),
+                    _accel.getAccelZ_raw()
+                    ));
+    }
+
+} // namespace hf

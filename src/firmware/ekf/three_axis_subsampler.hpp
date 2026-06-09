@@ -24,9 +24,9 @@ namespace hf {
 
         public:
 
-            float conversionFactor;
+            float conversion_factor;
             ThreeAxis sum;
-            ThreeAxis subSample;
+            ThreeAxis sub_sample;
             uint32_t count;
 
             ThreeAxisSubSampler() = default;
@@ -34,50 +34,50 @@ namespace hf {
             ThreeAxisSubSampler& operator=(const ThreeAxisSubSampler& other) = default;
  
             ThreeAxisSubSampler
-                (const float conversionFactor,
+                (const float conversion_factor,
                  const ThreeAxis sum={},
-                 const ThreeAxis subSample={},
+                 const ThreeAxis sub_sample={},
                  const uint32_t count={})
                 :
-                    conversionFactor(conversionFactor),
+                    conversion_factor(conversion_factor),
                     sum(sum),
-                    subSample(subSample),
+                    sub_sample(sub_sample),
                     count(count) {}
 
-            static auto accumulate(const ThreeAxisSubSampler & subSampler,
+            static auto Accumulate(const ThreeAxisSubSampler & sub_sampler,
                     const ThreeAxis & sample) -> ThreeAxisSubSampler
             {
-                const auto sum = subSampler.sum;
+                const auto sum = sub_sampler.sum;
 
                 return ThreeAxisSubSampler(
-                        subSampler.conversionFactor,
+                        sub_sampler.conversion_factor,
                         ThreeAxis(
                             sum.x + sample.x,
                             sum.y + sample.y,
                             sum.z + sample.z),
-                        subSampler.subSample,
-                        subSampler.count + 1);
+                        sub_sampler.sub_sample,
+                        sub_sampler.count + 1);
             }
 
-            static auto finalize (const ThreeAxisSubSampler &
-                    subSampler)-> ThreeAxisSubSampler
+            static auto Finalize(const ThreeAxisSubSampler & sub_sampler
+                    )-> ThreeAxisSubSampler
             {
-                const auto count = subSampler.count;
-                const auto sum = subSampler.sum;
-                const auto conversionFactor = subSampler.conversionFactor;
+                const auto count = sub_sampler.count;
+                const auto sum = sub_sampler.sum;
+                const auto conversion_factor = sub_sampler.conversion_factor;
 
-                return subSampler.count > 0 ?
+                return sub_sampler.count > 0 ?
 
                     ThreeAxisSubSampler(
-                            conversionFactor,
+                            conversion_factor,
                             ThreeAxis(), // sum
                             ThreeAxis(
-                                sum.x * conversionFactor / count,
-                                sum.y * conversionFactor / count,
-                                sum.z * conversionFactor / count),
-                            0) :              // count
+                                sum.x * conversion_factor / count,
+                                sum.y * conversion_factor / count,
+                                sum.z * conversion_factor / count),
+                            0) :        // count
 
-                        subSampler;
+                        sub_sampler;
             }
 
     };

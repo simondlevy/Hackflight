@@ -69,7 +69,7 @@ void loop()
 
     float motorvals[4] = {inp, inp, inp, inp};
 
-    _motors.run(inp > 0, motorvals);
+    _motors.Run(inp > 0, motorvals);
 
     printf("%3.3f\n",analogRead(VOLTAGE_INPUT_PIN) * 3.3 * VOLTAGE_SCALEUP / 1023);
 

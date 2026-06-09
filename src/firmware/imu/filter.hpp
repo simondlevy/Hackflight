@@ -24,17 +24,17 @@ namespace hf {
 
         private:
 
-            static const uint32_t ACC_SCALE_SAMPLES = 200;
+            static const uint32_t kAccelScaleSamples = 200;
 
-            static constexpr float GYRO_LPF_CUTOFF_FREQ  = 80;
-            static constexpr float ACCEL_LPF_CUTOFF_FREQ = 30;
+            static constexpr float kGyroLpfCuttofFreq  = 80;
+            static constexpr float kAccelLpfCutoffFreq = 30;
 
-            static constexpr float GYRO_RAW_VARIANCE_BASE = 100;
-            static const uint32_t GYRO_MIN_BIAS_TIMEOUT_MS = 1000;
+            static constexpr float kGyroRawVarianceBase = 100;
+            static const uint32_t kGyroMinBiasTimeoutMsec = 1000;
 
             // Number of samples used in variance calculation. Changing this
             // affects the threshold
-            static const uint16_t GYRO_NBR_OF_SAMPLES = 512;
+            static const uint16_t kGyroNumberOfSamples = 512;
 
         public:
 
@@ -42,20 +42,20 @@ namespace hf {
 
                 public:
 
-                    ThreeAxis gyroDps;
-                    ThreeAxis accelGs;
+                    ThreeAxis gyro_dps;
+                    ThreeAxis accel_gs;
 
                     Data() = default;
 
-                    Data(const ThreeAxis & gyroDps, const ThreeAxis & accelGs) 
-                        : gyroDps(gyroDps), accelGs(accelGs) {}
+                    Data(const ThreeAxis & gyro_dps, const ThreeAxis & accel_gs) 
+                        : gyro_dps(gyro_dps), accel_gs(accel_gs) {}
 
                     Data& operator=(const Data& other) = default;
             };
 
             Data output;
 
-            bool isGyroCalibrated;
+            bool is_gyro_calibrated;
 
             ImuFilter& operator=(const ImuFilter& other) = default;
 
@@ -63,24 +63,24 @@ namespace hf {
 
             ImuFilter(
                     const Data & output,
-                    const bool isGyroCalibrated,
-                    const ThreeAxis & gyroSum,
-                    const ThreeAxis & gyroSumOfSquares,
-                    const uint16_t  gyroSampleCount,
-                    const ThreeAxis & gyroBias,
-                    const uint32_t gyroVarianceSampleTimeMsec,
-                    const ThreeAxisLpf & accelLpf,
-                    const ThreeAxisLpf & gyroLpf) 
+                    const bool is_gyro_calibrated,
+                    const ThreeAxis & gyro_sum,
+                    const ThreeAxis & gyro_sum_of_squares,
+                    const uint16_t  gyro_sample_count,
+                    const ThreeAxis & gyro_bias,
+                    const uint32_t gyro_variance_sample_time_msec,
+                    const ThreeAxisLpf & accel_lpf,
+                    const ThreeAxisLpf & gyro_lpf) 
                 : 
                     output(output),
-                    isGyroCalibrated(isGyroCalibrated),
-                    _gyroSum(gyroSum),
-                    _gyroSumOfSquares(gyroSumOfSquares),
-                    _gyroSampleCount(gyroSampleCount),
-                    _gyroBias(gyroBias),
-                    _gyroVarianceSampleTimeMsec(gyroVarianceSampleTimeMsec),
-                    _accelLpf(accelLpf),
-                    _gyroLpf(gyroLpf) {}
+                    is_gyro_calibrated(is_gyro_calibrated),
+                    gyro_sum_(gyro_sum),
+                    gyro_sum_of_squares_(gyro_sum_of_squares),
+                    gyro_sample_count_(gyro_sample_count),
+                    gyro_bias_(gyro_bias),
+                    gyro_variance_sample_time_msec_(gyro_variance_sample_time_msec),
+                    accel_lpf_(accel_lpf),
+                    gyro_lpf_(gyro_lpf) {}
 
             /**
              * imuraw should come in as follows:
@@ -91,7 +91,7 @@ namespace hf {
              *   accel.y: positive roll-right
              *   accel.z: positive rightside-up
              */
-            static auto step(
+            static auto Step(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
                     const IMU::RawData & imuraw,
@@ -100,102 +100,88 @@ namespace hf {
             {
                 const auto gyroraw = imuraw.gyro;
 
-                const auto gyromean = filter._gyroSum / GYRO_NBR_OF_SAMPLES;
+                const auto gyromean = filter.gyro_sum_ / kGyroNumberOfSamples;
 
                 const auto gyrovariance =
-                    (filter._gyroSumOfSquares/GYRO_NBR_OF_SAMPLES) -
-                    square(gyromean);
+                    (filter.gyro_sum_of_squares_/kGyroNumberOfSamples) -
+                    Square(gyromean);
 
-                const auto gyroval = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
+                const auto gyro_val = ThreeAxis(gyroraw.x, gyroraw.y, gyroraw.z);
 
-                const auto gyroSum = filter.isGyroCalibrated ?
-                    filter._gyroSum : filter._gyroSum + gyroval;
+                const auto gyro_sum = filter.is_gyro_calibrated ?
+                    filter.gyro_sum_ : filter.gyro_sum_ + gyro_val;
 
-                const auto gyroSumOfSquares = filter.isGyroCalibrated ?
-                    filter._gyroSumOfSquares :
-                    filter._gyroSumOfSquares + square(gyroval);
+                const auto gyro_sum_of_squares = filter.is_gyro_calibrated ?
+                    filter.gyro_sum_of_squares_ :
+                    filter.gyro_sum_of_squares_ + Square(gyro_val);
 
-                const auto accelraw = imuraw.accel;
-                const auto accel = scale(
-                        ThreeAxis(accelraw.x, accelraw.y, accelraw.z),
+                const auto accel_raw = imuraw.accel;
+                const auto accel = Scale(
+                        ThreeAxis(accel_raw.x, accel_raw.y, accel_raw.z),
                         accel_range_gs);
 
-                const auto newBufferIndex = filter._gyroSampleCount + 1;
+                const auto new_buffer_index = filter.gyro_sample_count_ + 1;
 
-                const auto isBufferFilled =
-                    newBufferIndex == GYRO_NBR_OF_SAMPLES;
+                const auto is_buffer_filled =
+                    new_buffer_index == kGyroNumberOfSamples;
 
-                const auto wantUpdate =!filter.isGyroCalibrated &&
-                    isBufferFilled;
+                const auto want_update =!filter.is_gyro_calibrated &&
+                    is_buffer_filled;
 
-                const bool isGyroVarianceLow = gyrovariance < GYRO_RAW_VARIANCE_BASE;
+                const bool is_gyro_variance_low = gyrovariance < kGyroRawVarianceBase;
 
-                const bool inSampleWindow = (filter._gyroVarianceSampleTimeMsec +
-                        GYRO_MIN_BIAS_TIMEOUT_MS) < msec_curr;
+                const bool in_sample_window = (filter.gyro_variance_sample_time_msec_ +
+                        kGyroMinBiasTimeoutMsec) < msec_curr;
 
-                const auto shouldUpdate =
-                    wantUpdate && isGyroVarianceLow && inSampleWindow;
+                const auto should_update =
+                    want_update && is_gyro_variance_low && in_sample_window;
 
-                /*
-                static bool _didUpdate;
-                static uint32_t _count;
-                if (shouldUpdate) {
-                    _didUpdate = true;
-                }
-                if (!_didUpdate) {
-                    printf("%05lu: (x=%+5.0f y=%+5.0f z=%+5.0f) => " 
-                            "(x=%+5.0f y=%+5.0f z=%+5.0f)\n",
-                            _count++,
-                            gyroval.x, gyroval.y, gyroval.z,
-                            gyrovariance.x, gyrovariance.y, gyrovariance.z);
-                }*/
+                const auto gyro_bias = should_update ?  gyromean : filter.gyro_bias_;
 
-                const auto gyroBias = shouldUpdate ?  gyromean : filter._gyroBias;
+                const auto gyro_variance_sample_time_msec =
+                    should_update ? msec_curr : filter.gyro_variance_sample_time_msec_;
 
-                const auto gyroVarianceSampleTimeMsec =
-                    shouldUpdate ? msec_curr : filter._gyroVarianceSampleTimeMsec;
+                const auto is_gyro_calibrated = should_update ? true :
+                    filter.is_gyro_calibrated;
 
-                const auto isGyroCalibrated = shouldUpdate ? true :
-                    filter.isGyroCalibrated;
+                const auto gyro_sample_count = is_buffer_filled ? 0 : new_buffer_index;
 
-                const auto gyroSampleCount = isBufferFilled ? 0 : newBufferIndex;
+                const auto gyro_unbiased =
+                    Scale(gyro_val - gyro_bias, gyro_range_dps);
 
-                const auto gyroUnbiased =
-                    scale(gyroval - gyroBias, gyro_range_dps);
+                const auto gyro_lpf = filter.gyro_lpf_.Apply(
+                        filter.gyro_lpf_, gyro_unbiased, kGyroLpfCuttofFreq);
 
-                const auto gyroLpf = filter._gyroLpf.apply(
-                        filter._gyroLpf, gyroUnbiased, GYRO_LPF_CUTOFF_FREQ);
+                const auto gyro_filtered = gyro_lpf.output;
 
-                const auto gyroFiltered = gyroLpf.output;
+                const auto accel_lpf = filter.accel_lpf_.Apply(filter.accel_lpf_,
+                        accel, kAccelLpfCutoffFreq);
 
-                const auto accelLpf = filter._accelLpf.apply(filter._accelLpf,
-                        accel, ACCEL_LPF_CUTOFF_FREQ);
+                const auto accel_filtered = filter.accel_lpf_.output;
 
-                const auto accelFiltered = filter._accelLpf.output;
+                const auto output = Data(gyro_filtered, accel_filtered);
 
-                const auto output = Data(gyroFiltered, accelFiltered);
-
-                return ImuFilter(output, isGyroCalibrated, gyroSum,
-                        gyroSumOfSquares, gyroSampleCount, gyroBias,
-                        gyroVarianceSampleTimeMsec, accelLpf, gyroLpf);
+                return ImuFilter(output, is_gyro_calibrated, gyro_sum,
+                        gyro_sum_of_squares, gyro_sample_count, gyro_bias,
+                        gyro_variance_sample_time_msec, accel_lpf, gyro_lpf);
             }
 
         private:
 
-            ThreeAxis _gyroSum;
-            ThreeAxis _gyroSumOfSquares;
-            uint16_t _gyroSampleCount;
-            ThreeAxis _gyroBias;
-            uint32_t _gyroVarianceSampleTimeMsec;
-            ThreeAxisLpf _accelLpf;
-            ThreeAxisLpf _gyroLpf;
+            ThreeAxis gyro_sum_;
+            ThreeAxis gyro_sum_of_squares_;
+            uint16_t gyro_sample_count_;
+            ThreeAxis gyro_bias_;
+            uint32_t gyro_variance_sample_time_msec_;
+            ThreeAxisLpf accel_lpf_;
+            ThreeAxisLpf gyro_lpf_;
 
-            static auto square(const ThreeAxis & vec) -> ThreeAxis
+            static auto Square(const ThreeAxis & vec) -> ThreeAxis
             {
                 return vec * vec;
             }
 
-            static auto scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
+            static auto Scale(const ThreeAxis & vec, const int16_t s) -> ThreeAxis
             {
                 return vec * 2 * (float)s / 65536;
             }

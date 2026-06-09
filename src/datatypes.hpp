@@ -65,13 +65,13 @@ namespace hf {
 
     typedef enum {
 
-        MODE_IDLE,
-        MODE_ARMED,
-        MODE_HOVERING,
-        MODE_AUTONOMOUS,
-        MODE_PANIC
+        kModeIdle,
+        kModeArmed,
+        kModeHovering,
+        kModeAutonomous,
+        kModePanic
 
-    } mode_e;
+    } Mode;
 
     class Setpoint {
 

@@ -30,8 +30,7 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-static constexpr int DISTANCE_DIFFERENCE_THRESHOLD = 1800;
-static constexpr float SPEED = 0.5;
+static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * _ahelper;
 
@@ -68,7 +67,7 @@ static auto getSetpoint(
 
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
-    return hf::Setpoint(0, 0, direction * SPEED, 0);
+    return hf::Setpoint(0, 0, direction * kSpeed, 0);
 }
 
 // Returns false on collision, true otherwise
@@ -85,7 +84,7 @@ DLLEXPORT void webots_physics_step()
 
     // Replace open-loop setpoint with setpoint from autopilot if
     // available
-    const auto setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+    const auto setpoint = message.mode == hf::kModeAutonomous ?
         getSetpoint(_distance_forward_mm, 
                 _distance_backward_mm, state.dy) :
         message.setpoint;

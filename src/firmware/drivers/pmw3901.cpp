@@ -25,26 +25,29 @@
 #include <hackflight.h>
 #include <firmware/debugging.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-using namespace hf;
 
 static PMW3901 _pmw3901;
 
-void OpticalFlowSensor::begin()
-{
-    SPI.begin();
+namespace hf {
 
-    if (!_pmw3901.begin()) {
-        Debugger::reportForever("Unable to initialize PMW3901");
+    void OpticalFlowSensor::Begin()
+    {
+        SPI.begin();
+
+        if (!_pmw3901.begin()) {
+            Debugger::ReportForever("Unable to initialize PMW3901");
+        }
     }
-}
 
-auto OpticalFlowSensor::read() -> OpticalFlowSensor::RawData
-{
-    int16_t dx = 0;
-    int16_t dy = 0;
-    auto moved = false;
+    auto OpticalFlowSensor::Read() -> OpticalFlowSensor::RawData
+    {
+        int16_t dx = 0;
+        int16_t dy = 0;
+        auto moved = false;
 
-    _pmw3901.readMotion(dx, dy, moved);
+        _pmw3901.readMotion(dx, dy, moved);
 
-    return OpticalFlowSensor::RawData(dx, dy, moved);
+        return OpticalFlowSensor::RawData(dx, dy, moved);
+    }
+
 }

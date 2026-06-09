@@ -28,44 +28,44 @@ namespace hf {
 
             ReceiverData data;
 
-            void handleSerial1Event()
+            void HandleSerial1Event()
             {
                 while (Serial1.available()) {
 
-                    handleIncomingByte(Serial1.read());
+                    HandleIncomingByte(Serial1.read());
                 }
             }
 
         private:
 
-            void handleIncomingByte(const uint8_t byte)
+            void HandleIncomingByte(const uint8_t byte)
             {
                 static MspParser _parser;
 
-                _parser = MspParser::parse(_parser, byte);
+                _parser = MspParser::Parse(_parser, byte);
 
-                switch (MspParser::getid(_parser)) {
+                switch (MspParser::GetId(_parser)) {
 
-                    case MSP_SET_ARMING:
+                    case kMspSetArming:
                         data.requested_arming = !data.requested_arming;
                         data.timestamp_msec = millis();
                         break;
 
-                    case MSP_SET_IDLE:
+                    case kMspSetIdle:
                         data.requested_hover = false;
                         data.timestamp_msec = millis();
                         break;
 
-                    case MSP_SET_HOVER:
+                    case kMspSetHover:
                         data.requested_hover = true;
                         data.setpoint.thrust =
-                            MspParser::getFloat(_parser, 0);
+                            MspParser::GetFloat(_parser, 0);
                         data.setpoint.pitch =
-                            MspParser::getFloat(_parser, 1); // vx
+                            MspParser::GetFloat(_parser, 1); // vx
                         data.setpoint.roll =
-                            MspParser::getFloat(_parser, 2); // vy
+                            MspParser::GetFloat(_parser, 2); // vy
                         data.setpoint.yaw =
-                            MspParser::getFloat(_parser, 3);
+                            MspParser::GetFloat(_parser, 3);
                         data.timestamp_msec = millis();
                         break;
 

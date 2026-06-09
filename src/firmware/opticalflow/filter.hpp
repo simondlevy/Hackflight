@@ -25,19 +25,18 @@ namespace hf {
 
         private:
 
-            static constexpr int16_t OUTLIER_LIMIT = 100;
-
-            static constexpr float FLOW_STD_FIXED = 2.0;
+            static constexpr int16_t kOutlierLimit = 100;
+            static constexpr float kStandardDeviationFixed = 2.0;
 
         public:
 
-            bool gotMotion;
+            bool got_motion;
             uint32_t timestamp_usec;
             uint32_t usec_prev;
             float dpixelx;  // Accumulated pixel count x
             float dpixely;  // Accumulated pixel count y
-            float stdDevX;  // Measurement standard deviation
-            float stdDevY;  // Measurement standard deviation
+            float std_dev_x;  // Measurement standard deviation
+            float std_dev_y;  // Measurement standard deviation
             float dt;       // Time during which pixels were accumulated
 
             OpticalFlowFilter() = default;
@@ -45,23 +44,23 @@ namespace hf {
             OpticalFlowFilter& operator=(const OpticalFlowFilter& other) = default;
 
             OpticalFlowFilter(
-                    const bool gotMotion,
+                    const bool got_motion,
                     const uint32_t usec_prev,
                     const float dpixelx,  
                     const float dpixely, 
-                    const float stdDevX,
-                    const float stdDevY,
+                    const float std_dev_x,
+                    const float std_dev_y,
                     const float dt)
                 : 
-                    gotMotion(gotMotion),
+                    got_motion(got_motion),
                     usec_prev(usec_prev),
                     dpixelx(dpixelx),  
                     dpixely(dpixely), 
-                    stdDevX(stdDevX),
-                    stdDevY(stdDevY),
+                    std_dev_x(std_dev_x),
+                    std_dev_y(std_dev_y),
                     dt(dt) {}
 
-            static auto update(
+            static auto Update(
                     const OpticalFlowFilter & filter,
                     const uint32_t usec_curr,
                     const OpticalFlowSensor::RawData & rawdata
@@ -72,15 +71,15 @@ namespace hf {
                 const int16_t accpx = rawdata.y;
                 const int16_t accpy = rawdata.x;
 
-                return inlimit(accpx) && inlimit(accpy) ?
+                return IsInLimit(accpx) && IsInLimit(accpy) ?
 
                     OpticalFlowFilter(
                             true,           // got motion
                             usec_curr,      // usec_prev
                             (float)accpx,   // dpixelx
                             (float)accpy,   // dpixely
-                            FLOW_STD_FIXED, // stdDevX
-                            FLOW_STD_FIXED, // stdDevY
+                            kStandardDeviationFixed, 
+                            kStandardDeviationFixed, 
                             (float)(usec_curr - filter.usec_prev) / 1e6 // dt
                             ) :
                     filter;
@@ -88,9 +87,9 @@ namespace hf {
 
         private:
 
-            static auto inlimit(const int16_t accval) -> bool
+            static auto IsInLimit(const int16_t accval) -> bool
             {
-                return abs(accval) < OUTLIER_LIMIT;
+                return abs(accval) < kOutlierLimit;
             }
 
     };

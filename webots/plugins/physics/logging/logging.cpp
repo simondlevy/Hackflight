@@ -22,7 +22,7 @@ static PluginHelper * _helper;
 
 static FILE * _logfile;
 
-static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
+static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
@@ -48,7 +48,7 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
-    const auto pwd = getenv(PATH_VARIABLE_NAME);
+    const auto pwd = getenv(kPathVariableName);
 
     char log_path[256] = {};
     sprintf(log_path, "%s/log.csv", pwd);

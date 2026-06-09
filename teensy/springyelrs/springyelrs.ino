@@ -24,17 +24,16 @@
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
-using namespace hf;
 
-static FC _fc;
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static SpringyReceiver _rxdata;
+static hf::FC _fc;
 
-static Mixer _mixer;
+static hf::SpringyReceiver _rxdata;
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+static hf::Mixer _mixer;
 
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels)
@@ -53,7 +52,7 @@ static void onReceiveRcChannels(
 
         _button_val = button_val;
 
-        _rxdata = SpringyReceiver::update(
+        _rxdata = hf::SpringyReceiver::Update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
@@ -70,12 +69,12 @@ void setup()
     // Start receiver
     if (!_crsf.begin()) {
         _crsf.end();
-        Debugger::reportForever("Unable to start ELRS receiver");
+        hf::Debugger::ReportForever("Unable to start ELRS receiver");
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start flight control
-    _fc.begin();
+    _fc.Begin();
 
     // Start motors
     _motors.begin();
@@ -87,13 +86,13 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.update(_rxdata, _mixer.motorvals, 4);
+    const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
 
     // Run motor mixer on setpoint
-    _mixer = Mixer::run(_mixer, setpoint);
+    _mixer = hf::Mixer::Run(_mixer, setpoint);
 
     // Run motors if safe
-    if (_fc.isSafeToFly()) {
-        _motors.run(_fc.isArmed(), _mixer.motorvals);
+    if (_fc.IsSafeToFly()) {
+        _motors.run(_fc.IsArmed(), _mixer.motorvals);
     }
 }

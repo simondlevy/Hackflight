@@ -25,9 +25,10 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 1;//25;
-            static constexpr float KI = 0;//15
-            static constexpr float ILIMIT = 0;//5;
+            static constexpr float kP = 1;
+            static constexpr float kI = 0;
+
+            static constexpr float kIntegralLimit = 0;
 
         public:
 
@@ -36,10 +37,10 @@ namespace hf {
             ClimbRateController() = default;
 
             ClimbRateController(const ClimbRateController & a) 
-                : output(a.output), _integral(a._integral) {}
+                : output(a.output), integral_(a.integral_) {}
 
             ClimbRateController(const float output, const float integral)
-                : output(output), _integral(integral) {}
+                : output(output), integral_(integral) {}
 
             ClimbRateController& operator=(const ClimbRateController&) = default;
 
@@ -47,7 +48,7 @@ namespace hf {
              * Demand is input as climbrate target in meters per second and
              * output so that neutral (hover) = 0.5.
              */
-            static auto run(
+            static auto Run(
                     const ClimbRateController & controller,
                     const bool airborne,
                     const float dt,
@@ -57,13 +58,13 @@ namespace hf {
                 const auto error = target - dz;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(controller._integral + error * dt,
-                            ILIMIT) : 0;
+                    Num::ConstrainFloat(controller.integral_ + error * dt,
+                            kIntegralLimit) : 0;
 
-                const auto thrust = KP * error + KI * integral;
+                const auto thrust = kP * error + kI * integral;
 
                 const auto output = airborne ?
-                    Num::fconstrain(0.5 + thrust, 0, 1) :
+                    Num::ConstrainFloat(0.5 + thrust, 0, 1) :
                     0;
 
                 return ClimbRateController(output, integral);
@@ -71,6 +72,6 @@ namespace hf {
 
         private:
 
-            float _integral;
+            float integral_;
     };
 }

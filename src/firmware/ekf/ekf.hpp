@@ -34,70 +34,70 @@ namespace hf {
 
             // Initial variances, uncertain of position, but know we're
             // stationary and roughly flat
-            static constexpr float STDEV_INITIAL_POSITION_Z = 1;
-            static constexpr float STDEV_INITIAL_VELOCITY = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_ROLLPITCH = 0.01;
-            static constexpr float STDEV_INITIAL_ATTITUDE_YAW = 0.01;
+            static constexpr float kStdevInitialPositionZ = 1;
+            static constexpr float kStdevInitialVelocity = 0.01;
+            static constexpr float kStdevInitialAttitudeRollPitch = 0.01;
+            static constexpr float kStdevInitialAttitudeYaw = 0.01;
 
-            static constexpr float PROC_NOISE_ACCEL_XY = 0.5f;
-            static constexpr float PROC_NOISE_ACCEL_Z = 1.0f;
-            static constexpr float PROC_NOISE_VEL = 0;
-            static constexpr float PROC_NOISE_POS = 0;
-            static constexpr float PROC_NOISE_ATT = 0;
-            static constexpr float MEAS_NOISE_GYRO_ROLLPITCH = 0.1f; // radians per second
-            static constexpr float MEAS_NOISE_GYRO_YAW = 0.1f;       // radians per second
+            static constexpr float kProcessNoiseAccelXy = 0.5f;
+            static constexpr float kProcessNoiseAccelZ = 1.0f;
+            static constexpr float kProcessNoiseVelocity = 0;
+            static constexpr float kProcessNoisePosition = 0;
+            static constexpr float kProcessNoiseAttitude = 0;
+            static constexpr float kMeasurementNoiseGyroRollPitch = 0.1f; // radians per second
+            static constexpr float kMeasurementNoiseGyroYaw = 0.1f;       // radians per second
 
-            static constexpr float GRAVITY = 9.81;
+            static constexpr float kGravity = 9.81;
 
             //We do get the measurements in 10x the motion pixels (experimentally measured)
-            static constexpr float FLOW_RESOLUTION = 0.1;
+            static constexpr float kFlowResolution = 0.1;
 
             // The bounds on the covariance, these shouldn't be hit, but sometimes are... why?
-            static constexpr float MAX_COVARIANCE = 100;
-            static constexpr float MIN_COVARIANCE = 1e-6;
+            static constexpr float MaxCovariance = 100;
+            static constexpr float MinCovariance = 1e-6;
 
             // the reversion of pitch and roll to zero
-            static constexpr float ROLLPITCH_ZERO_REVERSION = 0.001;
+            static constexpr float kRollPitchZeroReversion = 0.001;
 
-            static constexpr float MIN_ANGLE = 1e-4;
-            static constexpr float MAX_ANGLE = 10;
+            static constexpr float MinAngle = 1e-4;
+            static constexpr float MaxAngle = 10;
 
             // Indexes to acceless the vehicle's state, stored as a column vector
             enum
             {
-                STATE_Z,
-                STATE_VX,
-                STATE_VY,
-                STATE_VZ,
-                STATE_D0,
-                STATE_D1,
-                STATE_D2,
-                STATE_DIM
+                kStateZ,
+                kStateVx,
+                kStateVy,
+                kStateVz,
+                kStateD0,
+                kStateD1,
+                kStateD2,
+                kStateDim
             };
 
-            typedef std::array<float, STATE_DIM*STATE_DIM> matrix;
+            typedef std::array<float, kStateDim*kStateDim> Matrix;
 
-            typedef std::array<float, STATE_DIM> vector;
+            typedef std::array<float, kStateDim> Vector;
 
-            class FC {
+            class Core {
 
                 public:
 
                     // State vector
-                    vector x;
+                    Vector x;
 
                     // Covariance matrix
-                    matrix P;
+                    Matrix p;
 
-                    FC() = default;
+                    Core() = default;
 
-                    FC& operator=(const FC& other) = default;
+                    Core& operator=(const Core& other) = default;
 
-                    FC(const vector & x, const matrix & P) 
-                        : x(x), P(P) {}
+                    Core(const Vector & x, const Matrix & p) 
+                        : x(x), p(p) {}
             };
 
-            FC core;
+            Core core;
 
         public:
 
@@ -106,218 +106,220 @@ namespace hf {
             EKF()
             {
                 // Add in the initial process noise 
-                const float pinit[STATE_DIM] = {
+                const float pinit[kStateDim] = {
 
-                    STDEV_INITIAL_POSITION_Z,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_VELOCITY,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_ROLLPITCH,
-                    STDEV_INITIAL_ATTITUDE_YAW
+                    kStdevInitialPositionZ,
+                    kStdevInitialVelocity,
+                    kStdevInitialVelocity,
+                    kStdevInitialVelocity,
+                    kStdevInitialAttitudeRollPitch,
+                    kStdevInitialAttitudeRollPitch,
+                    kStdevInitialAttitudeYaw
                 };
 
-                core.P = addCovarianceNoise(matrix(), pinit);
+                core.p = AddCovarianceNoise(Matrix(), pinit);
 
-                didUpdateWithFlowDeck = false;
-                lastProcessNoiseUpdateMsec = 0;
+                did_update_with_flow_deck_ = false;
+                last_process_noise_update_msec_ = 0;
 
-                didPredict = false;
-                lastPredictionMsec = 0;
+                did_predict_ = false;
+                last_prediction_msec_ = 0;
             }
 
             EKF(
-                    const FC & core,
+                    const Core & core,
                     const Quaternion & q,
-                    const ThreeAxis & gyroLatest,
-                    const ThreeAxisSubSampler & accelSubSampler,
-                    const ThreeAxisSubSampler & gyroSubSampler,
-                    const Rotation & R,
-                    const bool didUpdateWithFlowDeck,
-                    const ZRangerFilter & zrangerFilterLatest,
-                    const OpticalFlowFilter & opticalFlowFilterLatest,
-                    const uint32_t lastProcessNoiseUpdateMsec,
-                    const bool didPredict,
-                    const uint32_t lastPredictionMsec)
+                    const Rotation & r,
+                    const ThreeAxis & gyro_latest,
+                    const ThreeAxisSubSampler & accel_subsampler,
+                    const ThreeAxisSubSampler & gyro_subsampler,
+                    const bool did_update_with_flow_deck,
+                    const ZRangerFilter & zranger_filter_latest_,
+                    const OpticalFlowFilter & optical_flow_filter_latest_,
+                    const uint32_t last_process_noise_update_msec_,
+                    const bool did_predict,
+                    const uint32_t last_prediction_msec)
                 :
                     core(core),
-                    q(q),
-                    gyroLatest(gyroLatest),
-                    accelSubSampler(accelSubSampler),
-                    gyroSubSampler(gyroSubSampler),
-                    R(R),
-                    didUpdateWithFlowDeck(didUpdateWithFlowDeck),
-                    zrangerFilterLatest(zrangerFilterLatest),
-                    opticalFlowFilterLatest(opticalFlowFilterLatest),
-                    lastProcessNoiseUpdateMsec(lastProcessNoiseUpdateMsec),
-                    didPredict(didPredict),
-                    lastPredictionMsec(lastPredictionMsec) {}
+                    q_(q),
+                    r_(r),
+                    gyro_latest_(gyro_latest),
+                    accel_subsampler_(accel_subsampler),
+                    gyro_subsampler_(gyro_subsampler),
+                    did_update_with_flow_deck_(did_update_with_flow_deck),
+                    zranger_filter_latest_(zranger_filter_latest_),
+                    optical_flow_filter_latest_(optical_flow_filter_latest_),
+                    last_process_noise_update_msec_(last_process_noise_update_msec_),
+                    did_predict_(did_predict),
+                    last_prediction_msec_(last_prediction_msec) {}
 
-            static auto predict(const EKF & ekf, const uint32_t msec_curr,
+            static auto Predict(const EKF & ekf, const uint32_t msec_curr,
                     const bool isFlying) -> EKF
             {
-                const auto accelSubSampler =
-                    ThreeAxisSubSampler::finalize(ekf.accelSubSampler);
+                const auto accel_subsampler =
+                    ThreeAxisSubSampler::Finalize(ekf.accel_subsampler_);
 
-                const auto gyroSubSampler =
-                    ThreeAxisSubSampler::finalize(ekf.gyroSubSampler);
+                const auto gyro_subsampler =
+                    ThreeAxisSubSampler::Finalize(ekf.gyro_subsampler_);
 
-                const auto dt = (msec_curr - ekf.lastPredictionMsec) / 1000.f;
+                const auto dt = (msec_curr - ekf.last_prediction_msec_) / 1000.f;
 
-                const auto accel = accelSubSampler.subSample;
-                const auto gyro = gyroSubSampler.subSample;
+                const auto accel = accel_subsampler.sub_sample;
+                const auto gyro = gyro_subsampler.sub_sample;
 
                 // The linearized Jacobean matrix
-                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.R);
+                const auto F = makeJacobian(dt, gyro, ekf.core.x, ekf.r_);
 
                 // P_k = F_{k-1} P_{k-1} F^T_{k-1} --------------------
-                const auto P = dot(dot(F, ekf.core.P), trans(F));
+                const auto P = Dot(Dot(F, ekf.core.p), Transpose(F));
 
                 const auto dt2 = dt * dt;
 
                 // keep previous time step's state for the update
-                const auto tmpSPX = ekf.core.x[STATE_VX];
-                const auto tmpSPY = ekf.core.x[STATE_VY];
-                const auto tmpSPZ = ekf.core.x[STATE_VZ];
+                const auto tmpSPX = ekf.core.x[kStateVx];
+                const auto tmpSPY = ekf.core.x[kStateVy];
+                const auto tmpSPZ = ekf.core.x[kStateVz];
 
-                // position updates in the body frame (will be rotated to inertial frame)
-                const auto dx = ekf.core.x[STATE_VX] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
-                const auto dy = ekf.core.x[STATE_VY] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
+                // position updates in the body frame (will be Rotated to inertial frame)
+                const auto dx = ekf.core.x[kStateVx] * dt + (isFlying ? 0 : accel.x * dt2 / 2);
+                const auto dy = ekf.core.x[kStateVy] * dt + (isFlying ? 0 : accel.y * dt2 / 2);
 
                 // thrust can only be produced in the body's Z direction
-                const auto dz = ekf.core.x[STATE_VZ] * dt + accel.z * dt2 / 2; 
+                const auto dz = ekf.core.x[kStateVz] * dt + accel.z * dt2 / 2; 
 
                 const auto accelx = isFlying ? 0 : accel.x;
                 const auto accely = isFlying ? 0 : accel.y;
 
                 // body-velocity update: accelerometers - gyros cross velocity
                 // - gravity in body frame
-                auto x = vector();
-                x[STATE_Z] = ekf.core.x[STATE_Z] + ekf.R.zx * dx + ekf.R.zy * dy +
-                    ekf.R.zz * dz - GRAVITY * dt2 / 2;
+                auto x = Vector();
+                x[kStateZ] = ekf.core.x[kStateZ] + ekf.r_.zx * dx + ekf.r_.zy * dy +
+                    ekf.r_.zz * dz - kGravity * dt2 / 2;
 
-                x[STATE_VX] = ekf.core.x[STATE_VX] + dt * (accelx + gyro.z * tmpSPY -
-                        gyro.y * tmpSPZ - GRAVITY * ekf.R.zx);
+                x[kStateVx] = ekf.core.x[kStateVx] + dt * (accelx + gyro.z * tmpSPY -
+                        gyro.y * tmpSPZ - kGravity * ekf.r_.zx);
 
-                x[STATE_VY] = ekf.core.x[STATE_VY] + dt * (accely - gyro.z * tmpSPX +
-                        gyro.x * tmpSPZ - GRAVITY * ekf.R.zy);
+                x[kStateVy] = ekf.core.x[kStateVy] + dt * (accely - gyro.z * tmpSPX +
+                        gyro.x * tmpSPZ - kGravity * ekf.r_.zy);
 
-                x[STATE_VZ] = ekf.core.x[STATE_VZ] + dt * (accel.z + gyro.y * tmpSPX -
-                        gyro.x * tmpSPY - GRAVITY * ekf.R.zz);
+                x[kStateVz] = ekf.core.x[kStateVz] + dt * (accel.z + gyro.y * tmpSPX -
+                        gyro.x * tmpSPY - kGravity * ekf.r_.zz);
 
-                x[STATE_D0] = ekf.core.x[STATE_D0];
-                x[STATE_D1] = ekf.core.x[STATE_D1];
-                x[STATE_D2] = ekf.core.x[STATE_D2];
+                x[kStateD0] = ekf.core.x[kStateD0];
+                x[kStateD1] = ekf.core.x[kStateD1];
+                x[kStateD2] = ekf.core.x[kStateD2];
 
-                // Attitude update (rotate by gyroscope): we do this in quaternions
+                // Attitude update (Rotate by gyroscope): we do this in quaternions
                 // this is the gyroscope angular velocity integrated over the sample period
                 const auto dtw = gyro * dt;
 
                 // compute the quaternion values in [w,x,y,z] order
-                auto tmpq = rotate(dtw, ekf.q);
+                auto tmpq = Rotate(dtw, ekf.q_);
 
-                const auto keep = 1.0f - ROLLPITCH_ZERO_REVERSION;
+                const auto keep = 1.0f - kRollPitchZeroReversion;
 
                 const auto newtmpq = isFlying ? tmpq : 
                     Quaternion(
-                            tmpq.w = keep * tmpq.w + ROLLPITCH_ZERO_REVERSION,
+                            tmpq.w = keep * tmpq.w + kRollPitchZeroReversion,
                             tmpq.x = keep * tmpq.x, 
                             tmpq.y = keep * tmpq.y, 
                             tmpq.z = keep * tmpq.z); 
 
                 // normalize and store the result
-                const auto q = newtmpq / Quaternion::l2norm(newtmpq);
+                const auto q = newtmpq / Quaternion::L2Norm(newtmpq);
 
                 return EKF(
-                        FC(x, P),
+                        Core(x, P),
                         q,
-                        ekf.gyroLatest,
-                        accelSubSampler,
-                        gyroSubSampler,
-                        ekf.R,
-                        ekf.didUpdateWithFlowDeck,
-                        ekf.zrangerFilterLatest,
-                        ekf.opticalFlowFilterLatest,
-                        ekf.lastProcessNoiseUpdateMsec,
-                        true, // didPredict,
-                        msec_curr);  // lastPredictionMsec
+                        ekf.r_,
+                        ekf.gyro_latest_,
+                        accel_subsampler,
+                        gyro_subsampler,
+                        ekf.did_update_with_flow_deck_,
+                        ekf.zranger_filter_latest_,
+                        ekf.optical_flow_filter_latest_,
+                        ekf.last_process_noise_update_msec_,
+                        true, // did_predict,
+                        msec_curr);  // last_prediction_msec
 
             } // predict
 
-            static auto update(
+            static auto Update(
                     const EKF & ekf,
                     const ImuFilter::Data & imudata,
                     const uint32_t msec_curr) -> EKF
             {
                 const auto dt =
-                    (msec_curr - ekf.lastProcessNoiseUpdateMsec) / 1000.0f;
+                    (msec_curr - ekf.last_process_noise_update_msec_) / 1000.0f;
 
                 const auto dtpositive = dt > 0;
 
-                const float noise[STATE_DIM] = {
-                    PROC_NOISE_ACCEL_Z*dt*dt + PROC_NOISE_VEL*dt + PROC_NOISE_POS,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_XY*dt + PROC_NOISE_VEL,
-                    PROC_NOISE_ACCEL_Z*dt + PROC_NOISE_VEL,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_ROLLPITCH * dt + PROC_NOISE_ATT,
-                    MEAS_NOISE_GYRO_YAW * dt + PROC_NOISE_ATT
+                const float noise[kStateDim] = {
+                    kProcessNoiseAccelZ*dt*dt + kProcessNoiseVelocity*dt +
+                        kProcessNoisePosition,
+                    kProcessNoiseAccelXy*dt + kProcessNoiseVelocity,
+                    kProcessNoiseAccelXy*dt + kProcessNoiseVelocity,
+                    kProcessNoiseAccelZ*dt + kProcessNoiseVelocity,
+                    kMeasurementNoiseGyroRollPitch * dt + kProcessNoiseAttitude,
+                    kMeasurementNoiseGyroRollPitch * dt + kProcessNoiseAttitude,
+                    kMeasurementNoiseGyroYaw * dt + kProcessNoiseAttitude
                 };
 
-                const auto lastProcessNoiseUpdateMsec =
-                    dtpositive ? msec_curr : ekf.lastProcessNoiseUpdateMsec;
+                const auto last_process_noise_update_msec_ =
+                    dtpositive ? msec_curr : ekf.last_process_noise_update_msec_;
 
-                const auto accelSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.accelSubSampler, imudata.accelGs);
+                const auto accel_subsampler = ThreeAxisSubSampler::Accumulate(
+                        ekf.accel_subsampler_, imudata.accel_gs);
 
-                const auto gyroSubSampler = ThreeAxisSubSampler::accumulate(
-                        ekf.gyroSubSampler, imudata.gyroDps);
+                const auto gyro_subsampler = ThreeAxisSubSampler::Accumulate(
+                        ekf.gyro_subsampler_, imudata.gyro_dps);
 
-                const auto gyroLatest = imudata.gyroDps;
+                const auto gyro_latest = imudata.gyro_dps;
 
-                const auto rzz = ekf.R.zz;
+                const auto rzz = ekf.r_.zz;
 
                 const auto rangeok = fabs(rzz) > 0.1 && rzz > 0; 
 
                 const auto coreWithNoise = dtpositive ?
-                    FC(ekf.core.x, 
-                            enforceSymmetry(addCovarianceNoise(ekf.core.P, noise))) :
+                    Core(ekf.core.x, 
+                            EnforceSymmetry(AddCovarianceNoise(ekf.core.p, noise))) :
                     ekf.core;
 
-                const auto coreWithRange = rangeok && ekf.didUpdateWithFlowDeck ?
-                    updateWithRange(
-                            coreWithNoise, ekf.zrangerFilterLatest, rzz) :
+                const auto coreWithRange = rangeok && ekf.did_update_with_flow_deck_ ?
+                    UpdateWithRange(
+                            coreWithNoise, ekf.zranger_filter_latest_, rzz) :
                     coreWithNoise;
 
-                const auto coreWithRangeAndFlow = ekf.didUpdateWithFlowDeck ?  
-                    updateWithFlow(coreWithRange, ekf.opticalFlowFilterLatest,
-                            gyroLatest, rzz):
+                const auto core_with_range_and_flow = ekf.did_update_with_flow_deck_ ?  
+                    UpdateWithFlow(coreWithRange, ekf.optical_flow_filter_latest_,
+                            gyro_latest, rzz):
                     coreWithRange;
 
-                const auto ready = ekf.didUpdateWithFlowDeck || ekf.didPredict;
+                const auto ready = ekf.did_update_with_flow_deck_ || ekf.did_predict_;
 
                 // Incorporate the attitude error (Kalman filter state) with the attitude
                 const auto v = ThreeAxis(
-                        ekf.core.x[STATE_D0], ekf.core.x[STATE_D1], ekf.core.x[STATE_D2]);
+                        ekf.core.x[kStateD0], ekf.core.x[kStateD1], ekf.core.x[kStateD2]);
 
                 // reset the attitude error
-                const auto x = vector{
-                    coreWithRangeAndFlow.x[0],
-                    coreWithRangeAndFlow.x[1],
-                    coreWithRangeAndFlow.x[2],
-                    coreWithRangeAndFlow.x[3],
+                const auto x = Vector{
+                    core_with_range_and_flow.x[0],
+                    core_with_range_and_flow.x[1],
+                    core_with_range_and_flow.x[2],
+                    core_with_range_and_flow.x[3],
                     0, 0, 0};
 
-                const auto P = enforceSymmetry(coreWithRangeAndFlow.P);
+                const auto p = EnforceSymmetry(core_with_range_and_flow.p);
 
                 const auto q = ready &&
-                    (bigenough(v.x) || bigenough(v.y) || bigenough(v.z)) &&
-                    smallenough(v.x) && smallenough(v.y) && smallenough(v.z) ?
-                    ekf.q / Quaternion::l2norm(rotate(v, ekf.q)) : ekf.q;
+                    (IsBigEnough(v.x) || IsBigEnough(v.y) || IsBigEnough(v.z)) &&
+                    IsSmallEnough(v.x) && IsSmallEnough(v.y) && IsSmallEnough(v.z) ?
+                    ekf.q_ / Quaternion::L2Norm(Rotate(v, ekf.q_)) : ekf.q_;
 
                 // Convert the new attitude to a rotation matrix, such that we can
-                // rotate body-frame velocity and accel
-                const auto R = ready ?
+                // Rotate body-frame velocity and accel
+                const auto r = ready ?
+
                     Rotation(
                             q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
                             2 * q.x * q.y - 2 * q.w * q.z,
@@ -327,44 +329,46 @@ namespace hf {
                             2 * q.y * q.z - 2 * q.w * q.x,
                             2 * q.x * q.z - 2 * q.w * q.y,
                             2 * q.y * q.z + 2 * q.w * q.x,
-                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) : ekf.R;
+                            q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z) :
+                        
+                        ekf.r_;
 
-                const auto core = ready ? FC(x, P) : coreWithRangeAndFlow;
+                const auto core = ready ? Core(x, p) : core_with_range_and_flow;
 
                 return EKF(
                         core,
                         q,
-                        gyroLatest,
-                        accelSubSampler,
-                        gyroSubSampler,
-                        R,
+                        r,
+                        gyro_latest,
+                        accel_subsampler,
+                        gyro_subsampler,
                         false, // didUpateWithFlowDeck
-                        ekf.zrangerFilterLatest,
-                        ekf.opticalFlowFilterLatest,
-                        lastProcessNoiseUpdateMsec,
-                        false, // didPredict
-                        ekf.lastPredictionMsec);
+                        ekf.zranger_filter_latest_,
+                        ekf.optical_flow_filter_latest_,
+                        last_process_noise_update_msec_,
+                        false, // did_predict
+                        ekf.last_prediction_msec_);
 
             } // update
 
-            static auto update(
+            static auto Update(
                     const EKF &ekf,
                     const ZRangerFilter & zrfilter,
                     const OpticalFlowFilter & offilter) -> EKF
             {
                 return EKF(
                         ekf.core,
-                        ekf.q,
-                        ekf.gyroLatest,
-                        ekf.accelSubSampler,
-                        ekf.gyroSubSampler,
-                        ekf.R,
-                        true, // didUpdateWithFlowDeck,
+                        ekf.q_,
+                        ekf.r_,
+                        ekf.gyro_latest_,
+                        ekf.accel_subsampler_,
+                        ekf.gyro_subsampler_,
+                        true, // did_update_with_flow_deck,
                         zrfilter,
                         offilter,
-                        ekf.lastProcessNoiseUpdateMsec,
-                        ekf. didPredict,
-                        ekf. lastPredictionMsec);
+                        ekf.last_process_noise_update_msec_,
+                        ekf. did_predict_,
+                        ekf. last_prediction_msec_);
             }
 
             static auto getVehicleState(const EKF & ekf) -> VehicleState
@@ -372,41 +376,41 @@ namespace hf {
                 const auto x = ekf.core.x;
 
                 const auto dx =
-                    ekf.R.xx*x[STATE_VX] +
-                    ekf.R.xy*x[STATE_VY] +
-                    ekf.R.xz*x[STATE_VZ];
+                    ekf.r_.xx*x[kStateVx] +
+                    ekf.r_.xy*x[kStateVy] +
+                    ekf.r_.xz*x[kStateVz];
 
                 // make right positive
                 const auto dy = -(
-                        ekf.R.yx*x[STATE_VX] +
-                        ekf.R.yy*x[STATE_VY] +
-                        ekf.R.yz*x[STATE_VZ]); 
+                        ekf.r_.yx*x[kStateVx] +
+                        ekf.r_.yy*x[kStateVy] +
+                        ekf.r_.yz*x[kStateVz]); 
 
-                const auto z = x[STATE_Z];
+                const auto z = x[kStateZ];
 
                 const auto dz =
-                    ekf.R.zx*x[STATE_VX] +
-                    ekf.R.zy*x[STATE_VY] +
-                    ekf.R.zz*x[STATE_VZ];
+                    ekf.r_.zx*x[kStateVx] +
+                    ekf.r_.zy*x[kStateVy] +
+                    ekf.r_.zz*x[kStateVz];
 
-                const auto q0 = ekf.q.w;
-                const auto q1 = ekf.q.x;
-                const auto q2 = ekf.q.y;
-                const auto q3 = ekf.q.z;
+                const auto q0 = ekf.q_.w;
+                const auto q1 = ekf.q_.x;
+                const auto q2 = ekf.q_.y;
+                const auto q3 = ekf.q_.z;
 
-                const auto phi = Num::RAD2DEG * atan2f(2*(q2*q3+q0* q1) ,
+                const auto phi = Num::kRad2Deg * atan2f(2*(q2*q3+q0* q1) ,
                         q0*q0 - q1*q1 - q2*q2 + q3*q3);
 
-                const auto dphi = ekf.gyroLatest.x;
+                const auto dphi = ekf.gyro_latest_.x;
 
-                const auto theta = Num::RAD2DEG * asinf(-2*(q1*q3 - q0*q2));
+                const auto theta = Num::kRad2Deg * asinf(-2*(q1*q3 - q0*q2));
 
-                const auto dtheta = ekf.gyroLatest.y;
+                const auto dtheta = ekf.gyro_latest_.y;
 
-                const auto psi = Num::RAD2DEG * atan2f(2*(q1*q2+q0* q3),
+                const auto psi = Num::kRad2Deg * atan2f(2*(q1*q2+q0* q3),
                         q0*q0 + q1*q1 - q2*q2 - q3*q3); 
 
-                const auto dpsi = ekf.gyroLatest.z;
+                const auto dpsi = ekf.gyro_latest_.z;
 
                 // Return psi/dpsi nose-right positive
                 return VehicleState(
@@ -418,150 +422,150 @@ namespace hf {
             // The vehicle's attitude as a quaternion (w,x,y,z) We store as a quaternion
             // to allow easy normalization (in comparison to a rotation matrix),
             // while also being robust against singularities (in comparison to euler angles)
-            Quaternion q;
-
-            ThreeAxis gyroLatest;
-
-            ThreeAxisSubSampler accelSubSampler = ThreeAxisSubSampler(GRAVITY);
-            ThreeAxisSubSampler gyroSubSampler = ThreeAxisSubSampler(Num::DEG2RAD);
+            Quaternion q_;
 
             // The vehicle's attitude as a rotation matrix (used by the prediction,
             // updated by the finalization)
-            Rotation R;
+            Rotation r_;
 
-            bool didUpdateWithFlowDeck;
+            ThreeAxis gyro_latest_;
 
-            ZRangerFilter zrangerFilterLatest;
-            OpticalFlowFilter opticalFlowFilterLatest;
+            ThreeAxisSubSampler accel_subsampler_ = ThreeAxisSubSampler(kGravity);
+            ThreeAxisSubSampler gyro_subsampler_ = ThreeAxisSubSampler(Num::kDeg2Rad);
 
-            uint32_t lastProcessNoiseUpdateMsec;
+            bool did_update_with_flow_deck_;
 
-            bool didPredict;
-            uint32_t lastPredictionMsec;
+            ZRangerFilter zranger_filter_latest_;
+            OpticalFlowFilter optical_flow_filter_latest_;
+
+            uint32_t last_process_noise_update_msec_;
+
+            bool did_predict_;
+            uint32_t last_prediction_msec_;
 
             static auto makeJacobian(
                     const float dt,
                     const ThreeAxis & gyro,
-                    const vector x,
-                    const Rotation &R) -> matrix
+                    const Vector x,
+                    const Rotation & r) -> Matrix
             {
                 const auto d0 = gyro.x*dt/2;
                 const auto d1 = gyro.y*dt/2;
                 const auto d2 = gyro.z*dt/2;
 
-                const auto vx = x[STATE_VX];
-                const auto vy = x[STATE_VY];
-                const auto vz = x[STATE_VZ];
+                const auto vx = x[kStateVx];
+                const auto vy = x[kStateVy];
+                const auto vz = x[kStateVz];
 
-                const size_t N = STATE_DIM;
+                const auto N = kStateDim;
 
-                auto F = matrix();
+                auto f = Matrix();
 
                 // position
-                F[STATE_Z*N+STATE_Z] = 1;
-                F[STATE_Z*N+STATE_VX] = R.zx*dt;
-                F[STATE_Z*N+STATE_VY] = R.zy*dt;
-                F[STATE_Z*N+STATE_VZ] = R.zz*dt;
-                F[STATE_Z*N+STATE_D0] = (vy*R.zz - vz*R.zy)*dt;
-                F[STATE_Z*N+STATE_D1] = (-vx*R.zz + vz*R.zx)*dt;
-                F[STATE_Z*N+STATE_D2] = (vx*R.zy - vy*R.zx)*dt;
+                f[kStateZ*N+kStateZ] = 1;
+                f[kStateZ*N+kStateVx] = r.zx*dt;
+                f[kStateZ*N+kStateVy] = r.zy*dt;
+                f[kStateZ*N+kStateVz] = r.zz*dt;
+                f[kStateZ*N+kStateD0] = (vy*r.zz - vz*r.zy)*dt;
+                f[kStateZ*N+kStateD1] = (-vx*r.zz + vz*r.zx)*dt;
+                f[kStateZ*N+kStateD2] = (vx*r.zy - vy*r.zx)*dt;
 
-                F[STATE_VX*N+STATE_Z] = 0; 
-                F[STATE_VX*N+STATE_VX] = 1; 
-                F[STATE_VX*N+STATE_VY] = gyro.z*dt;
-                F[STATE_VX*N+STATE_VZ] =-gyro.y*dt;
-                F[STATE_VX*N+STATE_D0] =  0;
-                F[STATE_VX*N+STATE_D1] =  GRAVITY*R.zz*dt;
-                F[STATE_VX*N+STATE_D2] = -GRAVITY*R.zy*dt;
+                f[kStateVx*N+kStateZ] = 0; 
+                f[kStateVx*N+kStateVx] = 1; 
+                f[kStateVx*N+kStateVy] = gyro.z*dt;
+                f[kStateVx*N+kStateVz] =-gyro.y*dt;
+                f[kStateVx*N+kStateD0] =  0;
+                f[kStateVx*N+kStateD1] =  kGravity*r.zz*dt;
+                f[kStateVx*N+kStateD2] = -kGravity*r.zy*dt;
 
-                F[STATE_VY*N+STATE_Z] = 0; 
-                F[STATE_VY*N+STATE_VX] =-gyro.z*dt;
-                F[STATE_VY*N+STATE_VY] = 1; 
-                F[STATE_VY*N+STATE_VZ] = gyro.x*dt;
-                F[STATE_VY*N+STATE_D0] = -GRAVITY*R.zz*dt;
-                F[STATE_VY*N+STATE_D1] =  0;
-                F[STATE_VY*N+STATE_D2] =  GRAVITY*R.zx*dt;
+                f[kStateVy*N+kStateZ] = 0; 
+                f[kStateVy*N+kStateVx] =-gyro.z*dt;
+                f[kStateVy*N+kStateVy] = 1; 
+                f[kStateVy*N+kStateVz] = gyro.x*dt;
+                f[kStateVy*N+kStateD0] = -kGravity*r.zz*dt;
+                f[kStateVy*N+kStateD1] =  0;
+                f[kStateVy*N+kStateD2] =  kGravity*r.zx*dt;
 
-                F[STATE_VZ*N+STATE_Z] = 0; 
-                F[STATE_VZ*N+STATE_VX] = gyro.y*dt;
-                F[STATE_VZ*N+STATE_VY] =-gyro.x*dt;
-                F[STATE_VZ*N+STATE_VZ] = 1; 
-                F[STATE_VZ*N+STATE_D0] =  GRAVITY*R.zy*dt;
-                F[STATE_VZ*N+STATE_D1] = -GRAVITY*R.zx*dt;
-                F[STATE_VZ*N+STATE_D2] =  0;
+                f[kStateVz*N+kStateZ] = 0; 
+                f[kStateVz*N+kStateVx] = gyro.y*dt;
+                f[kStateVz*N+kStateVy] =-gyro.x*dt;
+                f[kStateVz*N+kStateVz] = 1; 
+                f[kStateVz*N+kStateD0] =  kGravity*r.zy*dt;
+                f[kStateVz*N+kStateD1] = -kGravity*r.zx*dt;
+                f[kStateVz*N+kStateD2] =  0;
 
-                F[STATE_D0*N+STATE_Z] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
-                F[STATE_D0*N+STATE_VX] = 0; 
-                F[STATE_D0*N+STATE_VZ] = 0; 
-                F[STATE_D0*N+STATE_D0] =  1 - d1*d1/2 - d2*d2/2;
-                F[STATE_D0*N+STATE_D1] =  d2 + d0*d1/2;
-                F[STATE_D0*N+STATE_D2] = -d1 + d0*d2/2;
+                f[kStateD0*N+kStateZ] = 0; 
+                f[kStateD0*N+kStateVx] = 0; 
+                f[kStateD0*N+kStateVx] = 0; 
+                f[kStateD0*N+kStateVz] = 0; 
+                f[kStateD0*N+kStateD0] =  1 - d1*d1/2 - d2*d2/2;
+                f[kStateD0*N+kStateD1] =  d2 + d0*d1/2;
+                f[kStateD0*N+kStateD2] = -d1 + d0*d2/2;
 
-                F[STATE_D1*N+STATE_Z] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
-                F[STATE_D1*N+STATE_VX] = 0; 
-                F[STATE_D1*N+STATE_VZ] = 0; 
-                F[STATE_D1*N+STATE_D0] = -d2 + d0*d1/2;
-                F[STATE_D1*N+STATE_D1] =  1 - d0*d0/2 - d2*d2/2;
-                F[STATE_D1*N+STATE_D2] =  d0 + d1*d2/2;
+                f[kStateD1*N+kStateZ] = 0; 
+                f[kStateD1*N+kStateVx] = 0; 
+                f[kStateD1*N+kStateVx] = 0; 
+                f[kStateD1*N+kStateVz] = 0; 
+                f[kStateD1*N+kStateD0] = -d2 + d0*d1/2;
+                f[kStateD1*N+kStateD1] =  1 - d0*d0/2 - d2*d2/2;
+                f[kStateD1*N+kStateD2] =  d0 + d1*d2/2;
 
-                F[STATE_D2*N+STATE_Z] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
-                F[STATE_D2*N+STATE_VX] = 0; 
-                F[STATE_D2*N+STATE_VZ] = 0; 
-                F[STATE_D2*N+STATE_D0] =  d1 + d0*d2/2;
-                F[STATE_D2*N+STATE_D1] = -d0 + d1*d2/2;
-                F[STATE_D2*N+STATE_D2] = 1 - d0*d0/2 - d1*d1/2;
+                f[kStateD2*N+kStateZ] = 0; 
+                f[kStateD2*N+kStateVx] = 0; 
+                f[kStateD2*N+kStateVx] = 0; 
+                f[kStateD2*N+kStateVz] = 0; 
+                f[kStateD2*N+kStateD0] =  d1 + d0*d2/2;
+                f[kStateD2*N+kStateD1] = -d0 + d1*d2/2;
+                f[kStateD2*N+kStateD2] = 1 - d0*d0/2 - d1*d1/2;
 
-                return F;
+                return f;
             }
 
-            static auto updateWithFlow(
-                    const FC & core,
+            static auto UpdateWithFlow(
+                    const Core & core,
                     const OpticalFlowFilter & offilter,
-                    const ThreeAxis & gyro, const float r22) -> FC
+                    const ThreeAxis & gyro, const float r22) -> Core
             {
-                const auto newcore = updateWithFlowAxis(core, offilter.dt, r22,
-                        offilter.dpixelx, offilter.stdDevX, STATE_VX, gyro.y);
+                const auto newcore = UpdateWithFlowAxis(core, offilter.dt, r22,
+                        offilter.dpixelx, offilter.std_dev_x, kStateVx, gyro.y);
 
-                return updateWithFlowAxis(newcore, offilter.dt, r22,
-                        offilter.dpixely, offilter.stdDevY, STATE_VY, gyro.x);
+                return UpdateWithFlowAxis(newcore, offilter.dt, r22,
+                        offilter.dpixely, offilter.std_dev_y, kStateVy, gyro.x);
             }
 
-            static auto updateWithRange(
-                    const FC & core,
+            static auto UpdateWithRange(
+                    const Core & core,
                     const ZRangerFilter & zrfilter,
-                    const float rzz) -> FC
+                    const float rzz) -> Core
             {
 
                 const auto angle = max(0, fabsf(acosf(rzz)) -
-                        Num::DEG2RAD * (15.0f / 2));
-                const auto predictedDistance = core.x[STATE_Z] / cosf(angle);
-                const auto measuredDistance = zrfilter.distance_m;
+                        Num::kDeg2Rad * (15.0f / 2));
+                const auto predicted_distance = core.x[kStateZ] / cosf(angle);
+                const auto measured_distance = zrfilter.distance_m;
 
                 // This just acts like a gain for the sensor model. Further
                 // updates are done in the scalar update function below
-                const vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
+                const Vector h = {1 / cosf(angle), 0, 0, 0, 0, 0, 0 };
 
-                return updateWithScalar(core, h,
-                        measuredDistance-predictedDistance,
+                return UpdateWithScalar(core, h,
+                        measured_distance-predicted_distance,
                         zrfilter.stdev);
             }
 
-            static auto updateWithFlowAxis(
-                    const FC & core,
+            static auto UpdateWithFlowAxis(
+                    const Core & core,
                     const float dt,
                     const float r22,
                     const float dpixel,
                     const float stdev,
                     const uint8_t state_index,
-                    const float gyroval) -> FC
+                    const float gyroval) -> Core
             {
                 // [pixels] (same in x and y)
                 const float Npix = 35.0;                      
 
-                //float thetapix = Num::DEG2RAD * 4.0f;
+                //float thetapix = Num::kDeg2Rad * 4.0f;
                 // [rad]    (same in x and y)
                 // 2*sin(42/2); 42degree is the agnle of aperture, here we computed the
                 // corresponding ground length
@@ -569,118 +573,118 @@ namespace hf {
 
                 // Saturate elevation in prediction and correction to avoid
                 // singularities
-                const auto z_g  = max(core.x[STATE_Z], 0.1);
+                const auto z_g  = max(core.x[kStateZ], 0.1);
 
                 const auto dg = core.x[state_index];
 
-                const auto omegab = gyroval * Num::DEG2RAD;
+                const auto omegab = gyroval * Num::kDeg2Rad;
 
-                vector h = {0, 0, 0, 0, 0, 0, 0};
+                Vector h = {0, 0, 0, 0, 0, 0, 0};
 
-                const auto predictedN = (dt * Npix / thetapix ) * 
+                const auto predicted_n = (dt * Npix / thetapix ) * 
                     ((dg * r22 / z_g) - omegab);
 
-                const auto measuredN = dpixel*FLOW_RESOLUTION;
+                const auto measured_n = dpixel*kFlowResolution;
 
-                h[STATE_Z] = (Npix * dt / thetapix) * 
+                h[kStateZ] = (Npix * dt / thetapix) * 
                     ((r22 * dg) / (-z_g * z_g));
 
                 h[state_index] = (Npix * dt / thetapix) * (r22 / z_g);
 
-                return updateWithScalar(core, h, measuredN-predictedN,
-                        stdev*FLOW_RESOLUTION);
+                return UpdateWithScalar(core, h, measured_n-predicted_n,
+                        stdev*kFlowResolution);
             }
 
-            static auto updateWithScalar(
-                    const FC & core,
-                    const vector & h,
+            static auto UpdateWithScalar(
+                    const Core & core,
+                    const Vector & h,
                     const float error,
-                    const float stdMeasNoise) -> FC
+                    const float std_meas_noise) -> Core
             {
-                const auto R = stdMeasNoise*stdMeasNoise;
+                const auto r = std_meas_noise*std_meas_noise;
 
-                const auto PHt = dot(core.P, h); // PH'
+                const auto pht = Dot(core.p, h); // PH'
 
-                float HPHR = R; // HPH' + R
-                for (size_t i=0; i<STATE_DIM; i++) { 
-                    HPHR += h[i] * PHt[i]; 
+                float hphr = r; // HPH' + R
+                for (size_t i=0; i<kStateDim; i++) { 
+                    hphr += h[i] * pht[i]; 
                 }
 
-                vector G;
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    G[i] = PHt[i]/HPHR; // kalman gain = (PH' (HPH' + R )^-1)
+                Vector g;
+                for (size_t i=0; i<kStateDim; i++) {
+                    g[i] = pht[i]/hphr; // kalman gain = (PH' (HPH' + R )^-1)
                 }
 
-                auto GH = outer(G, h);
+                auto gh = Outer(g, h);
 
                 // GH - I
-                for (size_t i=0; i<STATE_DIM; i++) { 
-                    GH[i*STATE_DIM+i] -= 1; 
+                for (size_t i=0; i<kStateDim; i++) { 
+                    gh[i*kStateDim+i] -= 1; 
                 }
 
                 // (GH - I)'
-                const auto GH_I = trans(GH);
+                const auto gh_i = Transpose(gh);
 
                 // (GH - I)*P
-                const auto GH_I_P = dot(GH, core.P); 
+                const auto gh_i_p = Dot(gh, core.p); 
 
                 // (GH - I)*P*(GH - I)'
-                auto P = dot(GH_I_P, GH_I);
+                auto p = Dot(gh_i_p, gh_i);
 
                 // State update
-                auto x = vector();
-                for (int i=0; i<STATE_DIM; i++) {
-                    x[i] = core.x[i] + G[i] * error; 
+                auto x = Vector();
+                for (int i=0; i<kStateDim; i++) {
+                    x[i] = core.x[i] + g[i] * error; 
                 }
 
                 // Add the measurement variance and ensure boundedness and symmetry
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<kStateDim; i++) {
 
-                    for (int j=i; j<STATE_DIM; j++) {
+                    for (int j=i; j<kStateDim; j++) {
 
-                        const auto v = G[i] * R * G[j];
+                        const auto v = g[i] * r * g[j];
 
                         // add measurement noise
-                        P[i*STATE_DIM+j] = P[j*STATE_DIM+i] =
-                            get_pval(i, j, 0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i] + v,
-                                    MIN_COVARIANCE, MAX_COVARIANCE); 
+                        p[i*kStateDim+j] = p[j*kStateDim+i] =
+                            GetPval(i, j, 0.5*p[i*kStateDim+j] + 0.5*p[j*kStateDim+i] + v,
+                                    MinCovariance, MaxCovariance); 
                     }
                 }
 
-                return FC(x, P);
+                return Core(x, p);
             }
 
-            static auto enforceSymmetry(const matrix & P) -> matrix
+            static auto EnforceSymmetry(const Matrix & P) -> Matrix
             {
                 auto Pnew = P;
 
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<kStateDim; i++) {
 
-                    for (int j=i; j<STATE_DIM; j++) {
+                    for (int j=i; j<kStateDim; j++) {
 
-                        Pnew[i*STATE_DIM+j] = Pnew[j*STATE_DIM+i] =
-                            get_pval(i, j,
-                                    0.5*P[i*STATE_DIM+j] + 0.5*P[j*STATE_DIM+i],
-                                    MIN_COVARIANCE, MAX_COVARIANCE);
+                        Pnew[i*kStateDim+j] = Pnew[j*kStateDim+i] =
+                            GetPval(i, j,
+                                    0.5*P[i*kStateDim+j] + 0.5*P[j*kStateDim+i],
+                                    MinCovariance, MaxCovariance);
                     }
                 }
 
                 return Pnew;
             }
 
-            static auto addCovarianceNoise(const matrix & P,
-                    const float * noise) -> matrix
+            static auto AddCovarianceNoise(const Matrix & P,
+                    const float * noise) -> Matrix
             {
                 auto Pnew = P;
 
-                for (uint8_t k=0; k<STATE_DIM; ++k) {
-                    Pnew[k*STATE_DIM+k] = P[k*STATE_DIM+k] + noise[k]*noise[k];
+                for (uint8_t k=0; k<kStateDim; ++k) {
+                    Pnew[k*kStateDim+k] = P[k*kStateDim+k] + noise[k]*noise[k];
                 }
 
                 return Pnew;
             }
 
-            static auto get_pval(const int i, const int j,
+            static auto GetPval(const int i, const int j,
                     const float pval, const float minval,
                     const float maxval) -> float
             {
@@ -690,14 +694,24 @@ namespace hf {
                     pval;
             }
 
-            // C = x * y
-            static auto outer(const vector & x, const vector & y) -> matrix
+            static auto IsBigEnough(const float v) -> bool
             {
-                auto C = matrix();
+                return fabsf(v) > MinAngle;
+            }
 
-                for (size_t i=0; i<STATE_DIM; i++) {
-                    for (size_t j=0; j<STATE_DIM; j++) {
-                        C[i*STATE_DIM+j] = x[i] * y[j];
+            static auto IsSmallEnough(const float v) -> bool
+            {
+                return fabsf(v) < MaxAngle;
+            }
+
+            // C = x * y
+            static auto Outer(const Vector & x, const Vector & y) -> Matrix
+            {
+                auto C = Matrix();
+
+                for (size_t i=0; i<kStateDim; i++) {
+                    for (size_t j=0; j<kStateDim; j++) {
+                        C[i*kStateDim+j] = x[i] * y[j];
                     }
                 }
 
@@ -705,65 +719,55 @@ namespace hf {
             }
 
             // At = A^T
-            static auto trans(const matrix & A) -> matrix
+            static auto Transpose(const Matrix & a) -> Matrix
             {
-                auto At = matrix();
+                auto at = Matrix();
 
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        At[i*STATE_DIM+j] = A[j*STATE_DIM+i];
+                for (int i=0; i<kStateDim; ++i) {
+                    for (int j=0; j<kStateDim; ++j) {
+                        at[i*kStateDim+j] = a[j*kStateDim+i];
                     }
                 }
 
-                return At;
+                return at;
             }
 
             // C = A * B
-            static auto dot(const matrix & A, const matrix & B) -> matrix
+            static auto Dot(const Matrix & a, const Matrix & b) -> Matrix
             {
-                auto C = matrix();
+                auto c = Matrix();
 
-                for (int i=0; i<STATE_DIM; ++i) {
-                    for (int j=0; j<STATE_DIM; ++j) {
-                        C[i*STATE_DIM+j] = 0;
-                        for (int k=0; k<STATE_DIM; ++k) {
-                            C[i*STATE_DIM+j] += A[i*STATE_DIM+k] * B[k*STATE_DIM+j];
+                for (int i=0; i<kStateDim; ++i) {
+                    for (int j=0; j<kStateDim; ++j) {
+                        c[i*kStateDim+j] = 0;
+                        for (int k=0; k<kStateDim; ++k) {
+                            c[i*kStateDim+j] += a[i*kStateDim+k] * b[k*kStateDim+j];
                         }
                     }
                 }
 
-                return C;
+                return c;
             }
 
             // y = A * x
-            static auto dot(const matrix & A, const vector & x) -> vector
+            static auto Dot(const Matrix & a, const Vector & x) -> Vector
             {
-                vector y = vector();
+                auto y = Vector();
 
-                for (int i=0; i<STATE_DIM; i++) {
+                for (int i=0; i<kStateDim; i++) {
                     y[i] = 0; 
-                    for (int j=0; j<STATE_DIM; j++) {
-                        y[i] += A[i*STATE_DIM+j] * x[j];
+                    for (int j=0; j<kStateDim; j++) {
+                        y[i] += a[i*kStateDim+j] * x[j];
                     }
                 }
 
                 return y;
             }
 
-            static auto bigenough(const float v) -> bool
-            {
-                return fabsf(v) > MIN_ANGLE;
-            }
-
-            static auto smallenough(const float v) -> bool
-            {
-                return fabsf(v) < MAX_ANGLE;
-            }
-
-            static auto rotate(
+            static auto Rotate(
                     const ThreeAxis & v, const Quaternion & q)-> Quaternion
             {
-                const auto angle = ThreeAxis::l2norm(v);
+                const auto angle = ThreeAxis::L2Norm(v);
                 const auto ca = cos(angle / 2);
                 const auto sa = sin(angle / 2);
                 const auto dq = Quaternion(

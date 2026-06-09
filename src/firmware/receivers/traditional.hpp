@@ -26,7 +26,7 @@ namespace hf {
 
         private:
 
-            static constexpr float THROTTLE_DOWN_MAX = -0.95;
+            static constexpr float kThrottleDownMax = -0.95;
 
         public:
 
@@ -45,12 +45,12 @@ namespace hf {
                 :
                     data(setpoint, requested_arming, false, timestamp_msec),
                     is_throttle_down(is_throttle_down),
-                    _aux(aux) {}
+                    aux_(aux) {}
 
             TraditionalReceiver& operator=(
                     const TraditionalReceiver& other) = default;
 
-            static auto update(
+            static auto Update(
                     const TraditionalReceiver & tdata,
                     const uint16_t throttle,
                     const uint16_t roll,
@@ -68,18 +68,18 @@ namespace hf {
                         scale(yaw));
 
                 const auto is_throttle_down = setpoint.thrust <
-                    THROTTLE_DOWN_MAX;
+                    kThrottleDownMax;
 
                 const auto safe_to_arm = require_throttle_down_to_arm ? 
                     is_throttle_down : true;
 
                 // Push-button arming; ignores startup transient
-                const auto did_aux_change = tdata._aux >= 988 && aux !=
-                    tdata._aux;
+                const auto didaux__change = tdata.aux_ >= 988 && aux !=
+                    tdata.aux_;
 
                 const auto requested_arming = 
-                    did_aux_change && tdata.data.requested_arming ? false :
-                    did_aux_change && safe_to_arm ? true :
+                    didaux__change && tdata.data.requested_arming ? false :
+                    didaux__change && safe_to_arm ? true :
                     tdata.data.requested_arming;
 
                 return TraditionalReceiver(setpoint, requested_arming,
@@ -88,7 +88,7 @@ namespace hf {
 
         private:
 
-            uint16_t _aux;
+            uint16_t aux_;
 
             static auto scale(const uint16_t val) -> float
             {

@@ -47,198 +47,198 @@ namespace hf {
         private:
 
             // Voltage sensing
-            static constexpr uint8_t VOLTAGE_INPUT_PIN = A9;
-            static constexpr float VOLTAGE_SCALEUP = 4.29;
+            static constexpr uint8_t kVoltageInputPin = A9;
+            static constexpr float kVoltageScaleup = 4.29;
 
             // LED indicator
-            static const uint8_t LED_PIN = 9;
-            static constexpr float LED_HEARTBEAT_FREQ_HZ = 0.75;
-            static constexpr float LED_FASTBLINK_FREQ_HZ = 3;
-            static constexpr uint32_t LED_PULSE_DURATION_MSEC = 50;
+            static const uint8_t kLedPin = 9;
+            static constexpr float kLedHeartbeat_Rate = 0.75;
+            static constexpr float kLedFastBlink_Rate = 3;
+            static constexpr uint32_t kLedPulseDurationMsec = 50;
 
             // Rate constants
-            static constexpr float CORE_LOOP_HZ = 1000;
-            static constexpr float EKF_PREDICTION_RATE_HZ = 100;
-            static constexpr float FLYING_CHECK_RATE_HZ   = 25;
-            static constexpr float HOVER_DECK_ACQUISITION_RATE_HZ = 100;
-            static constexpr float TELEMETRY_RATE_HZ = 50;
+            static constexpr float kCoreLoopRate = 1000;
+            static constexpr float kEkfPredictionRate = 100;
+            static constexpr float kFlyingCheckRate   = 25;
+            static constexpr float kHoverDeckAcquisitionRate = 100;
+            static constexpr float kTelemetryRate = 50;
 
             // Safety constants
-            static constexpr float TILT_ANGLE_FLIPPED_MIN_DEG = 75;
-            static constexpr uint32_t FAILSAFE_MSEC = 500;
+            static constexpr float kTiltAngleFlippedMinDeg = 75;
+            static constexpr uint32_t kFailsafeMsec = 500;
 
             // We say we are flying if one or more motors are running
             // over the idle thrust.
-            static const uint32_t FLYING_HYSTERESIS_THRESHOLD_MSEC = 2000;
-            static constexpr float MOTOR_IDLE_MAX = 0.1;
+            static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
+            static constexpr float kMotorIdleMax = 0.1;
 
         // Public instance methods --------------------------------------------
 
         public:
 
-            void begin(const bool useHoverdeck=true)
+            void Begin(const bool use_hover_deck=true)
             {
                 Serial1.begin(115200);
 
-                _imu.begin();
+                imu_.Begin();
 
-                pinMode(LED_PIN, OUTPUT); 
+                pinMode(kLedPin, OUTPUT); 
 
-                if (useHoverdeck) {
-                    _zranger.begin();
-                    _flowsensor.begin();
+                if (use_hover_deck) {
+                    zranger_.Begin();
+                    flow_sensor_.Begin();
                 }
 
-                _mode = MODE_IDLE;
+                mode_ = kModeIdle;
             }
 
-            auto update(
+            auto Update(
                     const TraditionalReceiver & rx,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 const auto rxdata = rx.data;
 
-                step(rxdata.requested_arming, false, // false = no hover
-                        rxdata.timestamp_msec, motorvals, motorcount);
+                Step(rxdata.requested_arming, false, // false = no hover
+                        rxdata.timestamp_msec, motor_vals, motor_count);
 
-                const auto rxsetpoint = rxdata.setpoint;
+                const auto rx_setpoint = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(
-                        (rxsetpoint.thrust+1)/2, // [-1,+1] => [0,1]
-                        rxsetpoint.roll *
-                        PositionController::MAX_DEMAND_DEG,
-                        rxsetpoint.pitch *
-                        PositionController::MAX_DEMAND_DEG, 
-                        rxsetpoint.yaw);
+                        (rx_setpoint.thrust+1)/2, // [-1,+1] => [0,1]
+                        rx_setpoint.roll *
+                        PositionController::kMaxDemandDegrees,
+                        rx_setpoint.pitch *
+                        PositionController::kMaxDemandDegrees, 
+                        rx_setpoint.yaw);
 
-                _stabilizerPid = StabilizerPidController::run( _stabilizerPid,
-                        _isFlying, getDt(), _state, setpoint);
+                stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
+                        is_flying_, GetDt(), state_, setpoint);
 
-                sendTelemetry(_stabilizerPid.setpoint);
+                SendTelemetry(stabilizer_pid_.setpoint);
 
-                return _stabilizerPid.setpoint;
+                return stabilizer_pid_.setpoint;
             } 
 
-            auto update(
+            auto Update(
                     const SpringyReceiver & rx,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                acquireHoverData();
+                AcquireHoverData();
 
                 const auto rxdata = rx.data;
 
-                return update(rxdata.setpoint, rxdata.requested_arming,
+                return Update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
-                        motorvals, motorcount);
+                        motor_vals, motor_count);
             } 
 
-            auto update(
+            auto Update(
                     GamepadReceiver & gamepad,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                acquireHoverData();
+                AcquireHoverData();
 
                 const auto gpdata = gamepad.data;
 
-                return update(gpdata.setpoint, gpdata.requested_arming,
+                return Update(gpdata.setpoint, gpdata.requested_arming,
                         gpdata.requested_hover, gpdata.timestamp_msec,
-                        motorvals, motorcount);
+                        motor_vals, motor_count);
             } 
 
-            void acquireHoverData()
+            void AcquireHoverData()
             {
                 // Slower EKF update with range, optical flow
-                if (_hoverDeckTimer.ready()) {
-                    _zrangerFilter = ZRangerFilter::update(
-                            _zrangerFilter, _zranger.read());
-                    _opticalFlowFilter = OpticalFlowFilter::update(
-                            _opticalFlowFilter,
-                            micros(), _flowsensor.read());
-                    _ekf = EKF::update(_ekf, _zrangerFilter, _opticalFlowFilter);
+                if (hover_deck_timer_.Ready()) {
+                    zranger_filter_ = ZRangerFilter::Update(
+                            zranger_filter_, zranger_.Read());
+                    optical_flow_filter_ = OpticalFlowFilter::Update(
+                            optical_flow_filter_,
+                            micros(), flow_sensor_.Read());
+                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }
 
-            auto isSafeToFly() -> bool
+            auto IsSafeToFly() -> bool
             {
-                return _mode != MODE_PANIC;
+                return mode_ != kModePanic;
             }
 
-            auto isArmed() -> bool
+            auto IsArmed() -> bool
             {
-                return _mode != MODE_IDLE;
+                return mode_ != kModeIdle;
             }
 
         private:
 
             // Static methods ------------------------------------------------
 
-            static auto updateMode(
+            static auto UpdateMode(
                     const uint32_t msecCurr,
                     const VehicleState & state,
-                    const bool isGyroCalibrated,
+                    const bool is_gyro_calibrated,
                     const bool requestedArming,
                     const bool requestedHover,
                     const uint32_t msecPrev,
                     const ImuFilter & imufilt,
-                    const mode_e mode) -> mode_e
+                    const Mode mode) -> Mode
             {
                 const auto shouldArm = 
 
                     // Disable arming while gyro is calibrating
-                    !isGyroCalibrated ? false :
+                    !is_gyro_calibrated ? false :
 
                     // Check receiver timeout
-                    checkFailsafe(msecCurr, msecPrev, requestedArming);
+                    CheckFailsafe(msecCurr, msecPrev, requestedArming);
 
                 // Run a little state-transition machine to update flight mode
                 return 
 
                     //  Vehicle flipped over: enter panic mode
-                    isFlipped(state) ? MODE_PANIC :
+                    IsFlipped(state) ? kModePanic :
 
                     // Panic mode: can't recover
-                    mode == MODE_PANIC ? MODE_PANIC :
+                    mode == kModePanic ? kModePanic :
 
                     // Disallow jumping directly from idle to hover
-                    mode == MODE_IDLE && requestedHover ? MODE_IDLE :
+                    mode == kModeIdle && requestedHover ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
-                    mode == MODE_IDLE && shouldArm && imufilt.isGyroCalibrated
-                    ? MODE_ARMED :
+                    mode == kModeIdle && shouldArm && imufilt.is_gyro_calibrated
+                    ? kModeArmed :
 
                     // Armed and requested disarm: enter idle mode
-                    mode == MODE_ARMED && !shouldArm ? MODE_IDLE :
+                    mode == kModeArmed && !shouldArm ? kModeIdle :
 
                     // Armed and requested hover; enter hover mode
-                    mode == MODE_ARMED && requestedHover ? MODE_HOVERING :
+                    mode == kModeArmed && requestedHover ? kModeHovering :
 
                     // Hovering and requested no-hover; return to armed mode
-                    mode == MODE_HOVERING && !requestedHover ? MODE_ARMED :
+                    mode == kModeHovering && !requestedHover ? kModeArmed :
 
                     // Hovering and requested disarm; enter idle mode
-                    mode == MODE_HOVERING && !requestedArming ? MODE_IDLE :
+                    mode == kModeHovering && !requestedArming ? kModeIdle :
 
                     //  Default: stay in current mode
                     mode;
             }
 
-            static auto isFlipped(const VehicleState & state) -> bool
+            static auto IsFlipped(const VehicleState & state) -> bool
             {
-                return isFlippedAngle(state.theta) ||
-                    isFlippedAngle(state.phi); 
+                return IsFlippedAngle(state.theta) ||
+                    IsFlippedAngle(state.phi); 
             }
 
-            static auto isFlippedAngle(const float angle) -> bool
+            static auto IsFlippedAngle(const float angle) -> bool
             {
-                return fabs(angle) > TILT_ANGLE_FLIPPED_MIN_DEG;
+                return fabs(angle) > kTiltAngleFlippedMinDeg;
             }
 
-            static auto checkFailsafe(
+            static auto CheckFailsafe(
                     const uint32_t msec_curr,
                     const uint32_t msec_prev,
                     const bool requested_arming) -> bool
@@ -246,12 +246,16 @@ namespace hf {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
-                    msec_curr - msec_prev > FAILSAFE_MSEC;
+                    msec_curr - msec_prev > kFailsafeMsec;
 
                 return timed_out ? false : requested_arming;
             } 
 
-            static void runDelayLoop(const uint32_t usec_curr, 
+            /* Adapted from github.com/nickrehm/dRehmFlight/blob/master/
+                 Versions/dRehmFlight_Teensy_BETA_1.3/
+                 dRehmFlight_Teensy_BETA_1.3.ino 
+               */
+            static void RunDelayLoop(const uint32_t usec_curr, 
                     const uint32_t loop_freq_hz)
             {
                 float invFreq = 1.0 / loop_freq_hz * 1000000.0;
@@ -265,194 +269,194 @@ namespace hf {
             // Instance variables ---------------------------------------------
 
             // Vehicle state
-            VehicleState _state;
+            VehicleState state_;
 
             // Idle, armed, etc.
-            mode_e _mode;
+            Mode mode_;
 
             // Flying status based on motors
-            bool _isFlying;
-            uint32_t _motorCheckMsec;
+            bool is_flying_;
+            uint32_t motor_check_msec_;
 
             // Sensor fusion
-            ImuFilter _imuFilter;
-            EKF _ekf;
-            OpticalFlowFilter _opticalFlowFilter;
-            ZRangerFilter _zrangerFilter;
+            ImuFilter imu_filter_;
+            EKF ekf_;
+            OpticalFlowFilter optical_flow_filter_;
+            ZRangerFilter zranger_filter_;
 
             // Devices
-            IMU _imu;
-            ZRanger _zranger;
-            OpticalFlowSensor _flowsensor;
+            IMU imu_;
+            ZRanger zranger_;
+            OpticalFlowSensor flow_sensor_;
 
             // Timers
-            Timer _ekfPredictionTimer = Timer(EKF_PREDICTION_RATE_HZ);
-            Timer _flyingCheckTimer = Timer(FLYING_CHECK_RATE_HZ);
-            Timer _hoverDeckTimer = Timer(HOVER_DECK_ACQUISITION_RATE_HZ);
-            Timer _telemetryTimer = Timer(TELEMETRY_RATE_HZ);
+            Timer ekf_prediction_timer_ = Timer(kEkfPredictionRate);
+            Timer flying_check_timer_ = Timer(kFlyingCheckRate);
+            Timer hover_deck_timer_ = Timer(kHoverDeckAcquisitionRate);
+            Timer telemetry_timer_ = Timer(kTelemetryRate);
 
             // PID control for stabilize-only
-            StabilizerPidController _stabilizerPid;
+            StabilizerPidController stabilizer_pid_;
 
             // PID control for hover
-            HoverPidController _hoverPid;
+            HoverPidController hover_pid_;
 
             // Telemetry serializer
-            MspSerializer _telemetrySerializer;
+            MspSerializer telemetry_serializer_;
 
             // Debugging
-            Debugger _debugger;
+            Debugger debugger_;
 
-            // Support for getDt()
-            uint32_t _usec_prev;
+            // Support for GetDt()
+            uint32_t usec_prev_;
 
             // Support for LED blink
-            bool _is_led_pulsing;
-            uint32_t _led_pulse_start;
+            bool is_led_pusing_;
+            uint32_t led_pulse_start_;
 
             // Support for LED blinking
-            Timer _heartbeatTimer = Timer(LED_HEARTBEAT_FREQ_HZ);
-            Timer _fastblinkTimer = Timer(LED_FASTBLINK_FREQ_HZ);
+            Timer heartbeat_timer_ = Timer(kLedHeartbeat_Rate);
+            Timer fast_blink_timer_ = Timer(kLedFastBlink_Rate);
 
             // Instance methods ---------------------------------------------0
 
-            auto update(
+            auto Update(
                     const Setpoint & setpoint_in,
                     const bool requested_arming,
                     const bool requested_hover,
                     const uint32_t timestamp_msec,
-                    const float * motorvals,
-                    const uint8_t motorcount) -> Setpoint
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
             {
-                runDelayLoop(micros(), CORE_LOOP_HZ);
+                RunDelayLoop(micros(), kCoreLoopRate);
 
-                step(requested_arming, requested_hover,
-                        timestamp_msec, motorvals, motorcount);
+                Step(requested_arming, requested_hover,
+                        timestamp_msec, motor_vals, motor_count);
 
-                acquireHoverData();
+                AcquireHoverData();
 
-                _hoverPid= HoverPidController::run(_hoverPid,
-                        getDt(), _mode, _state, setpoint_in);
+                hover_pid_= HoverPidController::Run(hover_pid_,
+                        GetDt(), mode_, state_, setpoint_in);
 
-                const auto setpoint_out = _hoverPid.setpoint;
+                const auto setpoint_out = hover_pid_.setpoint;
 
-                sendTelemetry(setpoint_out);
+                SendTelemetry(setpoint_out);
 
                 return setpoint_out;
              } 
 
-            void step(
+            void Step(
                     const bool requested_arming,
                     bool requested_hover,
                     const uint32_t timestamp_msec,
-                    const float * motorvals,
-                    const uint8_t motorcount)
+                    const float * motor_vals,
+                    const uint8_t motor_count)
             {
                 // Safely update flight mode
-                _mode = updateMode(millis(), _state,
-                        _imuFilter.isGyroCalibrated, requested_arming,
-                        requested_hover, timestamp_msec, _imuFilter, _mode);
+                mode_ = UpdateMode(millis(), state_,
+                        imu_filter_.is_gyro_calibrated, requested_arming,
+                        requested_hover, timestamp_msec, imu_filter_, mode_);
 
                 // Periodically run flying check to get status for EKF
-                _isFlying = 
+                is_flying_ = 
 
-                    _mode == MODE_IDLE || _mode == MODE_PANIC  ? false :
+                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
 
-                    _flyingCheckTimer.ready() ?
-                    areMotorsAboveIdle(motorvals, motorcount) :
+                    flying_check_timer_.Ready() ?
+                    AreMotorsAboveIdle(motor_vals, motor_count) :
 
-                    _isFlying;
+                    is_flying_;
 
                 // Blink LED to indicate status
-                blinkLed(_imuFilter.isGyroCalibrated && _mode != MODE_PANIC);
+                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
                 // Read the raw IMU data
-                const auto imuraw = _imu.read();
+                const auto imuraw = imu_.Read();
 
                 // Filter the raw IMU data
-                _imuFilter = ImuFilter::step(_imuFilter, millis(), imuraw,
-                        _imu.gyroRangeDps(), _imu.accelRangeGs());
+                imu_filter_ = ImuFilter::Step(imu_filter_, millis(), imuraw,
+                        imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
 
                 // Periodically run the EKF prediction step
-                if (_ekfPredictionTimer.ready()) {
-                    _ekf = EKF::predict(_ekf, millis(), _isFlying); 
+                if (ekf_prediction_timer_.Ready()) {
+                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
                 }
 
                 // Do EKF fast-update with IMU readings
-                _ekf = EKF::update(_ekf, _imuFilter.output, millis());
+                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
 
                 // Get vehicle state from EKF
-                _state = EKF::getVehicleState(_ekf);
+                state_ = EKF::getVehicleState(ekf_);
             }
 
-            auto areMotorsAboveIdle(
-                    const float * motorvals,
-                    const uint8_t motorcount) -> bool
+            auto AreMotorsAboveIdle(
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> bool
             {
-                auto isThrustOverIdle = false;
+                auto is_thrust_hover_idle = false;
 
-                for (int i = 0; i < motorcount; ++i) {
-                    if (motorvals[i] > MOTOR_IDLE_MAX) {
-                        isThrustOverIdle = true;
+                for (int i = 0; i < motor_count; ++i) {
+                    if (motor_vals[i] > kMotorIdleMax) {
+                        is_thrust_hover_idle = true;
                         break;
                     }
                 }
 
                 const auto msec_curr = millis();
 
-                _motorCheckMsec = isThrustOverIdle ? msec_curr :
-                    _motorCheckMsec;
+                motor_check_msec_ = is_thrust_hover_idle ? msec_curr :
+                    motor_check_msec_;
 
-                return  _motorCheckMsec > 0 &&
-                    (msec_curr - _motorCheckMsec) <
-                    FLYING_HYSTERESIS_THRESHOLD_MSEC;
+                return  motor_check_msec_ > 0 &&
+                    (msec_curr - motor_check_msec_) <
+                    kFlyingHysteresisThresholdMsec;
             }
 
-            void sendTelemetry(const Setpoint & setpoint)
+            void SendTelemetry(const Setpoint & setpoint)
             {
-                if (_telemetryTimer.ready()) {
+                if (telemetry_timer_.Ready()) {
 
                     const float data[15] = {
-                        (float)_mode,
+                        (float)mode_,
                         setpoint.thrust, setpoint.roll, setpoint.pitch,
-                        setpoint.yaw, _state.dx, _state.dy, _state.z, _state.dz,
-                        _state.phi, _state.dphi, _state.theta, _state.dtheta,
-                        _state.psi, _state.dpsi
+                        setpoint.yaw, state_.dx, state_.dy, state_.z, state_.dz,
+                        state_.phi, state_.dphi, state_.theta, state_.dtheta,
+                        state_.psi, state_.dpsi
                     };
 
-                    _telemetrySerializer = MspSerializer::serializeFloats(
-                            _telemetrySerializer, MSP_TELEMETRY, data, 15);
+                    telemetry_serializer_ = MspSerializer::SerializeFloat(
+                            telemetry_serializer_, kMspTelemetry, data, 15);
 
                     Serial1.write(
-                            MspSerializer::payloadBytes(_telemetrySerializer),
-                            MspSerializer::payloadSize(_telemetrySerializer));
+                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
+                            MspSerializer::GetPayloadSize(telemetry_serializer_));
                 }
             }
 
-            auto getDt() -> float
+            auto GetDt() -> float
             {
                 const auto usec_curr = micros();      
-                const float dt = (usec_curr - _usec_prev)/1000000.0;
-                _usec_prev = usec_curr;
+                const float dt = (usec_curr - usec_prev_)/1000000.0;
+                usec_prev_ = usec_curr;
 
                 return dt;
             }
 
-            void blinkLed(const bool is_imu_calibrated)
+            void BlinkLed(const bool isimu__calibrated)
             {
-                const auto ready = is_imu_calibrated ?
-                    _heartbeatTimer.ready() : _fastblinkTimer.ready();
+                const auto ready = isimu__calibrated ?
+                    heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
                 
                 if (ready) {
-                    digitalWrite(LED_PIN, true);
-                    _is_led_pulsing = true;
-                    _led_pulse_start = millis();
+                    digitalWrite(kLedPin, true);
+                    is_led_pusing_ = true;
+                    led_pulse_start_ = millis();
                 }
 
-                else if (_is_led_pulsing) {
-                    if (millis() - _led_pulse_start > LED_PULSE_DURATION_MSEC) {
-                        digitalWrite(LED_PIN, false);
-                        _is_led_pulsing = false;
+                else if (is_led_pusing_) {
+                    if (millis() - led_pulse_start_ > kLedPulseDurationMsec) {
+                        digitalWrite(kLedPin, false);
+                        is_led_pusing_ = false;
                     }
                 }
             }

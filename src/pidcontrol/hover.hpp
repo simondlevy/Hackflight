@@ -40,43 +40,43 @@ namespace hf {
                     const StabilizerPidController & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
-                _althold_pid(althold_pid),
-                _position_x_pid(position_x_pid),
-                _position_y_pid(position_y_pid),
-                _stabilizer_pid(stabilizer_pid) {}
+                alt_hold_pid_(althold_pid),
+                position_x_pid_(position_x_pid),
+                position_y_pid_(position_y_pid),
+                stabilizer_pid_(stabilizer_pid) {}
 
-            static auto run(
+            static auto Run(
                     const HoverPidController & pid,
                     const float dt,
-                    const mode_e mode,
+                    const Mode mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> HoverPidController
             {
                 // Altitude hold ---------------------------------------------
 
-                const auto althold_pid = AltHoldPidController::run(
-                        pid._althold_pid, dt, mode, state, setpoint_in);
+                const auto althold_pid = AltHoldPidController::Run(
+                        pid.alt_hold_pid_, dt, mode, state, setpoint_in);
 
                 const auto airborne =
-                    state.z > AltHoldPidController::ALTITUDE_LANDING_M;
+                    state.z > AltHoldPidController::kLandingM;
 
                 // Position hold ---------------------------------------------
 
                 // Rotate world-coordinate velocities into body coordinates
                 const auto dxw = state.dx;
                 const auto dyw = state.dy;
-                const auto psi = Num::DEG2RAD * state.psi;
+                const auto psi = Num::kDeg2Rad * state.psi;
                 const auto cospsi = cos(psi);
                 const auto sinpsi = sin(psi);
                 const auto dxb =  dxw * cospsi + dyw * sinpsi;
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
                 const auto position_y_pid =
-                    PositionController::run(pid._position_y_pid, airborne, dt,
+                    PositionController::Run(pid.position_y_pid_, airborne, dt,
                             setpoint_in.roll, dyb);
 
                 const auto position_x_pid =
-                    PositionController::run(pid._position_x_pid, airborne, dt,
+                    PositionController::Run(pid.position_x_pid_, airborne, dt,
                             setpoint_in.pitch, dxb);
 
                 //  Stabilization ---------------------------------------------
@@ -85,8 +85,8 @@ namespace hf {
                         position_y_pid.output, position_x_pid.output,
                         setpoint_in.yaw);
 
-                const auto stabilizer_pid = StabilizerPidController::run(
-                        pid._stabilizer_pid, airborne, dt, state, setpoint_mid);
+                const auto stabilizer_pid = StabilizerPidController::Run(
+                        pid.stabilizer_pid_, airborne, dt, state, setpoint_mid);
 
                 return HoverPidController(althold_pid,
                         position_x_pid, position_y_pid,
@@ -95,11 +95,11 @@ namespace hf {
 
         private:
 
-            AltHoldPidController _althold_pid;
+            AltHoldPidController alt_hold_pid_;
 
-            PositionController _position_x_pid;
-            PositionController _position_y_pid;
+            PositionController position_x_pid_;
+            PositionController position_y_pid_;
 
-            StabilizerPidController _stabilizer_pid;
+            StabilizerPidController stabilizer_pid_;
     };
 }

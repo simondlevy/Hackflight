@@ -61,9 +61,9 @@ namespace hf {
                 return ThreeAxis(x/d, y/d, z/d);
             }
 
-            static auto l2norm(const ThreeAxis& v) -> float
+            static auto L2Norm(const ThreeAxis& v) -> float
             {
-                return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z) + Num::EPSILON;
+                return sqrtf(v.x*v.x + v.y*v.y + v.z*v.z) + Num::kEpsilon;
             }
 
             bool operator<(const float v) const

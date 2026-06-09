@@ -51,9 +51,9 @@ namespace hf {
                 return Quaternion(w*d, x*d, y*d, z*d);
             }
 
-            static auto l2norm(const Quaternion& q) -> float
+            static auto L2Norm(const Quaternion& q) -> float
             {
-                return sqrtf(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z) + Num::EPSILON;
+                return sqrtf(q.w*q.w + q.x*q.x + q.y*q.y + q.z*q.z) + Num::kEpsilon;
             }
     };
 

@@ -55,7 +55,7 @@ namespace hf {
 
             Mixer& operator=(const Mixer& other) = default;
 
-            static auto run(
+            static auto Run(
                     const Mixer & mixer, const Setpoint & setpoint)-> Mixer
             {
                 const auto t = setpoint.thrust;

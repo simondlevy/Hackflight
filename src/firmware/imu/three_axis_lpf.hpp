@@ -30,16 +30,16 @@ namespace hf {
 
             ThreeAxisLpf(const ThreeAxis & output,
                     const LPF &x, const LPF &y, const LPF &z)
-                : output(output), _x(x), _y(y), _z(z) {}
+                : output(output), x_(x), y_(y), z_(z) {}
 
             ThreeAxisLpf& operator=(const ThreeAxisLpf& other) = default;
 
-            static auto apply(const ThreeAxisLpf & lpf, const ThreeAxis & in,
+            static auto Apply(const ThreeAxisLpf & lpf, const ThreeAxis & in,
                     const float cutoff_freq) -> ThreeAxisLpf
             {
-                const auto x = LPF::apply(lpf._x, in.x, cutoff_freq);
-                const auto y = LPF::apply(lpf._y, in.y, cutoff_freq);
-                const auto z = LPF::apply(lpf._z, in.z, cutoff_freq);
+                const auto x = LPF::Apply(lpf.x_, in.x, cutoff_freq);
+                const auto y = LPF::Apply(lpf.y_, in.y, cutoff_freq);
+                const auto z = LPF::Apply(lpf.z_, in.z, cutoff_freq);
 
                 const auto output = ThreeAxis(x.output, y.output, z.output);
 
@@ -48,9 +48,9 @@ namespace hf {
 
         private:
 
-            LPF _x;
-            LPF _y;
-            LPF _z;
+            LPF x_;
+            LPF y_;
+            LPF z_;
 
     }; // class ThreeAxisLpf
 

@@ -66,7 +66,7 @@ namespace hf {
                 double I;  // body inertia [kg*m^2]  for roll, pitch
                 double d;  // drag coefficient [T=d*w^2] for yaw
 
-            } vehicle_params_t; 
+            } VehicleParams; 
 
             /**
              *  World parameters
@@ -77,29 +77,29 @@ namespace hf {
                 double g;   // gravitational constant [m/s/s]
                 double rho; // air density [kg/m^3]
 
-            } world_params_t; 
+            } WorldParams; 
 
             Dynamics() = default;
 
             Dynamics& operator=(const Dynamics& other) = default;
 
             Dynamics(const Pose & pose)
-                : state(pose), _airborne(false) {}
+                : state(pose), airborne_(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
-                : state(state), _dstate(dstate), _airborne(airborne) {}
+                : state(state), dstate_(dstate), airborne_(airborne) {}
 
-            static auto update(
+            static auto Update(
                     const Dynamics & dyn,
-                    const vehicle_params_t & vparams,
+                    const VehicleParams & vparams,
                     const float dt,
                     const float * rpms,
-                    const uint8_t rotorCount,
+                    const uint8_t rotor_count,
                     const int8_t * roll,
                     const int8_t * pitch,
                     const int8_t * yaw,
-                    const world_params_t wparams = { 9.807, 1.225 }) -> Dynamics
+                    const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
                 const auto cphi = cos(dyn.state.phi);
                 const auto cnphi = cos(-dyn.state.phi);
@@ -116,13 +116,13 @@ namespace hf {
                 const auto m = vparams.m;
 
                 const auto s = dyn.state;
-                const auto ds = dyn._dstate;
+                const auto ds = dyn.dstate_;
 
                 // Equation 6 ---------------------------------------
 
                 double u1=0, u2=0, u3=0, u4=0;
 
-                for (unsigned int i = 0; i < rotorCount; ++i) {
+                for (unsigned int i = 0; i < rotor_count; ++i) {
 
                     // RPM => rad/sec
                     const auto omega = rpms[i] * 2 * M_PI / 60;
@@ -142,8 +142,8 @@ namespace hf {
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
                     ddz > 0 ? true :
-                    dyn._airborne && s.dz < 0 && s.z <= 0 ? false :
-                    dyn._airborne;
+                    dyn.airborne_ && s.dz < 0 && s.z <= 0 ? false :
+                    dyn.airborne_;
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
@@ -178,7 +178,7 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
-                return dyn._airborne && !airborne ? // just landed ?
+                return dyn.airborne_ && !airborne ? // just landed ?
 
                     // yes: reset dynamics, keeping current pose
                     Dynamics(Pose(s.x, s.y, s.z, s.phi, s.theta, s.psi)) :
@@ -191,10 +191,10 @@ namespace hf {
         private:
 
             // Vehicle state first derivative (Equation 12)
-            SimState _dstate;
+            SimState dstate_;
 
             // Flag for whether we're airborne and can update dynamics
-            bool _airborne;
+            bool airborne_;
 
             static auto constrain_psi(const double psi) -> float
             {

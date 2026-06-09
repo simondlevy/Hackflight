@@ -30,10 +30,11 @@ namespace hf {
 
         private:
 
-            static constexpr float KP = 0.003;           
-            static constexpr float KI = 0.001;          
-            static constexpr float KD = 0.0000015;       
-            static constexpr float ILIMIT = 25.0;     
+            static constexpr float kP = 0.003;           
+            static constexpr float kI = 0.001;          
+            static constexpr float kD = 0.0000015;       
+
+            static constexpr float kIntegralLimit = 25.0;     
 
         public:
 
@@ -42,10 +43,10 @@ namespace hf {
             YawPid() = default;
 
             YawPid(const YawPid & a) 
-                : output(a.output), _integral(a._integral), _error(a._error) {}
+                : output(a.output), integral_(a.integral_), error_(a.error_) {}
 
             YawPid(const float output, const float error, const float integral)
-                : output(output), _integral(integral), _error(error) {}
+                : output(output), integral_(integral), error_(error) {}
 
             YawPid& operator=(const YawPid&) = default;
 
@@ -54,7 +55,7 @@ namespace hf {
              * arbitrary value to be scaled according to vehicle
              * characteristics.
              */
-             static auto run(
+             static auto Run(
                     const YawPid & p,
                     const float dt,
                     const bool airborne,
@@ -64,19 +65,19 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::fconstrain(p._integral + error * dt, ILIMIT) : 0;
+                    Num::ConstrainFloat(p.integral_ + error * dt, kIntegralLimit) : 0;
 
-                const auto derivative = dt > 0 ? (error - p._error) / dt : 0; 
+                const auto derivative = dt > 0 ? (error - p.error_) / dt : 0; 
 
-                const auto output = KP*error + KI*integral + KD*derivative; 
+                const auto output = kP*error + kI*integral + kD*derivative; 
 
                 return YawPid(output, integral, error);
             }
 
         private:
 
-            float _integral;
-            float _error;
+            float integral_;
+            float error_;
 
     };
 
