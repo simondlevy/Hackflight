@@ -46,17 +46,17 @@ namespace hf {
 
                 switch (MspParser::GetId(_parser)) {
 
-                    case MSP_SET_ARMING:
+                    case kMspSetArming:
                         data.requested_arming = !data.requested_arming;
                         data.timestamp_msec = millis();
                         break;
 
-                    case MSP_SET_IDLE:
+                    case kMspSetIdle:
                         data.requested_hover = false;
                         data.timestamp_msec = millis();
                         break;
 
-                    case MSP_SET_HOVER:
+                    case kMspSetHover:
                         data.requested_hover = true;
                         data.setpoint.thrust =
                             MspParser::GetFloat(_parser, 0);

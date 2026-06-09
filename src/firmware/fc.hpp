@@ -425,7 +425,7 @@ namespace hf {
                     };
 
                     telemetry_serializer_ = MspSerializer::SerializeFloat(
-                            telemetry_serializer_, MSP_TELEMETRY, data, 15);
+                            telemetry_serializer_, kMspTelemetry, data, 15);
 
                     Serial1.write(
                             MspSerializer::GetPayloadBytes(telemetry_serializer_),

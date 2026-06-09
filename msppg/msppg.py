@@ -153,7 +153,8 @@ class PythonEmitter(CodeEmitter):
         self._write('\n            self.message_buffer += char')
         self._write('\n            self.message_checksum ^= byte')
         self._write('\n            self.message_length_received += 1')
-        self._write('\n            if self.message_length_received >= self.message_length_expected:')
+        self._write('\n            if self.message_length_received >= ' +
+                    'self.message_length_expected:')
         self._write('\n                self.state += 1\n')
         self._write('\n        elif self.state == 6:')
         self._write('\n            if self.message_checksum == byte:')
@@ -359,8 +360,12 @@ class CppHeaderEmitter:
             output.write('#pragma once\n\n')
 
             for key in self.msgdict:
-                output.write('static const uint8_t MSP_%-20s = %d;\n' %
-                             (key, self.msgdict[key][0]))
+                words = key.lower().split('_')
+                newkey = (words[0] +
+                          ''.join(word.capitalize() for word in words[1:]))
+                output.write(
+                        'static const uint8_t kMsp%c%s = %d;\n' %
+                        (newkey[0].upper(), newkey[1:], self.msgdict[key][0]))
 
 
 # main ========================================================================
