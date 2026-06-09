@@ -26,12 +26,6 @@ classes.
 
 The sample [messages.json](messages.json) file specifies the messages used in Hackflight.
 
-## Extending
-
-The messages.json file currently contains just a few message specifications,
-but you can easily add to it by specifying additional messages from the the MSP protocol.
-or add some of your own new message types.
-
 ## Caveats
 
 The Java code produced by msppg.py has not been tested recently and may not even compile.
