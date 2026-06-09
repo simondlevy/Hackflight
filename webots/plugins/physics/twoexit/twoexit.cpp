@@ -26,8 +26,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 #include <simsensors/src/visualizers/rangefinder.hpp>
 
-static const uint8_t RANGEFINDER_DISPLAY_SCALEUP = 64;
-static constexpr float FRAME_RATE_HZ = 32;
+static const uint8_t kRangefinderDisplayScaleup = 64;
 
 static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
 {
@@ -57,7 +56,7 @@ DLLEXPORT void webots_physics_step()
 
     // Replace open-loop setpoint with setpoint from autopilot if
     // available
-    const auto setpoint = message.mode == hf::MODE_AUTONOMOUS ?
+    const auto setpoint = message.mode == hf::kModeAutonomous ?
         getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
     // Get vehicle pose based on setpoint
@@ -76,7 +75,7 @@ DLLEXPORT void webots_physics_step()
             _rangefinder_distances_mm,
             rangefinder.min_distance_m,
             rangefinder.max_distance_m,
-            8, 1, RANGEFINDER_DISPLAY_SCALEUP);
+            8, 1, kRangefinderDisplayScaleup);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

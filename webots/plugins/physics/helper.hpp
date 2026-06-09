@@ -33,7 +33,7 @@ class PluginHelper {
 
     private:
 
-        static constexpr char ROBOT_NAME[] = "diyquad";
+        static constexpr char kRobotName[] = "diyquad";
 
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;
@@ -55,7 +55,7 @@ class PluginHelper {
         {
             simulator_ = hf::Simulator(starting_pose);
 
-            robot_body = dWebotsGetBodyFromDEF(ROBOT_NAME);
+            robot_body = dWebotsGetBodyFromDEF(kRobotName);
 
             if (robot_body == NULL) {
 

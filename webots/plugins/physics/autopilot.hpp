@@ -30,7 +30,7 @@ class AutopilotHelper {
 
     private:
 
-        static constexpr char PATH_VARIABLE_NAME[] = "WEBOTS_PATH";
+        static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
         FILE * logfile_;
 
@@ -45,7 +45,7 @@ class AutopilotHelper {
 
         AutopilotHelper(const char * worldname)
         {
-            const auto pwd = getenv(PATH_VARIABLE_NAME);
+            const auto pwd = getenv(kPathVariableName);
 
             char world_path[256] = {};
             sprintf(world_path, "%s/../../worlds/%s.wbt", pwd, worldname);
