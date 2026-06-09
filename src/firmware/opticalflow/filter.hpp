@@ -30,7 +30,6 @@ namespace hf {
 
         public:
 
-            bool got_motion;
             uint32_t timestamp_usec;
             uint32_t usec_prev;
             float dpixelx;  // Accumulated pixel count x
@@ -44,7 +43,6 @@ namespace hf {
             OpticalFlowFilter& operator=(const OpticalFlowFilter& other) = default;
 
             OpticalFlowFilter(
-                    const bool got_motion,
                     const uint32_t usec_prev,
                     const float dpixelx,  
                     const float dpixely, 
@@ -52,7 +50,6 @@ namespace hf {
                     const float std_dev_y,
                     const float dt)
                 : 
-                    got_motion(got_motion),
                     usec_prev(usec_prev),
                     dpixelx(dpixelx),  
                     dpixely(dpixely), 
@@ -66,18 +63,17 @@ namespace hf {
                     const OpticalFlowSensor::RawData & rawdata
                     ) -> OpticalFlowFilter
             {
-                // Flip motion information to comply with sensor mounting
+                // Provide motion information to comply with sensor mounting
                 // (might need to be changed if mounted differently)
-                const int16_t accpx = rawdata.y;
-                const int16_t accpy = rawdata.x;
+                const int16_t dx = rawdata.y;
+                const int16_t dy = rawdata.x;
 
-                return IsInLimit(accpx) && IsInLimit(accpy) ?
+                return IsInLimit(dx) && IsInLimit(dy) ?
 
                     OpticalFlowFilter(
-                            true,           // got motion
-                            usec_curr,      // usec_prev
-                            (float)accpx,   // dpixelx
-                            (float)accpy,   // dpixely
+                            usec_curr,   
+                            (float)dx,   
+                            (float)dy,   
                             kStandardDeviationFixed, 
                             kStandardDeviationFixed, 
                             (float)(usec_curr - filter.usec_prev) / 1e6 // dt

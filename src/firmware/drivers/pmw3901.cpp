@@ -43,11 +43,11 @@ namespace hf {
     {
         int16_t dx = 0;
         int16_t dy = 0;
-        auto moved = false;
+        auto moved = false; // we ignore this
 
         _pmw3901.readMotion(dx, dy, moved);
 
-        return OpticalFlowSensor::RawData(dx, dy, moved);
+        return OpticalFlowSensor::RawData(dx, dy);
     }
 
 }

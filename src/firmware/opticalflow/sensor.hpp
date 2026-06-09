@@ -30,12 +30,10 @@ namespace hf {
 
                     int16_t x;
                     int16_t y;
-                    bool got_motion;
 
                     RawData() = default;
 
-                    RawData(const int16_t x, const int16_t y, const bool got_motion)
-                        : x(x), y(y), got_motion(got_motion) {}
+                    RawData(const int16_t x, const int16_t y) : x(x), y(y) {}
 
                     RawData& operator=(const RawData& other) = default;
             };
