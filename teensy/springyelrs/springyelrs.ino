@@ -1,5 +1,6 @@
 /*
-   Hackflight main sketch for Teensy quadcopter using ELRS receiver
+   Hackflight main sketch for Teensy quadcopter using ELRS receiver with
+   springy throttle
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -18,14 +19,11 @@
 
 // Third-party libraries
 #include <CRSFforArduino.hpp>
-#include <dshot-teensy4.hpp>  
 
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <mixers/bfquadx.hpp>
-
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+#include <firmware/effectors/quad_dshot.hpp>
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
@@ -33,7 +31,7 @@ static hf::FC _fc;
 
 static hf::SpringyReceiver _rxdata;
 
-static hf::Mixer _mixer;
+static hf::QuadDshot _effector;
 
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels)
@@ -77,7 +75,7 @@ void setup()
     _fc.Begin();
 
     // Start motors
-    _motors.begin();
+    _effector.Begin();
 }
 
 void loop()
@@ -88,11 +86,6 @@ void loop()
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
 
-    // Run motor mixer on setpoint
-    _mixer = hf::Mixer::Run(_mixer, setpoint);
-
-    // Run motors if safe
-    if (_fc.IsSafeToFly()) {
-        _motors.run(_fc.IsArmed(), _mixer.motorvals);
-    }
+    // Run the mixer and motors
+    _effector.Run(_fc, setpoint);
 }

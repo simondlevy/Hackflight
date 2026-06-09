@@ -1,0 +1,63 @@
+/*
+   Quadcopter motor mixer for DSHOT motors
+
+   Copyright (C) 2026 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+// Third-party libraries
+#include <dshot-teensy4.hpp>  
+
+// Hackflight library
+#include <hackflight.h>
+#include <firmware/fc.hpp>
+#include <mixers/bfquadx.hpp>
+
+static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+
+static hf::Mixer _mixer;
+
+namespace hf {
+
+    class QuadDshot {
+
+        public:
+
+            void Begin()
+            {
+                motors_.begin();
+            }
+
+            void Run(FC & fc, const Setpoint & setpoint)
+            {
+                mixer_ = hf::Mixer::Run(mixer_, setpoint);
+
+                // Run motors if safe
+                if (fc.IsSafeToFly()) {
+                    motors_.run(fc.IsArmed(), mixer_.motorvals);
+                }
+            }
+
+        private:
+
+            DshotTeensy4 motors_ = DshotTeensy4({2, 3, 4, 5});
+
+            hf::Mixer mixer_;
+
+
+    }; // class QuadDshot
+
+} // namespace hf

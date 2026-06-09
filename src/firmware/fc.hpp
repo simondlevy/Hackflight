@@ -21,7 +21,7 @@
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
 #include <firmware/debugging.hpp>
-#include <firmware/ekf/ekf.hpp>
+#include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/msp/__messages__.h>
