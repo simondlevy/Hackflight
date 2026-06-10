@@ -135,13 +135,15 @@ class Telemetry(MspParser):
         if self.outfile is None and self.plotter is None:
 
             print(('%-5s | '+
-                   'thrust=%+3.3f roll=%+3.3f pitch=%+3.3f yaw=%+3.3f | ' +
+                   't=%+3.3f r=%+3.3f p=%+3.3f y=%+3.3f | ' +
                    'dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-                   'phi=%+5.1f dphi=%+6.1f theta=%+5.1f dtheta=%+6.1f ' +
-                   'psi=%+5.1f dpsi=%+5.1f') %
+                   'phi=%+5.1f dphi=%+6.1f the=%+5.1f dthe=%+6.1f ' +
+                   'psi=%+5.1f dpsi=%+5.1f | ' + 
+                   'm1=%f m2=%f m3=%f m4=%f') %
                   (('idle', 'armed', 'hover', 'auto', 'panic')[mode],
                    thrust, roll, pitch, yaw,
-                   dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi))
+                   dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi,
+                   m1, m2, m3, m4))
 
         elif self.outfile is not None:
 
