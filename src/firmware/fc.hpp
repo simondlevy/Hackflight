@@ -115,8 +115,6 @@ namespace hf {
                 stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
 
-                SendTelemetry(stabilizer_pid_.setpoint);
-
                 return stabilizer_pid_.setpoint;
             } 
 
@@ -171,6 +169,27 @@ namespace hf {
             auto IsArmed() -> bool
             {
                 return mode_ != kModeIdle;
+            }
+
+            void SendTelemetry(const Setpoint & setpoint)
+            {
+                if (telemetry_timer_.Ready()) {
+
+                    const float data[15] = {
+                        (float)mode_,
+                        setpoint.thrust, setpoint.roll, setpoint.pitch,
+                        setpoint.yaw, state_.dx, state_.dy, state_.z, state_.dz,
+                        state_.phi, state_.dphi, state_.theta, state_.dtheta,
+                        state_.psi, state_.dpsi
+                    };
+
+                    telemetry_serializer_ = MspSerializer::SerializeFloat(
+                            telemetry_serializer_, kMspTelemetry, data, 15);
+
+                    Serial1.write(
+                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
+                            MspSerializer::GetPayloadSize(telemetry_serializer_));
+                }
             }
 
         private:
@@ -340,8 +359,6 @@ namespace hf {
 
                 const auto setpoint_out = hover_pid_.setpoint;
 
-                SendTelemetry(setpoint_out);
-
                 return setpoint_out;
              } 
 
@@ -410,27 +427,6 @@ namespace hf {
                 return  motor_check_msec_ > 0 &&
                     (msec_curr - motor_check_msec_) <
                     kFlyingHysteresisThresholdMsec;
-            }
-
-            void SendTelemetry(const Setpoint & setpoint)
-            {
-                if (telemetry_timer_.Ready()) {
-
-                    const float data[15] = {
-                        (float)mode_,
-                        setpoint.thrust, setpoint.roll, setpoint.pitch,
-                        setpoint.yaw, state_.dx, state_.dy, state_.z, state_.dz,
-                        state_.phi, state_.dphi, state_.theta, state_.dtheta,
-                        state_.psi, state_.dpsi
-                    };
-
-                    telemetry_serializer_ = MspSerializer::SerializeFloat(
-                            telemetry_serializer_, kMspTelemetry, data, 15);
-
-                    Serial1.write(
-                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
-                            MspSerializer::GetPayloadSize(telemetry_serializer_));
-                }
             }
 
             auto GetDt() -> float

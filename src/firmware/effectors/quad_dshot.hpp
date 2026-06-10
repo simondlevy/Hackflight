@@ -45,6 +45,8 @@ namespace hf {
                 if (fc.IsSafeToFly()) {
                     motors_.run(fc.IsArmed(), mixer_.motorvals);
                 }
+
+                fc.SendTelemetry(setpoint);
             }
 
             auto GetMotorValues() -> float *
