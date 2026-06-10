@@ -72,23 +72,27 @@ def main():
     # dtheta = data[:, 13]
     # psi = data[:, 14]
     # dpsi = data[:, 15]
+    m1 = data[:,16]
+    m2 = data[:,17]
+    m3 = data[:,18]
+    m4 = data[:,19]
 
     beg = (time >= args.begin).argmax()
 
     end = -1 if args.end is None else (time <= args.end).argmin() 
 
-    plt.subplot(4, 1, 1)
+    plt.subplot(5, 1, 1)
     plt.plot(time[beg:end], thrust[beg:end], 'b')
     plt.ylim((0, 1))
     plotmid(time[beg:end], 0.5)
     plt.ylabel('Thrust')
 
-    plt.subplot(4, 1, 2)
+    plt.subplot(5, 1, 2)
     plt.plot(time[beg:end], z[beg:end])
     plt.ylim((0, args.zmax))
     plt.ylabel('Z (m)')
 
-    plt.subplot(4, 1, 3)
+    plt.subplot(5, 1, 3)
     plt.plot(time[beg:end], dy[beg:end], 'r')
     plt.plot(time[beg:end], dx[beg:end], 'g')
     plt.plot(time[beg:end], dz[beg:end], 'b')
@@ -96,7 +100,7 @@ def main():
     plt.legend(('dy/dt', 'dx/dt', 'dz/dt'))
     plt.ylabel('Vel (m/s)')
 
-    plt.subplot(4, 1, 4)
+    plt.subplot(5, 1, 4)
     plt.plot(time[beg:end], roll[beg:end], 'r')
     plt.plot(time[beg:end], pitch[beg:end], 'g')
     plt.plot(time[beg:end], yaw[beg:end], 'b')
@@ -104,6 +108,15 @@ def main():
     plt.legend(('roll', 'pitch', 'yaw'))
     plt.ylim((-args.smax, +args.smax))
     plt.ylabel('Setpoint')
+
+    plt.subplot(5, 1, 5)
+    plt.plot(time[beg:end], m1[beg:end], 'r')
+    plt.plot(time[beg:end], m2[beg:end], 'g')
+    plt.plot(time[beg:end], m3[beg:end], 'b')
+    plt.plot(time[beg:end], m4[beg:end], 'k')
+    plotmid(time[beg:end], 0)
+    plt.legend(('m1', 'm2', 'm3', 'm4'))
+    plt.ylabel('Motors')
 
     plt.xlabel('time (s)')
 

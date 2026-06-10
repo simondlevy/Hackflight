@@ -136,10 +136,10 @@ class Telemetry(MspParser):
         print('phi=%+5.1f theta=%+5.1f psi=%+5.1f' % (phi, theta, psi))
 
         self.outfile.write(
-                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
+                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
                 (time.time() - self.start_time, mode, thrust, roll, pitch,
                     yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
-                    dpsi))
+                    dpsi, m1, m2, m3, m4))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
