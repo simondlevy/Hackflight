@@ -19,22 +19,19 @@
 
 // Third-party libraries
 #include <CRSFforArduino.hpp>
-#include <dshot-teensy4.hpp>  
 
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <mixers/bfquadx.hpp>
+#include <firmware/effectors/quad_dshot.hpp>
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
-
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
 
 static hf::FC _fc;
 
 static hf::TraditionalReceiver _rxdata;
 
-static hf::Mixer _mixer;
+static hf::QuadDshot _effector;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
@@ -64,7 +61,7 @@ void setup()
     _fc.Begin();
 
     // Start motors
-    _motors.begin();
+    _effector.Begin();
 }
 
 void loop()
@@ -78,11 +75,6 @@ void loop()
     // Run sensor fusion on hover-deck
     _fc.AcquireHoverData();
 
-    // Run motor mixer on setpoint
-    _mixer = hf::Mixer::Run(_mixer, setpoint);
-
-    // Run motors if safe
-    if (_fc.IsSafeToFly()) {
-        _motors.run(_fc.IsArmed(), _mixer.motorvals);
-    }
+    // Run the mixer and motors
+    _effector.Run(_fc, setpoint);
 }

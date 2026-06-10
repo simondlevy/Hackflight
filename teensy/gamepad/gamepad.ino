@@ -17,21 +17,18 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Third-party libraries
-#include <dshot-teensy4.hpp>  
-
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <mixers/bfquadx.hpp>
-
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
+#include <firmware/effectors/quad_dshot.hpp>
 
 static hf::FC _fc;
 
 static hf::GamepadReceiver _rx;
 
 static hf::Mixer _mixer;
+
+static hf::QuadDshot _effector;
 
 void serialEvent1()
 {
@@ -44,7 +41,7 @@ void setup()
     _fc.Begin();
 
     // Start motors
-    _motors.begin();
+    _effector.Begin();
 }
 
 void loop()
@@ -52,11 +49,6 @@ void loop()
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.Update(_rx, _mixer.motorvals, 4);
 
-    // Run motor mixer on setpoint
-    _mixer = hf::Mixer::Run(_mixer, setpoint);
-
-    // Run motors if safe
-    if (_fc.IsSafeToFly()) {
-        _motors.run(_fc.IsArmed(), _mixer.motorvals);
-    }
+    // Run the mixer and motors
+    _effector.Run(_fc, setpoint);
 }

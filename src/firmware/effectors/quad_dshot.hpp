@@ -26,10 +26,6 @@
 #include <firmware/fc.hpp>
 #include <mixers/bfquadx.hpp>
 
-static DshotTeensy4 _motors = DshotTeensy4({2, 3, 4, 5});
-
-static hf::Mixer _mixer;
-
 namespace hf {
 
     class QuadDshot {
