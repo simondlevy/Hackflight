@@ -72,14 +72,14 @@ def main():
     # dtheta = data[:, 13]
     # psi = data[:, 14]
     # dpsi = data[:, 15]
-    m1 = data[:,16]
-    m2 = data[:,17]
-    m3 = data[:,18]
-    m4 = data[:,19]
+    m1 = data[:, 16]
+    m2 = data[:, 17]
+    m3 = data[:, 18]
+    m4 = data[:, 19]
 
     beg = (time >= args.begin).argmax()
 
-    end = -1 if args.end is None else (time <= args.end).argmin() 
+    end = -1 if args.end is None else (time <= args.end).argmin()
 
     plt.subplot(5, 1, 1)
     plt.plot(time[beg:end], thrust[beg:end], 'b')
