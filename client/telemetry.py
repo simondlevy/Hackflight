@@ -48,7 +48,8 @@ class Telemetry(MspParser):
         argparser = argparse.ArgumentParser(
                 formatter_class=ArgumentDefaultsHelpFormatter)
 
-        argparser.add_argument('-o', '--outfile', help='CSV file for logging')
+        argparser.add_argument('-o', '--outfile', help='CSV file for logging',
+                               default='log.csv')
 
         argparser.add_argument('-r', '--realtime', action='store_true',
                                help='Real-time plot')
@@ -65,24 +66,23 @@ class Telemetry(MspParser):
             print('Unable to open port ' + args.port)
             exit(1)
 
-        self.outfile = None
-
         self.start_time = time.time()
 
-        if args.outfile is not None:
+        self.outfile = None
 
-            try:
+        try:
 
-                self.outfile = open(args.outfile, 'w')
+            self.outfile = open(args.outfile, 'w')
 
-                self.outfile.write(
-                        'time,thrust,roll,pitch,yaw,' +
-                        'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
+            self.outfile.write(
+                    'time,thrust,roll,pitch,yaw,' +
+                    'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi,' +
+                    'm1,m2,m3,m4\n')
 
-            except Exception as e:
-                print('Unable to open log file %s: %s' %
-                      (args.outfile, str(e)))
-                exit(1)
+        except Exception as e:
+            print('Unable to open log file %s: %s' %
+                  (args.outfile, str(e)))
+            exit(1)
 
         self.plotter = None
 
@@ -126,8 +126,8 @@ class Telemetry(MspParser):
         return self.plotter_data
 
     def handle_QUADROTOR_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
-                         dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi,
-                         m1, m2, m3, m4):
+                                   dx, dy, z, dz, phi, dphi, theta,
+                                   dtheta, psi, dpsi, m1, m2, m3, m4):
 
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
@@ -135,13 +135,11 @@ class Telemetry(MspParser):
         # Euler angles are simplest test for success
         print('phi=%+5.1f theta=%+5.1f psi=%+5.1f' % (phi, theta, psi))
 
-        if self.outfile is not None:
-
-            self.outfile.write(
-                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
-                    (time.time() - self.start_time, mode, thrust, roll, pitch,
-                        yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
-                        dpsi))
+        self.outfile.write(
+                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
+                (time.time() - self.start_time, mode, thrust, roll, pitch,
+                    yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
+                    dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
