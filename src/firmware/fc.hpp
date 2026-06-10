@@ -40,7 +40,7 @@
 
 namespace hf {
 
-    class FC {
+    class FlightController {
 
         // Constants ---------------------------------------------------------
 
@@ -461,6 +461,6 @@ namespace hf {
                 }
             }
 
-    }; // class FC
+    }; // class FlightController
 
 } // namespace hf

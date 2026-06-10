@@ -27,7 +27,7 @@
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
-static hf::FC _fc;
+static hf::FlightController _fc;
 
 static hf::SpringyReceiver _rxdata;
 
@@ -84,7 +84,7 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.Update(_rxdata, _mixer.motorvals, 4);
+    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
 
     // Run the mixer and motors
     _effector.Run(_fc, setpoint);

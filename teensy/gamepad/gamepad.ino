@@ -22,11 +22,9 @@
 #include <firmware/fc.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
 
-static hf::FC _fc;
+static hf::FlightController _fc;
 
 static hf::GamepadReceiver _rx;
-
-static hf::Mixer _mixer;
 
 static hf::QuadDshot _effector;
 
@@ -47,7 +45,7 @@ void setup()
 void loop()
 {
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.Update(_rx, _mixer.motorvals, 4);
+    const auto setpoint = _fc.Update(_rx, _effector.GetMotorValues(), 4);
 
     // Run the mixer and motors
     _effector.Run(_fc, setpoint);

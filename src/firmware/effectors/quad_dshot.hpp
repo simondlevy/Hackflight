@@ -37,7 +37,7 @@ namespace hf {
                 motors_.begin();
             }
 
-            void Run(FC & fc, const Setpoint & setpoint)
+            void Run(FlightController & fc, const Setpoint & setpoint)
             {
                 mixer_ = hf::Mixer::Run(mixer_, setpoint);
 
@@ -45,6 +45,11 @@ namespace hf {
                 if (fc.IsSafeToFly()) {
                     motors_.run(fc.IsArmed(), mixer_.motorvals);
                 }
+            }
+
+            auto GetMotorValues() -> float *
+            {
+                return mixer_.motorvals;
             }
 
         private:
