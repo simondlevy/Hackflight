@@ -173,21 +173,39 @@ namespace hf {
 
             void SendTelemetry(
                     const Setpoint & setpoint,
+                    const uint8_t message_id,
                     const float * motor_values,
                     const size_t motor_count)
             {
                 if (telemetry_timer_.Ready()) {
 
-                    const float data[15] = {
-                        (float)mode_,
-                        setpoint.thrust, setpoint.roll, setpoint.pitch,
-                        setpoint.yaw, state_.dx, state_.dy, state_.z, state_.dz,
-                        state_.phi, state_.dphi, state_.theta, state_.dtheta,
-                        state_.psi, state_.dpsi
-                    };
+                    float data[256] = {};
+
+                    data[0] = (float)mode_;
+
+                    data[1] = setpoint.thrust;
+                    data[2] = setpoint.roll;
+                    data[3] = setpoint.pitch;
+                    data[4] = setpoint.yaw;
+
+                    data[5] = state_.dx;
+                    data[6] = state_.dy;
+                    data[7] = state_.z;
+                    data[8] = state_.dz;
+                    data[9] = state_.phi;
+                    data[10] = state_.dphi;
+                    data[11] = state_.theta;
+                    data[12] = state_.dtheta;
+                    data[13] = state_.psi;
+                    data[14] = state_.dpsi;
+
+                    for (uint8_t i=0; i<motor_count; ++i) {
+                        data[15+i] = motor_values[i];
+                    }
 
                     telemetry_serializer_ = MspSerializer::SerializeFloat(
-                            telemetry_serializer_, kMspTelemetry, data, 15);
+                            telemetry_serializer_, message_id,
+                            data, 15 + motor_count);
 
                     Serial1.write(
                             MspSerializer::GetPayloadBytes(telemetry_serializer_),

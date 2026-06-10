@@ -125,8 +125,9 @@ class Telemetry(MspParser):
         self.step()
         return self.plotter_data
 
-    def handle_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
-                         dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+    def handle_QUADROTOR_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
+                         dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi,
+                         m1, m2, m3, m4):
 
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <vector>
+
 // Third-party libraries
 #include <dshot-teensy4.hpp>  
 
@@ -29,6 +31,10 @@
 namespace hf {
 
     class QuadDshot {
+
+        private:
+
+            std::vector<uint8_t> kMotorPins = {2, 3, 4, 5};
 
         public:
 
@@ -46,7 +52,8 @@ namespace hf {
                     motors_.run(fc.IsArmed(), mixer_.motorvals);
                 }
 
-                fc.SendTelemetry(setpoint, mixer_.motorvals, 4);
+                fc.SendTelemetry(setpoint, kMspQuadrotorTelemetry,
+                        mixer_.motorvals, 4);
             }
 
             auto GetMotorValues() -> float *
@@ -56,7 +63,7 @@ namespace hf {
 
         private:
 
-            DshotTeensy4 motors_ = DshotTeensy4({2, 3, 4, 5});
+            DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
             hf::Mixer mixer_;
 
