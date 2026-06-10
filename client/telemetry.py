@@ -132,20 +132,10 @@ class Telemetry(MspParser):
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
 
-        if self.outfile is None and self.plotter is None:
+        # Euler angles are simplest test for success
+        print('phi=%+5.1f theta=%+5.1f psi=%+5.1f' % (phi, theta, psi))
 
-            print(('%-5s | '+
-                   't=%+3.3f r=%+3.3f p=%+3.3f y=%+3.3f | ' +
-                   'dx=%+03.2f dy=%+03.2f z=%+03.2f dz=%+03.2f ' +
-                   'phi=%+5.1f dphi=%+6.1f the=%+5.1f dthe=%+6.1f ' +
-                   'psi=%+5.1f dpsi=%+5.1f | ' + 
-                   'm1=%f m2=%f m3=%f m4=%f') %
-                  (('idle', 'armed', 'hover', 'auto', 'panic')[mode],
-                   thrust, roll, pitch, yaw,
-                   dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi,
-                   m1, m2, m3, m4))
-
-        elif self.outfile is not None:
+        if self.outfile is not None:
 
             self.outfile.write(
                     '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n' %
