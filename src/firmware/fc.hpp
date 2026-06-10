@@ -171,7 +171,10 @@ namespace hf {
                 return mode_ != kModeIdle;
             }
 
-            void SendTelemetry(const Setpoint & setpoint)
+            void SendTelemetry(
+                    const Setpoint & setpoint,
+                    const float * motor_values,
+                    const size_t motor_count)
             {
                 if (telemetry_timer_.Ready()) {
 

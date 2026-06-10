@@ -46,7 +46,7 @@ namespace hf {
                     motors_.run(fc.IsArmed(), mixer_.motorvals);
                 }
 
-                fc.SendTelemetry(setpoint);
+                fc.SendTelemetry(setpoint, mixer_.motorvals, 4);
             }
 
             auto GetMotorValues() -> float *
