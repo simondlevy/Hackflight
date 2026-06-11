@@ -102,6 +102,8 @@ namespace hf {
                 Step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motor_vals, motor_count);
 
+                debugger_.Report(rxdata);
+
                 const auto rx_setpoint = rxdata.setpoint;
 
                 const auto setpoint = Setpoint(

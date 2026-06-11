@@ -57,7 +57,7 @@ void setup()
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
-    // Start flight control
+    // Start flight control, no hoverdeck
     _fc.Begin(false);
 
     // Start motors

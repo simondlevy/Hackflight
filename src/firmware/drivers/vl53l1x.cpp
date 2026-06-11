@@ -31,7 +31,6 @@ namespace hf {
         Wire1.setClock(400000);
         delay(100);
 
-
         if (!_vl53l1x.begin(0x29, &Wire1)) {
             Debugger::ReportForever("Unable to initialize VL53L1X");
         }
