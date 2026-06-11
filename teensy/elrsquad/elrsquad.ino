@@ -58,7 +58,7 @@ void setup()
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start flight control
-    _fc.Begin();
+    _fc.Begin(false);
 
     // Start motors
     _effector.Begin();
@@ -71,9 +71,6 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
-
-    // Run sensor fusion on hover-deck
-    _fc.AcquireHoverData();
 
     // Run the mixer and motors
     _effector.Run(_fc, setpoint);

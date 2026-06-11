@@ -17,6 +17,7 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/datatypes.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
@@ -95,14 +96,27 @@ namespace hf {
                 }
             }
 
+            void Report(const ReceiverData & rxdata)
+            {
+                if (helper_.Ready()) {
+
+                    ReportSetpoint(rxdata.setpoint);
+
+                    printf(" | requested_arming=%s requested_hover=%s "
+                            " timestamp=%lu msec\n",
+                            Bool2Str(rxdata.requested_arming),
+                            Bool2Str(rxdata.requested_hover),
+                            rxdata.timestamp_msec);
+                }
+            }
+
             void Report(const Setpoint & setpoint)
             {
                 if (helper_.Ready()) {
 
-                    printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
-                            "yaw=%+3.3f\n",
-                            helper_.count, setpoint.thrust, setpoint.roll,
-                            setpoint.pitch, setpoint.yaw); }
+                    ReportSetpoint(setpoint);
+                    printf("\n");
+                }
             }
 
             void ReportHover(const VehicleState & state)
@@ -201,12 +215,24 @@ namespace hf {
 
                     printf("\n");
                 }
-             }
+            }
 
         private:
 
             Helper helper_;
 
+            const void ReportSetpoint(const Setpoint & setpoint)
+            {
+                printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
+                        "yaw=%+3.3f",
+                        helper_.count, setpoint.thrust, setpoint.roll,
+                        setpoint.pitch, setpoint.yaw);
+            }
+
+            static auto Bool2Str(const bool value) -> const char *
+            {
+                return value ? "true" : "false";
+            }
 
     };
 }
