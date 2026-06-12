@@ -2966,7 +2966,6 @@
 			)
 		)
 		(property ki_fp_filters "TinyPICO_Nano_Connector")
-		(path "/52c18325-1cc9-4dc4-ae76-095c6881a664")
 		(sheetname "/")
 		(sheetfile "main.kicad_sch")
 		(units
