@@ -2989,18 +2989,6 @@
 		)
 	)
 	(gr_text "5V"
-		(at 152.4 25.4 0)
-		(layer "F.SilkS")
-		(uuid "b91c1c86-c630-4d82-8237-f0d71c9bf15e")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
-	(gr_text "5V"
 		(at 152.5 113.5 0)
 		(layer "F.SilkS")
 		(uuid "4b1bca78-15b5-436d-84e4-e39641366354")
