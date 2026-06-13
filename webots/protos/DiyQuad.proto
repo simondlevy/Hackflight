@@ -146,7 +146,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                          url [ "../meshes/stl_files//diyquad/prop_cw.stl" ]
                       }
                     }
 
@@ -204,7 +204,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_ccw.stl" ]
+                          url [ "../meshes/stl_files//diyquad/prop_ccw.stl" ]
                       }
                     }
 
@@ -259,7 +259,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_ccw.stl" ]
+                          url [ "../meshes/stl_files//diyquad/prop_ccw.stl" ]
                       }
                     }
 
@@ -315,7 +315,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                          url [ "../meshes/stl_files//diyquad/prop_cw.stl" ]
                       }
                     }
 
