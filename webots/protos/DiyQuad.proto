@@ -2,6 +2,10 @@
 
 PROTO DiyQuad [
   field SFVec3f translation      0 0 0.0
+  field SFVec3f motor1_translation  0.031 -0.031 0.016  
+  field SFVec3f motor2_translation -0.031 -0.031 0.016  
+  field SFVec3f motor3_translation -0.031  0.031 0.016  
+  field SFVec3f motor4_translation  0.031  0.031 0.016  
   field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
   field SFFloat prop_fast_helix_radius 0.025
@@ -102,7 +106,7 @@ DEF ROBOT Robot {
 
     DEF M1 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust 0.031 -0.031 0.016  
+            centerOfThrust IS motor1_translation
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
@@ -113,7 +117,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
 
-            translation 0.031 -0.031 0.016
+            translation IS motor1_translation 
 
                 children [ 
 
@@ -134,7 +138,7 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation 0.031 -0.031 0.016
+            translation IS motor1_translation
 
                 children [
 
@@ -159,7 +163,7 @@ DEF ROBOT Robot {
 
     DEF M2 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust -0.031 -0.031 0.016
+            centerOfThrust IS motor2_translation
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
@@ -170,7 +174,7 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
 
-            translation -0.031 -0.031 0.016
+            translation IS motor2_translation
 
                 children [ 
 
@@ -192,7 +196,7 @@ DEF ROBOT Robot {
         }
         slowHelix Solid {
 
-            translation -0.031 -0.031 0.016
+            translation IS motor2_translation
 
                 children [
 
@@ -216,7 +220,7 @@ DEF ROBOT Robot {
 
     DEF M3 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust -0.031 0.031 0.016
+            centerOfThrust IS motor3_translation
             thrustConstants 0 0
             torqueConstants  0 0
             fastHelixThreshold IS prop_fast_helix_threshold
@@ -226,7 +230,7 @@ DEF ROBOT Robot {
                 maxTorque IS motor_max_torque
             }
         fastHelix Solid {
-            translation -0.031 0.031 0.016
+            translation IS motor3_translation
                 children [ 
                   
                 Shape {
@@ -271,7 +275,7 @@ DEF ROBOT Robot {
 
     DEF M4 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust 0.031 0.031 0.016
+            centerOfThrust IS motor4_translation
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
@@ -304,7 +308,7 @@ DEF ROBOT Robot {
                 ] 
         }
         slowHelix DEF PROP Solid {
-            translation 0.031 0.031 0.016
+            translation IS motor4_translation
                 children [
 
                     Shape {

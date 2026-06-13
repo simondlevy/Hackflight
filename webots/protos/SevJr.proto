@@ -2,7 +2,7 @@
 
 PROTO SevJr [
   field SFVec3f translation      0 0 0.0
-#  field SFColor rear_prop_color  0.5 0 0.25
+  field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
   field SFFloat prop_fast_helix_radius 0.025
   field SFFloat prop_fast_helix_height 0.001
@@ -98,11 +98,69 @@ DEF ROBOT Robot {
     DEF INERTIAL_UNIT InertialUnit {
     }
 
-    # Motor 1 ----------------------------------------------------------------
+    # Motor Front Left -------------------------------------------------------
 
-    # Motor 2 ----------------------------------------------------------------
+    DEF M1 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust 0.031 -0.031 0.016  
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold IS prop_fast_helix_threshold
+            device RotationalMotor {
+                name "motor1"
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
+            }
+        fastHelix Solid {
 
-    # Motor 3 ----------------------------------------------------------------
+            translation 0.031 -0.031 0.064
+
+                children [ 
+
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor IS rear_prop_color
+                                    baseColorMap ImageTexture {
+                                        url [ "../meshes/textures/fast_helix.png" ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
+                            }
+                        }
+
+                ]
+        }
+        slowHelix Solid {
+            translation 0.031 -0.031 0.064
+
+                children [
+
+                    Shape {
+
+                        appearance DEF PLASTIC PBRAppearance {
+                            baseColor IS rear_prop_color
+                                metalness 0
+                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files//diyquad/prop_cw.stl" ]
+                      }
+                    }
+
+
+                ]
+        }
+    }
+
+ 
+    # Motor Front Right ------------------------------------------------------
+
+    # Motor Rear -------------------------------------------------------------
+
+
 
     DEF M4 Propeller {
         shaftAxis 0 0 1

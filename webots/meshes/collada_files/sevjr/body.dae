@@ -5,8 +5,8 @@
    <author> Anonymous </author>
    <authoring_tool> Collada Exporter for Blender 2.9+, by Gregery Barton </authoring_tool>
   </contributor>
-  <created>2026-06-13T18:14:02Z  </created>
-  <modified>2026-06-13T18:14:02Z</modified>
+  <created>2026-06-13T18:21:46Z  </created>
+  <modified>2026-06-13T18:21:46Z</modified>
   <unit meter="1.0" name="meter"/>
   <up_axis>Z_UP</up_axis>
  </asset>
@@ -382,7 +382,7 @@
     <instance_camera url="#Camera-camera"/>
    </node>
    <node id="SEV_Jr_Motor.003" name="SEV_Jr_Motor.003" type="NODE">
-    <matrix sid="transform">0.0016 0.0 0.0 -0.2673 0.0 0.0016 0.0 0.1336 0.0 0.0 0.0016 0.0432 0.0 0.0 0.0 1.0</matrix>
+    <matrix sid="transform">0.0016 0.0 0.0 -0.2673 0.0 0.0016 0.0 0.136 0.0 0.0 0.0016 0.0432 0.0 0.0 0.0 1.0</matrix>
     <instance_geometry url="#SEV_Jr_Motor.006">
      <bind_material>
       <technique_common>
