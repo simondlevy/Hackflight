@@ -20,12 +20,46 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.026304409994995254 0.9084765727539335 -0.4171071742035643 0.8399679974532084
-  position -1.8135925749013784 0.5727261812211244 1.6273939276852114
+  orientation -0.1363034288549451 0.2162915929550541 0.9667674601988577 0.946423967081561
+  position -0.9117626784846846 -1.0936032525570878 0.4867283600035488
   follow "SevJr"
 }
 DEF diyquad SevJr {
   rotation 0 0 -1 0
+}
+Solid {
+  translation 0.025 -0.175 -0.025
+  children [
+    CadShape {
+      url [
+        "../meshes/collada_files/sevjr/rudder.dae"
+      ]
+    }
+  ]
+  name "rudder_left"
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
+  physics Physics {
+  }
+}
+Solid {
+  translation 0.099 -0.175 -0.02
+  children [
+    CadShape {
+      url [
+        "../meshes/collada_files/sevjr/rudder.dae"
+      ]
+    }
+  ]
+  name "rudder_right"
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
+  physics Physics {
+  }
 }
 TexturedBackground {
 }
