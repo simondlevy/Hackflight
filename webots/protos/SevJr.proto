@@ -2,7 +2,8 @@
 
 PROTO SevJr [
   field SFVec3f translation      0 0 0.0
-  field SFVec3f motor_rear_translation  0.25 0.16 0.09
+  field SFVec3f motor_front_right_translation  0.247 0.157 0.090
+  field SFVec3f motor_front_left_translation  -0.247 0.157 0.090
   field SFColor prop_color  0.75 0 0
   field SFFloat prop_fast_helix_radius 0.025
   field SFFloat prop_fast_helix_height 0.001
@@ -98,27 +99,21 @@ DEF ROBOT Robot {
     DEF INERTIAL_UNIT InertialUnit {
     }
 
-    # Motor Front Left -------------------------------------------------------
-
     # Motor Front Right ------------------------------------------------------
-
-    # Motor Rear -------------------------------------------------------------
-
-
 
     DEF M4 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust IS motor_rear_translation
+            centerOfThrust IS motor_front_right_translation
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
-                name "motor_rear"
+                name "motor_front_right"
                 maxVelocity IS motor_max_velocity
                 maxTorque IS motor_max_torque
             }
         fastHelix Solid {
-            translation IS motor_rear_translation
+            translation IS motor_front_right_translation
                 children [
 
                 Shape {
@@ -141,7 +136,7 @@ DEF ROBOT Robot {
                 ] 
         }
         slowHelix DEF PROP Solid {
-            translation IS motor_rear_translation
+            translation IS motor_front_right_translation
                 children [
 
                     Shape {
