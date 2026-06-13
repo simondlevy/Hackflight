@@ -252,7 +252,7 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation -0.031 0.031 0.016
+            translation IS motor3_translation
                 children [
 
                     Shape {
@@ -285,7 +285,7 @@ DEF ROBOT Robot {
                 maxTorque IS motor_max_torque
             }
         fastHelix Solid {
-            translation 0.031 0.031 0.016
+            translation IS motor4_translation
                 children [
 
                 Shape {
