@@ -1377,12 +1377,12 @@
 	(footprint "LOGO"
 		(layer "F.Cu")
 		(uuid "4b898f41-5d86-4a44-8c1f-93b6e0921ec5")
-		(at 138.05 102.35)
+		(at 153.43 102.2)
 		(property "Reference" "G***"
 			(at 0 0 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "36e749b8-b235-4ab9-a4fa-50289cfeeb45")
+			(uuid "7b1c0321-0023-4c10-99da-190f6b00490d")
 			(effects
 				(font
 					(size 1.5 1.5)
@@ -1394,7 +1394,7 @@
 			(at 0.75 0 0)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "cfec278c-2dc6-452f-8803-d72781eb37ff")
+			(uuid "570968e6-698b-4cee-ac2f-27aee9f90655")
 			(effects
 				(font
 					(size 1.5 1.5)
@@ -1406,7 +1406,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "eb56f2c3-2bab-4176-b3dd-f0cb4cb88186")
+			(uuid "af2ef3ac-f58c-4e30-9a57-af38e3dc3e41")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1417,7 +1417,7 @@
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "5968bd39-d7c0-4f09-a75e-d48ca6b67133")
+			(uuid "9ce24594-dbc3-4d4e-956f-afbc5d069c8b")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7722,7 +7722,7 @@
 		(uuid "74a69cc4-4ae3-417f-9217-2817994007ae")
 	)
 	(gr_text "tindie.com/stores/bobbiebots"
-		(at 140.9 101.25 0)
+		(at 155.86 103.9 49)
 		(layer "F.SilkS")
 		(uuid "d58fe1d5-68e4-4636-82a7-f45e6fbc6cbc")
 		(effects
@@ -8166,7 +8166,7 @@
 		)
 	)
 	(gr_text "5V"
-		(at 162.65 95.75 90)
+		(at 164.11 93.64 90)
 		(layer "F.SilkS")
 		(uuid "d21921fd-1531-4b27-bae5-6d68df965a31")
 		(effects
