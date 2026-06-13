@@ -28,7 +28,7 @@ DEF ROBOT Robot {
                 children [
 
                 CadShape {
-                    url [ "../meshes/collada_files/sevjr.dae" ]
+                    url [ "../meshes/collada_files/sevjr/body.dae" ]
                 }
 
                 ]
@@ -157,11 +157,14 @@ DEF ROBOT Robot {
                 ]
         }
     }
+
     ]
-        boundingObject Cylinder {
-            height 0.03
-                radius 0.05
-        }
+
+    boundingObject Cylinder {
+        height 0.03
+        radius 0.05
+    }
+
     physics Physics {
         density -1
         mass 0.05
