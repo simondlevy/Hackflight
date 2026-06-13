@@ -2,7 +2,7 @@
 
 PROTO SevJr [
   field SFVec3f translation      0 0 0.0
-  field SFColor rear_prop_color  0.5 0 0.25
+#  field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
   field SFFloat prop_fast_helix_radius 0.025
   field SFFloat prop_fast_helix_height 0.001
@@ -124,7 +124,7 @@ DEF ROBOT Robot {
                                 baseColor IS front_prop_color
                                     baseColorMap ImageTexture {
                                         url [
-                                            "../meshes/textures/fast_helix.png"
+                                            # "../meshes/textures/fast_helix.png"
                                         ]
                                     }
                                 metalness 0
@@ -150,7 +150,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/prop_cw.stl" ]
+                          # url [ "../meshes/stl_files/prop_cw.stl" ]
                       }
                     }
 
