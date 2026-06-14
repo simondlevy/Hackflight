@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
    Python flight simulator main for Hackflight with C++ custom physics plugin
 
@@ -135,10 +134,11 @@ def getAndEnableDevice(robot, timestep, device_name):
     device.enable(timestep)
     return device
 
+def makeRobot():
 
-def main():
+    return Robot()
 
-    robot = Robot()
+def run(robot):
 
     timestep = int(robot.getBasicTimeStep())
 
@@ -173,11 +173,6 @@ def main():
 
     cmdinfo = 'armed', 0, 0, 0, 0
 
-    startMotor(robot, 'motor1', -1)
-    startMotor(robot, 'motor2', +1)
-    startMotor(robot, 'motor3', +1)
-    startMotor(robot, 'motor4', -1)
-
     while True:
 
         if robot.step(timestep) == -1:
@@ -192,6 +187,3 @@ def main():
 
         # Send siminfo to fast thread
         emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
-
-
-main()

@@ -29,11 +29,11 @@ run:
         echo "World file" $(WORLD_FILE) "not found";\
 	else \
 	    webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
-		--stdout-redirect ./standard.py $(world) &> /dev/null;\
+		--stdout-redirect ./diyquad.py $(world) &> /dev/null;\
 	fi
 
 edit:
-	vim standard.py 
+	vim diyquad.py 
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
