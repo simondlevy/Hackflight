@@ -298,4 +298,4 @@ DEF ROBOT Robot {
     }
 }
 
-}
+} # DEF ROBOT ROBOT
