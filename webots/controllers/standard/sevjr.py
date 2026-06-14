@@ -24,10 +24,9 @@ def main():
 
     robot = makeRobot()
 
-    startMotor(robot, 'motor1', -1)
-    startMotor(robot, 'motor2', +1)
-    startMotor(robot, 'motor3', +1)
-    startMotor(robot, 'motor4', -1)
+    startMotor(robot, 'motor_front_left', -1)
+    startMotor(robot, 'motor_front_right', +1)
+    startMotor(robot, 'motor_rear', +1)
 
     run(robot)
 
