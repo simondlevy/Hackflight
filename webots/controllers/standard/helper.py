@@ -134,9 +134,11 @@ def getAndEnableDevice(robot, timestep, device_name):
     device.enable(timestep)
     return device
 
+
 def makeRobot():
 
     return Robot()
+
 
 def run(robot):
 
@@ -148,7 +150,6 @@ def run(robot):
     keyboard = robot.getKeyboard()
     keyboard.enable(timestep)
 
-    gps = getAndEnableDevice(robot, timestep, 'gps')
     emitter = robot.getDevice('emitter')
 
     robot.step(timestep)
@@ -168,8 +169,6 @@ def run(robot):
         printKeyboardInstructions()
 
     buttons_down = {'hover': False, 'auto': False}
-
-    zstart = gps.getValues()[2]
 
     cmdinfo = 'armed', 0, 0, 0, 0
 

@@ -32,9 +32,6 @@ run:
 		--stdout-redirect ./diyquad.py $(world) &> /dev/null;\
 	fi
 
-edit:
-	vim diyquad.py 
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
