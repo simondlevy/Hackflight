@@ -4,6 +4,8 @@ PROTO SevJr [
   field SFVec3f translation      0 0 0.0
   field SFVec3f motor_front_left_translation  -0.260  0.157 0.090
   field SFVec3f motor_front_right_translation  0.247  0.157 0.090
+  field SFRotation motor_front_left_rotation   0 0 1  1
+  field SFRotation motor_front_right_rotation  0 0 1 -1
   field SFVec3f motor_rear_translation        -0.008 -0.280 0.108
   field SFColor prop_color  0.75 0 0
   field SFFloat prop_fast_helix_radius 0.025
@@ -11,7 +13,6 @@ PROTO SevJr [
   field SFFloat prop_fast_helix_threshold 50
   field SFFloat motor_max_velocity 100
   field SFFloat motor_max_torque 30
-  field SFRotation rotation      0 0 0 0
 ]
 
 {
@@ -19,7 +20,7 @@ PROTO SevJr [
 DEF ROBOT Robot {
 
     translation  IS translation
-        rotation IS rotation
+        rotation 0 0 0 0
         controller "<extern>"
         supervisor TRUE
         name "SevJr"
@@ -138,6 +139,7 @@ DEF ROBOT Robot {
             }
             slowHelix DEF PROP Solid {
                 translation IS motor_front_left_translation
+                rotation IS motor_front_left_rotation
                     children [
 
                         Shape {
@@ -194,6 +196,7 @@ DEF ROBOT Robot {
             }
             slowHelix DEF PROP Solid {
                 translation IS motor_front_right_translation
+                rotation IS motor_front_right_rotation
                     children [
 
                         Shape {
