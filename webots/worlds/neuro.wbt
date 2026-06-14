@@ -25,7 +25,7 @@ Viewpoint {
   position -1.9331339285684632 0.08331128415878952 3.1094423098913775
   follow "DiyQuad"
 }
-DEF diyquad DiyQuad {
+DEF robot DiyQuad {
   translation 1.02 -0.05 0.0131967
   rotation -1.56804e-18 -1.60403e-18 1 1.5708
 }

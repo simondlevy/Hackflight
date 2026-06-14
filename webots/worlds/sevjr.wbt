@@ -24,7 +24,7 @@ Viewpoint {
   position -1.7258915034776114 -1.2354889509164857 1.120438843911584
   follow "SevJr"
 }
-DEF diyquad SevJr {
+DEF robot SevJr {
 }
 Solid {
   translation 0.025 -0.175 -0.025

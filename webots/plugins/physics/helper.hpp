@@ -33,7 +33,7 @@ class PluginHelper {
 
     private:
 
-        static constexpr char kRobotName[] = "diyquad";
+        static constexpr char kRobotName[] = "robot";
 
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;

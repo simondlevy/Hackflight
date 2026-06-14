@@ -24,7 +24,7 @@ Viewpoint {
   position -0.7477883901845636 -0.04275310979460666 0.48472269360044024
   follow "DiyQuad"
 }
-DEF diyquad DiyQuad {
+DEF robot DiyQuad {
   rotation 0 0 -1 0
 }
 TexturedBackground {
