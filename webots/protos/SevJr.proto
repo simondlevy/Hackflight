@@ -101,7 +101,7 @@ DEF ROBOT Robot {
 
         # Motor Front Left ----------------------------------------------------
 
-        DEF M4 Propeller {
+        DEF FRONT_LEFT Propeller {
             shaftAxis 0 0 1
                 centerOfThrust IS motor_front_left_translation
                 thrustConstants 0 0
@@ -157,7 +157,7 @@ DEF ROBOT Robot {
 
         # Motor Front Right ------------------------------------------------------
 
-        DEF M4 Propeller {
+        DEF FRONT_RIGHT Propeller {
             shaftAxis 0 0 1
                 centerOfThrust IS motor_front_right_translation
                 thrustConstants 0 0
