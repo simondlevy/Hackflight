@@ -50,7 +50,7 @@ PROTO SevJr [
             children [ # =========================================================
 
             Solid {
-              translation -0.25 0.047 0.025
+              translation -0.245 0.047 0.025
               rotation IS rudder_rotation
               children [
                 CadShape {
