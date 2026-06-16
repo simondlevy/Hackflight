@@ -129,7 +129,7 @@ DEF ROBOT Robot {
                     maxTorque IS motor_max_torque
                 }
             fastHelix Solid {
-                translation IS motor_front_right_translation
+                translation IS motor_front_left_translation
                     children [
 
                     Shape {
@@ -137,7 +137,7 @@ DEF ROBOT Robot {
                                     baseColor IS prop_color
                                         baseColorMap ImageTexture {
                                             url [
-                                                # "../meshes/textures/fast_helix.png"
+                                                "../meshes/textures/fast_helix.png"
                                             ]
                                         }
                                     metalness 0
@@ -194,7 +194,7 @@ DEF ROBOT Robot {
                                     baseColor IS prop_color
                                         baseColorMap ImageTexture {
                                             url [
-                                                # "../meshes/textures/fast_helix.png"
+                                                "../meshes/textures/fast_helix.png"
                                             ]
                                         }
                                     metalness 0
