@@ -55,7 +55,7 @@ PROTO SevJr [
               children [
                 CadShape {
                   url [
-                    "../meshes/collada_files/sevjr/rudder.dae"
+                    "../../meshes/collada_files/sevjr/rudder.dae"
                   ]
                 }
               ]
@@ -70,7 +70,7 @@ PROTO SevJr [
                     translation 0 0 0
                         children [
                             CadShape {
-                                url [ "../meshes/collada_files/sevjr/body.dae" ]
+                                url [ "../../meshes/collada_files/sevjr/body.dae" ]
                             }
                         ]
               }
@@ -161,7 +161,7 @@ PROTO SevJr [
                                         baseColor IS prop_color
                                             baseColorMap ImageTexture {
                                                 url [
-                                                    "../meshes/textures/fast_helix.png"
+                                                    "../../meshes/textures/fast_helix.png"
                                                 ]
                                             }
                                         metalness 0
@@ -188,7 +188,7 @@ PROTO SevJr [
                                 }
 
                               geometry Mesh {
-                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                                  url [ "../../meshes/stl_files/sevjr/prop.stl" ]
                               }
                             }
 
@@ -218,7 +218,7 @@ PROTO SevJr [
                                         baseColor IS prop_color
                                             baseColorMap ImageTexture {
                                                 url [
-                                                    "../meshes/textures/fast_helix.png"
+                                                    "../../meshes/textures/fast_helix.png"
                                                 ]
                                             }
                                         metalness 0
@@ -245,7 +245,7 @@ PROTO SevJr [
                                 }
 
                               geometry Mesh {
-                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                                  url [ "../../meshes/stl_files/sevjr/prop.stl" ]
                               }
                             }
 
@@ -275,7 +275,7 @@ PROTO SevJr [
                                         baseColor IS prop_color
                                             baseColorMap ImageTexture {
                                                 url [
-                                                    "../meshes/textures/fast_helix.png"
+                                                    "../../meshes/textures/fast_helix.png"
                                                 ]
                                             }
                                         metalness 0
@@ -302,7 +302,7 @@ PROTO SevJr [
                                 }
 
                               geometry Mesh {
-                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                                  url [ "../../meshes/stl_files/sevjr/prop.stl" ]
                               }
                             }
 
