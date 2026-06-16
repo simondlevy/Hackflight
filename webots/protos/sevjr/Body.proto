@@ -14,7 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-PROTO SevJr [
+PROTO Body [
 
   field SFVec3f vehicle_translation 0 0 0.0
 
@@ -44,8 +44,8 @@ PROTO SevJr [
             rotation 0 0 0 0
             controller "<extern>"
             supervisor TRUE
-            name "SevJr"
-            model "SevJr"
+            name "Body"
+            model "Body"
 
             children [ # =========================================================
 
