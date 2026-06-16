@@ -9,7 +9,7 @@ EXTERNPROTO "../protos/sevjr/Rudder.proto"
 WorldInfo {
   title "Hackflight"
   gravity 0
-  physics "simple"
+  physics "sevjr"
   contactProperties [
     ContactProperties {
       coulombFriction [
