@@ -15,12 +15,18 @@
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 PROTO SevJr [
-  field SFVec3f translation      0 0 0.0
-  field SFVec3f motor_front_left_translation  -0.260  0.157 0.090
-  field SFVec3f motor_front_right_translation  0.247  0.157 0.090
-  field SFRotation motor_front_left_rotation   0 0 1  1
-  field SFRotation motor_front_right_rotation  0 0 1 -1
-  field SFVec3f motor_rear_translation        -0.008 -0.280 0.108
+
+  field SFVec3f vehicle_translation 0 0 0.0
+
+  field SFVec3f motor_front_right_translation  0.157 -0.247  0.090
+  field SFRotation motor_front_right_rotation   0 0 1  1
+
+  field SFVec3f motor_front_left_translation  0.157 0.260 0.090
+  field SFRotation motor_front_left_rotation  0 0 1 -1
+
+  field SFVec3f motor_rear_translation -0.282 0.007 0.100
+  field SFRotation motor_rear_rotation  0 0 1 0
+
   field SFColor prop_color  0.75 0 0
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
@@ -30,272 +36,272 @@ PROTO SevJr [
 ]
 
 {
+    DEF ROBOT Robot {
 
-DEF ROBOT Robot {
+        translation  IS vehicle_translation
+            rotation 0 0 0 0
+            controller "<extern>"
+            supervisor TRUE
+            name "SevJr"
+            model "SevJr"
 
-    translation  IS translation
-        rotation 0 0 0 0
-        controller "<extern>"
-        supervisor TRUE
-        name "SevJr"
-        model "SevJr"
+            children [ # =========================================================
 
-        children [ # =========================================================
-
-          DEF BODY Pose {
-                translation 0 0 0
-                    children [
-                        CadShape {
-                            url [ "../meshes/collada_files/sevjr/body.dae" ]
-                        }
-                    ]
-          }
-
-          DEF emitter Emitter {
-            model "radio"
-            bufferSize 1000
-          }
-
-          Receiver {
-            bufferSize 1000
-          }
-
-        Camera {
-            translation 0.05 0 0.01
-            fieldOfView 0.87
-            width 324
-            height 324
-        }
-
-        RangeFinder {
-
-          # VL53L5 specs
-          fieldOfView 1.34  # radians
-          width 8 
-          height 1
-          minRange 0.01
-          maxRange 4.0
-          noise 0.0 # should probably adjust this
-          translation 0.04 0 0.0
-          rotation 0 0 1 0
-          name "VL53L5-forward"
-        }
-
-        RangeFinder {
-
-          # VL13L1 specs
-          fieldOfView 0.47  # radians
-          width 1 
-          height 1
-          minRange 0.04
-          maxRange 4.0
-          noise 0.0 # should probably adjust this
-          translation 0.04 0 0.0
-          rotation 0 0 1 0
-           name "VL53L1-forward"
-        }
-
-        RangeFinder {
-
-          # VL13L1 specs
-          fieldOfView 0.47  # radians
-          width 1 
-          height 1
-          minRange 0.04
-          maxRange 4.0
-          noise 0.0 # should probably adjust this
-          translation 0.04 0 0.0
-          rotation 0 0 1 3.14
-          name "VL53L1-backward"
-        }
-
-        GPS { # For obtaining initial location
-        }
-     
-        DEF INERTIAL_UNIT InertialUnit {
-        }
-
-        # Motor Front Left ----------------------------------------------------
-
-        DEF FRONT_LEFT Propeller {
-            shaftAxis 0 0 1
-                centerOfThrust IS motor_front_left_translation
-                thrustConstants 0 0
-                torqueConstants 0 0
-                fastHelixThreshold IS prop_fast_helix_threshold
-                device RotationalMotor {
-                    name "motor_front_left"
-                    maxVelocity IS motor_max_velocity
-                    maxTorque IS motor_max_torque
-                }
-            fastHelix Solid {
-                translation IS motor_front_left_translation
-                    children [
-
-                    Shape {
-                                appearance PBRAppearance {
-                                    baseColor IS prop_color
-                                        baseColorMap ImageTexture {
-                                            url [
-                                                "../meshes/textures/fast_helix.png"
-                                            ]
-                                        }
-                                    metalness 0
-                                }
-                                geometry Cylinder {
-                                    height IS prop_fast_helix_height
-                                    radius IS prop_fast_helix_radius
-                                }
+              DEF BODY Pose {
+                    translation 0 0 0
+                        children [
+                            CadShape {
+                                url [ "../meshes/collada_files/sevjr/body.dae" ]
                             }
+                        ]
+              }
 
-                  
-                    ] 
+              DEF emitter Emitter {
+                model "radio"
+                bufferSize 1000
+              }
+
+              Receiver {
+                bufferSize 1000
+              }
+
+            Camera {
+                translation 0.05 0 0.01
+                fieldOfView 0.87
+                width 324
+                height 324
             }
-            slowHelix DEF PROP Solid {
-                translation IS motor_front_left_translation
-                rotation IS motor_front_left_rotation
-                    children [
+
+            RangeFinder {
+
+              # VL53L5 specs
+              fieldOfView 1.34  # radians
+              width 8 
+              height 1
+              minRange 0.01
+              maxRange 4.0
+              noise 0.0 # should probably adjust this
+              translation 0.04 0 0.0
+              rotation 0 0 1 0
+              name "VL53L5-forward"
+            }
+
+            RangeFinder {
+
+              # VL13L1 specs
+              fieldOfView 0.47  # radians
+              width 1 
+              height 1
+              minRange 0.04
+              maxRange 4.0
+              noise 0.0 # should probably adjust this
+              translation 0.04 0 0.0
+              rotation 0 0 1 0
+               name "VL53L1-forward"
+            }
+
+            RangeFinder {
+
+              # VL13L1 specs
+              fieldOfView 0.47  # radians
+              width 1 
+              height 1
+              minRange 0.04
+              maxRange 4.0
+              noise 0.0 # should probably adjust this
+              translation 0.04 0 0.0
+              rotation 0 0 1 3.14
+              name "VL53L1-backward"
+            }
+
+            GPS { # For obtaining initial location
+            }
+         
+            DEF INERTIAL_UNIT InertialUnit {
+            }
+
+            # Motor Front Left ----------------------------------------------------
+
+            DEF FRONT_LEFT Propeller {
+                shaftAxis 0 0 1
+                    centerOfThrust IS motor_front_right_translation
+                    thrustConstants 0 0
+                    torqueConstants 0 0
+                    fastHelixThreshold IS prop_fast_helix_threshold
+                    device RotationalMotor {
+                        name "motor_front_right"
+                        maxVelocity IS motor_max_velocity
+                        maxTorque IS motor_max_torque
+                    }
+                fastHelix Solid {
+                    translation IS motor_front_right_translation
+                        children [
 
                         Shape {
+                                    appearance PBRAppearance {
+                                        baseColor IS prop_color
+                                            baseColorMap ImageTexture {
+                                                url [
+                                                    "../meshes/textures/fast_helix.png"
+                                                ]
+                                            }
+                                        metalness 0
+                                    }
+                                    geometry Cylinder {
+                                        height IS prop_fast_helix_height
+                                        radius IS prop_fast_helix_radius
+                                    }
+                                }
 
-                            appearance DEF PLASTIC PBRAppearance {
-                                baseColor IS prop_color
-                                    metalness 0
-                            }
-
-                          geometry Mesh {
-                              url [ "../meshes/stl_files/sevjr/prop.stl" ]
-                          }
-                        }
-
-                    ]
-            }
-        }
-
-        # Motor Front Right ------------------------------------------------------
-
-        DEF FRONT_RIGHT Propeller {
-            shaftAxis 0 0 1
-                centerOfThrust IS motor_front_right_translation
-                thrustConstants 0 0
-                torqueConstants 0 0
-                fastHelixThreshold IS prop_fast_helix_threshold
-                device RotationalMotor {
-                    name "motor_front_right"
-                    maxVelocity IS motor_max_velocity
-                    maxTorque IS motor_max_torque
+                      
+                        ] 
                 }
-            fastHelix Solid {
-                translation IS motor_front_right_translation
-                    children [
+                slowHelix DEF PROP Solid {
+                    translation IS motor_front_right_translation
+                    rotation IS motor_front_right_rotation
+                        children [
 
-                    Shape {
-                                appearance PBRAppearance {
+                            Shape {
+
+                                appearance DEF PLASTIC PBRAppearance {
                                     baseColor IS prop_color
-                                        baseColorMap ImageTexture {
-                                            url [
-                                                "../meshes/textures/fast_helix.png"
-                                            ]
-                                        }
-                                    metalness 0
+                                        metalness 0
                                 }
-                                geometry Cylinder {
-                                    height IS prop_fast_helix_height
-                                    radius IS prop_fast_helix_radius
-                                }
+
+                              geometry Mesh {
+                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                              }
                             }
 
-                  
-                    ] 
+                        ]
+                }
             }
-            slowHelix DEF PROP Solid {
-                translation IS motor_front_right_translation
-                rotation IS motor_front_right_rotation
-                    children [
+
+            # Motor Front Right ------------------------------------------------------
+
+            DEF FRONT_RIGHT Propeller {
+                shaftAxis 0 0 1
+                    centerOfThrust IS motor_front_left_translation
+                    thrustConstants 0 0
+                    torqueConstants 0 0
+                    fastHelixThreshold IS prop_fast_helix_threshold
+                    device RotationalMotor {
+                        name "motor_front_left"
+                        maxVelocity IS motor_max_velocity
+                        maxTorque IS motor_max_torque
+                    }
+                fastHelix Solid {
+                    translation IS motor_front_left_translation
+                        children [
 
                         Shape {
+                                    appearance PBRAppearance {
+                                        baseColor IS prop_color
+                                            baseColorMap ImageTexture {
+                                                url [
+                                                    "../meshes/textures/fast_helix.png"
+                                                ]
+                                            }
+                                        metalness 0
+                                    }
+                                    geometry Cylinder {
+                                        height IS prop_fast_helix_height
+                                        radius IS prop_fast_helix_radius
+                                    }
+                                }
 
-                            appearance DEF PLASTIC PBRAppearance {
-                                baseColor IS prop_color
-                                    metalness 0
-                            }
-
-                          geometry Mesh {
-                              url [ "../meshes/stl_files/sevjr/prop.stl" ]
-                          }
-                        }
-
-                    ]
-            }
-        }
-
-        # Motor Rear ---------------------------------------------------------
-
-        DEF REAR Propeller {
-            shaftAxis 0 0 1
-                centerOfThrust IS motor_rear_translation
-                thrustConstants 0 0
-                torqueConstants 0 0
-                fastHelixThreshold IS prop_fast_helix_threshold
-                device RotationalMotor {
-                    name "motor_rear"
-                    maxVelocity IS motor_max_velocity
-                    maxTorque IS motor_max_torque
+                      
+                        ] 
                 }
-            fastHelix Solid {
-                translation IS motor_rear_translation
-                    children [
+                slowHelix DEF PROP Solid {
+                    translation IS motor_front_left_translation
+                    rotation IS motor_front_left_rotation
+                        children [
 
-                    Shape {
-                                appearance PBRAppearance {
+                            Shape {
+
+                                appearance DEF PLASTIC PBRAppearance {
                                     baseColor IS prop_color
-                                        baseColorMap ImageTexture {
-                                            url [
-                                                "../meshes/textures/fast_helix.png"
-                                            ]
-                                        }
-                                    metalness 0
+                                        metalness 0
                                 }
-                                geometry Cylinder {
-                                    height IS prop_fast_helix_height
-                                    radius IS prop_fast_helix_radius
-                                }
+
+                              geometry Mesh {
+                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                              }
                             }
 
-                  
-                    ] 
+                        ]
+                }
             }
-            slowHelix DEF PROP Solid {
-                translation IS motor_rear_translation
-                    children [
+
+            # Motor Rear ---------------------------------------------------------
+
+            DEF REAR Propeller {
+                shaftAxis 0 0 1
+                    centerOfThrust IS motor_rear_translation
+                    thrustConstants 0 0
+                    torqueConstants 0 0
+                    fastHelixThreshold IS prop_fast_helix_threshold
+                    device RotationalMotor {
+                        name "motor_rear"
+                        maxVelocity IS motor_max_velocity
+                        maxTorque IS motor_max_torque
+                    }
+                fastHelix Solid {
+                    translation IS motor_rear_translation
+                        children [
 
                         Shape {
+                                    appearance PBRAppearance {
+                                        baseColor IS prop_color
+                                            baseColorMap ImageTexture {
+                                                url [
+                                                    "../meshes/textures/fast_helix.png"
+                                                ]
+                                            }
+                                        metalness 0
+                                    }
+                                    geometry Cylinder {
+                                        height IS prop_fast_helix_height
+                                        radius IS prop_fast_helix_radius
+                                    }
+                                }
 
-                            appearance DEF PLASTIC PBRAppearance {
-                                baseColor IS prop_color
-                                    metalness 0
+                      
+                        ] 
+                }
+                slowHelix DEF PROP Solid {
+                    translation IS motor_rear_translation
+                    rotation IS motor_rear_rotation
+                        children [
+
+                            Shape {
+
+                                appearance DEF PLASTIC PBRAppearance {
+                                    baseColor IS prop_color
+                                        metalness 0
+                                }
+
+                              geometry Mesh {
+                                  url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                              }
                             }
 
-                          geometry Mesh {
-                              url [ "../meshes/stl_files/sevjr/prop.stl" ]
-                          }
-                        }
-
-                    ]
+                        ]
+                }
             }
+
+        ] # DEF ROBOT Robot { children [ =========================================
+
+        boundingObject Cylinder {
+            height 0.03
+            radius 0.05
         }
 
-    ] # DEF ROBOT Robot { children [ =========================================
+        physics Physics {
+            density -1
+            mass 0.05
+        }
+    } # DEF ROBOT ROBOT
 
-    boundingObject Cylinder {
-        height 0.03
-        radius 0.05
-    }
-
-    physics Physics {
-        density -1
-        mass 0.05
-    }
-}
-
-} # DEF ROBOT ROBOT
+} 

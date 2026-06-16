@@ -48,7 +48,7 @@ class PluginHelper {
         } message_t;
 
         dBodyID robot_body;
-       
+
         PluginHelper() : PluginHelper({0, 0, 0, 0, 0, 0}) {}
 
         PluginHelper(const hf::Pose & starting_pose)
