@@ -4,6 +4,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/sevjr/Body.proto"
+EXTERNPROTO "../protos/sevjr/Rudder.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -29,6 +30,8 @@ DEF robot Body {
   hidden angularVelocity_0 -5.3793782886062323e-33 -4.1447827396307855e-17 -2.805419841743553e-17
   motor_front_right_rotation 0 0 1 3.6330481569225115
   motor_front_left_rotation 0 0 -1 3.6330481569225115
+}
+DEF rudder Rudder {
 }
 TexturedBackground {
 }
