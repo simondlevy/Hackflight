@@ -251,7 +251,7 @@ DEF ROBOT Robot {
                                     baseColor IS prop_color
                                         baseColorMap ImageTexture {
                                             url [
-                                                # "../meshes/textures/fast_helix.png"
+                                                "../meshes/textures/fast_helix.png"
                                             ]
                                         }
                                     metalness 0
