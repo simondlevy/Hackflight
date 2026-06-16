@@ -27,6 +27,8 @@ PROTO SevJr [
   field SFVec3f motor_rear_translation -0.282 0.007 0.100
   field SFRotation motor_rear_rotation  0 0 1 0
 
+  field SFRotation rudder_rotation  0 1 0 0.030
+
   field SFColor prop_color  0.75 0 0
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
@@ -46,6 +48,23 @@ PROTO SevJr [
             model "SevJr"
 
             children [ # =========================================================
+
+            Solid {
+              translation -0.25 0.047 0.025
+              rotation IS rudder_rotation
+              children [
+                CadShape {
+                  url [
+                    "../meshes/collada_files/sevjr/rudder.dae"
+                  ]
+                }
+              ]
+              name "rudder_right"
+              boundingObject Cylinder {
+                height 0.1
+                radius 0.05
+              }
+            }
 
               DEF BODY Pose {
                     translation 0 0 0

@@ -20,47 +20,15 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.03109486192272481 0.9959229541895342 -0.08467927066524461 0.42223121832903243
-  position -1.8096766094239818 0.006555029583009797 0.953747833740683
+  orientation 0.0451055084211582 0.05953554230072441 -0.9972066046276606 1.6840174587786017
+  position -0.1287891109111763 0.715693258877781 0.08146190214830808
   follow "SevJr"
 }
 DEF robot SevJr {
-  hidden rotation_0 -1.0748098791350662e-16 -0.8281353711188624 -0.5605281501421888 1.6015865556978885e-18
   hidden linearVelocity_0 1.1840714082130835e-18 1.4153318748712773e-18 0.093713393205779
   hidden angularVelocity_0 -5.3793782886062323e-33 -4.1447827396307855e-17 -2.805419841743553e-17
   motor_front_right_rotation 0 0 1 3.6330481569225115
   motor_front_left_rotation 0 0 -1 3.6330481569225115
-}
-Solid {
-  translation 0.025 -0.175 -0.025
-  children [
-    CadShape {
-      url [
-        "../meshes/collada_files/sevjr/rudder.dae"
-      ]
-    }
-  ]
-  name "rudder_left"
-  boundingObject Cylinder {
-    height 0.1
-    radius 0.05
-  }
-  locked TRUE
-}
-Solid {
-  translation 0.099 -0.175 -0.02
-  children [
-    CadShape {
-      url [
-        "../meshes/collada_files/sevjr/rudder.dae"
-      ]
-    }
-  ]
-  name "rudder_right"
-  boundingObject Cylinder {
-    height 0.1
-    radius 0.05
-  }
 }
 TexturedBackground {
 }
