@@ -55,18 +55,25 @@ class PluginHelper {
         {
             simulator_ = hf::Simulator(starting_pose);
 
-            robot_body = dWebotsGetBodyFromDEF(kRobotName);
+            robot_body = init_body(kRobotName);
+        }
 
-            if (robot_body == NULL) {
+        static dBodyID init_body(const char * name)
+        {
+            auto body = dWebotsGetBodyFromDEF(name);
+
+            if (body == NULL) {
 
                 dWebotsConsolePrintf("webots_physics_init :: ");
-                dWebotsConsolePrintf("error : could not get body of robot.\r\n");
+                dWebotsConsolePrintf("error : could not get body of %s.\r\n", name);
             }
             else {
 
-                dBodySetGravityMode(robot_body, 0);
+                dBodySetGravityMode(body, 0);
             }
-        }
+
+            return body;
+         }
 
         // Get sim info from main program
         static auto get_message() -> message_t
