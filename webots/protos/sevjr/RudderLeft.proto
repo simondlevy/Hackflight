@@ -1,7 +1,6 @@
 #VRML_SIM R2023b utf8
 
 PROTO RudderLeft [ 
-    field SFRotation rotation  0 1 0 0.030
 ]
 
 {
@@ -11,7 +10,6 @@ PROTO RudderLeft [
 
             Solid {
               translation -0.245 0.047 0.0125
-              rotation IS rotation
               children [
                 CadShape {
                   url [

@@ -31,14 +31,17 @@ static void SetRudderDbody( dBodyID body, const hf::SimState & state,
 
     const auto phi = state.phi - yaw;
 
+    const auto theta = 0.f;
+    const auto psi = 0.f;
+
     // Turn Euler angles into quaternion, negating psi for nose-left
     // positive
     const auto cr = (float)cos(phi / 2);
     const auto sr = (float)sin(phi / 2);
-    const auto cp = (float)cos(state.theta / 2);
-    const auto sp = (float)sin(state.theta / 2);
-    const auto cy = (float)cos(-state.psi / 2);
-    const auto sy = (float)sin(-state.psi / 2);
+    const auto cp = (float)cos(theta / 2);
+    const auto sp = (float)sin(theta / 2);
+    const auto cy = (float)cos(-psi / 2);
+    const auto sy = (float)sin(-psi / 2);
 
     const dQuaternion q = {
         cr * cp * cy + sr * sp * sy,
@@ -66,12 +69,12 @@ DLLEXPORT void webots_physics_step()
 
     const auto state = _helper->RunSimulator(message.mode, message.setpoint);
 
-    _helper->SetDbodyFromState(state);
+    _helper->SetDbodyFromState(state, true);
 
-    const auto yaw = _helper->GetSetpoint().yaw;
+    const auto yaw = -0.5; //_helper->GetSetpoint().yaw;
 
     SetRudderDbody(_rudder_left, state, yaw);
-    SetRudderDbody(_rudder_right, state, yaw);
+    SetRudderDbody(_rudder_right, state, 0);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

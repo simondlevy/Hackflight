@@ -106,7 +106,8 @@ class PluginHelper {
             return simulator_.pid_controller.setpoint;
         }
 
-        void SetDbodyFromState(const hf::SimState & state)
+        void SetDbodyFromState(const hf::SimState & state,
+                const bool freeze=false)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(robot_body, state.x, -state.y, state.z);
@@ -114,12 +115,16 @@ class PluginHelper {
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
 
-            const auto cr = (float)cos(state.phi / 2);
-            const auto sr = (float)sin(state.phi / 2);
-            const auto cp = (float)cos(state.theta / 2);
-            const auto sp = (float)sin(state.theta / 2);
-            const auto cy = (float)cos(-state.psi / 2);
-            const auto sy = (float)sin(-state.psi / 2);
+            const auto phi = freeze ? 0.f : state.phi;
+            const auto theta = freeze ? 0.f : state.theta;
+            const auto psi = freeze ? 0.f : state.psi;
+
+            const auto cr = (float)cos(phi / 2);
+            const auto sr = (float)sin(phi / 2);
+            const auto cp = (float)cos(theta / 2);
+            const auto sp = (float)sin(theta / 2);
+            const auto cy = (float)cos(-psi / 2);
+            const auto sy = (float)sin(-psi / 2);
 
             const dQuaternion q = {
                 cr * cp * cy + sr * sp * sy,
