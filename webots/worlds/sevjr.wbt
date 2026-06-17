@@ -31,7 +31,7 @@ DEF robot Body {
   motor_front_right_rotation 0 0 1 3.6330481569225115
   motor_front_left_rotation 0 0 -1 3.6330481569225115
 }
-DEF rudder RudderLeft {
+DEF rudder_left RudderLeft {
 }
 TexturedBackground {
 }

@@ -20,13 +20,13 @@
 
 static PluginHelper * _helper;
 
-static dBodyID _rudder;
+static dBodyID _rudder_left;
 
 DLLEXPORT void webots_physics_init() 
 {
     _helper = new PluginHelper();
 
-    _rudder = PluginHelper::InitBody("rudder");
+    _rudder_left = PluginHelper::InitBody("rudder_left");
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -38,7 +38,7 @@ DLLEXPORT void webots_physics_step()
 
     _helper->SetDbodyFromState(state);
 
-    PluginHelper::SetDbodyFromState(_rudder, state);
+    PluginHelper::SetDbodyFromState(_rudder_left, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
