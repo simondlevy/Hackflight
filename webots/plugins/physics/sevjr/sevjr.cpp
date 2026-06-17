@@ -23,8 +23,11 @@ static PluginHelper * _helper;
 static dBodyID _rudder_left;
 static dBodyID _rudder_right;
 
-static void SetRudderDbody( dBodyID body, const hf::SimState & state)
+static void SetRudderDbody( dBodyID body, const hf::SimState & state,
+        const float yaw)
 {
+    printf("yaw=%+3.3f\n", yaw);
+
     // Negate Y to make leftward positive
     dBodySetPosition(body, state.x, -state.y, state.z);
 
@@ -66,8 +69,10 @@ DLLEXPORT void webots_physics_step()
 
     _helper->SetDbodyFromState(state);
 
-    SetRudderDbody(_rudder_left, state);
-    SetRudderDbody(_rudder_right, state);
+    const auto yaw = _helper->GetSetpoint().yaw;
+
+    SetRudderDbody(_rudder_left, state, yaw);
+    SetRudderDbody(_rudder_right, state, yaw);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

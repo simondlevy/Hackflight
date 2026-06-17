@@ -101,6 +101,11 @@ class PluginHelper {
             return simulator_.dynamics.state;
         }
 
+        auto GetSetpoint() -> hf::Setpoint
+        {
+            return simulator_.pid_controller.setpoint;
+        }
+
         void SetDbodyFromState(const hf::SimState & state)
         {
             // Negate Y to make leftward positive
