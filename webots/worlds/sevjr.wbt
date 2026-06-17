@@ -4,8 +4,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/sevjr/Body.proto"
-EXTERNPROTO "../protos/sevjr/RudderLeft.proto"
-EXTERNPROTO "../protos/sevjr/RudderRight.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -22,27 +20,19 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.03968716030300933 -0.9878302136405619 -0.1503874939146367 0.1228119312553654
-  position -0.5821631944535066 0.04525603102549514 0.4644813092176049
+  orientation -0.00537951212653712 0.9950444008905327 0.09928595623592332 0.6333875680946482
+  position -0.8686372133525814 0.05617103200262652 0.6639541206325965
   follow "Body"
 }
 DEF robot Body {
-  hidden rotation_0 -0.9999998548813046 0.000538736827934866 -1.4153494493381504e-11 0.00010777958450814433
+  hidden rotation_0 -0.9999998548813003 0.0005387368357328393 -1.415349449687345e-11 0.00010777958450814479
   hidden linearVelocity_0 2.3053144013682435e-08 4.279150442040763e-05 0.07940373473817897
-  hidden angularVelocity_0 -0.0033681115303639438 1.814525985320762e-06 -4.7670554915989565e-14
-  vehicle_translation 7.37700608437838e-10 1.3693281414530441e-06 0.40267487734315877
-  motor_front_right_rotation 0 0 -1 1.6347265876974368
-  motor_front_left_rotation 0 0 1 1.6347265876974368
-  motor_rear_rotation 0 0 -1 5.267774744619942
+  hidden angularVelocity_0 -0.0033681115303639438 1.8145260115852174e-06 -4.767055492775104e-14
+  vehicle_translation 7.37700608437838e-10 1.3693281414530441e-06 0.002540919511621727
+  motor_front_left_rotation 0 0 1 2.0118270318032137
+  motor_rear_rotation 0 0 -1 5.644875188725719
+  rudder_translation -0.35 0.043 0.058
 }
-DEF rudder_left RudderLeft {
-  hidden translation_0 -5.562292758480402e-07 -0.00027873907035007013 0.41586410883920555
-  hidden rotation_0 0.9999987076845775 0.001575481088691391 0.0003201382736821218 0.44041183716868304
-  hidden linearVelocity_0 -1.7382164870251258e-05 -0.008710595948439691 0.4915672189896402
-  hidden angularVelocity_0 -1.8626988096829824 0.01976718100997515 0.009560119944232602
-}
-#DEF rudder_right RudderRight {
-#}
 TexturedBackground {
 }
 TexturedBackgroundLight {

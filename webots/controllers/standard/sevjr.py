@@ -28,6 +28,10 @@ def main():
     startMotor(robot, 'motor_front_right', +1)
     startMotor(robot, 'motor_rear', +1)
 
+    rudder = robot.getDevice("rudder")
+    rudder.setPosition(float('inf'))
+    rudder.setVelocity(2)
+
     run(robot)
 
 
