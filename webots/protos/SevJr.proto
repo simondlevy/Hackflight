@@ -18,6 +18,9 @@ PROTO SevJr [
 
   field SFColor body_color  0 0 0
 
+  field SFVec3f logo_translation  0 0 0.10
+  field SFColor logo_color  1 1 1
+
   field SFVec3f motor_front_right_translation  0.157 -0.247  0.090
   field SFRotation motor_front_right_rotation   0 0 1  1
 
@@ -67,6 +70,24 @@ PROTO SevJr [
                     
                     }
                 ]
+              }
+
+              DEF LOGO Solid {
+
+                   translation IS logo_translation
+
+                        children [
+
+                            Shape {
+                                appearance PBRAppearance {
+                                    baseColor IS logo_color
+                                    metalness 0
+                                }
+                              geometry Mesh {
+                                  url [ "../meshes/stl_files/sevjr/logo.stl" ]
+                              }
+                            }
+                        ] 
               }
 
               DEF emitter Emitter {
@@ -338,7 +359,6 @@ PROTO SevJr [
                 }
 
             } # Motor rear
-
 
 
         ] # DEF ROBOT Robot { children [ =========================================
