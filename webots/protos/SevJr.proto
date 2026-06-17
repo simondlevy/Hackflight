@@ -30,6 +30,9 @@ PROTO SevJr [
   field SFVec3f motor_rear_translation -0.282 0.007 0.110
   field SFRotation motor_rear_rotation  0 0 1 0
 
+  field SFColor motor_color 0.8 0.0 0.0
+  field SFFloat motor_metalness 0.9
+
   field SFVec3f rudder_translation -0.350 0.050 0.110
   field SFRotation rudder_rotation  0 1 0 1.578
   field SFColor rudder_color  0.8 0.0 0.0
@@ -72,24 +75,34 @@ PROTO SevJr [
                 ]
               }
 
+              DEF MOTOR1 Solid {
+                translation IS motor_front_right_translation
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                    baseColor IS motor_color
+                    metalness IS motor_metalness
+                  }
+                    geometry Mesh {
+                      url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                    }
+                  }
+                ] 
+              }
+
               DEF LOGO Solid {
-
-                   translation IS logo_translation
-
-                        children [
-
-                            Shape {
-
-                                appearance PBRAppearance {
-                                    baseColor IS logo_color
-                                    metalness 0
-                                }
-
-                                geometry Mesh {
-                                    url [ "../meshes/stl_files/sevjr/logo.stl" ]
-                                }
-                            }
-                        ] 
+                translation IS logo_translation
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                    baseColor IS logo_color
+                    metalness 0
+                  }
+                    geometry Mesh {
+                      url [ "../meshes/stl_files/sevjr/logo.stl" ]
+                    }
+                  }
+                ] 
               }
 
               DEF emitter Emitter {
@@ -156,7 +169,7 @@ PROTO SevJr [
             DEF INERTIAL_UNIT InertialUnit {
             }
 
-            # Motor Front Right ----------------------------------------------------
+            # Propeller Front Right ----------------------------------------------------
 
             DEF FRONT_RIGHT Propeller {
                 shaftAxis 0 0 1
@@ -213,7 +226,7 @@ PROTO SevJr [
                 }
             }
 
-            # Motor Front Left ------------------------------------------------------
+            # Propeller Front Left ------------------------------------------------------
 
             DEF FRONT_LEFT Propeller {
                 shaftAxis 0 0 1
@@ -270,7 +283,7 @@ PROTO SevJr [
                 }
             }
 
-            # Motor Rear ---------------------------------------------------------
+            # Propeller Rear ---------------------------------------------------------
 
             DEF REAR Propeller {
                 shaftAxis 0 0 1
