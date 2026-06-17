@@ -26,16 +26,15 @@ static dBodyID _rudder_right;
 static void SetRudderDbody( dBodyID body, const hf::SimState & state,
         const float yaw)
 {
-    printf("yaw=%+3.3f\n", yaw);
-
     // Negate Y to make leftward positive
     dBodySetPosition(body, state.x, -state.y, state.z);
 
+    const auto phi = state.phi - yaw;
+
     // Turn Euler angles into quaternion, negating psi for nose-left
     // positive
-
-    const auto cr = (float)cos(state.phi / 2);
-    const auto sr = (float)sin(state.phi / 2);
+    const auto cr = (float)cos(phi / 2);
+    const auto sr = (float)sin(phi / 2);
     const auto cp = (float)cos(state.theta / 2);
     const auto sp = (float)sin(state.theta / 2);
     const auto cy = (float)cos(-state.psi / 2);

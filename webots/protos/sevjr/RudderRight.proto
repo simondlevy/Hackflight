@@ -10,7 +10,7 @@ PROTO RudderRight [
         children [
 
             Solid {
-              translation -0.245 -0.026 0.0125
+              translation -0.245 -0.025 0
               rotation IS rotation
               children [
                 CadShape {
