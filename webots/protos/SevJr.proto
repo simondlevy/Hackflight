@@ -32,6 +32,7 @@ PROTO SevJr [
   field SFColor rudder_color  0.8 0.0 0.0
 
   field SFColor prop_color  0.4 0.4 0.4
+
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
   field SFFloat prop_fast_helix_threshold 50
@@ -124,9 +125,9 @@ PROTO SevJr [
             DEF INERTIAL_UNIT InertialUnit {
             }
 
-            # Motor Front Left ----------------------------------------------------
+            # Motor Front Right ----------------------------------------------------
 
-            DEF FRONT_LEFT Propeller {
+            DEF FRONT_RIGHT Propeller {
                 shaftAxis 0 0 1
                     centerOfThrust IS motor_front_right_translation
                     thrustConstants 0 0
@@ -181,9 +182,9 @@ PROTO SevJr [
                 }
             }
 
-            # Motor Front Right ------------------------------------------------------
+            # Motor Front Left ------------------------------------------------------
 
-            DEF FRONT_RIGHT Propeller {
+            DEF FRONT_LEFT Propeller {
                 shaftAxis 0 0 1
                     centerOfThrust IS motor_front_left_translation
                     thrustConstants 0 0
