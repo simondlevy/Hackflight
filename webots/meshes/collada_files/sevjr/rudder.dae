@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 4.5.9 LTS commit date:2026-04-20, commit time:14:24, hash:8bf95cbd38d1</authoring_tool>
     </contributor>
-    <created>2026-06-16T13:52:34</created>
-    <modified>2026-06-16T13:52:34</modified>
+    <created>2026-06-17T04:15:09</created>
+    <modified>2026-06-17T04:15:09</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -128,7 +128,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="SEV_Jr_Rudder" name="SEV_Jr_Rudder" type="NODE">
-        <matrix sid="transform">-6.44743e-11 -0.001475 0 0.009980013 0.001475 -6.44743e-11 0 -0.003352402 0 0 0.001475 0.003124565 0 0 0 1</matrix>
+        <matrix sid="transform">6.44743e-11 -0.001475 0 0.009980017 -0.001475 -6.44743e-11 -1.28949e-10 0 1.28949e-10 0 -0.001475 0.03 0 0 0 1</matrix>
         <instance_geometry url="#SEV_Jr_Rudder-mesh" name="SEV_Jr_Rudder">
           <bind_material>
             <technique_common>

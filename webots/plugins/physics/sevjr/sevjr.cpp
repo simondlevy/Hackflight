@@ -21,13 +21,14 @@
 static PluginHelper * _helper;
 
 static dBodyID _rudder_left;
-static dBodyID _rudder_right;
+//static dBodyID _rudder_right;
 
 static void SetRudderDbody( dBodyID body, const hf::SimState & state,
+        const float xoff, const float yoff, const float zoff,
         const float yaw)
 {
     // Negate Y to make leftward positive
-    dBodySetPosition(body, state.x, -state.y, state.z);
+    dBodySetPosition(body, state.x+xoff, -(state.y+yoff), state.z+zoff);
 
     const auto phi = state.phi - yaw;
 
@@ -59,7 +60,7 @@ DLLEXPORT void webots_physics_init()
     _helper = new PluginHelper();
 
     _rudder_left = PluginHelper::InitBody("rudder_left");
-    _rudder_right = PluginHelper::InitBody("rudder_right");
+    //_rudder_right = PluginHelper::InitBody("rudder_right");
 }
 
 // This is called by Webots in the outer (display, kinematics) loop
@@ -71,10 +72,14 @@ DLLEXPORT void webots_physics_step()
 
     _helper->SetDbodyFromState(state, true);
 
-    const auto yaw = -0.5; //_helper->GetSetpoint().yaw;
+    const auto yaw = _helper->GetSetpoint().yaw + M_PI;
 
-    SetRudderDbody(_rudder_left, state, yaw);
-    SetRudderDbody(_rudder_right, state, 0);
+    const float xoff = -0.250;
+    const float yoff = -0.045;
+    const float zoff = +0.044;
+
+    SetRudderDbody(_rudder_left, state, xoff, yoff, zoff, yaw);
+    //SetRudderDbody(_rudder_right, state, 0);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

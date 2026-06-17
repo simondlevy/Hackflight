@@ -9,7 +9,6 @@ PROTO RudderLeft [
         children [
 
             Solid {
-              translation -0.245 0.047 0.0125
               children [
                 CadShape {
                   url [
