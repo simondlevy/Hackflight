@@ -23,6 +23,32 @@ static PluginHelper * _helper;
 static dBodyID _rudder_left;
 static dBodyID _rudder_right;
 
+static void SetRudderDbody( dBodyID body, const hf::SimState & state)
+{
+    // Negate Y to make leftward positive
+    dBodySetPosition(body, state.x, -state.y, state.z);
+
+    // Turn Euler angles into quaternion, negating psi for nose-left
+    // positive
+
+    const auto cr = (float)cos(state.phi / 2);
+    const auto sr = (float)sin(state.phi / 2);
+    const auto cp = (float)cos(state.theta / 2);
+    const auto sp = (float)sin(state.theta / 2);
+    const auto cy = (float)cos(-state.psi / 2);
+    const auto sy = (float)sin(-state.psi / 2);
+
+    const dQuaternion q = {
+        cr * cp * cy + sr * sp * sy,
+        sr * cp * cy - cr * sp * sy,
+        cr * sp * cy + sr * cp * sy,
+        cr * cp * sy - sr * sp * cy
+    };
+
+    dBodySetQuaternion(body, q);
+}
+
+
 DLLEXPORT void webots_physics_init() 
 {
     _helper = new PluginHelper();
@@ -40,8 +66,8 @@ DLLEXPORT void webots_physics_step()
 
     _helper->SetDbodyFromState(state);
 
-    PluginHelper::SetDbodyFromState(_rudder_left, state);
-    PluginHelper::SetDbodyFromState(_rudder_right, state);
+    SetRudderDbody(_rudder_left, state);
+    SetRudderDbody(_rudder_right, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
