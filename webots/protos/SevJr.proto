@@ -39,7 +39,7 @@ PROTO SevJr [
   field SFColor motor_color 0.8 0.0 0.0
   field SFFloat motor_metalness 0.9
 
-  field SFVec3f rudder_translation -0.350 0.050 0.110
+  field SFVec3f rudder_translation 0 0 0
   field SFRotation rudder_rotation  0 1 0 1.578
   field SFColor rudder_color  0.8 0.0 0.0
 
@@ -412,7 +412,7 @@ PROTO SevJr [
                         ]
                 }
 
-            } # Motor rear
+            } # Rudder
 
 
         ] # DEF ROBOT Robot { children [ =========================================
