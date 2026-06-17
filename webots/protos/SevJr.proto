@@ -21,11 +21,13 @@ PROTO SevJr [
   field SFVec3f logo_translation  0.080 -0.030 0.050
   field SFColor logo_color  1 1 1
 
-  field SFVec3f motor_front_right_translation  0.200 -0.290  0.035
+  field SFVec3f motor_front_left_translation 0.200 0.225 0.035
+  field SFVec3f prop_front_left_translation  0.200 0.225 0.075
+
+  field SFVec3f motor_front_right_translation 0.200 -0.290  0.035
+  field SFVec3f prop_front_right_translation  0.200 -0.290  0.075
 
   field SFRotation prop_front_right_rotation  0 0 1  1
-
-  field SFVec3f motor_front_left_translation  0.157 0.260 0.090
 
   field SFRotation prop_front_left_rotation  0 0 1 -1
 
@@ -76,22 +78,6 @@ PROTO SevJr [
                     
                     }
                 ]
-              }
-
-              DEF MOTOR_FRONT_RIGHT Solid {
-                translation IS motor_front_right_translation
-                name "motor_front_right"
-                children [
-                  Shape {
-                    appearance PBRAppearance {
-                    baseColor IS motor_color
-                    metalness IS motor_metalness
-                  }
-                    geometry Mesh {
-                      url [ "../meshes/stl_files/sevjr/motor.stl" ]
-                    }
-                  }
-                ] 
               }
 
               DEF LOGO Solid {
@@ -175,9 +161,25 @@ PROTO SevJr [
 
             # Propeller Front Right ----------------------------------------------------
 
+              DEF MOTOR_FRONT_RIGHT Solid {
+                translation IS motor_front_right_translation
+                name "motor_front_right"
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                    baseColor IS motor_color
+                    metalness IS motor_metalness
+                  }
+                    geometry Mesh {
+                      url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                    }
+                  }
+                ] 
+              }
+
             DEF FRONT_RIGHT Propeller {
                 shaftAxis 0 0 1
-                    centerOfThrust IS motor_front_right_translation
+                    centerOfThrust IS prop_front_right_translation
                     thrustConstants 0 0
                     torqueConstants 0 0
                     fastHelixThreshold IS prop_fast_helix_threshold
@@ -187,7 +189,7 @@ PROTO SevJr [
                         maxTorque IS motor_max_torque
                     }
                 fastHelix Solid {
-                    translation IS motor_front_right_translation
+                    translation IS prop_front_right_translation
                         children [
 
                         Shape {
@@ -210,7 +212,7 @@ PROTO SevJr [
                         ] 
                 }
                 slowHelix DEF PROP Solid {
-                    translation IS motor_front_right_translation
+                    translation IS prop_front_right_translation
                     rotation IS prop_front_right_rotation
                         children [
 
@@ -232,9 +234,25 @@ PROTO SevJr [
 
             # Propeller Front Left ------------------------------------------------------
 
+              DEF MOTOR_FRONT_LEFT Solid {
+                translation IS motor_front_left_translation
+                name "motor_front_left"
+                children [
+                  Shape {
+                    appearance PBRAppearance {
+                    baseColor IS motor_color
+                    metalness IS motor_metalness
+                  }
+                    geometry Mesh {
+                      url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                    }
+                  }
+                ] 
+              }
+
             DEF FRONT_LEFT Propeller {
                 shaftAxis 0 0 1
-                    centerOfThrust IS motor_front_left_translation
+                    centerOfThrust IS prop_front_left_translation
                     thrustConstants 0 0
                     torqueConstants 0 0
                     fastHelixThreshold IS prop_fast_helix_threshold
@@ -244,7 +262,7 @@ PROTO SevJr [
                         maxTorque IS motor_max_torque
                     }
                 fastHelix Solid {
-                    translation IS motor_front_left_translation
+                    translation IS prop_front_left_translation
                         children [
 
                         Shape {
@@ -267,7 +285,7 @@ PROTO SevJr [
                         ] 
                 }
                 slowHelix DEF PROP Solid {
-                    translation IS motor_front_left_translation
+                    translation IS prop_front_left_translation
                     rotation IS prop_front_left_rotation
                         children [
 

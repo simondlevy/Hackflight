@@ -24,9 +24,9 @@ def main():
 
     robot = makeRobot()
 
-    startMotor(robot, 'motor_front_left', -1)
-    startMotor(robot, 'motor_front_right', +1)
-    startMotor(robot, 'motor_rear', +1)
+    startMotor(robot, 'prop_front_left', -1)
+    startMotor(robot, 'prop_front_right', +1)
+    startMotor(robot, 'prop_rear', +1)
 
     rudder = robot.getDevice("rudder")
     rudder.setPosition(float('inf'))
