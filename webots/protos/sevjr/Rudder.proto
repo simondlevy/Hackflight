@@ -7,9 +7,6 @@ PROTO Rudder [
 {
     Robot {
 
-        name "Rudder"
-        model "Rudder"
-
         children [
 
             Solid {
