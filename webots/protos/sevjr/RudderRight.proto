@@ -1,0 +1,33 @@
+#VRML_SIM R2023b utf8
+
+PROTO RudderRight [ 
+    field SFRotation rotation  0 1 0 0.030
+]
+
+{
+    Robot {
+
+        children [
+
+            Solid {
+              translation -0.245 -0.028 0.025
+              rotation IS rotation
+              children [
+                CadShape {
+                  url [
+                    "../../meshes/collada_files/sevjr/rudder.dae"
+                  ]
+                }
+              ]
+            }
+      ]
+
+      boundingObject Cylinder {
+        height 0.07
+        radius 0.07
+     }
+
+    physics Physics {
+    }
+  }
+}
