@@ -16,7 +16,7 @@
 
 PROTO SevJr [
 
-  field SFVec3f vehicle_translation 0 0 0.0
+  field SFColor body_color  0 0 0
 
   field SFVec3f motor_front_right_translation  0.157 -0.247  0.090
   field SFRotation motor_front_right_rotation   0 0 1  1
@@ -31,19 +31,17 @@ PROTO SevJr [
   field SFRotation rudder_rotation  0 1 0 1.578
   field SFColor rudder_color  0.8 0.0 0.0
 
-  field SFColor prop_color  0.4 0.4 0.4
-
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
   field SFFloat prop_fast_helix_threshold 50
   field SFFloat motor_max_velocity 100
   field SFFloat motor_max_torque 30
+  field SFColor prop_color  0.4 0.4 0.4
 ]
 
 {
     DEF ROBOT Robot {
 
-        translation  IS vehicle_translation
             rotation 0 0 0 0
             controller "<extern>"
             supervisor TRUE
@@ -53,10 +51,20 @@ PROTO SevJr [
             children [ # =========================================================
 
             DEF BODY Pose {
-                translation 0 0 0
+
                 children [
-                    CadShape {
-                        url [ "../meshes/collada_files/sevjr/body.dae" ]
+
+                    Shape {
+
+                      appearance DEF PLASTIC PBRAppearance {
+                          baseColor IS body_color
+                          metalness 0
+                      }
+
+                      geometry Mesh {
+                        url [ "../meshes/stl_files/sevjr/body.stl" ]
+                      }
+                    
                     }
                 ]
               }
