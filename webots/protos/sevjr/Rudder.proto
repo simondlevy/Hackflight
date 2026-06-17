@@ -1,6 +1,9 @@
 #VRML_SIM R2023b utf8
 
-PROTO Rudder [ ]
+PROTO Rudder [ 
+    # field SFRotation rudder_rotation  0 1 0 0.030
+]
+
 {
     Robot {
 
@@ -8,6 +11,23 @@ PROTO Rudder [ ]
         model "Rudder"
 
         children [
+
+        #    Solid {
+        #      translation -0.245 0.047 0.025
+        #      rotation IS rudder_rotation
+        #      children [
+        #        CadShape {
+        #          url [
+        #            "../../meshes/collada_files/sevjr/rudder.dae"
+        #          ]
+        #        }
+        #      ]
+        #      name "rudder_right"
+        #      boundingObject Cylinder {
+        #        height 0.1
+        #        radius 0.05
+        #      }
+        #    }
 
          Shape {
 
