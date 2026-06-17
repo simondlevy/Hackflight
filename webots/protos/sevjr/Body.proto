@@ -24,7 +24,7 @@ PROTO Body [
   field SFVec3f motor_front_left_translation  0.157 0.260 0.090
   field SFRotation motor_front_left_rotation  0 0 1 -1
 
-  field SFVec3f motor_rear_translation -0.282 0.007 0.100
+  field SFVec3f motor_rear_translation -0.282 0.007 0.110
   field SFRotation motor_rear_rotation  0 0 1 0
 
   field SFColor prop_color  0.4 0.4 0.4
