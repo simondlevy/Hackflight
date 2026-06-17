@@ -52,7 +52,7 @@ DLLEXPORT void webots_physics_step()
 {
     static int _rangefinder_distances_mm[8];
 
-    const auto message = PluginHelper::get_message();
+    const auto message = PluginHelper::GetMessage();
 
     // Replace open-loop setpoint with setpoint from autopilot if
     // available
@@ -60,7 +60,7 @@ DLLEXPORT void webots_physics_step()
         getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
     // Get vehicle pose based on setpoint
-    const auto pose = _ahelper->get_pose(message.mode, setpoint);
+    const auto pose = _ahelper->GetPose(message.mode, setpoint);
 
     auto rangefinder = _ahelper->robot.rangefinders["VL53L5-forward"];
 
@@ -68,7 +68,7 @@ DLLEXPORT void webots_physics_step()
     rangefinder.read(pose, _ahelper->world, _rangefinder_distances_mm);
 
     // Log data to file
-    _ahelper->write_to_log(pose, _rangefinder_distances_mm, 8);
+    _ahelper->WriteToLog(pose, _rangefinder_distances_mm, 8);
 
     // Display rangefinder distances
     simsens::RangefinderVisualizer::show(

@@ -23,11 +23,11 @@ static PluginHelper * _helper;
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    const auto message = PluginHelper::get_message();
+    const auto message = PluginHelper::GetMessage();
 
-    const auto state = _helper->run_simulator(message.mode, message.setpoint);
+    const auto state = _helper->RunSimulator(message.mode, message.setpoint);
 
-    _helper->set_dbody_from_state(state);
+    _helper->SetDbodyFromState(state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

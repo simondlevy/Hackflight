@@ -55,10 +55,10 @@ class PluginHelper {
         {
             simulator_ = hf::Simulator(starting_pose);
 
-            robot_body = init_body(kRobotName);
+            robot_body = InitBody(kRobotName);
         }
 
-        static dBodyID init_body(const char * name)
+        static dBodyID InitBody(const char * name)
         {
             auto body = dWebotsGetBodyFromDEF(name);
 
@@ -76,7 +76,7 @@ class PluginHelper {
          }
 
         // Get sim info from main program
-        static auto get_message() -> message_t
+        static auto GetMessage() -> message_t
         {
             int bytes_received = 0;
 
@@ -93,7 +93,7 @@ class PluginHelper {
             return message;
         }
 
-        auto run_simulator(const hf::Mode mode, const hf::Setpoint & setpoint)
+        auto RunSimulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint);
@@ -101,7 +101,7 @@ class PluginHelper {
             return simulator_.dynamics.state;
         }
 
-        static void set_dbody_from_state(
+        static void SetDbodyFromState(
                 dBodyID body, const hf::SimState & state)
         {
             // Negate Y to make leftward positive
@@ -126,7 +126,7 @@ class PluginHelper {
 
             dBodySetQuaternion(body, q);
         }
-        void set_dbody_from_state(const hf::SimState & state)
+        void SetDbodyFromState(const hf::SimState & state)
         {
             // Negate Y to make leftward positive
             dBodySetPosition(robot_body, state.x, -state.y, state.z);
