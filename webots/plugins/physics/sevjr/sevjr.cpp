@@ -20,6 +20,15 @@
 
 static PluginHelper * _helper;
 
+static dBodyID _rudder;
+
+DLLEXPORT void webots_physics_init() 
+{
+    _helper = new PluginHelper();
+
+    _rudder = PluginHelper::init_body("rudder");
+}
+
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
@@ -28,6 +37,8 @@ DLLEXPORT void webots_physics_step()
     const auto state = _helper->run_simulator(message.mode, message.setpoint);
 
     _helper->set_dbody_from_state(state);
+
+    PluginHelper::set_dbody_from_state(_rudder, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
@@ -35,7 +46,3 @@ DLLEXPORT void webots_physics_cleanup()
     delete _helper;
 }
 
-DLLEXPORT void webots_physics_init() 
-{
-    _helper = new PluginHelper();
-}
