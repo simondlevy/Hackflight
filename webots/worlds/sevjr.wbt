@@ -3,7 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "../protos/sevjr/Body.proto"
+EXTERNPROTO "../protos/SevJr.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -22,9 +22,9 @@ WorldInfo {
 Viewpoint {
   orientation -0.00537951212653712 0.9950444008905327 0.09928595623592332 0.6333875680946482
   position -0.8686372133525814 0.05617103200262652 0.6639541206325965
-  follow "Body"
+  follow "SevJr"
 }
-DEF robot Body {
+DEF robot SevJr {
   hidden rotation_0 -0.9999998548813003 0.0005387368357328393 -1.415349449687345e-11 0.00010777958450814479
   hidden linearVelocity_0 2.3053144013682435e-08 4.279150442040763e-05 0.07940373473817897
   hidden angularVelocity_0 -0.0033681115303639438 1.8145260115852174e-06 -4.767055492775104e-14
