@@ -17,6 +17,9 @@
 PROTO SevJr [
 
   field SFColor body_color  0 0 0
+  field SFColor rudder_color  0.8 0.0 0.0
+  field SFColor motor_color 0.8 0.0 0.0
+  field SFFloat motor_metalness 0.9
 
   field SFVec3f logo_translation  0.080 -0.030 0.050
   field SFColor logo_color  1 1 1
@@ -36,12 +39,10 @@ PROTO SevJr [
 
   field SFRotation prop_rear_rotation  0 0 1 0
 
-  field SFColor motor_color 0.8 0.0 0.0
-  field SFFloat motor_metalness 0.9
+  field SFVec3f left_rudder_translation  -0.320 -0.001 0.034
+  field SFVec3f right_rudder_translation -0.320 -0.070 0.034
 
-  field SFVec3f left_rudder_translation -0.320  -0.001 0.034
-  field SFRotation rudder_rotation  0 1 0 1.578
-  field SFColor rudder_color  0.8 0.0 0.0
+  field SFRotation rudder_rotation  0 1 0 1
 
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
@@ -380,7 +381,7 @@ PROTO SevJr [
 
             } # Motor rear
 
-            # Rudder ---------------------------------------------------------
+            # Rudders ---------------------------------------------------------
 
             DEF LEFT_RUDDER Propeller {
                 shaftAxis 1 0 0
@@ -388,7 +389,7 @@ PROTO SevJr [
                     thrustConstants 0 0
                     torqueConstants 0 0
                     device RotationalMotor {
-                        name "rudder"
+                        name "left_rudder"
                         maxVelocity IS motor_max_velocity
                         maxTorque IS motor_max_torque
                     }
@@ -412,8 +413,40 @@ PROTO SevJr [
                         ]
                 }
 
-            } # Rudder
+            } # LEFT_RUDDER
 
+
+            DEF RIGHT_RUDDER Propeller {
+                shaftAxis 1 0 0
+                    centerOfThrust IS right_rudder_translation
+                    thrustConstants 0 0
+                    torqueConstants 0 0
+                    device RotationalMotor {
+                        name "right_rudder"
+                        maxVelocity IS motor_max_velocity
+                        maxTorque IS motor_max_torque
+                    }
+                slowHelix DEF PROP Solid {
+                    translation IS right_rudder_translation
+                    rotation IS rudder_rotation
+                        children [
+
+                            Shape {
+
+                                appearance DEF PLASTIC PBRAppearance {
+                                    baseColor IS rudder_color
+                                        metalness 0
+                                }
+
+                              geometry Mesh {
+                                  url [ "../meshes/stl_files/sevjr/rudder.stl" ]
+                              }
+                            }
+
+                        ]
+                }
+
+            } # RIGHT_RUDDER
 
         ] # DEF ROBOT Robot { children [ =========================================
 
