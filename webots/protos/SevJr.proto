@@ -18,7 +18,7 @@ PROTO SevJr [
 
   field SFColor body_color  0 0 0
 
-  field SFVec3f logo_translation  0 0 0.10
+  field SFVec3f logo_translation  0.080 -0.030 0.050
   field SFColor logo_color  1 1 1
 
   field SFVec3f motor_front_right_translation  0.157 -0.247  0.090
@@ -79,13 +79,15 @@ PROTO SevJr [
                         children [
 
                             Shape {
+
                                 appearance PBRAppearance {
                                     baseColor IS logo_color
                                     metalness 0
                                 }
-                              geometry Mesh {
-                                  url [ "../meshes/stl_files/sevjr/logo.stl" ]
-                              }
+
+                                geometry Mesh {
+                                    url [ "../meshes/stl_files/sevjr/logo.stl" ]
+                                }
                             }
                         ] 
               }
