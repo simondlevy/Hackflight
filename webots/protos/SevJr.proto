@@ -39,7 +39,7 @@ PROTO SevJr [
   field SFColor motor_color 0.8 0.0 0.0
   field SFFloat motor_metalness 0.9
 
-  field SFVec3f rudder_translation 0 0 0
+  field SFVec3f left_rudder_translation -0.320  -0.001 0.034
   field SFRotation rudder_rotation  0 1 0 1.578
   field SFColor rudder_color  0.8 0.0 0.0
 
@@ -382,9 +382,9 @@ PROTO SevJr [
 
             # Rudder ---------------------------------------------------------
 
-            DEF RUDDER Propeller {
+            DEF LEFT_RUDDER Propeller {
                 shaftAxis 1 0 0
-                    centerOfThrust IS rudder_translation
+                    centerOfThrust IS left_rudder_translation
                     thrustConstants 0 0
                     torqueConstants 0 0
                     device RotationalMotor {
@@ -393,7 +393,7 @@ PROTO SevJr [
                         maxTorque IS motor_max_torque
                     }
                 slowHelix DEF PROP Solid {
-                    translation IS rudder_translation
+                    translation IS left_rudder_translation
                     rotation IS rudder_rotation
                         children [
 
