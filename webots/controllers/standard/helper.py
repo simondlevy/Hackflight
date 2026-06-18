@@ -20,6 +20,7 @@ import struct
 
 from controller import Robot
 
+
 class Helper:
 
     JOYSTICK_AXIS_MAP = {
@@ -46,7 +47,7 @@ class Helper:
 
         self.robot.step(self.timestep)
 
-        use_keyboard = False
+        self.use_keyboard = False
 
         if self.joystick.is_connected:
 
@@ -84,7 +85,8 @@ class Helper:
         mode = self.cmdinfo[0]
 
         # Send siminfo to fast thread
-        self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *self.cmdinfo[1:]))
+        self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]),
+                          *self.cmdinfo[1:]))
 
         return True
 
@@ -94,7 +96,6 @@ class Helper:
         print('- Use W and S to go up and down\n')
         print('- Use arrow keys to move horizontally\n')
         print('- Use Q and E to change heading\n')
-
 
     def switchMode(self, what, mode):
         '''A little state-transition machine'''
@@ -114,31 +115,31 @@ class Helper:
             buttons_down[what] = False
         return mode
 
-
     def normalizeJoystickAxis(self, rawval):
         return 2 * rawval / (2**16)
-
 
     def readJoystickRaw(self, joystick, index):
         axis = abs(index) - 1
         sign = -1 if index < 0 else +1
         return sign * joystick.getAxisValue(axis)
 
-
     def readJoystickAxis(self, joystick, index):
-        return self.normalizeJoystickAxis(self, readJoystickRaw(joystick, index))
+        return self.normalizeJoystickAxis(
+                self, self.readJoystickRaw(joystick, index))
 
-
-    def getMode(self, button, hover_button, auto_button, buttons_down, cmdinfo):
+    def getMode(
+            self, button, hover_button, auto_button, buttons_down, cmdinfo):
 
         mode = cmdinfo[0]
-        mode = self.checkPressed(button, hover_button, 'hover', buttons_down, mode)
-        return self.checkPressed(button, auto_button, 'auto', buttons_down, mode)
-
+        mode = self.checkPressed(button, hover_button, 'hover', buttons_down,
+                                 mode)
+        return self.checkPressed(button, auto_button, 'auto', buttons_down,
+                                 mode)
 
     def getCommandInfoFromJoystick(self, joystick, buttons_down, cmdinfo):
 
-        mode = self.getMode(joystick.getPressedButton(), 5, 4, buttons_down, cmdinfo)
+        mode = self.getMode(joystick.getPressedButton(), 5, 4, buttons_down,
+                            cmdinfo)
 
         axes = self.JOYSTICK_AXIS_MAP[joystick.model]
 
@@ -148,7 +149,6 @@ class Helper:
         yaw = self.readJoystickAxis(joystick, axes[3])
 
         return mode, thrust, roll, pitch, yaw
-
 
     def getCommandInfoFromKeyboard(self, keyboard, keys_down, cmdinfo):
 
