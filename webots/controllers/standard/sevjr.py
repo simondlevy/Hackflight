@@ -33,6 +33,11 @@ def setRudderVelocityRpm(left_rudder, right_rudder, velocity_rpm):
     right_rudder.setVelocity(velocity_rpm * RUDDER_RPM_SCALE)
 
 
+def setRudderPosition(left_rudder, right_rudder):
+
+    left_rudder.setPosition(1)
+    right_rudder.setPosition(0)
+
 def main():
 
     helper = Helper()
@@ -61,7 +66,9 @@ def main():
                if time_curr - time_start < STARTUP_YAW_TIME
                else -helper.cmdinfo[4])
 
-        setRudderVelocityRpm(left_rudder, right_rudder, rudder_velocity_rpm)
+        # setRudderVelocityRpm(left_rudder, right_rudder, rudder_velocity_rpm)
+
+        setRudderPosition(left_rudder, right_rudder)
 
 
 main()

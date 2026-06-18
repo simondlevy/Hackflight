@@ -36,10 +36,6 @@ srun:
 	webots ../../worlds/sevjr.wbt & /usr/local/webots/webots-controller \
 	--stdout-redirect ./sevjr.py simple &> /dev/null;
 
-nrun:
-	webots ../../worlds/newsevjr.wbt & /usr/local/webots/webots-controller \
-	--stdout-redirect ./newsevjr.py simple &> /dev/null;
-
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
