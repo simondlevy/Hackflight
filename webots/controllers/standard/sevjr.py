@@ -19,12 +19,14 @@
 
 from helper import Helper
 
+
 def makeRudder(robot, name):
 
     rudder = robot.getDevice(name)
     rudder.setVelocity(0)
 
     return rudder
+
 
 def main():
 
