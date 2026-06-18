@@ -20,9 +20,9 @@
 from helper import Helper
 
 
-def makeRudder(robot, name):
+def makeRudder(helper, name):
 
-    rudder = robot.getDevice(name)
+    rudder = helper.robot.getDevice(name)
     rudder.setVelocity(0)
 
     return rudder
@@ -36,8 +36,8 @@ def main():
     helper.startMotor('prop_front_right', +1)
     helper.startMotor('prop_rear', +1)
 
-    left_rudder = makeRudder(helper.robot, 'left_rudder')
-    right_rudder = makeRudder(helper.robot, 'right_rudder')
+    left_rudder = makeRudder(helper, 'left_rudder')
+    right_rudder = makeRudder(helper, 'right_rudder')
 
     while True:
 
