@@ -20,17 +20,19 @@ import struct
 
 from controller import Robot
 
-class Helper:
 
-    JOYSTICK_AXIS_MAP = {
-        'Logitech Gamepad F310': None,
-        'Microsoft X-Box 360 pad': None,
-    }
+class Helper:
 
     # These should agree with modes in hackflight/src/datatypes.hpp
     MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3}
 
     def __init__(self):
+
+        self.joystick_method_map = {
+            'Logitech Gamepad F310': self.getCommandInfoFromGamepad,
+            'Microsoft X-Box 360 pad': self.getCommandInfoFromGamepad,
+            'NATIONS RADIOMASTER SIM': self.getCommandInfoFromRadio
+        }
 
         self.robot = Robot()
 
@@ -47,18 +49,18 @@ class Helper:
 
         self.robot.step(self.timestep)
 
-        self.use_keyboard = False
+        self.joystick_method = None
 
         if self.joystick.is_connected:
 
-            if self.joystick.model not in self.JOYSTICK_AXIS_MAP:
+            if self.joystick.model in self.joystick_method_map:
+                self.joystick_method = (
+                        self.joystick_method_map[self.joystick.model])
+
+            else:
                 print('Unrecognized joystick %s' % self.joystick.model)
-                self.use_keyboard = True
 
-        else:
-            self.use_keyboard = True
-
-        if self.use_keyboard:
+        if self.useKeyboard():
             self.printKeyboardInstructions()
 
         self.buttons_down = {'hover': False, 'auto': False}
@@ -76,10 +78,10 @@ class Helper:
             return False
 
         self.cmdinfo = (self.getCommandInfoFromKeyboard(
-           self. keyboard, self.buttons_down, self.cmdinfo)
-                   if self.use_keyboard
-                   else self.getCommandInfoFromGamepad(
-                       self.joystick, self.buttons_down, self.cmdinfo))
+           self.keyboard, self.buttons_down, self.cmdinfo)
+                   if self.useKeyboard()
+                   else self.joystick_method(self.joystick, self.buttons_down,
+                                             self.cmdinfo))
 
         mode = self.cmdinfo[0]
 
@@ -151,6 +153,22 @@ class Helper:
 
         return mode, thrust, roll, pitch, yaw
 
+    def getCommandInfoFromRadio(self, joystick, buttons_down, cmdinfo):
+
+        mode = 1
+
+        hover = self.readJoystickAxis(joystick, 5)
+        autopilot = self.readJoystickAxis(joystick, 7)
+
+        print(hover, autopilot)
+
+        thrust = self.readJoystickAxis(joystick, 2)
+        roll = self.readJoystickAxis(joystick, 0)
+        pitch = self.readJoystickAxis(joystick, 1)
+        yaw = self.readJoystickAxis(joystick, 3)
+
+        return mode, thrust, roll, pitch, yaw
+
     def getCommandInfoFromKeyboard(self, keyboard, keys_down, cmdinfo):
 
         key = keyboard.getKey()
@@ -170,3 +188,6 @@ class Helper:
         yaw = +0.5 if key == ord('E') else -0.5 if key == ord('Q') else 0
 
         return mode, thrust, roll, pitch, yaw
+
+    def useKeyboard(self):
+        return self.joystick_method is None
