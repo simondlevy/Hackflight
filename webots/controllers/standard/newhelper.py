@@ -70,23 +70,23 @@ class Helper:
         motor.setPosition(float('inf'))
         motor.setVelocity(direction * 60)
 
-    def run(self):
+    def step(self):
 
-        while True:
+        if self.robot.step(self.timestep) == -1:
+            return False
 
-            if self.robot.step(self.timestep) == -1:
-                break
+        self.cmdinfo = (self.getCommandInfoFromKeyboard(
+           self. keyboard, self.buttons_down, self.cmdinfo)
+                   if self.use_keyboard
+                   else self.getCommandInfoFromJoystick(
+                       self.joystick, self.buttons_down, self.cmdinfo))
 
-            self.cmdinfo = (self.getCommandInfoFromKeyboard(
-               self. keyboard, self.buttons_down, self.cmdinfo)
-                       if self.use_keyboard
-                       else self.getCommandInfoFromJoystick(
-                           self.joystick, self.buttons_down, self.cmdinfo))
+        mode = self.cmdinfo[0]
 
-            mode = self.cmdinfo[0]
+        # Send siminfo to fast thread
+        self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *self.cmdinfo[1:]))
 
-            # Send siminfo to fast thread
-            self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *self.cmdinfo[1:]))
+        return True
 
     def printKeyboardInstructions(self):
         print('Using keyboard instead:\n')

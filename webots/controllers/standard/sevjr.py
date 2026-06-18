@@ -37,7 +37,9 @@ def main():
     left_rudder = makeRudder(helper.robot, 'left_rudder')
     right_rudder = makeRudder(helper.robot, 'right_rudder')
 
-    helper.run()
+    while True:
+        if not helper.step():
+            break
 
 
 main()
