@@ -21,6 +21,8 @@ from time import time
 
 from helper import Helper
 
+STARTUP_TIME = 0.25
+STARTUP_YAW = -0.5
 
 def main():
 
@@ -40,7 +42,7 @@ def main():
         if not helper.step():
             break
 
-        yaw = 0 if time() - start_time < 2 else -helper.cmdinfo[4]
+        yaw = STARTUP_YAW if time() - start_time < STARTUP_TIME else -helper.cmdinfo[4]
 
         left_rudder.setVelocity(yaw * 4)
         right_rudder.setVelocity(yaw * 4)
