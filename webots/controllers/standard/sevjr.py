@@ -17,7 +17,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from newhelper import makeRobot, run, startMotor
+from newhelper import Helper
 
 def makeRudder(robot, name):
 
@@ -28,16 +28,16 @@ def makeRudder(robot, name):
 
 def main():
 
-    robot = makeRobot()
+    helper = Helper()
 
-    startMotor(robot, 'prop_front_left', -1)
-    startMotor(robot, 'prop_front_right', +1)
-    startMotor(robot, 'prop_rear', +1)
+    helper.startMotor('prop_front_left', -1)
+    helper.startMotor('prop_front_right', +1)
+    helper.startMotor('prop_rear', +1)
 
-    left_rudder = makeRudder(robot, 'left_rudder')
-    right_rudder = makeRudder(robot, 'right_rudder')
+    left_rudder = makeRudder(helper.robot, 'left_rudder')
+    right_rudder = makeRudder(helper.robot, 'right_rudder')
 
-    run(robot)
+    helper.run()
 
 
 main()
