@@ -23,8 +23,8 @@ from controller import Robot
 class Helper:
 
     JOYSTICK_AXIS_MAP = {
-        'Logitech Gamepad F310': (-2, 4, -5, 1),
-        'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
+        'Logitech Gamepad F310': None,
+        'Microsoft X-Box 360 pad': None,
     }
 
     # These should agree with modes in hackflight/src/datatypes.hpp
@@ -78,7 +78,7 @@ class Helper:
         self.cmdinfo = (self.getCommandInfoFromKeyboard(
            self. keyboard, self.buttons_down, self.cmdinfo)
                    if self.use_keyboard
-                   else self.getCommandInfoFromJoystick(
+                   else self.getCommandInfoFromGamepad(
                        self.joystick, self.buttons_down, self.cmdinfo))
 
         mode = self.cmdinfo[0]
@@ -124,9 +124,7 @@ class Helper:
         return 2 * rawval / (2**16)
 
     def readJoystickRaw(self, joystick, index):
-        axis = abs(index) - 1
-        sign = -1 if index < 0 else +1
-        return sign * joystick.getAxisValue(axis)
+        return joystick.getAxisValue(index)
 
     def readJoystickAxis(self, joystick, index):
         return self.normalizeJoystickAxis(
@@ -141,17 +139,15 @@ class Helper:
         return self.checkPressed(button, auto_button, 'auto', buttons_down,
                                  mode)
 
-    def getCommandInfoFromJoystick(self, joystick, buttons_down, cmdinfo):
+    def getCommandInfoFromGamepad(self, joystick, buttons_down, cmdinfo):
 
         mode = self.getMode(joystick.getPressedButton(), 4, 5, buttons_down,
                             cmdinfo)
 
-        axes = self.JOYSTICK_AXIS_MAP[joystick.model]
-
-        thrust = self.readJoystickAxis(joystick, axes[0])
-        roll = self.readJoystickAxis(joystick, axes[1])
-        pitch = self.readJoystickAxis(joystick, axes[2])
-        yaw = self.readJoystickAxis(joystick, axes[3])
+        thrust = -self.readJoystickAxis(joystick, 1)
+        roll = self.readJoystickAxis(joystick, 3)
+        pitch = -self.readJoystickAxis(joystick, 4)
+        yaw = self.readJoystickAxis(joystick, 0)
 
         return mode, thrust, roll, pitch, yaw
 
