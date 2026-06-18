@@ -17,14 +17,8 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from time import time
-
 from helper import Helper
 
-def setRudderPosition(left_rudder, right_rudder, position):
-
-    left_rudder.setPosition(position)
-    right_rudder.setPosition(position)
 
 def main():
 
@@ -44,7 +38,8 @@ def main():
 
         yaw = -helper.cmdinfo[4]
 
-        setRudderPosition(left_rudder, right_rudder, yaw)
+        left_rudder.setPosition(yaw)
+        right_rudder.setPosition(yaw)
 
 
 main()
