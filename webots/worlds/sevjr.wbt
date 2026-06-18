@@ -8,7 +8,7 @@ EXTERNPROTO "../protos/SevJr.proto"
 WorldInfo {
   title "Hackflight"
   gravity 0
-  physics "sevjr"
+  physics "simple"
   contactProperties [
     ContactProperties {
       coulombFriction [
