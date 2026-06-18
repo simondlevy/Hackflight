@@ -17,7 +17,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from time import sleep
+from time import time
 
 from helper import Helper
 
@@ -33,12 +33,14 @@ def main():
     left_rudder = helper.makeMotor('left_rudder')
     right_rudder = helper.makeMotor('right_rudder')
 
+    start_time = time()
+
     while True:
 
         if not helper.step():
             break
 
-        yaw = -helper.cmdinfo[4]
+        yaw = 0 if time() - start_time < 2 else -helper.cmdinfo[4]
 
         left_rudder.setVelocity(yaw * 4)
         right_rudder.setVelocity(yaw * 4)
