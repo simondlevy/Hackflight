@@ -434,7 +434,7 @@ PROTO SevJr [
         }
         physics DEF PHYSICS_WHEEL Physics {
           density -1
-          mass 0.05
+          mass 0.00005
         }
       }
     }
