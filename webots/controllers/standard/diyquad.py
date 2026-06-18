@@ -17,19 +17,21 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from helper import makeRobot, run, startMotor
+from helper import Helper
 
 
 def main():
 
-    robot = makeRobot()
+    helper = Helper()
 
-    startMotor(robot, 'motor1', -1)
-    startMotor(robot, 'motor2', +1)
-    startMotor(robot, 'motor3', +1)
-    startMotor(robot, 'motor4', -1)
+    helper.startMotor('motor1', -1)
+    helper.startMotor('motor2', +1)
+    helper.startMotor('motor3', +1)
+    helper.startMotor('motor4', -1)
 
-    run(robot)
+    while True:
+        if not helper.step():
+            break
 
 
 main()

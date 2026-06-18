@@ -17,7 +17,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from newhelper import Helper
+from helper import Helper
 
 def makeRudder(robot, name):
 
@@ -38,8 +38,11 @@ def main():
     right_rudder = makeRudder(helper.robot, 'right_rudder')
 
     while True:
+
         if not helper.step():
             break
+
+        print(helper.cmdinfo)
 
 
 main()

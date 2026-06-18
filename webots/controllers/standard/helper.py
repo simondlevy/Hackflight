@@ -20,169 +20,152 @@ import struct
 
 from controller import Robot
 
-JOYSTICK_AXIS_MAP = {
-    'Logitech Gamepad F310': (-2, 4, -5, 1),
-    'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
-}
+class Helper:
 
-# These should agree with modes in hackflight/src/datatypes.hpp
-MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3}
+    JOYSTICK_AXIS_MAP = {
+        'Logitech Gamepad F310': (-2, 4, -5, 1),
+        'Microsoft X-Box 360 pad': (-2, 4, -5, 1)
+    }
 
-ZDIST_LANDING_MAX_M = 0.03
+    # These should agree with modes in hackflight/src/datatypes.hpp
+    MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3}
 
+    def __init__(self):
 
-def startMotor(robot, motor_name, direction):
+        self.robot = Robot()
 
-    motor = robot.getDevice(motor_name)
-    motor.setPosition(float('inf'))
-    motor.setVelocity(direction * 60)
+        self.timestep = int(self.robot.getBasicTimeStep())
 
+        self.joystick = self.robot.getJoystick()
+        self.joystick.enable(self.timestep)
 
-def printKeyboardInstructions():
-    print('Using keyboard instead:\n')
-    print('- Use Enter to take off and land\n')
-    print('- Use W and S to go up and down\n')
-    print('- Use arrow keys to move horizontally\n')
-    print('- Use Q and E to change heading\n')
+        self.keyboard = self.robot.getKeyboard()
+        self.keyboard.enable(self.timestep)
 
+        self.emitter = self.robot.getDevice('emitter')
 
-def reportUnrecognizedJoystick(joystick):
-    print('Unrecognized joystick %s with axes ' % joystick.model, end='')
-    for k in range(joystick.number_of_axes):
-        print('%2d=%+6d |' % (k+1, joystick.getAxisValue(k)), end=' ')
-    print()
+        self.robot.step(self.timestep)
 
+        use_keyboard = False
 
-def switchMode(what, mode):
-    '''A little state-transition machine'''
-    return (
-        'hovering' if mode == 'armed' and what == 'hover' else
-        'armed' if mode == 'hovering' and what == 'hover' else
-        'autonomous' if mode == 'hovering' and what == 'auto' else
-        'hovering' if mode == 'autonomous' and what == 'auto' else
-        mode)
+        if self.joystick.is_connected:
 
+            if self.joystick.model not in self.JOYSTICK_AXIS_MAP:
+                print('Unrecognized joystick %s' % self.joystick.model)
+                self.use_keyboard = True
 
-def checkPressed(button, target, what, buttons_down, mode):
-    if button == target:
-        if not buttons_down[what]:
-            mode = switchMode(what, mode)
-        buttons_down[what] = True
-    else:
-        buttons_down[what] = False
-    return mode
+        else:
+            self.use_keyboard = True
 
+        if self.use_keyboard:
+            self.printKeyboardInstructions()
 
-def normalizeJoystickAxis(rawval):
-    return 2 * rawval / (2**16)
+        self.buttons_down = {'hover': False, 'auto': False}
 
+        self.cmdinfo = 'armed', 0, 0, 0, 0
 
-def readJoystickRaw(joystick, index):
-    axis = abs(index) - 1
-    sign = -1 if index < 0 else +1
-    return sign * joystick.getAxisValue(axis)
+    def startMotor(self, motor_name, direction):
 
+        motor = self.robot.getDevice(motor_name)
+        motor.setPosition(float('inf'))
+        motor.setVelocity(direction * 60)
 
-def readJoystickAxis(joystick, index):
-    return normalizeJoystickAxis(readJoystickRaw(joystick, index))
+    def step(self):
 
+        if self.robot.step(self.timestep) == -1:
+            return False
 
-def getMode(button, hover_button, auto_button, buttons_down, cmdinfo):
+        self.cmdinfo = (self.getCommandInfoFromKeyboard(
+           self. keyboard, self.buttons_down, self.cmdinfo)
+                   if self.use_keyboard
+                   else self.getCommandInfoFromJoystick(
+                       self.joystick, self.buttons_down, self.cmdinfo))
 
-    mode = cmdinfo[0]
-    mode = checkPressed(button, hover_button, 'hover', buttons_down, mode)
-    return checkPressed(button, auto_button, 'auto', buttons_down, mode)
-
-
-def getCommandInfoFromJoystick(joystick, buttons_down, cmdinfo):
-
-    mode = getMode(joystick.getPressedButton(), 5, 4, buttons_down, cmdinfo)
-
-    axes = JOYSTICK_AXIS_MAP[joystick.model]
-
-    thrust = readJoystickAxis(joystick, axes[0])
-    roll = readJoystickAxis(joystick, axes[1])
-    pitch = readJoystickAxis(joystick, axes[2])
-    yaw = readJoystickAxis(joystick, axes[3])
-
-    return mode, thrust, roll, pitch, yaw
-
-
-def getCommandInfoFromKeyboard(keyboard, keys_down, cmdinfo):
-
-    key = keyboard.getKey()
-
-    mode = getMode(key, 4, 32, keys_down, cmdinfo)
-
-    thrust = +1 if key == ord('W') else -1 if key == ord('S') else 0
-
-    roll = (+1 if key == keyboard.RIGHT else
-            -1 if key == keyboard.LEFT else
-            0)
-
-    pitch = (+1 if key == keyboard.UP else
-             -1 if key == keyboard.DOWN else
-             0)
-
-    yaw = +0.5 if key == ord('E') else -0.5 if key == ord('Q') else 0
-
-    return mode, thrust, roll, pitch, yaw
-
-
-def getAndEnableDevice(robot, timestep, device_name):
-    device = robot.getDevice(device_name)
-    device.enable(timestep)
-    return device
-
-
-def makeRobot():
-
-    return Robot()
-
-
-def run(robot):
-
-    timestep = int(robot.getBasicTimeStep())
-
-    joystick = robot.getJoystick()
-    joystick.enable(timestep)
-
-    keyboard = robot.getKeyboard()
-    keyboard.enable(timestep)
-
-    emitter = robot.getDevice('emitter')
-
-    robot.step(timestep)
-
-    use_keyboard = False
-
-    if joystick.is_connected:
-
-        if joystick.model not in JOYSTICK_AXIS_MAP:
-            print('Unrecognized joystick %s' % joystick.model)
-            use_keyboard = True
-
-    else:
-        use_keyboard = True
-
-    if use_keyboard:
-        printKeyboardInstructions()
-
-    buttons_down = {'hover': False, 'auto': False}
-
-    cmdinfo = 'armed', 0, 0, 0, 0
-
-    while True:
-
-        if robot.step(timestep) == -1:
-            break
-
-        cmdinfo = (getCommandInfoFromKeyboard(keyboard, buttons_down, cmdinfo)
-                   if use_keyboard
-                   else getCommandInfoFromJoystick(
-                       joystick, buttons_down, cmdinfo))
-
-        mode = cmdinfo[0]
+        mode = self.cmdinfo[0]
 
         # Send siminfo to fast thread
-        emitter.send(struct.pack('Iffff', int(MODES[mode]), *cmdinfo[1:]))
+        self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *self.cmdinfo[1:]))
+
+        return True
+
+    def printKeyboardInstructions(self):
+        print('Using keyboard instead:\n')
+        print('- Use Enter to take off and land\n')
+        print('- Use W and S to go up and down\n')
+        print('- Use arrow keys to move horizontally\n')
+        print('- Use Q and E to change heading\n')
+
+
+    def switchMode(self, what, mode):
+        '''A little state-transition machine'''
+        return (
+            'hovering' if mode == 'armed' and what == 'hover' else
+            'armed' if mode == 'hovering' and what == 'hover' else
+            'autonomous' if mode == 'hovering' and what == 'auto' else
+            'hovering' if mode == 'autonomous' and what == 'auto' else
+            mode)
+
+    def checkPressed(self, button, target, what, buttons_down, mode):
+        if button == target:
+            if not buttons_down[what]:
+                mode = self.switchMode(what, mode)
+            buttons_down[what] = True
+        else:
+            buttons_down[what] = False
+        return mode
+
+
+    def normalizeJoystickAxis(self, rawval):
+        return 2 * rawval / (2**16)
+
+
+    def readJoystickRaw(self, joystick, index):
+        axis = abs(index) - 1
+        sign = -1 if index < 0 else +1
+        return sign * joystick.getAxisValue(axis)
+
+
+    def readJoystickAxis(self, joystick, index):
+        return self.normalizeJoystickAxis(self, readJoystickRaw(joystick, index))
+
+
+    def getMode(self, button, hover_button, auto_button, buttons_down, cmdinfo):
+
+        mode = cmdinfo[0]
+        mode = self.checkPressed(button, hover_button, 'hover', buttons_down, mode)
+        return self.checkPressed(button, auto_button, 'auto', buttons_down, mode)
+
+
+    def getCommandInfoFromJoystick(self, joystick, buttons_down, cmdinfo):
+
+        mode = self.getMode(joystick.getPressedButton(), 5, 4, buttons_down, cmdinfo)
+
+        axes = self.JOYSTICK_AXIS_MAP[joystick.model]
+
+        thrust = self.readJoystickAxis(joystick, axes[0])
+        roll = self.readJoystickAxis(joystick, axes[1])
+        pitch = self.readJoystickAxis(joystick, axes[2])
+        yaw = self.readJoystickAxis(joystick, axes[3])
+
+        return mode, thrust, roll, pitch, yaw
+
+
+    def getCommandInfoFromKeyboard(self, keyboard, keys_down, cmdinfo):
+
+        key = keyboard.getKey()
+
+        mode = self.getMode(key, 4, 32, keys_down, cmdinfo)
+
+        thrust = +1 if key == ord('W') else -1 if key == ord('S') else 0
+
+        roll = (+1 if key == keyboard.RIGHT else
+                -1 if key == keyboard.LEFT else
+                0)
+
+        pitch = (+1 if key == keyboard.UP else
+                 -1 if key == keyboard.DOWN else
+                 0)
+
+        yaw = +0.5 if key == ord('E') else -0.5 if key == ord('Q') else 0
+
+        return mode, thrust, roll, pitch, yaw
