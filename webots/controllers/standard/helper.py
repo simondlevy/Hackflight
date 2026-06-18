@@ -37,6 +37,7 @@ class Helper:
         self.timestep = int(self.robot.getBasicTimeStep())
 
         self.joystick = self.robot.getJoystick()
+
         self.joystick.enable(self.timestep)
 
         self.keyboard = self.robot.getKeyboard()
@@ -142,7 +143,7 @@ class Helper:
 
     def getCommandInfoFromJoystick(self, joystick, buttons_down, cmdinfo):
 
-        mode = self.getMode(joystick.getPressedButton(), 5, 4, buttons_down,
+        mode = self.getMode(joystick.getPressedButton(), 4, 5, buttons_down,
                             cmdinfo)
 
         axes = self.JOYSTICK_AXIS_MAP[joystick.model]
