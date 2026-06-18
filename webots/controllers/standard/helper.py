@@ -132,7 +132,7 @@ class Helper:
         return self.normalizeJoystickAxis(
                 self.readJoystickRaw(joystick, index))
 
-    def getModeFromGamepadOrKeyboard(self, button, hover_button, auto_button, buttons_down,
+    def getModeFromButtonOrKeyboard(self, button, hover_button, auto_button, buttons_down,
                 cmdinfo):
 
         mode = cmdinfo[0]
@@ -143,7 +143,9 @@ class Helper:
 
     def getCommandInfoFromGamepad(self, joystick, buttons_down, cmdinfo):
 
-        mode = self.getModeFromGamepadOrKeyboard(
+        print(joystick.getPressedButton())
+
+        mode = self.getModeFromButtonOrKeyboard(
                 joystick.getPressedButton(), 4, 5, buttons_down, cmdinfo)
 
         thrust = -self.readJoystickAxis(joystick, 1)
@@ -155,9 +157,12 @@ class Helper:
 
     def getCommandInfoFromRadio(self, joystick, buttons_down, cmdinfo):
 
-        hover = self.readJoystickAxis(joystick, 5)
+        button_from_axis = (4 if self.getButtonFromAxis(joystick, 5)
+                            else 5 if self.getButtonFromAxis(joystick, 7)
+                            else -1)
 
-        print(hover)
+        mode = self.getModeFromButtonOrKeyboard(
+                button_from_axis, 4, 5, buttons_down, cmdinfo)
 
         thrust = self.readJoystickAxis(joystick, 2)
         roll = self.readJoystickAxis(joystick, 0)
@@ -166,11 +171,15 @@ class Helper:
 
         return mode, thrust, roll, pitch, yaw
 
+    def getButtonFromAxis(self, joystick, index):
+
+        return self.readJoystickRaw(joystick, index) > 0
+
     def getCommandInfoFromKeyboard(self, keyboard, keys_down, cmdinfo):
 
         key = keyboard.getKey()
 
-        mode = self.getModeFromGamepadOrKeyboard(key, 4, 32, keys_down, cmdinfo)
+        mode = self.getModeFromButtonOrKeyboard(key, 4, 32, keys_down, cmdinfo)
 
         thrust = +1 if key == ord('W') else -1 if key == ord('S') else 0
 
