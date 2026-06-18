@@ -1,0 +1,38 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "../protos/NewSevJr.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/UnevenTerrain.proto"
+
+WorldInfo {
+  title "Hackflight"
+  gravity 0
+  physics "simple"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.25510210691379837 0.5184548615551405 -0.8161663259274919 0.06524980247751831
+  position -1.9371776310618358 -0.001630923566506265 0.15829212522395875
+  follow "NewSevJr"
+}
+DEF robot NewSevJr {
+  translation 2.463e-20 4.52906e-20 0.012999
+  rotation -3.680055564429845e-17 -0.8281353711188624 -0.5605281501421888 1.6015865556978885e-18
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+UnevenTerrain {
+  translation 0 0 -3.08
+  size 500 500 5
+}
