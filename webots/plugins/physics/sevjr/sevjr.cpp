@@ -32,7 +32,7 @@ DLLEXPORT void webots_physics_step()
 
     const auto state = _helper->RunSimulator(message.mode, message.setpoint);
 
-    _helper->SetDbodyFromState(state, true);
+    _helper->SetDbodyFromState(state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
