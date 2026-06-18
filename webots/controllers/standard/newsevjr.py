@@ -25,14 +25,18 @@ def main():
 
     helper = Helper()
 
-    helper.startMotor('prop_front_left', -1)
-    helper.startMotor('prop_front_right', +1)
-    helper.startMotor('prop_rear', +1)
+    #helper.startMotor('prop_front_left', -1)
+    #helper.startMotor('prop_front_right', +1)
+    #helper.startMotor('prop_rear', +1)
+
+    motor = helper.robot.getDevice('left wheel motor')
 
     while True:
 
         if not helper.step():
             break
+
+        print(motor)
 
 
 main()
