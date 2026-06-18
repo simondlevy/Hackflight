@@ -19,6 +19,8 @@
 
 from helper import Helper
 
+RUDDER_NEUTRAL = 0.2
+
 
 def main():
 
@@ -36,10 +38,10 @@ def main():
         if not helper.step():
             break
 
-        yaw = -helper.cmdinfo[4]
+        pos = -helper.cmdinfo[4] + RUDDER_NEUTRAL
 
-        left_rudder.setPosition(yaw)
-        right_rudder.setPosition(yaw)
+        left_rudder.setPosition(pos)
+        right_rudder.setPosition(pos)
 
 
 main()
