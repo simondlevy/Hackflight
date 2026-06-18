@@ -34,6 +34,36 @@ class Helper:
 
         self.robot = Robot()
 
+        self.timestep = int(self.robot.getBasicTimeStep())
+
+        self.joystick = self.robot.getJoystick()
+        self.joystick.enable(self.timestep)
+
+        self.keyboard = self.robot.getKeyboard()
+        self.keyboard.enable(self.timestep)
+
+        self.emitter = self.robot.getDevice('emitter')
+
+        self.robot.step(self.timestep)
+
+        use_keyboard = False
+
+        if self.joystick.is_connected:
+
+            if self.joystick.model not in self.JOYSTICK_AXIS_MAP:
+                print('Unrecognized joystick %s' % self.joystick.model)
+                self.use_keyboard = True
+
+        else:
+            self.use_keyboard = True
+
+        if self.use_keyboard:
+            self.printKeyboardInstructions()
+
+        self.buttons_down = {'hover': False, 'auto': False}
+
+        self.cmdinfo = 'armed', 0, 0, 0, 0
+
     def startMotor(self, motor_name, direction):
 
         motor = self.robot.getDevice(motor_name)
@@ -42,50 +72,21 @@ class Helper:
 
     def run(self):
 
-        timestep = int(self.robot.getBasicTimeStep())
-
-        joystick = self.robot.getJoystick()
-        joystick.enable(timestep)
-
-        keyboard = self.robot.getKeyboard()
-        keyboard.enable(timestep)
-
-        emitter = self.robot.getDevice('emitter')
-
-        self.robot.step(timestep)
-
-        use_keyboard = False
-
-        if joystick.is_connected:
-
-            if joystick.model not in self.JOYSTICK_AXIS_MAP:
-                print('Unrecognized joystick %s' % joystick.model)
-                use_keyboard = True
-
-        else:
-            use_keyboard = True
-
-        if use_keyboard:
-            self.printKeyboardInstructions()
-
-        buttons_down = {'hover': False, 'auto': False}
-
-        cmdinfo = 'armed', 0, 0, 0, 0
-
         while True:
 
-            if self.robot.step(timestep) == -1:
+            if self.robot.step(self.timestep) == -1:
                 break
 
-            cmdinfo = (self.getCommandInfoFromKeyboard(keyboard, buttons_down, cmdinfo)
-                       if use_keyboard
+            self.cmdinfo = (self.getCommandInfoFromKeyboard(
+               self. keyboard, self.buttons_down, self.cmdinfo)
+                       if self.use_keyboard
                        else self.getCommandInfoFromJoystick(
-                           joystick, buttons_down, cmdinfo))
+                           self.joystick, self.buttons_down, self.cmdinfo))
 
-            mode = cmdinfo[0]
+            mode = self.cmdinfo[0]
 
             # Send siminfo to fast thread
-            emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *cmdinfo[1:]))
+            self.emitter.send(struct.pack('Iffff', int(self.MODES[mode]), *self.cmdinfo[1:]))
 
     def printKeyboardInstructions(self):
         print('Using keyboard instead:\n')
