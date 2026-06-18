@@ -16,6 +16,9 @@
 
 PROTO SevJr [
 
+  field SFVec3f translation 0 0 0.0
+  field SFRotation rotation 0 0 0 0
+
   field SFColor body_color  0 0 0
   field SFFloat body_metalness 0
 
@@ -56,7 +59,8 @@ PROTO SevJr [
 {
     DEF ROBOT Robot {
 
-            rotation 0 0 0 0
+            translation  IS translation
+            rotation IS rotation
             controller "<extern>"
             supervisor TRUE
             name "SevJr"

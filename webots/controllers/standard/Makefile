@@ -36,6 +36,10 @@ srun:
 	webots ../../worlds/sevjr.wbt & /usr/local/webots/webots-controller \
 	--stdout-redirect ./sevjr.py $(world) &> /dev/null;\
 
+drun:
+	webots ../../worlds/desert.wbt & /usr/local/webots/webots-controller \
+	--stdout-redirect ./sevjr.py $(world) &> /dev/null;\
+
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)

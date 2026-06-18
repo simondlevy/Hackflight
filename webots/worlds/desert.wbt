@@ -1,0 +1,161 @@
+#VRML_SIM R2025a utf8
+
+#   Copyright (C) 2026 Simon D. Levy
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, in version 3.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program. If not, see <http:--www.gnu.org/licenses/>.
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/SandyGround.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Sassafras.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/factory/containers/protos/CardboardBox.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/Oak.proto"
+EXTERNPROTO "../protos/SevJr.proto"
+
+WorldInfo {
+  title "Hackflight"
+  gravity 0
+  physics "simple"
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.04377192464724553 0.9972189651460358 0.060318771255267876 0.24141697098786405
+  position -1.740072085810117 -0.03984435217478182 0.811679050670686
+  near 1
+  follow "SevJr"
+}
+DEF robot SevJr {
+  hidden linearVelocity_0 1.1840714082130835e-18 1.4153318748712773e-18 0.093713393205779
+  hidden angularVelocity_0 -1.5611891337585478e-32 -4.1447827396307855e-17 -2.805419841743553e-17
+  translation 3.7890285062818673e-20 4.5290619995880873e-20 0.002998828582584928
+  rotation -3.1192851927072027e-16 -0.8281353711188624 -0.5605281501421888 1.6015865556978885e-18
+  prop_front_right_rotation 0 0 1 5.633048156922512
+  prop_front_left_rotation 0 0 -1 5.633048156922512
+  prop_rear_rotation 0 0 1 4.633048156922511
+  rudder_rotation -0.43035064721023164 0.7918164199570028 -0.4333879065366382 1.8086417040948004
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+  luminosity 0.8
+}
+Sassafras {
+  translation -11.291784554659246 -13.202242590856223 5.539999999999956
+  name "sassafras tree(3)"
+}
+Sassafras {
+  translation -15.879514927124884 -14.02532598320656 5.5199999999999605
+  name "sassafras tree(4)"
+}
+DEF PLANE Solid {
+  children [
+    Shape {
+      appearance SandyGround {
+        textureTransform TextureTransform {
+          rotation 0.2
+          scale 200 200
+        }
+      }
+      geometry DEF PLANE_SHAPE Plane {
+        size 2000 2000
+      }
+    }
+  ]
+  name "plane"
+  boundingObject USE PLANE_SHAPE
+}
+CardboardBox {
+  translation -7.46107 6.44009 7.65221
+  rotation 0.9045812251176621 0.33689653625038113 0.261215487724455 1.589542292814968
+  name "robot cardboard payload"
+  size 1.2 0.6 1
+  mass 5
+}
+CardboardBox {
+  translation -0.5054160679276615 -34.962109644968024 0.3085113796201058
+  rotation 0.861655746286726 0.35890228321207 0.358801513369479 1.72070091325276
+  name "cardboard box(1)"
+  size 1.2 0.6 1
+}
+CardboardBox {
+  translation 0.37456796387561053 -34.074344036015866 0.30908350988383304
+  rotation -0.282660009010747 0.677738519969735 0.678803224694224 3.692686917124235
+  name "cardboard box(2)"
+  size 1.2 0.6 1
+}
+CardboardBox {
+  translation -0.1600549005205327 -34.61490894732346 0.9287350002620774
+  rotation 0.861655746286726 0.35890228321207 0.358801513369479 1.72070091325276
+  name "cardboard box(3)"
+  size 1.2 0.6 1
+}
+CardboardBox {
+  translation -0.011882441662218815 -34.46642520363706 1.4388305798319985
+  rotation 0.861655746286726 0.35890228321207 0.358801513369479 1.72070091325276
+  name "cardboard box(4)"
+  size 0.3 0.4 0.4
+}
+Sassafras {
+  translation 7.560552369423128 -11.745177237218291 4.899999999999982
+}
+Sassafras {
+  translation 12.752428163035134 -6.737294208026306 5.539999999999988
+  name "sassafras tree(2)"
+}
+Sassafras {
+  translation 8.196694630499223 -7.277750821462874 5.539999999999988
+  name "sassafras tree(1)"
+}
+Oak {
+  translation 7.828813618757364 -9.126541612854037 4.749999999999991
+}
+Oak {
+  translation 8.728868630130902 -5.9989481605745745 4.749999999999998
+  name "oak tree(2)"
+}
+Oak {
+  translation -14.025916084607276 -9.748843924353633 4.750000000000007
+  name "oak tree(3)"
+}
+Oak {
+  translation -15.915481975056919 -11.82755861197884 4.750000000000005
+  name "oak tree(5)"
+}
+Oak {
+  translation -14.0259 -9.74884 6.76
+  name "oak tree(6)"
+}
+Oak {
+  translation -13.2436 -12.4917 6.18
+  name "oak tree(8)"
+}
+Oak {
+  translation -10.7145 -10.8234 6.37
+  name "oak tree(7)"
+}
+Oak {
+  translation 5.460435876151285 -12.16163713962354 4.750000000000005
+  name "oak tree(4)"
+}
+Oak {
+  translation 8.613348102469539 -4.14079710434962 5.0299999999999905
+  name "oak tree(1)"
+}

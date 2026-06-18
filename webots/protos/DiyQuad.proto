@@ -15,7 +15,8 @@
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 PROTO DiyQuad [
-  field SFVec3f translation      0 0 0.0
+  field SFVec3f translation 0 0 0.0
+  field SFRotation rotation 0 0 0 0
   field SFVec3f motor1_translation  0.031 -0.031 0.016  
   field SFVec3f motor2_translation -0.031 -0.031 0.016  
   field SFVec3f motor3_translation -0.031  0.031 0.016  
@@ -27,14 +28,13 @@ PROTO DiyQuad [
   field SFFloat prop_fast_helix_threshold 50
   field SFFloat motor_max_velocity 100
   field SFFloat motor_max_torque 30
-  field SFRotation rotation      0 0 0 0
 ]
 
 {
 
 DEF ROBOT Robot {
 
-    translation  IS translation
+        translation  IS translation
         rotation IS rotation
         controller "<extern>"
         supervisor TRUE
