@@ -22,10 +22,8 @@ from helper import Helper
 
 def makeRudder(helper, name):
 
-    rudder = helper.robot.getDevice(name)
-    rudder.setPosition(float('inf'))
+    rudder = helper.makeMotor(name)
     rudder.setVelocity(0)
-
     return rudder
 
 
@@ -45,7 +43,7 @@ def main():
         if not helper.step():
             break
 
-        yaw = helper.cmdinfo[4]
+        yaw = -helper.cmdinfo[4]
 
         left_rudder.setVelocity(yaw * 4)
         right_rudder.setVelocity(yaw * 4)

@@ -65,10 +65,9 @@ class Helper:
 
         self.cmdinfo = 'armed', 0, 0, 0, 0
 
-    def startMotor(self, motor_name, direction):
+    def startMotor(self, name, direction):
 
-        motor = self.robot.getDevice(motor_name)
-        motor.setPosition(float('inf'))
+        motor = self.makeMotor(name)
         motor.setVelocity(direction * 60)
 
     def step(self):
@@ -89,6 +88,12 @@ class Helper:
                           *self.cmdinfo[1:]))
 
         return True
+
+    def makeMotor(self, name):
+
+        motor = self.robot.getDevice(name)
+        motor.setPosition(float('inf'))
+        return motor
 
     def printKeyboardInstructions(self):
         print('Using keyboard instead:\n')
