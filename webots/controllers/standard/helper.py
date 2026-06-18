@@ -20,7 +20,6 @@ import struct
 
 from controller import Robot
 
-
 class Helper:
 
     JOYSTICK_AXIS_MAP = {
@@ -130,10 +129,10 @@ class Helper:
 
     def readJoystickAxis(self, joystick, index):
         return self.normalizeJoystickAxis(
-                self, self.readJoystickRaw(joystick, index))
+                self.readJoystickRaw(joystick, index))
 
-    def getMode(
-            self, button, hover_button, auto_button, buttons_down, cmdinfo):
+    def getMode(self, button, hover_button, auto_button, buttons_down,
+                cmdinfo):
 
         mode = cmdinfo[0]
         mode = self.checkPressed(button, hover_button, 'hover', buttons_down,
