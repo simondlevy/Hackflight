@@ -37,16 +37,14 @@ PROTO SevJr [
   field SFVec3f motor_rear_translation -0.240 -0.035 0.038
   field SFVec3f prop_rear_translation  -0.240 -0.035 0.078
 
-  field SFRotation prop_front_right_rotation  0 0 1  1
-
-  field SFRotation prop_front_left_rotation  0 0 1 -1
-
-  field SFRotation prop_rear_rotation  0 0 1 0
+  field SFRotation prop_front_right_initial_rotation  0 0 1  1
+  field SFRotation prop_front_left_initial_rotation  0 0 1 -1
+  field SFRotation prop_rear_initial_rotation  0 0 1 0
 
   field SFVec3f left_rudder_translation  -0.320 -0.001 0.034
   field SFVec3f right_rudder_translation -0.320 -0.070 0.034
 
-  field SFRotation rudder_rotation -0.275 0.921 -0.277 1.66
+  field SFRotation rudder_initial_rotation -0.275 0.921 -0.277 1.66
 
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
@@ -220,7 +218,7 @@ PROTO SevJr [
                 }
                 slowHelix DEF PROP Solid {
                     translation IS prop_front_right_translation
-                    rotation IS prop_front_right_rotation
+                    rotation IS prop_front_right_initial_rotation
                         children [
 
                             Shape {
@@ -293,7 +291,7 @@ PROTO SevJr [
                 }
                 slowHelix DEF PROP Solid {
                     translation IS prop_front_left_translation
-                    rotation IS prop_front_left_rotation
+                    rotation IS prop_front_left_initial_rotation
                         children [
 
                             Shape {
@@ -366,7 +364,7 @@ PROTO SevJr [
                 }
                 slowHelix DEF PROP Solid {
                     translation IS prop_rear_translation
-                    rotation IS prop_rear_rotation
+                    rotation IS prop_rear_initial_rotation
                         children [
 
                             Shape {
@@ -400,7 +398,7 @@ PROTO SevJr [
                     }
                 slowHelix DEF PROP Solid {
                     translation IS left_rudder_translation
-                    rotation IS rudder_rotation
+                    rotation IS rudder_initial_rotation
                         children [
 
                             Shape {
@@ -433,7 +431,7 @@ PROTO SevJr [
                     }
                 slowHelix DEF PROP Solid {
                     translation IS right_rudder_translation
-                    rotation IS rudder_rotation
+                    rotation IS rudder_initial_rotation
                         children [
 
                             Shape {

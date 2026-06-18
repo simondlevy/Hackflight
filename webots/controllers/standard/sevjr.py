@@ -21,8 +21,8 @@ from time import time
 
 from helper import Helper
 
-STARTUP_TIME = 0.25
-STARTUP_YAW = -0.5
+STARTUP_YAW_TIME = 0.25
+STARTUP_YAW_VELOCITY = -0.5
 
 def main():
 
@@ -35,17 +35,27 @@ def main():
     left_rudder = helper.makeMotor('left_rudder')
     right_rudder = helper.makeMotor('right_rudder')
 
-    start_time = time()
+    time_start = time()
+
+    dt = 1 / helper.timestep
 
     while True:
 
         if not helper.step():
             break
 
-        yaw = STARTUP_YAW if time() - start_time < STARTUP_TIME else -helper.cmdinfo[4]
+        time_curr = time()
 
-        left_rudder.setVelocity(yaw * 4)
-        right_rudder.setVelocity(yaw * 4)
+        time_prev = time_curr
+
+        print('%3.3f' % dt)
+
+        yaw_velocity = (STARTUP_YAW_VELOCITY
+               if time_curr - time_start < STARTUP_YAW_TIME
+               else -helper.cmdinfo[4])
+
+        left_rudder.setVelocity(yaw_velocity * 4)
+        right_rudder.setVelocity(yaw_velocity * 4)
 
 
 main()
