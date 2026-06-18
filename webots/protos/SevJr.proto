@@ -17,7 +17,8 @@
 PROTO SevJr [
 
   field SFColor body_color  0 0 0
-  field SFColor rudder_color  0.8 0.0 0.0
+  field SFFloat body_metalness 0
+
   field SFColor motor_color 0.8 0.0 0.0
   field SFFloat motor_metalness 0.9
 
@@ -71,7 +72,7 @@ PROTO SevJr [
 
                       appearance DEF PLASTIC PBRAppearance {
                           baseColor IS body_color
-                          metalness 0
+                          metalness IS body_metalness
                       }
 
                       geometry Mesh {
@@ -401,8 +402,8 @@ PROTO SevJr [
                             Shape {
 
                                 appearance DEF PLASTIC PBRAppearance {
-                                    baseColor IS rudder_color
-                                        metalness 0
+                                    baseColor IS body_color
+                                    metalness IS body_metalness
                                 }
 
                               geometry Mesh {
@@ -434,8 +435,8 @@ PROTO SevJr [
                             Shape {
 
                                 appearance DEF PLASTIC PBRAppearance {
-                                    baseColor IS rudder_color
-                                        metalness 0
+                                    baseColor IS body_color
+                                    metalness IS body_metalness
                                 }
 
                               geometry Mesh {
