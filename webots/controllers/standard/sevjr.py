@@ -22,8 +22,7 @@ from helper import makeRobot, run, startMotor
 def makeRudder(robot, name):
 
     rudder = robot.getDevice(name)
-    rudder.setPosition(float('inf'))
-    rudder.setVelocity(2)
+    rudder.setVelocity(0)
 
     return rudder
 

@@ -42,7 +42,7 @@ PROTO SevJr [
   field SFVec3f left_rudder_translation  -0.320 -0.001 0.034
   field SFVec3f right_rudder_translation -0.320 -0.070 0.034
 
-  field SFRotation rudder_rotation  0 1 0 1
+  field SFRotation rudder_rotation -0.275 0.921 -0.277 1.66
 
   field SFFloat prop_fast_helix_radius 0.25
   field SFFloat prop_fast_helix_height 0.01
