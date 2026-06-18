@@ -21,22 +21,10 @@ from time import time
 
 from helper import Helper
 
-STARTUP_YAW_TIME = 0.25
-STARTUP_YAW_VELOCITY = -0.5
+def setRudderPosition(left_rudder, right_rudder, position):
 
-RUDDER_RPM_SCALE = 0.104  # velocity=1 should produce 1 RPM
-
-
-def setRudderVelocityRpm(left_rudder, right_rudder, velocity_rpm):
-
-    left_rudder.setVelocity(velocity_rpm * RUDDER_RPM_SCALE)
-    right_rudder.setVelocity(velocity_rpm * RUDDER_RPM_SCALE)
-
-
-def setRudderPosition(left_rudder, right_rudder):
-
-    left_rudder.setPosition(1)
-    right_rudder.setPosition(0)
+    left_rudder.setPosition(position)
+    right_rudder.setPosition(position)
 
 def main():
 
@@ -49,26 +37,14 @@ def main():
     left_rudder = helper.makeMotor('left_rudder')
     right_rudder = helper.makeMotor('right_rudder')
 
-    time_start = time()
-
-    dt = 1 / helper.timestep
-
     while True:
 
         if not helper.step():
             break
 
-        time_curr = time()
+        yaw = -helper.cmdinfo[4]
 
-        rudder_velocity_rpm = 1
-
-        yaw_velocity = (STARTUP_YAW_VELOCITY
-               if time_curr - time_start < STARTUP_YAW_TIME
-               else -helper.cmdinfo[4])
-
-        # setRudderVelocityRpm(left_rudder, right_rudder, rudder_velocity_rpm)
-
-        setRudderPosition(left_rudder, right_rudder)
+        setRudderPosition(left_rudder, right_rudder, yaw)
 
 
 main()
