@@ -55,8 +55,6 @@ def main():
 
         time_curr = time()
 
-        print('%d' % int(time_curr - time_start))
-
         rudder_velocity_rpm = 1
 
         yaw_velocity = (STARTUP_YAW_VELOCITY
