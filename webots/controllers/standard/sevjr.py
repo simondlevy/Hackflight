@@ -17,7 +17,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from helper import makeRobot, run, startMotor
+from newhelper import makeRobot, run, startMotor
 
 def makeRudder(robot, name):
 
