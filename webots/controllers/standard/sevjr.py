@@ -17,14 +17,9 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
+from time import sleep
+
 from helper import Helper
-
-
-def makeRudder(helper, name):
-
-    rudder = helper.makeMotor(name)
-    rudder.setVelocity(0)
-    return rudder
 
 
 def main():
@@ -35,8 +30,8 @@ def main():
     helper.startMotor('prop_front_right', +1)
     helper.startMotor('prop_rear', +1)
 
-    left_rudder = makeRudder(helper, 'left_rudder')
-    right_rudder = makeRudder(helper, 'right_rudder')
+    left_rudder = helper.makeMotor('left_rudder')
+    right_rudder = helper.makeMotor('right_rudder')
 
     while True:
 
