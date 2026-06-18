@@ -19,6 +19,13 @@
 
 from helper import makeRobot, run, startMotor
 
+def makeRudder(robot, name):
+
+    rudder = robot.getDevice(name)
+    rudder.setPosition(float('inf'))
+    rudder.setVelocity(2)
+
+    return rudder
 
 def main():
 
@@ -28,13 +35,8 @@ def main():
     startMotor(robot, 'prop_front_right', +1)
     startMotor(robot, 'prop_rear', +1)
 
-    left_rudder = robot.getDevice("left_rudder")
-    left_rudder.setPosition(float('inf'))
-    left_rudder.setVelocity(2)
-
-    right_rudder = robot.getDevice("right_rudder")
-    right_rudder.setPosition(float('inf'))
-    right_rudder.setVelocity(2)
+    left_rudder = makeRudder(robot, 'left_rudder')
+    right_rudder = makeRudder(robot, 'right_rudder')
 
     run(robot)
 
