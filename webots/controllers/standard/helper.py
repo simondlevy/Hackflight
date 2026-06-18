@@ -132,8 +132,8 @@ class Helper:
         return self.normalizeJoystickAxis(
                 self.readJoystickRaw(joystick, index))
 
-    def getModeFromButtonOrKeyboard(self, button, hover_button, auto_button, buttons_down,
-                cmdinfo):
+    def getModeFromButtonOrKeyboard(self, button, hover_button, auto_button,
+                                    buttons_down, cmdinfo):
 
         mode = cmdinfo[0]
         mode = self.checkPressed(button, hover_button, 'hover', buttons_down,
@@ -142,8 +142,6 @@ class Helper:
                                  mode)
 
     def getCommandInfoFromGamepad(self, joystick, buttons_down, cmdinfo):
-
-        print(joystick.getPressedButton())
 
         mode = self.getModeFromButtonOrKeyboard(
                 joystick.getPressedButton(), 4, 5, buttons_down, cmdinfo)
