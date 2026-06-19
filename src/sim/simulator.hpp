@@ -94,19 +94,18 @@ namespace hf {
                         };
 
                         // Run mixer on setpoint to get motor RPMs
-                        static hf::Mixer _mixer;
-                        _mixer = hf::Mixer::Run(_mixer, scaled_setpoint);
+                        const auto  mixer = hf::Mixer::Run(scaled_setpoint);
 
                         const auto motorvals = mixer_fun(scaled_setpoint);
 
-                        printf("%f (%f)\n", motorvals[0], _mixer.motorvals[0]);
+                        printf("%f (%f)\n", motorvals[0], mixer.motorvals[0]);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
                             dynamics = Dynamics::Update(dynamics,
                                     kVehicleParams, 1 / kDynamicsFreq,
-                                    _mixer.motorvals, 4, _mixer.roll,
-                                    _mixer.pitch, _mixer.yaw);
+                                    mixer.motorvals, 4, mixer.roll,
+                                    mixer.pitch, mixer.yaw);
                         }
                     }
                 }
