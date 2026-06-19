@@ -31,13 +31,6 @@ namespace hf {
 
     class BFQuadXDemixer {
 
-        private:
-
-                static constexpr double kB = 1.3e-8;  // thrust coefficient B [F=b*w^2]
-                static constexpr double kD = 3.9e-11; // drag coefficient D [T=d*w^2] for yaw
-
-                static constexpr double kRho = 1.225; // air density
-
         public:
 
             static auto demix(const float * rpms) -> Setpoint
@@ -49,12 +42,12 @@ namespace hf {
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto u1 = kB * (o1 + o2 + o3 + o4);
-                const auto u2 = kB * (-o1 - o2 + o3 + o4);
-                const auto u3 = kB * (o1 - o2  + o3 - o4);
-                const auto u4 = kD * (o1 - o2 - o3 + o4);
+                const auto t = o1 + o2 + o3 + o4;
+                const auto r = -o1 - o2 + o3 + o4;
+                const auto p = o1 - o2  + o3 - o4;
+                const auto y = o1 - o2 - o3 + o4;
 
-                return Setpoint(u1, u2, u3, u4);
+                return Setpoint(t, r, p, y);
             }
 
         private:
@@ -63,7 +56,7 @@ namespace hf {
             {
                 const auto omega = rpm * 2 * M_PI / 60;
 
-                return kRho * omega * omega;
+                return omega * omega;
             }
 
     };

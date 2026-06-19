@@ -97,10 +97,12 @@ namespace hf {
                     const Setpoint & forces,
                     const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
-                const double u1 = forces.thrust;
-                const double u2 = forces.roll;
-                const double u3 = forces.pitch;
-                const double u4 = forces.yaw;
+                // Equation 6 from Bouabdallah et al 2004 ---------------------
+
+                const double u1 = vparams.b * wparams.rho * forces.thrust;
+                const double u2 = vparams.b * wparams.rho * forces.roll;
+                const double u3 = vparams.b * wparams.rho * forces.pitch;
+                const double u4 = vparams.d * wparams.rho * forces.yaw;
 
                 // -----------------------------------------------------------
 
