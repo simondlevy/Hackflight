@@ -27,7 +27,7 @@
 // Hackflight
 #define _MAIN
 #include <mixers/bfquadx.hpp>
-#include <sim/demixers/bfquadx.hpp>
+#include <sim/vehicles/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
 

@@ -26,9 +26,9 @@
 #include <num.hpp>
 #include <pidcontrol/hover.hpp>
 #include <sim/datatypes.hpp>
-#include <sim/demixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/vehicles/apexquad.hpp>
+#include <sim/vehicles/bfquadx.hpp>
 
 namespace hf {
 
