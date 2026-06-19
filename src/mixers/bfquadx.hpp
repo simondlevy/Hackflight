@@ -79,5 +79,22 @@ namespace hf {
             }
     };
 
-}
 
+    float * BFQuadX(const Setpoint & setpoint)
+    {
+        const auto t = setpoint.thrust;
+        const auto r = setpoint.roll;
+        const auto p = setpoint.pitch;
+        const auto y = setpoint.yaw;
+
+        static float motors[4] = {
+            t - r + p - y,
+            t - r - p + y,
+            t + r + p + y,
+            t - r - p - y
+        };
+
+        return motors;
+    }
+
+} // namespace hf
