@@ -26,10 +26,9 @@
 
 // Hackflight
 #define _MAIN
-#include <mixers/bfquadx.hpp>
-#include <sim/vehicles/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
+#include <sim/vehicles/apexquad.hpp>
 
 class PluginHelper {
 
@@ -99,7 +98,7 @@ class PluginHelper {
             -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
-                    hf::BFQuadXDemixer::run);
+                    hf::ApexQuad::run);
 
             return simulator_.dynamics.state;
         }

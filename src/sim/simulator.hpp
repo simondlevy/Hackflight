@@ -28,7 +28,6 @@
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/vehicles/apexquad.hpp>
-#include <sim/vehicles/bfquadx.hpp>
 
 namespace hf {
 
@@ -88,8 +87,11 @@ namespace hf {
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
-                            dynamics = Dynamics::Update(dynamics,
-                                    kVehicleParams, 1 / kDynamicsFreq, forces);
+                            dynamics = Dynamics::Update(
+                                    dynamics,
+                                    ApexQuad::kVehicleParams,
+                                    1 / kDynamicsFreq,
+                                    forces);
                         }
                     }
                 }
