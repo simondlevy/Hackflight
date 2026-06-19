@@ -60,7 +60,6 @@ namespace hf {
                     const Simulator & sim,
                     const Mode mode,
                     const Setpoint & setpoint,
-                    MixerFun mixer_fun,
                     DemixerFun demixer_fun,
                     const float framerate=32) -> Simulator 
             {
@@ -85,18 +84,7 @@ namespace hf {
                         pidControl = HoverPidController::Run(
                                 pidControl, dt, mode, state, setpoint);
 
-                        // Scale up new setpoint to RPMs
-                        const Setpoint scaled_setpoint = {
-                            8000 * (pidControl.setpoint.thrust - 0.5f) +
-                                kVehicleHoverRpm,
-                            1000 * pidControl.setpoint.roll,
-                            1000 * pidControl.setpoint.pitch,
-                            1000 * pidControl.setpoint.yaw
-                        };
-
-                        const auto motorvals = mixer_fun(scaled_setpoint);
-
-                        const auto forces = demixer_fun(motorvals);
+                        const auto forces = demixer_fun(pidControl.setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {

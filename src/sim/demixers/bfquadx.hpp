@@ -26,21 +26,37 @@
 #pragma once
 
 #include <datatypes.hpp>
+#include <mixers/bfquadx.hpp>
 
 namespace hf {
 
     class BFQuadXDemixer {
 
+        private:
+
+            // Approximate thrust RPM needed when in perfect hover
+            static constexpr float kVehicleHoverRpm = 35546;
+
         public:
 
-            static auto demix(const float * rpms) -> Setpoint
+            static auto run(const Setpoint & setpoint) -> Setpoint
             {
-                const auto o1 = GetOmega2(rpms[0]);
-                const auto o2 = GetOmega2(rpms[1]);
-                const auto o3 = GetOmega2(rpms[2]);
-                const auto o4 = GetOmega2(rpms[3]);
+                // Scale up new setpoint to RPMs
+                const Setpoint setpoint_rpms = {
+                    8000 * (setpoint.thrust - 0.5f) + kVehicleHoverRpm,
+                    1000 * setpoint.roll,
+                    1000 * setpoint.pitch,
+                    1000 * setpoint.yaw
+                };
+
+                const auto motor_rpms = MixBFQuadX(setpoint_rpms);
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
+
+                const auto o1 = GetOmega2(motor_rpms[0]);
+                const auto o2 = GetOmega2(motor_rpms[1]);
+                const auto o3 = GetOmega2(motor_rpms[2]);
+                const auto o4 = GetOmega2(motor_rpms[3]);
 
                 const auto t = o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
