@@ -42,19 +42,19 @@ namespace hf {
 
             static auto demix(const float * rpms) -> Setpoint
             {
-                // Equation 6 ------------------------------------------------
-
                 const auto o1 = GetOmega2(rpms[0]);
                 const auto o2 = GetOmega2(rpms[1]);
                 const auto o3 = GetOmega2(rpms[2]);
                 const auto o4 = GetOmega2(rpms[3]);
 
-                const auto t = kB * (o1 + o2 + o3 + o4);
-                const auto r = -kB * o1 - kB * o2 + kB * o3  + kB * o4;
-                const auto p = kB * o1 - kB * o2  + kB * o3 - kB * o4;
-                const auto y = kD * o1 - kD * o2 - kD * o3 + kD * o4;
+                // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                return Setpoint(t, r, p, y);
+                const auto u1 = kB * (o1 + o2 + o3 + o4);
+                const auto u2 = kB * (-o1 - o2 + o3 + o4);
+                const auto u3 = kB * (o1 - o2  + o3 - o4);
+                const auto u4 = kD * (o1 - o2 - o3 + o4);
+
+                return Setpoint(u1, u2, u3, u4);
             }
 
         private:
