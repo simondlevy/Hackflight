@@ -165,7 +165,7 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "029e5ca9-7f42-4208-a418-8e9c0fa87570")
-		(at 152.63 81.25 -90)
+		(at 152 81.25 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J10"
@@ -762,7 +762,7 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "286270d1-19cc-43c6-bc5b-48db92e0e310")
-		(at 152.63 88.87 -90)
+		(at 152 88.87 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J13"
@@ -1041,14 +1041,14 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "2fd90ff2-4795-4ba6-9faf-53afb40b7542")
-		(at 137.63 83.79 90)
+		(at 138 83.79 90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J3"
 			(at 0 -2 90)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "b0136c3d-36d1-4eda-8ff8-1c407ac7ea67")
+			(uuid "ebf7d0e7-109f-4f29-9102-65715a242ce4")
 			(effects
 				(font
 					(size 1 1)
@@ -1060,7 +1060,7 @@
 			(at 0 2.54 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "087ab55e-ec41-4ae0-93e8-fe9acc10cb19")
+			(uuid "90f9fbc6-572a-4902-b05b-79bd66ba1946")
 			(effects
 				(font
 					(size 1 1)
@@ -1073,7 +1073,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "1b0fff11-901e-4ba5-bb3d-9a42b051c868")
+			(uuid "5f109f2a-2bad-4116-92f5-16b61782fe6c")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1086,7 +1086,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "fc845875-62f2-4b81-bf6d-349bbdb917f3")
+			(uuid "bf0887b8-5dd9-4852-92dc-81b2da2c5d47")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1153,14 +1153,14 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "41aa26a8-9867-42a5-b6e2-68e2e207915b")
-		(at 137.63 81.25 -90)
+		(at 138 81.25 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J7"
 			(at 0 -2 90)
 			(layer "F.SilkS")
 			(hide yes)
-			(uuid "67aafb69-c5fd-4127-b752-7fd7a5ab7694")
+			(uuid "337af1d9-e2d1-4ea6-a529-56b121b5c394")
 			(effects
 				(font
 					(size 1 1)
@@ -1172,7 +1172,7 @@
 			(at 0 2.54 90)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "f55fc2d4-223f-4248-afd8-cfc19f14136e")
+			(uuid "f2ff2b24-9c0c-4ea6-a0ef-9254b0c0f85f")
 			(effects
 				(font
 					(size 1 1)
@@ -1185,7 +1185,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "0793ec14-4c69-4aa7-88d8-9332fb28ae48")
+			(uuid "1ea51788-d46d-4968-a3e8-abedd43f1b54")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1198,7 +1198,7 @@
 			(unlocked yes)
 			(layer "F.Fab")
 			(hide yes)
-			(uuid "30d4b591-3b66-466f-ac8c-9f0011efecd5")
+			(uuid "7dc61dcd-108b-4f89-8a87-727be7086f5c")
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1363,7 +1363,7 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at 0 0 270)
+			(at 0 0.63 270)
 			(size 1 2)
 			(layers "F.Cu" "F.Mask")
 			(roundrect_rratio 0.25)
@@ -1922,7 +1922,7 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "75d4ebe9-877f-4f03-b4fa-4c8fbeed37fa")
-		(at 137.63 88.87 -90)
+		(at 138 88.87 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J9"
@@ -2196,7 +2196,7 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "8ef1f60f-5fe7-4ba9-a3bd-dbc2134e61ec")
-		(at 137.63 86.33 -90)
+		(at 138 86.33 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J8"
@@ -2998,7 +2998,7 @@
 	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
 		(layer "F.Cu")
 		(uuid "e7b9ad6d-6a7a-4be0-865a-8fb83bb9f929")
-		(at 152.63 86.33 -90)
+		(at 152 86.33 -90)
 		(descr "Wire Pad, Square, SMD Pad,  1mm x 2mm")
 		(tags "MeasurementPoint Square SMDPad 1mmx2mm ")
 		(property "Reference" "J12"
@@ -9509,20 +9509,20 @@
 		(uuid "d330b49e-4178-41c6-9554-b43f2daf84a8")
 	)
 	(segment
-		(start 144.145 92.275)
-		(end 144.145 92.725)
+		(start 144.145 91.645)
+		(end 152 83.79)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/SCL0")
-		(uuid "6838784c-0cf9-44eb-870b-cac51e2e1571")
+		(uuid "725aadfb-e63b-4812-a1d8-3a9597851c61")
 	)
 	(segment
-		(start 152.63 83.79)
-		(end 144.145 92.275)
+		(start 144.145 92.725)
+		(end 144.145 91.645)
 		(width 0.2)
 		(layer "F.Cu")
 		(net "/SCL0")
-		(uuid "a9d496b6-0517-4d9f-b409-f38623145dc6")
+		(uuid "9d0c438e-87ea-4178-9c46-c1cc5072ddca")
 	)
 	(segment
 		(start 160.860886 75.45)
