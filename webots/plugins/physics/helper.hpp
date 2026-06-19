@@ -27,6 +27,7 @@
 // Hackflight
 #define _MAIN
 #include <mixers/bfquadx.hpp>
+#include <sim/demixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
 
@@ -98,7 +99,7 @@ class PluginHelper {
             -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
-                    hf::MixBFQuadX);
+                    hf::MixBFQuadX, hf::DemixBFQuadX);
 
             return simulator_.dynamics.state;
         }

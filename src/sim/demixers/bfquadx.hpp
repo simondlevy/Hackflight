@@ -41,4 +41,69 @@ namespace hf {
 
     };
 
+    auto DemixBFQuadX(const float * motorvals) -> Setpoint
+    {
+        (void)motorvals;
+
+        static constexpr double kB = 1.3e-8;  // thrust coefficient B [F=b*w^2]
+        static constexpr double kD = 3.9e-11; // drag coefficient D [T=d*w^2] for yaw
+
+        static constexpr double kRho = 1.225; // air density
+
+        double u1 = 0;
+        double u2 = 0;
+        double u3 = 0;
+        double u4 = 0;
+
+        double omega = 0;
+        double omega2 = 0;
+
+        omega = motorvals[0] * 2 * M_PI / 60;
+        omega2 = kRho * omega * omega; 
+        u1 += kB * omega2;
+        u2 += kB * omega2 * -1;
+        u3 += kB * omega2 * +1;
+        u4 -= kD * omega2 * -1;
+
+        omega = motorvals[1] * 2 * M_PI / 60;
+        omega2 = kRho * omega * omega; 
+        u1 += kB * omega2;
+        u2 += kB * omega2 * -1;
+        u3 += kB * omega2 * -1;
+        u4 -= kD * omega2 * +1;
+
+        omega = motorvals[2] * 2 * M_PI / 60;
+        omega2 = kRho * omega * omega; 
+        u1 += kB * omega2;
+        u2 += kB * omega2 * +1;
+        u3 += kB * omega2 * +1;
+        u4 -= kD * omega2 * +1;
+
+        omega = motorvals[3] * 2 * M_PI / 60;
+        omega2 = kRho * omega * omega; 
+        u1 += kB * omega2;
+        u2 += kB * omega2 * +1;
+        u3 += kB * omega2 * -1;
+        u4 -= kD * omega2 * -1;
+
+        /*
+        for (int i=0; i<4; ++i) {
+
+            // RPM => rad/sec
+            const auto omega = motorvals[i] * 2 * M_PI / 60;
+
+            // Thrust is squared rad/sec scaled by air density
+            const auto omega2 = kRho * omega * omega; 
+
+            // Multiply by thrust coefficient
+            u1 += kB * omega2;                  
+            u2 += kB * omega2 * roll[i];
+            u3 += kB * omega2 * pitch[i];
+            u4 += kD * omega2 * -yaw[i];
+        }*/
+
+
+        return Setpoint(u1, u2, u3, u4);
+    }
+
 } // namespace hf

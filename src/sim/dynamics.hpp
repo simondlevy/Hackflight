@@ -101,24 +101,10 @@ namespace hf {
                     const int8_t * yaw,
                     const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
-                const auto cphi = cos(dyn.state.phi);
-                const auto cnphi = cos(-dyn.state.phi);
-                const auto snphi = sin(-dyn.state.phi);
-                const auto ctheta = cos(dyn.state.theta);
-                const auto stheta = sin(dyn.state.theta);
-                const auto cpsi = cos(dyn.state.psi);
-                const auto spsi = sin(dyn.state.psi);
-
                 const auto b = vparams.b;
                 const auto d = vparams.d;
-                const auto I = vparams.I;
-                const auto l = vparams.l;
-                const auto m = vparams.m;
 
-                const auto s = dyn.state;
-                const auto ds = dyn.dstate_;
-
-                // Equation 6 ---------------------------------------
+                // Equation 6 ------------------------------------------------
 
                 double u1=0, u2=0, u3=0, u4=0;
 
@@ -136,6 +122,23 @@ namespace hf {
                     u3 += b * omega2 * pitch[i];
                     u4 += d * omega2 * -yaw[i];
                 }
+
+                // -----------------------------------------------------------
+
+                const auto cphi = cos(dyn.state.phi);
+                const auto cnphi = cos(-dyn.state.phi);
+                const auto snphi = sin(-dyn.state.phi);
+                const auto ctheta = cos(dyn.state.theta);
+                const auto stheta = sin(dyn.state.theta);
+                const auto cpsi = cos(dyn.state.psi);
+                const auto spsi = sin(dyn.state.psi);
+
+                const auto I = vparams.I;
+                const auto l = vparams.l;
+                const auto m = vparams.m;
+
+                const auto s = dyn.state;
+                const auto ds = dyn.dstate_;
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 

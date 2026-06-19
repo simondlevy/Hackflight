@@ -61,8 +61,11 @@ namespace hf {
                     const Mode mode,
                     const Setpoint & setpoint,
                     MixerFun mixer_fun,
+                    DemixerFun demixer_fun,
                     const float framerate=32) -> Simulator 
             {
+                (void)demixer_fun;
+
                 const auto dt = 1/(float)kPidFastFreq;
 
                 auto pidControl = sim.pid_controller;
