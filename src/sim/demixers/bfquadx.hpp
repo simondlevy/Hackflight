@@ -42,7 +42,6 @@ namespace hf {
 
             static auto demix(const float * rpms) -> Setpoint
             {
-                double omega = 0;
                 double omega2 = 0;
 
                 double t = 0;
@@ -58,22 +57,19 @@ namespace hf {
                 p += kB * omega2;
                 y += kD * omega2;
 
-                omega = rpms[1] * 2 * M_PI / 60;
-                omega2 = kRho * omega * omega; 
+                omega2 = GetOmega2(rpms[1]);
                 t += kB * omega2;
                 r -= kB * omega2;
                 p -= kB * omega2;
                 y -= kD * omega2;
 
-                omega = rpms[2] * 2 * M_PI / 60;
-                omega2 = kRho * omega * omega; 
+                omega2 = GetOmega2(rpms[2]);
                 t += kB * omega2;
                 r += kB * omega2;
                 p += kB * omega2;
                 y -= kD * omega2;
 
-                omega = rpms[3] * 2 * M_PI / 60;
-                omega2 = kRho * omega * omega; 
+                omega2 = GetOmega2(rpms[3]);
                 t += kB * omega2;
                 r += kB * omega2;
                 p -= kB * omega2;
