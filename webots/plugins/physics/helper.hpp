@@ -98,7 +98,7 @@ class PluginHelper {
             -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
-                    hf::BFQuadX);
+                    hf::MixBFQuadX);
 
             return simulator_.dynamics.state;
         }

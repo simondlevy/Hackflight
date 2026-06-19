@@ -70,7 +70,7 @@ namespace hf {
     };
 
 
-    float * BFQuadX(const Setpoint & setpoint)
+    float * MixBFQuadX(const Setpoint & setpoint)
     {
         const auto t = setpoint.thrust;
         const auto r = setpoint.roll;

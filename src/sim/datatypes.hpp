@@ -86,4 +86,7 @@ namespace hf {
                 : x(x), dx(dx), y(y), dy(dy), z(z), dz(dz), phi(phi),
                 dphi(dphi), theta(theta), dtheta(dtheta), psi(psi), dpsi(dpsi) {}
     };
-}
+
+    typedef Setpoint & (*DemixerFun)(const float * motorvals);
+
+} // namespace hf
