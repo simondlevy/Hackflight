@@ -81,12 +81,12 @@ namespace hf {
         const auto p = setpoint.pitch;
         const auto y = setpoint.yaw;
 
-        static float motors[4] = {
-            t - r + p - y,
-            t - r - p + y,
-            t + r + p + y,
-            t - r - p - y
-        };
+        static float motors[4];
+
+        motors[0] = t - r + p - y;
+        motors[1] = t - r - p + y;
+        motors[2] = t + r + p + y;
+        motors[3] = t + r - p - y;
 
         return motors;
     }

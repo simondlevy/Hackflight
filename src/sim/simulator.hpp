@@ -98,13 +98,11 @@ namespace hf {
 
                         const auto motorvals = mixer_fun(scaled_setpoint);
 
-                        printf("%f (%f)\n", motorvals[0], mixer.motorvals[0]);
-
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
                             dynamics = Dynamics::Update(dynamics,
                                     kVehicleParams, 1 / kDynamicsFreq,
-                                    mixer.motorvals, 4, mixer.roll,
+                                    motorvals, 4, mixer.roll,
                                     mixer.pitch, mixer.yaw);
                         }
                     }
