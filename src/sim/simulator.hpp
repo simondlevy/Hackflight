@@ -98,11 +98,12 @@ namespace hf {
 
                         const auto motorvals = mixer_fun(scaled_setpoint);
 
+                        const auto forces = demixer_fun(motorvals);
+
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
                             dynamics = Dynamics::Update(dynamics,
-                                    kVehicleParams, 1 / kDynamicsFreq,
-                                    motorvals, 4, roll, pitch, yaw);
+                                    kVehicleParams, 1 / kDynamicsFreq, forces);
                         }
                     }
                 }
