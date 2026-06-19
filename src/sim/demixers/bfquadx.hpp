@@ -31,15 +31,17 @@ namespace hf {
 
     class BFQuadXDemixer {
 
-        public:
+        private:
 
-            static auto demix(const float * motorvals) -> Setpoint
-            {
                 static constexpr double kB = 1.3e-8;  // thrust coefficient B [F=b*w^2]
                 static constexpr double kD = 3.9e-11; // drag coefficient D [T=d*w^2] for yaw
 
                 static constexpr double kRho = 1.225; // air density
 
+        public:
+
+            static auto demix(const float * rpms) -> Setpoint
+            {
                 double omega = 0;
                 double omega2 = 0;
 
@@ -50,28 +52,27 @@ namespace hf {
 
                 // Equation 6 ------------------------------------------------
 
-                omega = motorvals[0] * 2 * M_PI / 60;
-                omega2 = kRho * omega * omega; 
+                omega2 = GetOmega2(rpms[0]);
                 t += kB * omega2;
                 r -= kB * omega2;
                 p += kB * omega2;
                 y += kD * omega2;
 
-                omega = motorvals[1] * 2 * M_PI / 60;
+                omega = rpms[1] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
                 r -= kB * omega2;
                 p -= kB * omega2;
                 y -= kD * omega2;
 
-                omega = motorvals[2] * 2 * M_PI / 60;
+                omega = rpms[2] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
                 r += kB * omega2;
                 p += kB * omega2;
                 y -= kD * omega2;
 
-                omega = motorvals[3] * 2 * M_PI / 60;
+                omega = rpms[3] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
                 r += kB * omega2;
@@ -82,6 +83,13 @@ namespace hf {
             }
 
         private:
+
+            static auto GetOmega2(const double rpm) -> double
+            {
+                const auto omega = rpm * 2 * M_PI / 60;
+
+                return kRho * omega * omega;
+            }
 
     };
 
