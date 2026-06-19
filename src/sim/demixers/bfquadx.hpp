@@ -29,52 +29,57 @@
 
 namespace hf {
 
-    auto DemixBFQuadX(const float * motorvals) -> Setpoint
-    {
-        static constexpr double kB = 1.3e-8;  // thrust coefficient B [F=b*w^2]
-        static constexpr double kD = 3.9e-11; // drag coefficient D [T=d*w^2] for yaw
+    class BFQuadXDemixer {
 
-        static constexpr double kRho = 1.225; // air density
+        public:
 
-        double omega = 0;
-        double omega2 = 0;
+            static auto demix(const float * motorvals) -> Setpoint
+            {
+                static constexpr double kB = 1.3e-8;  // thrust coefficient B [F=b*w^2]
+                static constexpr double kD = 3.9e-11; // drag coefficient D [T=d*w^2] for yaw
 
-        double t = 0;
-        double r = 0;
-        double p = 0;
-        double y = 0;
+                static constexpr double kRho = 1.225; // air density
 
-        // Equation 6 ------------------------------------------------
+                double omega = 0;
+                double omega2 = 0;
 
-        omega = motorvals[0] * 2 * M_PI / 60;
-        omega2 = kRho * omega * omega; 
-        t += kB * omega2;
-        r += kB * omega2 * -1;
-        p += kB * omega2 * +1;
-        y -= kD * omega2 * -1;
+                double t = 0;
+                double r = 0;
+                double p = 0;
+                double y = 0;
 
-        omega = motorvals[1] * 2 * M_PI / 60;
-        omega2 = kRho * omega * omega; 
-        t += kB * omega2;
-        r += kB * omega2 * -1;
-        p += kB * omega2 * -1;
-        y -= kD * omega2 * +1;
+                // Equation 6 ------------------------------------------------
 
-        omega = motorvals[2] * 2 * M_PI / 60;
-        omega2 = kRho * omega * omega; 
-        t += kB * omega2;
-        r += kB * omega2 * +1;
-        p += kB * omega2 * +1;
-        y -= kD * omega2 * +1;
+                omega = motorvals[0] * 2 * M_PI / 60;
+                omega2 = kRho * omega * omega; 
+                t += kB * omega2;
+                r += kB * omega2 * -1;
+                p += kB * omega2 * +1;
+                y -= kD * omega2 * -1;
 
-        omega = motorvals[3] * 2 * M_PI / 60;
-        omega2 = kRho * omega * omega; 
-        t += kB * omega2;
-        r += kB * omega2 * +1;
-        p += kB * omega2 * -1;
-        y -= kD * omega2 * -1;
+                omega = motorvals[1] * 2 * M_PI / 60;
+                omega2 = kRho * omega * omega; 
+                t += kB * omega2;
+                r += kB * omega2 * -1;
+                p += kB * omega2 * -1;
+                y -= kD * omega2 * +1;
 
-        return Setpoint(t, r, p, y);
-    }
+                omega = motorvals[2] * 2 * M_PI / 60;
+                omega2 = kRho * omega * omega; 
+                t += kB * omega2;
+                r += kB * omega2 * +1;
+                p += kB * omega2 * +1;
+                y -= kD * omega2 * +1;
+
+                omega = motorvals[3] * 2 * M_PI / 60;
+                omega2 = kRho * omega * omega; 
+                t += kB * omega2;
+                r += kB * omega2 * +1;
+                p += kB * omega2 * -1;
+                y -= kD * omega2 * -1;
+
+                return Setpoint(t, r, p, y);
+            }
+    };
 
 } // namespace hf
