@@ -35,10 +35,6 @@ namespace hf {
 
             uint8_t motorcount = 4;
 
-            int8_t roll[4]  = {-1, -1, +1, +1};
-            int8_t pitch[4] = {+1, -1, +1, -1};
-            int8_t yaw[4]   = {-1, +1, +1, -1};
-
             float motorvals[4];
 
             Mixer() = default;

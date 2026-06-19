@@ -23,10 +23,10 @@
 #include <time.h>
 
 #include <datatypes.hpp>
-#include <mixers/bfquadx.hpp>
 #include <num.hpp>
 #include <pidcontrol/hover.hpp>
 #include <sim/datatypes.hpp>
+#include <sim/demixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/vehicles/apexquad.hpp>
 
@@ -93,17 +93,13 @@ namespace hf {
                             1000 * pidControl.setpoint.yaw
                         };
 
-                        // Run mixer on setpoint to get motor RPMs
-                        const auto  mixer = hf::Mixer::Run(scaled_setpoint);
-
                         const auto motorvals = mixer_fun(scaled_setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
                             dynamics = Dynamics::Update(dynamics,
                                     kVehicleParams, 1 / kDynamicsFreq,
-                                    motorvals, 4, mixer.roll,
-                                    mixer.pitch, mixer.yaw);
+                                    motorvals, 4, roll, pitch, yaw);
                         }
                     }
                 }
