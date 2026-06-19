@@ -53,33 +53,36 @@ namespace hf {
                 omega = motorvals[0] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
-                r += kB * omega2 * -1;
-                p += kB * omega2 * +1;
-                y -= kD * omega2 * -1;
+                r -= kB * omega2;
+                p += kB * omega2;
+                y += kD * omega2;
 
                 omega = motorvals[1] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
-                r += kB * omega2 * -1;
-                p += kB * omega2 * -1;
-                y -= kD * omega2 * +1;
+                r -= kB * omega2;
+                p -= kB * omega2;
+                y -= kD * omega2;
 
                 omega = motorvals[2] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
-                r += kB * omega2 * +1;
-                p += kB * omega2 * +1;
-                y -= kD * omega2 * +1;
+                r += kB * omega2;
+                p += kB * omega2;
+                y -= kD * omega2;
 
                 omega = motorvals[3] * 2 * M_PI / 60;
                 omega2 = kRho * omega * omega; 
                 t += kB * omega2;
-                r += kB * omega2 * +1;
-                p += kB * omega2 * -1;
-                y -= kD * omega2 * -1;
+                r += kB * omega2;
+                p -= kB * omega2;
+                y += kD * omega2;
 
                 return Setpoint(t, r, p, y);
             }
+
+        private:
+
     };
 
 } // namespace hf
