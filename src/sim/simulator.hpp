@@ -60,6 +60,7 @@ namespace hf {
                     const Simulator & sim,
                     const Mode mode,
                     const Setpoint & setpoint,
+                    MixerFun mixer_fun,
                     const float framerate=32) -> Simulator 
             {
                 const auto dt = 1/(float)kPidFastFreq;
@@ -95,6 +96,10 @@ namespace hf {
                         // Run mixer on setpoint to get motor RPMs
                         static hf::Mixer _mixer;
                         _mixer = hf::Mixer::Run(_mixer, scaled_setpoint);
+
+                        const auto motorvals = mixer_fun(scaled_setpoint);
+
+                        printf("%f (%f)\n", motorvals[0], _mixer.motorvals[0]);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {

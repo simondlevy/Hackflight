@@ -26,6 +26,7 @@
 
 // Hackflight
 #define _MAIN
+#include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
 
@@ -96,7 +97,8 @@ class PluginHelper {
         auto RunSimulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
-            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint);
+            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
+                    hf::BFQuadX);
 
             return simulator_.dynamics.state;
         }
