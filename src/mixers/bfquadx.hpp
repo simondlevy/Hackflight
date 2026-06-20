@@ -33,8 +33,6 @@ namespace hf {
 
         public:
 
-            uint8_t motorcount = 4;
-
             float motorvals[4];
 
             Mixer() = default;
@@ -68,23 +66,5 @@ namespace hf {
                 return Mixer(m1, m2, m3, m4);
             }
     };
-
-
-    float * MixBFQuadX(const Setpoint & setpoint)
-    {
-        const auto t = setpoint.thrust;
-        const auto r = setpoint.roll;
-        const auto p = setpoint.pitch;
-        const auto y = setpoint.yaw;
-
-        static float motors[4];
-
-        motors[0] = t - r + p - y;
-        motors[1] = t - r - p + y;
-        motors[2] = t + r + p + y;
-        motors[3] = t + r - p - y;
-
-        return motors;
-    }
 
 } // namespace hf

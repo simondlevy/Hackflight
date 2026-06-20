@@ -57,7 +57,10 @@ namespace hf {
                     kRollPitchYawScale * setpoint.yaw
                 };
 
-                const auto motor_rpms = MixBFQuadX(setpoint_rpms);
+                static Mixer mixer_;
+                mixer_ = hf::Mixer::Run(setpoint_rpms);
+
+                const auto motor_rpms = mixer_.motorvals;
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
@@ -73,6 +76,7 @@ namespace hf {
 
                 return Setpoint(t, r, p, y);
             }
+
 
     }; // class ApexQuad
 
