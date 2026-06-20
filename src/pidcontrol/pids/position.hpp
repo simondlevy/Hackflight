@@ -30,9 +30,9 @@ namespace hf {
 
             static constexpr float kIntegralLimit = 5000;
 
-        public:
-
             static constexpr float kMaxDemandDegrees = 30;
+
+        public:
 
             float output;
 
@@ -68,6 +68,11 @@ namespace hf {
                     0;
 
                 return PositionController(output, integral);
+            }
+
+            static auto bypass(const float in) -> float
+            {
+                return in * kMaxDemandDegrees;
             }
 
         private:

@@ -63,7 +63,8 @@ namespace hf {
                     const float dt,
                     const Mode mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in) -> HoverPidController
+                    const Setpoint & setpoint_in,
+                    const bool hold_position=true) -> HoverPidController
             {
                 // Altitude hold ---------------------------------------------
 
@@ -110,11 +111,16 @@ namespace hf {
                     PositionController::Run(pid.position_x_pid_, airborne, dt,
                             setpoint_in.pitch, dxb);
 
+                const auto roll_demand = hold_position ? position_y_pid.output :
+                    PositionController::bypass(setpoint_in.roll);
+
+                const auto pitch_demand = hold_position ? position_x_pid.output :
+                    PositionController::bypass(setpoint_in.pitch);
+
                 //  Stabilization ---------------------------------------------
 
                 const auto setpoint_mid = Setpoint(climbrate_pid.output,
-                        position_y_pid.output, position_x_pid.output,
-                        setpoint_in.yaw);
+                        roll_demand, pitch_demand, setpoint_in.yaw);
 
                 const auto stabilizer_pid = StabilizerPidController::Run(
                         pid.stabilizer_pid_, airborne, dt, state, setpoint_mid);
