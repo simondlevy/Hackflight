@@ -14,7 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-PROTO Apex2 [
+PROTO NewApex2 [
 
   field SFColor frame_color  0 0 0
   field SFVec3f frame_translation 0 0 0.0
@@ -51,8 +51,8 @@ DEF ROBOT Robot {
         rotation IS frame_rotation
         controller "<extern>"
         supervisor TRUE
-        name "Apex2"
-        model "Apex2"
+        name "NewApex2"
+        model "NewApex2"
         children [
         DEF BODY Pose {
             translation 0 0 0
