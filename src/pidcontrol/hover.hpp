@@ -118,7 +118,7 @@ namespace hf {
 
                 //  Stabilization ---------------------------------------------
 
-                const auto setpoint_mid = Setpoint(althold_pid.thrust,
+                const auto setpoint_mid = Setpoint(climbrate_pid.output, //althold_pid.thrust,
                         position_y_pid.output, position_x_pid.output,
                         setpoint_in.yaw);
 
