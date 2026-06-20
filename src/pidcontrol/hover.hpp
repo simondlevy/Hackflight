@@ -17,6 +17,8 @@
 #pragma once
 
 #include <pidcontrol/althold.hpp>
+#include <pidcontrol/pids/altitude.hpp>
+#include <pidcontrol/pids/climbrate.hpp>
 #include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/stabilizer.hpp>
 
@@ -26,6 +28,10 @@ namespace hf {
 
         private:
 
+            static constexpr float kAltitudeMinM = 0.2;
+            static constexpr float kAltitudemaxM = 1.0;
+            static constexpr float kAltitudeInitM = 0.4;
+            static constexpr float kAltitudeIncMps = 0.2;
             static constexpr float kAltitudeLandingM = 0.03;
 
         public:
@@ -38,6 +44,8 @@ namespace hf {
                     const HoverPidController& other) = default;
 
             HoverPidController(
+                    const AltitudeController & altitude_pid,
+                    const ClimbRateController & climbrate_pid,
                     const AltHoldPidController & althold_pid,
                     const PositionController & position_x_pid,
                     const PositionController & position_y_pid,
@@ -45,6 +53,8 @@ namespace hf {
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
                 alt_hold_pid_(althold_pid),
+                altitude_pid_(altitude_pid),
+                climbrate_pid_(climbrate_pid),
                 position_x_pid_(position_x_pid),
                 position_y_pid_(position_y_pid),
                 stabilizer_pid_(stabilizer_pid) {}
@@ -91,14 +101,22 @@ namespace hf {
                 const auto stabilizer_pid = StabilizerPidController::Run(
                         pid.stabilizer_pid_, airborne, dt, state, setpoint_mid);
 
-                return HoverPidController(althold_pid,
-                        position_x_pid, position_y_pid,
-                        stabilizer_pid, stabilizer_pid.setpoint);
+                return HoverPidController(
+                        pid.altitude_pid_,
+                        pid.climbrate_pid_,
+                        althold_pid,
+                        position_x_pid,
+                        position_y_pid,
+                        stabilizer_pid,
+                        stabilizer_pid.setpoint);
             }
 
         private:
 
             AltHoldPidController alt_hold_pid_;
+
+            AltitudeController altitude_pid_;
+            ClimbRateController climbrate_pid_;
 
             PositionController position_x_pid_;
             PositionController position_y_pid_;
