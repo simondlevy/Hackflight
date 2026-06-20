@@ -24,6 +24,10 @@ namespace hf {
 
     class HoverPidController {
 
+        private:
+
+            static constexpr float kAltitudeLandingM = 0.03;
+
         public:
 
             Setpoint setpoint;
@@ -57,8 +61,7 @@ namespace hf {
                 const auto althold_pid = AltHoldPidController::Run(
                         pid.alt_hold_pid_, dt, mode, state, setpoint_in);
 
-                const auto airborne =
-                    state.z > AltHoldPidController::kAltitudeLandingM;
+                const auto airborne = state.z > kAltitudeLandingM;
 
                 // Position hold ---------------------------------------------
 
