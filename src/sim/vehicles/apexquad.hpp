@@ -30,6 +30,9 @@ namespace hf {
             // Approximate thrust RPM needed when in perfect hover
             static constexpr float kVehicleHoverRpm = 35546;
 
+            static constexpr float kThrustScale = 8000;
+            static constexpr float kAxisScale = 1000;
+
         public:
 
             static constexpr Dynamics::VehicleParams kVehicleParams = {
@@ -48,10 +51,10 @@ namespace hf {
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    8000 * (setpoint.thrust - 0.5f) + kVehicleHoverRpm,
-                    1000 * setpoint.roll,
-                    1000 * setpoint.pitch,
-                    1000 * setpoint.yaw
+                    kThrustScale * (setpoint.thrust - 0.5f) + kVehicleHoverRpm,
+                    kAxisScale * setpoint.roll,
+                    kAxisScale * setpoint.pitch,
+                    kAxisScale * setpoint.yaw
                 };
 
                 const auto motor_rpms = MixBFQuadX(setpoint_rpms);
