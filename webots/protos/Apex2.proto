@@ -55,14 +55,9 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files/diyquad/apex2-frame.stl" ]
+                          url [ "../meshes/stl_files/apex2/apex2-frame.stl" ]
                       }
- 
-                    #CadShape {
-                    #    url [ "../meshes/collada_files/diyquad.dae" ]
-                    #}
                   }
-
                 ]
         }
 
@@ -178,7 +173,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files//diyquad/prop_cw.stl" ]
+                          url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
                       }
                     }
 
@@ -236,7 +231,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files//diyquad/prop_ccw.stl" ]
+                          url [ "../meshes/stl_files//apex2/prop_ccw.stl" ]
                       }
                     }
 
@@ -291,7 +286,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files//diyquad/prop_ccw.stl" ]
+                          url [ "../meshes/stl_files//apex2/prop_ccw.stl" ]
                       }
                     }
 
@@ -347,7 +342,7 @@ DEF ROBOT Robot {
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files//diyquad/prop_cw.stl" ]
+                          url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
                       }
                     }
 
