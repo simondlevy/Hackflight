@@ -106,10 +106,8 @@ namespace hf {
 
                 const auto setpoint = Setpoint(
                         (rx_setpoint.thrust+1)/2, // [-1,+1] => [0,1]
-                        rx_setpoint.roll *
-                        PositionController::kMaxDemandDegrees,
-                        rx_setpoint.pitch *
-                        PositionController::kMaxDemandDegrees, 
+                        PositionController::bypass(rx_setpoint.roll),
+                        PositionController::bypass(rx_setpoint.pitch),
                         rx_setpoint.yaw);
 
                 stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,

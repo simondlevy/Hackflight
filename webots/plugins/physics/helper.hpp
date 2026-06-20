@@ -94,11 +94,14 @@ class PluginHelper {
             return message;
         }
 
-        auto RunSimulator(const hf::Mode mode, const hf::Setpoint & setpoint)
-            -> hf::SimState
+        auto RunSimulator(
+                hf::EffectorFun effector_fun,
+                const hf::Dynamics::VehicleParams & vehicle_params,
+                const hf::Mode mode,
+                const hf::Setpoint & setpoint) -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
-                    hf::ApexQuad::run, hf::ApexQuad::kVehicleParams);
+                    effector_fun, vehicle_params);
 
             return simulator_.dynamics.state;
         }
