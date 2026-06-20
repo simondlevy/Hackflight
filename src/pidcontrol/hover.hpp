@@ -70,6 +70,18 @@ namespace hf {
             {
                 // Altitude hold ---------------------------------------------
 
+                const auto  altitude_target =
+                    pid.altitude_target_ == 0 ? kAltitudeInitM :
+                    pid.altitude_target_;
+
+                const auto newaltitude_target_ = Num::ConstrainFloat(
+                        altitude_target +
+                        setpoint_in.thrust * kAltitudeIncMps * dt,
+                        kAltitudeMinM, kAltitudemaxM);
+
+                const auto hovering =
+                    mode == kModeHovering || mode == kModeAutonomous;
+
                 const auto althold_pid = AltHoldPidController::Run(
                         pid.alt_hold_pid_, dt, mode, state, setpoint_in);
 

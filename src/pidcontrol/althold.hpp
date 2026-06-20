@@ -72,14 +72,14 @@ namespace hf {
                 const auto hovering =
                     mode == kModeHovering || mode == kModeAutonomous;
 
-                const auto airborne = hovering || (state.z > kAltitudeLandingM);
-
                 const auto altitude_pid =
                     AltitudeController::Run(pid.altitude_pid_, hovering, dt,
                             newaltitude_target_, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::Run(pid.climbrate_pid_, airborne, dt,
+                    ClimbRateController::Run(pid.climbrate_pid_,
+                            hovering || (state.z > kAltitudeLandingM),
+                            dt,
                             altitude_pid.output, state.dz);
 
                 return AltHoldPidController(
@@ -94,7 +94,6 @@ namespace hf {
             float altitude_target_;
 
             AltitudeController altitude_pid_;
-
             ClimbRateController climbrate_pid_;
     };
 }
