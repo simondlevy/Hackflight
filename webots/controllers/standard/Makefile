@@ -29,7 +29,7 @@ run:
         echo "World file" $(WORLD_FILE) "not found";\
 	else \
 	    webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
-		--stdout-redirect ./diyquad.py $(world) &> /dev/null;\
+		--stdout-redirect ./apex2.py $(world) &> /dev/null;\
 	fi
 
 srun:

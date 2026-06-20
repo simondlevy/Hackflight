@@ -3,7 +3,7 @@
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
-EXTERNPROTO "../protos/DiyQuad.proto"
+EXTERNPROTO "../protos/Apex2.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -22,9 +22,9 @@ WorldInfo {
 Viewpoint {
   orientation -0.01328046516868346 0.9999088833488861 0.0024195546878335223 1.7621478075587371
   position 0.056503428167904164 -0.024884200527185308 0.42310193824174747
-  follow "DiyQuad"
+  follow "Apex2"
 }
-DEF robot DiyQuad {
+DEF robot Apex2 {
   hidden linearVelocity_0 1.1840714082130835e-18 1.4153318748712773e-18 0.093713393205779
   hidden angularVelocity_0 -1.841852348816264e-33 -4.1447827396307855e-17 -2.805419841743553e-17
   translation 3.7890285062818673e-20 4.5290619995880873e-20 0.002998828582584928
