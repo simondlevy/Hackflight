@@ -33,6 +33,8 @@ static hf::SpringyReceiver _rxdata;
 
 static hf::QuadDshot _effector;
 
+static const auto kHoldPosition = false;
+
 static void onReceiveRcChannels(
         serialReceiverLayer::rcChannels_t *rcChannels)
 {
@@ -84,7 +86,8 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4,
+            kHoldPosition);
 
     // Run the mixer and motors
     _effector.Run(_fc, setpoint);

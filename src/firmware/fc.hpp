@@ -119,7 +119,8 @@ namespace hf {
             auto Update(
                     const SpringyReceiver & rx,
                     const float * motor_vals,
-                    const uint8_t motor_count) -> Setpoint
+                    const uint8_t motor_count,
+                    const bool hold_position) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
                 AcquireHoverData();
@@ -128,7 +129,7 @@ namespace hf {
 
                 return Update(rxdata.setpoint, rxdata.requested_arming,
                         rxdata.requested_hover, rxdata.timestamp_msec,
-                        motor_vals, motor_count);
+                        motor_vals, motor_count, hold_position);
             } 
 
             auto Update(
@@ -143,7 +144,7 @@ namespace hf {
 
                 return Update(gpdata.setpoint, gpdata.requested_arming,
                         gpdata.requested_hover, gpdata.timestamp_msec,
-                        motor_vals, motor_count);
+                        motor_vals, motor_count, true);
             } 
 
             void AcquireHoverData()
@@ -364,7 +365,8 @@ namespace hf {
                     const bool requested_hover,
                     const uint32_t timestamp_msec,
                     const float * motor_vals,
-                    const uint8_t motor_count) -> Setpoint
+                    const uint8_t motor_count,
+                    const bool hold_position) -> Setpoint
             {
                 RunDelayLoop(micros(), kCoreLoopRate);
 
@@ -374,7 +376,7 @@ namespace hf {
                 AcquireHoverData();
 
                 hover_pid_= HoverPidController::Run(hover_pid_,
-                        GetDt(), mode_, state_, setpoint_in);
+                        GetDt(), mode_, state_, setpoint_in, hold_position);
 
                 const auto setpoint_out = hover_pid_.setpoint;
 
