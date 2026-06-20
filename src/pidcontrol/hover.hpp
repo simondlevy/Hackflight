@@ -16,7 +16,6 @@
 
 #pragma once
 
-#include <pidcontrol/althold.hpp>
 #include <pidcontrol/pids/altitude.hpp>
 #include <pidcontrol/pids/climbrate.hpp>
 #include <pidcontrol/pids/position.hpp>
@@ -47,14 +46,12 @@ namespace hf {
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
-                    const AltHoldPidController & althold_pid,
                     const PositionController & position_x_pid,
                     const PositionController & position_y_pid,
                     const StabilizerPidController & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
                 altitude_target_(altitude_target),
-                alt_hold_pid_(althold_pid),
                 altitude_pid_(altitude_pid),
                 climbrate_pid_(climbrate_pid),
                 position_x_pid_(position_x_pid),
@@ -92,9 +89,6 @@ namespace hf {
                             dt,
                             altitude_pid.output, state.dz);
 
-                const auto althold_pid = AltHoldPidController::Run(
-                        pid.alt_hold_pid_, dt, mode, state, setpoint_in);
-
                 const auto airborne = state.z > kAltitudeLandingM;
 
                 // Position hold ---------------------------------------------
@@ -118,7 +112,7 @@ namespace hf {
 
                 //  Stabilization ---------------------------------------------
 
-                const auto setpoint_mid = Setpoint(climbrate_pid.output, //althold_pid.thrust,
+                const auto setpoint_mid = Setpoint(climbrate_pid.output,
                         position_y_pid.output, position_x_pid.output,
                         setpoint_in.yaw);
 
@@ -129,7 +123,6 @@ namespace hf {
                         new_altitude_target,
                         altitude_pid,
                         climbrate_pid,
-                        althold_pid,
                         position_x_pid,
                         position_y_pid,
                         stabilizer_pid,
@@ -140,12 +133,12 @@ namespace hf {
 
             float altitude_target_;
 
-            AltHoldPidController alt_hold_pid_;
-
             AltitudeController altitude_pid_;
+
             ClimbRateController climbrate_pid_;
 
             PositionController position_x_pid_;
+
             PositionController position_y_pid_;
 
             StabilizerPidController stabilizer_pid_;
