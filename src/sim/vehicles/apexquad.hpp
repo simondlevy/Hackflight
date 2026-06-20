@@ -31,7 +31,7 @@ namespace hf {
             static constexpr float kVehicleHoverRpm = 35546;
 
             static constexpr float kThrustScale = 8000;
-            static constexpr float kAxisScale = 1000;
+            static constexpr float kRollPitchYawScale = 1000;
 
         public:
 
@@ -52,9 +52,9 @@ namespace hf {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
                     kThrustScale * (setpoint.thrust - 0.5f) + kVehicleHoverRpm,
-                    kAxisScale * setpoint.roll,
-                    kAxisScale * setpoint.pitch,
-                    kAxisScale * setpoint.yaw
+                    kRollPitchYawScale * setpoint.roll,
+                    kRollPitchYawScale * setpoint.pitch,
+                    kRollPitchYawScale * setpoint.yaw
                 };
 
                 const auto motor_rpms = MixBFQuadX(setpoint_rpms);
