@@ -19,7 +19,7 @@
 #include <pidcontrol/pids/altitude.hpp>
 #include <pidcontrol/pids/climbrate.hpp>
 #include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/stabilizer.hpp>
+#include <pidcontrol/stabilize.hpp>
 
 namespace hf {
 
