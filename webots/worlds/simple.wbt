@@ -1,19 +1,5 @@
 #VRML_SIM R2025a utf8
 
-#   Copyright (C) 2026 Simon D. Levy
-#
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, in version 3.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program. If not, see <http:--www.gnu.org/licenses/>.
-
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
@@ -34,8 +20,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.025322221061649258 0.9975924519792443 -0.06456070689315853 0.5626381954828487
-  position -1.6102962724122358 -0.003670869695468191 1.0291129258794576
+  orientation -0.01328046516868346 0.9999088833488861 0.0024195546878335223 1.7621478075587371
+  position 0.056503428167904164 -0.024884200527185308 0.42310193824174747
   follow "DiyQuad"
 }
 DEF robot DiyQuad {

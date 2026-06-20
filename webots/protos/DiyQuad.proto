@@ -15,6 +15,7 @@
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 PROTO DiyQuad [
+  field SFColor frame_color  0 0 0
   field SFVec3f translation 0 0 0.0
   field SFRotation rotation 0 0 0 0
   field SFVec3f motor1_translation  0.031 -0.031 0.016  
@@ -43,14 +44,27 @@ DEF ROBOT Robot {
         children [
         DEF BODY Pose {
             translation 0 0 0
+
                 children [
 
-                CadShape {
-                    url [ "../meshes/collada_files/diyquad.dae" ]
-                }
+                    Shape {
+
+                        appearance DEF PLASTIC PBRAppearance {
+                            baseColor IS frame_color
+                            metalness 0
+                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files/diyquad/apex2-frame.stl" ]
+                      }
+ 
+                    #CadShape {
+                    #    url [ "../meshes/collada_files/diyquad.dae" ]
+                    #}
+                  }
 
                 ]
-      }
+        }
 
       DEF emitter Emitter {
         model "radio"
