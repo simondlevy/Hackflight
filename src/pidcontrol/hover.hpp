@@ -74,13 +74,23 @@ namespace hf {
                     pid.altitude_target_ == 0 ? kAltitudeInitM :
                     pid.altitude_target_;
 
-                const auto newaltitude_target_ = Num::ConstrainFloat(
+                const auto new_altitude_target = Num::ConstrainFloat(
                         altitude_target +
                         setpoint_in.thrust * kAltitudeIncMps * dt,
                         kAltitudeMinM, kAltitudemaxM);
 
                 const auto hovering =
                     mode == kModeHovering || mode == kModeAutonomous;
+
+                const auto altitude_pid =
+                    AltitudeController::Run(pid.altitude_pid_, hovering, dt,
+                            new_altitude_target, state.z);
+
+                const auto climbrate_pid =
+                    ClimbRateController::Run(pid.climbrate_pid_,
+                            hovering || (state.z > kAltitudeLandingM),
+                            dt,
+                            altitude_pid.output, state.dz);
 
                 const auto althold_pid = AltHoldPidController::Run(
                         pid.alt_hold_pid_, dt, mode, state, setpoint_in);
@@ -116,9 +126,9 @@ namespace hf {
                         pid.stabilizer_pid_, airborne, dt, state, setpoint_mid);
 
                 return HoverPidController(
-                        pid.altitude_target_,
-                        pid.altitude_pid_,
-                        pid.climbrate_pid_,
+                        new_altitude_target,
+                        altitude_pid,
+                        climbrate_pid,
                         althold_pid,
                         position_x_pid,
                         position_y_pid,
