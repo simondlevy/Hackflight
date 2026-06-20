@@ -44,6 +44,7 @@ namespace hf {
                     const HoverPidController& other) = default;
 
             HoverPidController(
+                    const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
                     const AltHoldPidController & althold_pid,
@@ -52,6 +53,7 @@ namespace hf {
                     const StabilizerPidController & stabilizer_pid,
                     const Setpoint & setpoint)
                 : setpoint(setpoint),
+                altitude_target_(altitude_target),
                 alt_hold_pid_(althold_pid),
                 altitude_pid_(altitude_pid),
                 climbrate_pid_(climbrate_pid),
@@ -102,6 +104,7 @@ namespace hf {
                         pid.stabilizer_pid_, airborne, dt, state, setpoint_mid);
 
                 return HoverPidController(
+                        pid.altitude_target_,
                         pid.altitude_pid_,
                         pid.climbrate_pid_,
                         althold_pid,
@@ -112,6 +115,8 @@ namespace hf {
             }
 
         private:
+
+            float altitude_target_;
 
             AltHoldPidController alt_hold_pid_;
 
