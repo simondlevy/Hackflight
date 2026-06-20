@@ -58,7 +58,7 @@ namespace hf {
                         pid.alt_hold_pid_, dt, mode, state, setpoint_in);
 
                 const auto airborne =
-                    state.z > AltHoldPidController::kLandingM;
+                    state.z > AltHoldPidController::kAltitudeLandingM;
 
                 // Position hold ---------------------------------------------
 

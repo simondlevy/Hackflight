@@ -25,14 +25,14 @@ namespace hf {
 
         private:
 
-            static constexpr float kMinM = 0.2;
-            static constexpr float kMaxM = 1.0;
-            static constexpr float kInitM = 0.4;
-            static constexpr float kIncMps = 0.2;
+            static constexpr float kAltitudeMinM = 0.2;
+            static constexpr float kAltitudemaxM = 1.0;
+            static constexpr float kAltitudeInitM = 0.4;
+            static constexpr float kAltitudeIncMps = 0.2;
 
         public:
 
-            static constexpr float kLandingM = 0.03;
+            static constexpr float kAltitudeLandingM = 0.03;
 
             float thrust;
 
@@ -61,18 +61,18 @@ namespace hf {
                 // Altitude hold ---------------------------------------------
 
                 const auto  altitude_target =
-                    pid.altitude_target_ == 0 ? kInitM :
+                    pid.altitude_target_ == 0 ? kAltitudeInitM :
                     pid.altitude_target_;
 
                 const auto newaltitude_target_ = Num::ConstrainFloat(
                         altitude_target +
-                        setpoint_in.thrust * kIncMps * dt,
-                        kMinM, kMaxM);
+                        setpoint_in.thrust * kAltitudeIncMps * dt,
+                        kAltitudeMinM, kAltitudemaxM);
 
                 const auto hovering =
                     mode == kModeHovering || mode == kModeAutonomous;
 
-                const auto airborne = hovering || (state.z > kLandingM);
+                const auto airborne = hovering || (state.z > kAltitudeLandingM);
 
                 const auto altitude_pid =
                     AltitudeController::Run(pid.altitude_pid_, hovering, dt,
