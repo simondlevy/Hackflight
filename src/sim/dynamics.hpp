@@ -172,6 +172,13 @@ namespace hf {
 
             } // update
 
+            static auto GetOmega2(const double rpm) -> double
+            {
+                const auto omega = rpm * 2 * M_PI / 60;
+
+                return omega * omega;
+            }
+
         private:
 
             // Vehicle state first derivative (Equation 12)

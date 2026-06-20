@@ -61,10 +61,10 @@ namespace hf {
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o1 = GetOmega2(motor_rpms[0]);
-                const auto o2 = GetOmega2(motor_rpms[1]);
-                const auto o3 = GetOmega2(motor_rpms[2]);
-                const auto o4 = GetOmega2(motor_rpms[3]);
+                const auto o1 = Dynamics::GetOmega2(motor_rpms[0]);
+                const auto o2 = Dynamics::GetOmega2(motor_rpms[1]);
+                const auto o3 = Dynamics::GetOmega2(motor_rpms[2]);
+                const auto o4 = Dynamics::GetOmega2(motor_rpms[3]);
 
                 const auto t = o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
@@ -74,15 +74,6 @@ namespace hf {
                 return Setpoint(t, r, p, y);
             }
 
-        private:
-
-            static auto GetOmega2(const double rpm) -> double
-            {
-                const auto omega = rpm * 2 * M_PI / 60;
-
-                return omega * omega;
-            }
-
-    };
+    }; // class ApexQuad
 
 } // namespace hf
