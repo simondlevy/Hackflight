@@ -16,6 +16,7 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <sim/vehicles/apexquad.hpp>
 #include "../helper.hpp"
 
 static PluginHelper * _helper;
@@ -25,7 +26,9 @@ DLLEXPORT void webots_physics_step()
 {
     const auto message = PluginHelper::GetMessage();
 
-    const auto state = _helper->RunSimulator(message.mode, message.setpoint);
+    const auto state = _helper->RunSimulator(
+            hf::ApexQuad::run, hf::ApexQuad::kVehicleParams,
+            message.mode, message.setpoint);
 
     _helper->SetDbodyFromState(state);
 }
