@@ -15,6 +15,7 @@
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
 PROTO Apex2 [
+
   field SFColor frame_color  0 0 0
   field SFVec3f translation 0 0 0.0
   field SFRotation rotation 0 0 0 0
@@ -29,6 +30,9 @@ PROTO Apex2 [
   field SFFloat prop_fast_helix_threshold 50
   field SFFloat motor_max_velocity 100
   field SFFloat motor_max_torque 30
+  field SFColor motor_color 0.8 0.0 0.0
+  field SFFloat motor_metalness 0.9
+
 ]
 
 {
@@ -127,7 +131,24 @@ DEF ROBOT Robot {
 
     # Motor 1 ----------------------------------------------------------------
 
-    DEF M1 Propeller {
+      DEF MOTOR1 Solid {
+        translation IS motor1_translation
+        name "motor1"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS motor_color
+            metalness IS motor_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/motor.stl" ]
+            }
+          }
+        ] 
+      }
+
+
+    DEF PROP1 Propeller {
         shaftAxis 0 0 1
             centerOfThrust IS motor1_translation
             thrustConstants 0 0
@@ -184,7 +205,7 @@ DEF ROBOT Robot {
 
      # Motor 2 ----------------------------------------------------------------
 
-    DEF M2 Propeller {
+    DEF PROP2 Propeller {
         shaftAxis 0 0 1
             centerOfThrust IS motor2_translation
             thrustConstants 0 0
@@ -241,7 +262,7 @@ DEF ROBOT Robot {
 
    # Motor 3 ----------------------------------------------------------------
 
-    DEF M3 Propeller {
+    DEF PROP3 Propeller {
         shaftAxis 0 0 1
             centerOfThrust IS motor3_translation
             thrustConstants 0 0
@@ -296,7 +317,7 @@ DEF ROBOT Robot {
 
     # Motor 4 ----------------------------------------------------------------
 
-    DEF M4 Propeller {
+    DEF PROP4 Propeller {
         shaftAxis 0 0 1
             centerOfThrust IS motor4_translation
             thrustConstants 0 0
