@@ -98,7 +98,7 @@ class PluginHelper {
             -> hf::SimState
         {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
-                    hf::ApexQuad::run);
+                    hf::ApexQuad::run, hf::ApexQuad::kVehicleParams);
 
             return simulator_.dynamics.state;
         }

@@ -27,7 +27,6 @@
 #include <pidcontrol/hover.hpp>
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
-#include <sim/vehicles/apexquad.hpp>
 
 namespace hf {
 
@@ -59,7 +58,8 @@ namespace hf {
                     const Simulator & sim,
                     const Mode mode,
                     const Setpoint & setpoint,
-                    DemixerFun demixer_fun,
+                    EffectorFun effector_fun,
+                    const Dynamics::VehicleParams & vehicle_params,
                     const float framerate=32) -> Simulator 
             {
                 const auto dt = 1/(float)kPidFastFreq;
@@ -83,15 +83,14 @@ namespace hf {
                         pidControl = HoverPidController::Run(
                                 pidControl, dt, mode, state, setpoint);
 
-                        const auto forces = demixer_fun(pidControl.setpoint);
+                        // Run PID-control output through vehicle effector
+                        // dynamics to get thrust, roll, pitch, yaw forces
+                        const auto forces = effector_fun(pidControl.setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
-                            dynamics = Dynamics::Update(
-                                    dynamics,
-                                    ApexQuad::kVehicleParams,
-                                    1 / kDynamicsFreq,
-                                    forces);
+                            dynamics = Dynamics::Update(dynamics,
+                                    vehicle_params, 1 / kDynamicsFreq, forces);
                         }
                     }
                 }
