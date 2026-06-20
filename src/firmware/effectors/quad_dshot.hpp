@@ -45,7 +45,7 @@ namespace hf {
 
             void Run(FlightController & fc, const Setpoint & setpoint)
             {
-                mixer_ = hf::Mixer::Run(mixer_, setpoint);
+                mixer_ = hf::Mixer::Run(setpoint);
 
                 // Run motors if safe
                 if (fc.IsSafeToFly()) {

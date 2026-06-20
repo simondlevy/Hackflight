@@ -94,13 +94,18 @@ namespace hf {
                     const Dynamics & dyn,
                     const VehicleParams & vparams,
                     const float dt,
-                    const float * rpms,
-                    const uint8_t rotor_count,
-                    const int8_t * roll,
-                    const int8_t * pitch,
-                    const int8_t * yaw,
+                    const Setpoint & forces,
                     const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
+                // Equation 6 from Bouabdallah et al 2004 ---------------------
+
+                const double u1 = vparams.b * wparams.rho * forces.thrust;
+                const double u2 = vparams.b * wparams.rho * forces.roll;
+                const double u3 = vparams.b * wparams.rho * forces.pitch;
+                const double u4 = vparams.d * wparams.rho * forces.yaw;
+
+                // -----------------------------------------------------------
+
                 const auto cphi = cos(dyn.state.phi);
                 const auto cnphi = cos(-dyn.state.phi);
                 const auto snphi = sin(-dyn.state.phi);
@@ -109,33 +114,12 @@ namespace hf {
                 const auto cpsi = cos(dyn.state.psi);
                 const auto spsi = sin(dyn.state.psi);
 
-                const auto b = vparams.b;
-                const auto d = vparams.d;
                 const auto I = vparams.I;
                 const auto l = vparams.l;
                 const auto m = vparams.m;
 
                 const auto s = dyn.state;
                 const auto ds = dyn.dstate_;
-
-                // Equation 6 ---------------------------------------
-
-                double u1=0, u2=0, u3=0, u4=0;
-
-                for (unsigned int i = 0; i < rotor_count; ++i) {
-
-                    // RPM => rad/sec
-                    const auto omega = rpms[i] * 2 * M_PI / 60;
-
-                    // Thrust is squared rad/sec scaled by air density
-                    const auto omega2 = wparams.rho * omega * omega; 
-
-                    // Multiply by thrust coefficient
-                    u1 += b * omega2;                  
-                    u2 += b * omega2 * roll[i];
-                    u3 += b * omega2 * pitch[i];
-                    u4 += d * omega2 * -yaw[i];
-                }
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
@@ -187,6 +171,13 @@ namespace hf {
                         Dynamics(newstate, newdstate, airborne); 
 
             } // update
+
+            static auto GetOmega2(const double rpm) -> double
+            {
+                const auto omega = rpm * 2 * M_PI / 60;
+
+                return omega * omega;
+            }
 
         private:
 

@@ -18,6 +18,10 @@
  *   along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
+#include <datatypes.hpp>
+
 namespace hf {
 
     class Pose {
@@ -86,4 +90,7 @@ namespace hf {
                 : x(x), dx(dx), y(y), dy(dy), z(z), dz(dz), phi(phi),
                 dphi(dphi), theta(theta), dtheta(dtheta), psi(psi), dpsi(dpsi) {}
     };
-}
+
+    typedef Setpoint (*EffectorFun)(const Setpoint & setpoint);
+
+} // namespace hf

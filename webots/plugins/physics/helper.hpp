@@ -28,6 +28,7 @@
 #define _MAIN
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
+#include <sim/vehicles/apexquad.hpp>
 
 class PluginHelper {
 
@@ -96,7 +97,8 @@ class PluginHelper {
         auto RunSimulator(const hf::Mode mode, const hf::Setpoint & setpoint)
             -> hf::SimState
         {
-            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint);
+            simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
+                    hf::ApexQuad::run, hf::ApexQuad::kVehicleParams);
 
             return simulator_.dynamics.state;
         }

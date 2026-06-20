@@ -23,12 +23,10 @@
 #include <time.h>
 
 #include <datatypes.hpp>
-#include <mixers/bfquadx.hpp>
 #include <num.hpp>
 #include <pidcontrol/hover.hpp>
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
-#include <sim/vehicles/apexquad.hpp>
 
 namespace hf {
 
@@ -60,6 +58,8 @@ namespace hf {
                     const Simulator & sim,
                     const Mode mode,
                     const Setpoint & setpoint,
+                    EffectorFun effector_fun,
+                    const Dynamics::VehicleParams & vehicle_params,
                     const float framerate=32) -> Simulator 
             {
                 const auto dt = 1/(float)kPidFastFreq;
@@ -83,25 +83,14 @@ namespace hf {
                         pidControl = HoverPidController::Run(
                                 pidControl, dt, mode, state, setpoint);
 
-                        // Scale up new setpoint to RPMs
-                        const Setpoint scaled_setpoint = {
-                            8000 * (pidControl.setpoint.thrust - 0.5f) +
-                                kVehicleHoverRpm,
-                            1000 * pidControl.setpoint.roll,
-                            1000 * pidControl.setpoint.pitch,
-                            1000 * pidControl.setpoint.yaw
-                        };
-
-                        // Run mixer on setpoint to get motor RPMs
-                        static hf::Mixer _mixer;
-                        _mixer = hf::Mixer::Run(_mixer, scaled_setpoint);
+                        // Run PID-control output through vehicle effector
+                        // dynamics to get thrust, roll, pitch, yaw forces
+                        const auto forces = effector_fun(pidControl.setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
                             dynamics = Dynamics::Update(dynamics,
-                                    kVehicleParams, 1 / kDynamicsFreq,
-                                    _mixer.motorvals, 4, _mixer.roll,
-                                    _mixer.pitch, _mixer.yaw);
+                                    vehicle_params, 1 / kDynamicsFreq, forces);
                         }
                     }
                 }
