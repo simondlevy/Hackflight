@@ -64,7 +64,7 @@ namespace hf {
                     pid.altitude_target_ == 0 ? kAltitudeInitM :
                     pid.altitude_target_;
 
-                const auto newaltitude_target_ = Num::ConstrainFloat(
+                const auto new_altitude_target = Num::ConstrainFloat(
                         altitude_target +
                         setpoint_in.thrust * kAltitudeIncMps * dt,
                         kAltitudeMinM, kAltitudemaxM);
@@ -74,7 +74,7 @@ namespace hf {
 
                 const auto altitude_pid =
                     AltitudeController::Run(pid.altitude_pid_, hovering, dt,
-                            newaltitude_target_, state.z);
+                            new_altitude_target, state.z);
 
                 const auto climbrate_pid =
                     ClimbRateController::Run(pid.climbrate_pid_,
@@ -83,7 +83,7 @@ namespace hf {
                             altitude_pid.output, state.dz);
 
                 return AltHoldPidController(
-                        newaltitude_target_,
+                        new_altitude_target,
                         altitude_pid,
                         climbrate_pid,
                         climbrate_pid.output);
