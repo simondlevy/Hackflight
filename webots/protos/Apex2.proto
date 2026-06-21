@@ -19,7 +19,6 @@ PROTO Apex2 [
   field SFColor frame_color  0 0 0
   field SFFloat frame_metalness 0.0
   field SFVec3f frame_translation 0 0 0.014
-  field SFRotation frame_rotation 0 0 0 0
 
   field SFVec3f standoff1_translation -0.030 -0.008 0.000
   field SFVec3f standoff2_translation  0.022 -0.008 0.000
@@ -27,7 +26,6 @@ PROTO Apex2 [
   field SFVec3f standoff4_translation  0.022  0.008 0.000
 
   field SFVec3f top_translation 0.002 -0.002 0.015
-  field SFRotation top_rotation 0 0 1 0
 
   field SFVec3f battery_translation  0.000 -0.002 0.016
   field SFColor battery_color  0 0 0.5
@@ -35,7 +33,6 @@ PROTO Apex2 [
   field SFColor fc_color  0.000 0.176 0.016
   field SFFloat fc_metalness 0.0
   field SFVec3f fc_translation 0.002 0.001 0.001
-  field SFRotation fc_rotation 0 0 0 0
 
   field SFVec3f leg1_translation   -0.029 -0.038 -0.013
   field SFVec3f motor1_translation -0.028 -0.041  0.001
@@ -72,7 +69,6 @@ PROTO Apex2 [
 DEF ROBOT Robot {
 
         translation  IS frame_translation
-        rotation IS frame_rotation
         controller "<extern>"
         supervisor TRUE
         name "Apex2"
@@ -163,7 +159,6 @@ DEF ROBOT Robot {
 
       DEF FC Solid {
         translation IS fc_translation
-        rotation IS fc_rotation
         name "fc"
         children [
           Shape {
@@ -248,7 +243,6 @@ DEF ROBOT Robot {
 
       DEF TOP Solid {
         translation IS top_translation
-        rotation IS top_rotation
         name "top"
         children [
           Shape {
@@ -265,7 +259,6 @@ DEF ROBOT Robot {
 
       DEF BATTERY Solid {
         translation IS battery_translation
-        rotation IS top_rotation
         name "battery"
         children [
           Shape {
