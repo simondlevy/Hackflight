@@ -33,7 +33,7 @@ run:
 	fi
 
 srun:
-	webots ../../worlds/sevjr.wbt & /usr/local/webots/webots-controller \
+	@webots ../../worlds/sevjr.wbt & /usr/local/webots/webots-controller \
 	--stdout-redirect ./sevjr.py simple &> /dev/null;
 
 ### Do not modify: this includes Webots global Makefile.include
