@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
@@ -28,7 +30,7 @@ namespace hf {
         private:
 
             // Approximate thrust RPM needed when in perfect hover
-            static constexpr float kVehicleHoverRpm = 35546;
+            static constexpr float kVehicleHoverRpm = 5850; //35546;
 
             static constexpr float kThrustScale = 8000;
             static constexpr float kRollPitchYawScale = 1000;
@@ -38,8 +40,8 @@ namespace hf {
             static constexpr Dynamics::VehicleParams kVehicleParams = {
 
                 // Actual values
-                9.0e-2,  // mass [kg]
-                5.0e-2,  // arm length L [m]
+                4.8e-1,  // mass [kg]
+                1.7e-1,  // arm length L [m]
 
                 // Reverse-engineered by observation:
                 1.3e-8, // thrust coefficient B [F=b*w^2]
@@ -56,6 +58,8 @@ namespace hf {
                     kRollPitchYawScale * setpoint.pitch,
                     kRollPitchYawScale * setpoint.yaw
                 };
+
+                printf("SEVJr: t=%f\n", setpoint_rpms.thrust);
 
                 static Mixer mixer_;
                 mixer_ = hf::Mixer::Run(setpoint_rpms);

@@ -28,7 +28,6 @@
 #define _MAIN
 #include <sim/dynamics.hpp>
 #include <sim/simulator.hpp>
-#include <sim/vehicles/apexquad.hpp>
 
 class PluginHelper {
 
