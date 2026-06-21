@@ -66,10 +66,10 @@ namespace hf {
                 const auto o3 = Dynamics::GetOmega2(motor_rpms[2]);
                 const auto o4 = Dynamics::GetOmega2(motor_rpms[3]);
 
-                const auto t = o1 + o2 + o3 + o4;
+                const auto t =  o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
-                const auto p = o1 - o2  + o3 - o4;
-                const auto y = o1 - o2 - o3 + o4;
+                const auto p =  o1 - o2 + o3 - o4;
+                const auto y =  o1 - o2 - o3 + o4;
 
                 return Setpoint(t, r, p, y);
             }

@@ -42,8 +42,8 @@ namespace hf {
 
                 // Reverse-engineered by observation:
                 1.0e-6, // thrust coefficient B [F=b*w^2]
-                4.1e-7, // I [kg*m^2] for pitch, roll, yaw
-                3.9e-11 // drag coefficient D [T=d*w^2] for yaw
+                4.1e-5, // I [kg*m^2] for pitch, roll, yaw
+                3.9e-9  // drag coefficient D [T=d*w^2] for yaw
             };
 
             static auto Run(const Setpoint & setpoint) -> Setpoint
@@ -68,10 +68,10 @@ namespace hf {
                 const auto o3 = Dynamics::GetOmega2(motor_rpms[2]);
                 const auto o4 = Dynamics::GetOmega2(motor_rpms[3]);
 
-                const auto t = o1 + o2 + o3 + o4;
+                const auto t =  o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
-                const auto p = o1 - o2  + o3 - o4;
-                const auto y = o1 - o2 - o3 + o4;
+                const auto p =  o1 - o2 + o3 - o4;
+                const auto y =  o1 - o2 - o3 + o4;
 
                 return Setpoint(t, r, p, y);
             }
