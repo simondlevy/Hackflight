@@ -30,9 +30,9 @@ namespace hf {
         private:
 
             // Approximate thrust RPM needed when in perfect hover
-            static constexpr float kVehicleHoverRpm = 7550;
+            static constexpr float kVehicleHoverRpm = 5850;
 
-            static constexpr float kThrustScale = 100;
+            static constexpr float kThrustScale = 8000;
             static constexpr float kRollPitchYawScale = 1000;
 
         public:
@@ -58,6 +58,8 @@ namespace hf {
                     kRollPitchYawScale * setpoint.pitch,
                     kRollPitchYawScale * setpoint.yaw
                 };
+
+                printf("%.0f\n", setpoint_rpms.thrust);
 
                 static Mixer mixer_;
                 mixer_ = hf::Mixer::Run(setpoint_rpms);
