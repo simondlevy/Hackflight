@@ -27,7 +27,7 @@ DLLEXPORT void webots_physics_step()
     const auto message = PluginHelper::GetMessage();
 
     const auto state = _helper->RunSimulator(
-            hf::ApexQuad::run, hf::ApexQuad::kVehicleParams,
+            hf::ApexQuad::Run, hf::ApexQuad::kVehicleParams,
             message.mode, message.setpoint);
 
     _helper->SetDbodyFromState(state);

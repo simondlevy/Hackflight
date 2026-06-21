@@ -49,7 +49,7 @@ namespace hf {
                 3.9e-11 // drag coefficient D [T=d*w^2] for yaw
             };
 
-            static auto run(const Setpoint & setpoint) -> Setpoint
+            static auto Run(const Setpoint & setpoint) -> Setpoint
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {

@@ -27,7 +27,7 @@ DLLEXPORT void webots_physics_step()
     const auto message = PluginHelper::GetMessage();
 
     const auto state = _helper->RunSimulator(
-            hf::SevJr::run, hf::SevJr::kVehicleParams,
+            hf::SevJr::Run, hf::SevJr::kVehicleParams,
             message.mode, message.setpoint);
 
     _helper->SetDbodyFromState(state);
