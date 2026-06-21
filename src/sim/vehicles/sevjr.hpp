@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <stdio.h>
-
 #include <datatypes.hpp>
 #include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
@@ -30,7 +28,6 @@ namespace hf {
         private:
 
             static constexpr float kThrustScale = 10000;
-            static constexpr float kRollPitchYawScale = 1000;
 
         public:
 
@@ -51,9 +48,9 @@ namespace hf {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
                     kThrustScale * setpoint.thrust,
-                    kRollPitchYawScale * setpoint.roll,
-                    kRollPitchYawScale * setpoint.pitch,
-                    kRollPitchYawScale * setpoint.yaw
+                    Dynamics::kRollPitchYawScale * setpoint.roll,
+                    Dynamics::kRollPitchYawScale * setpoint.pitch,
+                    Dynamics::kRollPitchYawScale * setpoint.yaw
                 };
 
                 static Mixer mixer_;

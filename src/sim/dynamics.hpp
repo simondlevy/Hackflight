@@ -50,6 +50,8 @@ namespace hf {
 
         public:
 
+            static constexpr float kRollPitchYawScale = 1000;
+
             // Vehicle state (Equation 11)
             SimState state;
 
