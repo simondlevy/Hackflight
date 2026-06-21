@@ -21,17 +21,20 @@ PROTO Apex2 [
   field SFVec3f frame_translation 0 0 0.03
   field SFRotation frame_rotation 0 0 0 0
 
-  field SFVec3f leg1_translation -0.029 -0.038 -0.013
-  field SFVec3f motor1_translation -0.028 -0.041 0.001
-  field SFVec3f prop1_translation  -0.028 -0.041 0.010
+  field SFVec3f leg1_translation   -0.029 -0.038 -0.013
+  field SFVec3f motor1_translation -0.028 -0.041  0.001
+  field SFVec3f prop1_translation  -0.028 -0.041  0.010
 
-  field SFVec3f motor2_translation 0.028 -0.041 0.001
-  field SFVec3f prop2_translation  0.028 -0.041 0.010
+  field SFVec3f leg2_translation   0.029 -0.038 -0.013
+  field SFVec3f motor2_translation 0.028 -0.041  0.001
+  field SFVec3f prop2_translation  0.028 -0.041  0.010
 
-  field SFVec3f motor3_translation -0.028 0.041 0.001
-  field SFVec3f prop3_translation  -0.028 0.041 0.010
+  field SFVec3f leg3_translation   -0.029 0.046 -0.013
+  field SFVec3f motor3_translation -0.028 0.044  0.001
+  field SFVec3f prop3_translation  -0.028 0.043  0.010
 
-  field SFVec3f motor4_translation 0.028 0.041 0.001
+  field SFVec3f leg4_translation   0.031 0.045 -0.013
+  field SFVec3f motor4_translation 0.028 0.043 0.001
   field SFVec3f prop4_translation  0.028 0.041 0.010
 
   field SFColor rear_prop_color  0.5 0 0.25
@@ -151,7 +154,7 @@ DEF ROBOT Robot {
           Shape {
             appearance PBRAppearance {
             baseColor IS frame_color
-            metalness IS motor_metalness
+            metalness IS frame_metalness
           }
             geometry Mesh {
               url [ "../meshes/stl_files/apex2/leg.stl" ]
@@ -235,6 +238,22 @@ DEF ROBOT Robot {
 
     # Motor 2 ----------------------------------------------------------------
 
+      DEF LEG2 Solid {
+        translation IS leg2_translation
+        name "leg2"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS frame_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/leg.stl" ]
+            }
+          }
+        ] 
+      }
+
       DEF MOTOR2 Solid {
         translation IS motor2_translation
         name "motor2"
@@ -311,7 +330,23 @@ DEF ROBOT Robot {
 
     # Motor 3 ----------------------------------------------------------------
 
-      DEF MOTOR3 Solid {
+      DEF LEG3 Solid {
+        translation IS leg3_translation
+        name "leg3"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS frame_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/leg.stl" ]
+            }
+          }
+        ] 
+      }
+
+       DEF MOTOR3 Solid {
         translation IS motor3_translation
         name "motor3"
         children [
@@ -386,6 +421,23 @@ DEF ROBOT Robot {
 
 
     # Motor 4 ----------------------------------------------------------------
+
+      DEF LEG4 Solid {
+        translation IS leg4_translation
+        name "leg4"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS frame_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/leg.stl" ]
+            }
+          }
+        ] 
+      }
+
 
       DEF MOTOR4 Solid {
         translation IS motor4_translation
