@@ -27,7 +27,10 @@ PROTO Apex2 [
   field SFVec3f standoff4_translation  0.022  0.008 0.000
 
   field SFVec3f top_translation 0.002 -0.002 0.015
-  field SFRotation top_rotation 0 0 0 0
+  field SFRotation top_rotation 0 0 1 0
+
+  field SFVec3f battery_translation  0.000 -0.002 0.016
+  field SFColor battery_color  0 0 0.5
 
   field SFColor fc_color  0.000 0.176 0.016
   field SFFloat fc_metalness 0.0
@@ -255,6 +258,23 @@ DEF ROBOT Robot {
           }
             geometry Mesh {
               url [ "../meshes/stl_files/apex2/top.stl" ]
+            }
+          }
+        ] 
+      }
+
+      DEF BATTERY Solid {
+        translation IS battery_translation
+        rotation IS top_rotation
+        name "battery"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS battery_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/battery.stl" ]
             }
           }
         ] 
