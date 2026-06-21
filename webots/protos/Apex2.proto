@@ -21,6 +21,11 @@ PROTO Apex2 [
   field SFVec3f frame_translation 0 0 0.015
   field SFRotation frame_rotation 0 0 0 0
 
+  field SFColor fc_color  0.000 0.176 0.016
+  field SFFloat fc_metalness 0.0
+  field SFVec3f fc_translation 0.002 0.001 0.001
+  field SFRotation fc_rotation 0 0 0 0
+
   field SFVec3f leg1_translation   -0.029 -0.038 -0.013
   field SFVec3f motor1_translation -0.028 -0.041  0.001
   field SFVec3f prop1_translation  -0.028 -0.041  0.012
@@ -144,6 +149,22 @@ DEF ROBOT Robot {
  
     DEF INERTIAL_UNIT InertialUnit {
     }
+
+      DEF FC Solid {
+        translation IS fc_translation
+        name "fc"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS fc_color
+            metalness IS fc_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/fc.stl" ]
+            }
+          }
+        ] 
+      }
 
     # Motor 1 ----------------------------------------------------------------
 
