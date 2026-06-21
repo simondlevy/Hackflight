@@ -39,6 +39,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <sim/datatypes.hpp>
@@ -122,6 +123,8 @@ namespace hf {
                 const auto ds = dyn.dstate_;
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
+
+                printf("%f,%f\n", u1,ddz);
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =

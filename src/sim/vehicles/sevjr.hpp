@@ -59,8 +59,6 @@ namespace hf {
                     kRollPitchYawScale * setpoint.yaw
                 };
 
-                printf("SEVJr: t=%f\n", setpoint_rpms.thrust);
-
                 static Mixer mixer_;
                 mixer_ = hf::Mixer::Run(setpoint_rpms);
 
