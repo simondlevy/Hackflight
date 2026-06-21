@@ -44,7 +44,7 @@ namespace hf {
                 1.7e-1,  // arm length L [m]
 
                 // Reverse-engineered by observation:
-                1.3e-8, // thrust coefficient B [F=b*w^2]
+                1.0e-6, // thrust coefficient B [F=b*w^2]
                 4.1e-7, // I [kg*m^2] for pitch, roll, yaw
                 3.9e-11 // drag coefficient D [T=d*w^2] for yaw
             };
