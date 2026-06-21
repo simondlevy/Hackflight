@@ -124,9 +124,8 @@ namespace hf {
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
-                const auto rpm = 60 * sqrt(forces.thrust/4) /(2*M_PI); 
-
-                printf("%f,%f,%f\n", rpm, u1, ddz);
+                //const auto rpm = 60 * sqrt(forces.thrust/4) /(2*M_PI); 
+                //printf("%f,%f,%f\n", rpm, u1, ddz);
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =

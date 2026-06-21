@@ -27,10 +27,7 @@ namespace hf {
 
         private:
 
-            // Approximate thrust RPM needed when in perfect hover
-            static constexpr float kVehicleHoverRpm = 35546;
-
-            static constexpr float kThrustScale = 8000;
+            static constexpr float kThrustScale = 70000;
             static constexpr float kRollPitchYawScale = 1000;
 
         public:
@@ -51,7 +48,7 @@ namespace hf {
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    kThrustScale * (setpoint.thrust - 0.5f) + kVehicleHoverRpm,
+                    kThrustScale * setpoint.thrust,
                     kRollPitchYawScale * setpoint.roll,
                     kRollPitchYawScale * setpoint.pitch,
                     kRollPitchYawScale * setpoint.yaw
