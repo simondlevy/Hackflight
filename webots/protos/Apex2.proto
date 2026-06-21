@@ -21,6 +21,9 @@ PROTO Apex2 [
   field SFVec3f frame_translation 0 0 0.015
   field SFRotation frame_rotation 0 0 0 0
 
+  field SFVec3f top_translation 0.002 -0.002 0.015
+  field SFRotation top_rotation 0 0 0 0
+
   field SFColor fc_color  0.000 0.176 0.016
   field SFFloat fc_metalness 0.0
   field SFVec3f fc_translation 0.002 0.001 0.001
@@ -152,6 +155,7 @@ DEF ROBOT Robot {
 
       DEF FC Solid {
         translation IS fc_translation
+        rotation IS fc_rotation
         name "fc"
         children [
           Shape {
@@ -161,6 +165,23 @@ DEF ROBOT Robot {
           }
             geometry Mesh {
               url [ "../meshes/stl_files/apex2/fc.stl" ]
+            }
+          }
+        ] 
+      }
+
+      DEF TOP Solid {
+        translation IS top_translation
+        rotation IS top_rotation
+        name "top"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS frame_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/top.stl" ]
             }
           }
         ] 
