@@ -18,7 +18,6 @@
 #pragma once
 
 #include <datatypes.hpp>
-#include <mixers/bfquadx.hpp>
 #include <sim/dynamics.hpp>
 
 namespace hf {
@@ -45,26 +44,22 @@ namespace hf {
 
             static auto Run(const Setpoint & setpoint) -> Setpoint
             {
-                const auto rpm_thrust = kThrustScale * setpoint.thrust;
-                const auto rpm_roll = Dynamics::kRollPitchYawScale * setpoint.roll;
-                const auto rpm_pitch = Dynamics::kRollPitchYawScale * setpoint.pitch;
-                const auto rpm_yaw = Dynamics::kRollPitchYawScale * setpoint.yaw;
+                const auto t_rpm = kThrustScale * setpoint.thrust;
+                const auto r_rpm = Dynamics::kRollPitchYawScale * setpoint.roll;
+                const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
+                const auto y_rpm = Dynamics::kRollPitchYawScale * setpoint.yaw;
 
-                const Setpoint setpoint_rpms = {
-                    rpm_thrust, rpm_roll, rpm_pitch, rpm_yaw
-                };
-
-                static Mixer mixer_;
-                mixer_ = hf::Mixer::Run(setpoint_rpms);
-
-                const auto motor_rpms = mixer_.motorvals;
+                const auto m1 = t_rpm - r_rpm + p_rpm - y_rpm;
+                const auto m2 = t_rpm - r_rpm - p_rpm + y_rpm;
+                const auto m3 = t_rpm + r_rpm + p_rpm + y_rpm;
+                const auto m4 = t_rpm + r_rpm - p_rpm - y_rpm;
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o1 = Dynamics::GetOmega2(motor_rpms[0]);
-                const auto o2 = Dynamics::GetOmega2(motor_rpms[1]);
-                const auto o3 = Dynamics::GetOmega2(motor_rpms[2]);
-                const auto o4 = Dynamics::GetOmega2(motor_rpms[3]);
+                const auto o1 = Dynamics::GetOmega2(m1);
+                const auto o2 = Dynamics::GetOmega2(m2);
+                const auto o3 = Dynamics::GetOmega2(m3);
+                const auto o4 = Dynamics::GetOmega2(m4);
 
                 const auto t =  o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
