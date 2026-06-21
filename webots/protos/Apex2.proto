@@ -17,9 +17,11 @@
 PROTO Apex2 [
 
   field SFColor frame_color  0 0 0
-  field SFVec3f frame_translation 0 0 0.0
+  field SFFloat frame_metalness 0.0
+  field SFVec3f frame_translation 0 0 0.03
   field SFRotation frame_rotation 0 0 0 0
 
+  field SFVec3f leg1_translation -0.029 -0.038 -0.013
   field SFVec3f motor1_translation -0.028 -0.041 0.001
   field SFVec3f prop1_translation  -0.028 -0.041 0.010
 
@@ -66,7 +68,7 @@ DEF ROBOT Robot {
 
                         appearance DEF PLASTIC PBRAppearance {
                             baseColor IS frame_color
-                            metalness 0
+                            metalness IS frame_metalness
                         }
 
                       geometry Mesh {
@@ -141,6 +143,22 @@ DEF ROBOT Robot {
     }
 
     # Motor 1 ----------------------------------------------------------------
+
+      DEF LEG1 Solid {
+        translation IS leg1_translation
+        name "leg1"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS frame_color
+            metalness IS motor_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/leg.stl" ]
+            }
+          }
+        ] 
+      }
 
       DEF MOTOR1 Solid {
         translation IS motor1_translation
