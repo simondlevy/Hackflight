@@ -45,12 +45,13 @@ namespace hf {
 
             static auto Run(const Setpoint & setpoint) -> Setpoint
             {
-                // Scale up new setpoint to RPMs
+                const auto rpm_thrust = kThrustScale * setpoint.thrust;
+                const auto rpm_roll = Dynamics::kRollPitchYawScale * setpoint.roll;
+                const auto rpm_pitch = Dynamics::kRollPitchYawScale * setpoint.pitch;
+                const auto rpm_yaw = Dynamics::kRollPitchYawScale * setpoint.yaw;
+
                 const Setpoint setpoint_rpms = {
-                    kThrustScale * setpoint.thrust,
-                    Dynamics::kRollPitchYawScale * setpoint.roll,
-                    Dynamics::kRollPitchYawScale * setpoint.pitch,
-                    Dynamics::kRollPitchYawScale * setpoint.yaw
+                    rpm_thrust, rpm_roll, rpm_pitch, rpm_yaw
                 };
 
                 static Mixer mixer_;
