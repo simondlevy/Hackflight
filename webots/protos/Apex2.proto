@@ -30,6 +30,10 @@ PROTO Apex2 [
   field SFVec3f battery_translation  0.000 -0.002 0.016
   field SFColor battery_color  0 0 0.5
 
+  field SFVec3f rubber_band_rear_translation  0.006 -0.0015 0.016
+  field SFVec3f rubber_band_front_translation 0.029 -0.0015 0.016
+  field SFColor rubber_band_color  0.5 0.5 0
+
   field SFColor fc_color  0.000 0.176 0.016
   field SFFloat fc_metalness 0.0
   field SFVec3f fc_translation 0.002 0.001 0.001
@@ -268,6 +272,38 @@ DEF ROBOT Robot {
           }
             geometry Mesh {
               url [ "../meshes/stl_files/apex2/battery.stl" ]
+            }
+          }
+        ] 
+      }
+
+      DEF RUBBER_BAND1 Solid {
+        translation IS rubber_band_rear_translation
+        name "rubber_band_rear"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS rubber_band_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/rubber-band.stl" ]
+            }
+          }
+        ] 
+      }
+
+      DEF RUBBER_BAND2 Solid {
+        translation IS rubber_band_front_translation
+        name "rubber_band_front"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS rubber_band_color
+            metalness IS frame_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/rubber-band.stl" ]
             }
           }
         ] 
