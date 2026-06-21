@@ -20,14 +20,17 @@ PROTO Apex2 [
   field SFVec3f frame_translation 0 0 0.0
   field SFRotation frame_rotation 0 0 0 0
 
-  field SFVec3f motor1_translation  0.031 -0.031 0.001
-  field SFVec3f prop1_translation  0.031 -0.031 0.001
+  field SFVec3f motor1_translation -0.028 -0.041 0.001
+  field SFVec3f prop1_translation  -0.028 -0.041 0.010
 
-  field SFVec3f motor2_translation -0.031 -0.031 0.016  
+  field SFVec3f motor2_translation 0.028 -0.041 0.001
+  field SFVec3f prop2_translation  0.028 -0.041 0.010
 
-  field SFVec3f motor3_translation -0.031  0.031 0.016  
+  field SFVec3f motor3_translation -0.028 0.041 0.001
+  field SFVec3f prop3_translation  -0.028 0.041 0.010
 
-  field SFVec3f motor4_translation  0.031  0.031 0.016  
+  field SFVec3f motor4_translation 0.028 0.041 0.001
+  field SFVec3f prop4_translation  0.028 0.041 0.010
 
   field SFColor rear_prop_color  0.5 0 0.25
   field SFColor front_prop_color 0.1 0.1 0.1
@@ -175,7 +178,7 @@ DEF ROBOT Robot {
 
                 Shape {
                             appearance PBRAppearance {
-                                baseColor IS front_prop_color
+                                baseColor IS rear_prop_color
                                     baseColorMap ImageTexture {
                                         url [ "../meshes/textures/fast_helix.png" ]
                                     }
@@ -190,14 +193,15 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation IS motor1_translation
+
+            translation IS prop1_translation
 
                 children [
 
                     Shape {
 
                         appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS front_prop_color
+                            baseColor IS rear_prop_color
                                 metalness 0
                         }
 
@@ -211,11 +215,28 @@ DEF ROBOT Robot {
         }
     }
 
-     # Motor 2 ----------------------------------------------------------------
+    # Motor 2 ----------------------------------------------------------------
+
+      DEF MOTOR2 Solid {
+        translation IS motor2_translation
+        name "motor2"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS motor_color
+            metalness IS motor_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/motor.stl" ]
+            }
+          }
+        ] 
+      }
+
 
     DEF PROP2 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust IS motor2_translation
+            centerOfThrust IS prop2_translation
             thrustConstants 0 0
             torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
@@ -226,11 +247,87 @@ DEF ROBOT Robot {
             }
         fastHelix Solid {
 
-            translation IS motor2_translation
+            translation IS prop2_translation 
 
                 children [ 
 
+                Shape {
+                            appearance PBRAppearance {
+                                baseColor IS front_prop_color
+                                    baseColorMap ImageTexture {
+                                        url [ "../meshes/textures/fast_helix.png" ]
+                                    }
+                                metalness 0
+                            }
+                            geometry Cylinder {
+                                height IS prop_fast_helix_height
+                                radius IS prop_fast_helix_radius
+                            }
+                        }
+
+                ]
+        }
+        slowHelix Solid {
+
+            translation IS prop2_translation
+
+                children [
+
                     Shape {
+
+                        appearance DEF PLASTIC PBRAppearance {
+                            baseColor IS front_prop_color
+                                metalness 0
+                        }
+
+                      geometry Mesh {
+                          url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
+                      }
+                    }
+
+
+                ]
+        }
+    }
+
+
+    # Motor 3 ----------------------------------------------------------------
+
+      DEF MOTOR3 Solid {
+        translation IS motor3_translation
+        name "motor3"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS motor_color
+            metalness IS motor_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/motor.stl" ]
+            }
+          }
+        ] 
+      }
+
+
+    DEF PROP3 Propeller {
+        shaftAxis 0 0 1
+            centerOfThrust IS prop3_translation
+            thrustConstants 0 0
+            torqueConstants 0 0
+            fastHelixThreshold IS prop_fast_helix_threshold
+            device RotationalMotor {
+                name "motor3"
+                maxVelocity IS motor_max_velocity
+                maxTorque IS motor_max_torque
+            }
+        fastHelix Solid {
+
+            translation IS prop3_translation 
+
+                children [ 
+
+                Shape {
                             appearance PBRAppearance {
                                 baseColor IS rear_prop_color
                                     baseColorMap ImageTexture {
@@ -248,7 +345,7 @@ DEF ROBOT Robot {
         }
         slowHelix Solid {
 
-            translation IS motor2_translation
+            translation IS prop3_translation
 
                 children [
 
@@ -256,42 +353,61 @@ DEF ROBOT Robot {
 
                         appearance DEF PLASTIC PBRAppearance {
                             baseColor IS rear_prop_color
-                            metalness 0
+                                metalness 0
                         }
 
                       geometry Mesh {
-                          url [ "../meshes/stl_files//apex2/prop_ccw.stl" ]
+                          url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
                       }
                     }
+
 
                 ]
         }
     }
 
-   # Motor 3 ----------------------------------------------------------------
 
-    DEF PROP3 Propeller {
+    # Motor 4 ----------------------------------------------------------------
+
+      DEF MOTOR4 Solid {
+        translation IS motor4_translation
+        name "motor4"
+        children [
+          Shape {
+            appearance PBRAppearance {
+            baseColor IS motor_color
+            metalness IS motor_metalness
+          }
+            geometry Mesh {
+              url [ "../meshes/stl_files/apex2/motor.stl" ]
+            }
+          }
+        ] 
+      }
+
+
+    DEF PROP4 Propeller {
         shaftAxis 0 0 1
-            centerOfThrust IS motor3_translation
+            centerOfThrust IS prop4_translation
             thrustConstants 0 0
-            torqueConstants  0 0
+            torqueConstants 0 0
             fastHelixThreshold IS prop_fast_helix_threshold
             device RotationalMotor {
-                name "motor3"
+                name "motor4"
                 maxVelocity IS motor_max_velocity
                 maxTorque IS motor_max_torque
             }
         fastHelix Solid {
-            translation IS motor3_translation
+
+            translation IS prop4_translation 
+
                 children [ 
-                  
+
                 Shape {
                             appearance PBRAppearance {
-                                baseColor IS rear_prop_color
+                                baseColor IS front_prop_color
                                     baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
+                                        url [ "../meshes/textures/fast_helix.png" ]
                                     }
                                 metalness 0
                             }
@@ -304,63 +420,9 @@ DEF ROBOT Robot {
                 ]
         }
         slowHelix Solid {
-            translation IS motor3_translation
-                children [
 
-                    Shape {
+            translation IS prop4_translation
 
-                        appearance DEF PLASTIC PBRAppearance {
-                            baseColor IS rear_prop_color
-                                metalness 0
-                        }
-
-                      geometry Mesh {
-                          url [ "../meshes/stl_files//apex2/prop_ccw.stl" ]
-                      }
-                    }
-
-                ]
-        }
-    }
-
-    # Motor 4 ----------------------------------------------------------------
-
-    DEF PROP4 Propeller {
-        shaftAxis 0 0 1
-            centerOfThrust IS motor4_translation
-            thrustConstants 0 0
-            torqueConstants 0 0
-            fastHelixThreshold IS prop_fast_helix_threshold
-            device RotationalMotor {
-                name "motor4"
-                maxVelocity IS motor_max_velocity
-                maxTorque IS motor_max_torque
-            }
-        fastHelix Solid {
-            translation IS motor4_translation
-                children [
-
-                Shape {
-                            appearance PBRAppearance {
-                                baseColor IS front_prop_color
-                                    baseColorMap ImageTexture {
-                                        url [
-                                            "../meshes/textures/fast_helix.png"
-                                        ]
-                                    }
-                                metalness 0
-                            }
-                            geometry Cylinder {
-                                height IS prop_fast_helix_height
-                                radius IS prop_fast_helix_radius
-                            }
-                        }
-
-              
-                ] 
-        }
-        slowHelix DEF PROP Solid {
-            translation IS motor4_translation
                 children [
 
                     Shape {
@@ -375,14 +437,20 @@ DEF ROBOT Robot {
                       }
                     }
 
+
                 ]
         }
     }
+
+
+
     ]
-        boundingObject Cylinder {
-            height 0.03
-                radius 0.05
-        }
+
+    boundingObject Cylinder {
+        height 0.03
+            radius 0.05
+    }
+
     physics Physics {
         density -1
         mass 0.05
