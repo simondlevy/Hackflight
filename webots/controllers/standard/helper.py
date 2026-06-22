@@ -29,6 +29,8 @@ class Helper:
     PROP_CW = -1
     PROP_CCW = +1
 
+    PROP_SPEED_SCALE = 60
+
     def __init__(self):
 
         self.joystick_method_map = {
@@ -73,7 +75,7 @@ class Helper:
     def startMotor(self, name, direction):
 
         motor = self.makeMotor(name)
-        motor.setVelocity(direction * 1) # 60)
+        motor.setVelocity(direction * self.PROP_SPEED_SCALE)
 
     def step(self):
 
