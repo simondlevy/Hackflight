@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <datatypes.hpp>
 
 namespace hf {
@@ -52,7 +54,7 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 // const auto y = setpoint.yaw;
 
-                return SevJrMixer(t + r - p, t - r - p, 1.414213 * (t + p));
+                return SevJrMixer(t + r - p, t - r - p, t + p);
             }
     };
 

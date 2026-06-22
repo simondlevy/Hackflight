@@ -61,11 +61,13 @@ namespace hf {
                 const auto o_fr_ccw = Dynamics::RpmToOmegaSquared(mixer_.fr_ccw);
                 const auto o_r_cw  = Dynamics::RpmToOmegaSquared(mixer_.r_cw);
 
-                return Setpoint(
+                const auto out = Setpoint(
                         o_fl_cw + o_fr_ccw + o_r_cw,
                         o_fl_cw - o_fr_ccw,
-                        -o_fl_cw - o_fr_ccw + o_r_cw,
+                        -(o_fl_cw + o_fr_ccw)/2 + o_r_cw,
                         0);
+
+                return out;
             }
 
     }; // class SevJr
