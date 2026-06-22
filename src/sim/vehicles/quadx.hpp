@@ -28,7 +28,7 @@ namespace hf {
         public:
 
             static auto Run(
-                    const Dynamics::VehicleParams vparams,
+                    const VehicleParams vparams,
                     const Setpoint & setpoint) -> Setpoint
             {
 

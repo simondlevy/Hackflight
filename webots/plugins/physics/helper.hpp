@@ -95,7 +95,7 @@ class PluginHelper {
 
         auto RunSimulator(
                 hf::EffectorFun effector_fun,
-                const hf::Dynamics::VehicleParams & vehicle_params,
+                const hf::VehicleParams & vehicle_params,
                 const hf::Mode mode,
                 const hf::Setpoint & setpoint) -> hf::SimState
         {

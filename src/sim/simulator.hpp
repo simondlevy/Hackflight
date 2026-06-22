@@ -59,7 +59,7 @@ namespace hf {
                     const Mode mode,
                     const Setpoint & setpoint,
                     EffectorFun effector_fun,
-                    const Dynamics::VehicleParams & vehicle_params,
+                    const VehicleParams & vehicle_params,
                     const float framerate=32) -> Simulator 
             {
                 const auto dt = 1/(float)kPidFastFreq;

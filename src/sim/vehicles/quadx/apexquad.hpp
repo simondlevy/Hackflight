@@ -28,7 +28,7 @@ namespace hf {
 
         public:
 
-            static constexpr Dynamics::VehicleParams kVehicleParams = {
+            static constexpr VehicleParams kVehicleParams = {
 
                 // Actual values
                 7.4,     // battery voltage

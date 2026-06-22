@@ -55,35 +55,6 @@ namespace hf {
             // Vehicle state (Equation 11)
             SimState state;
 
-            /**
-             *  Vehicle parameters
-             */
-            typedef struct {
-
-                // These can be determined directly
-                double battery_voltage;
-                double motor_kv;
-                double m;  // mass [kg]
-                double l;  // arm length [m]
-
-                // These should be estimated to get realistic behavior
-                double b;  // thrust coefficient [F=b*w^2]
-                double I;  // body inertia [kg*m^2]  for roll, pitch
-                double d;  // drag coefficient [T=d*w^2] for yaw
-
-            } VehicleParams; 
-
-            /**
-             *  World parameters
-             */
-            typedef struct {
-
-                // These can be measured directly
-                double g;   // gravitational constant [m/s/s]
-                double rho; // air density [kg/m^3]
-
-            } WorldParams; 
-
             Dynamics() = default;
 
             Dynamics& operator=(const Dynamics& other) = default;
