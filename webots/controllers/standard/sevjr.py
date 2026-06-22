@@ -26,9 +26,9 @@ def main():
 
     helper = Helper()
 
-    helper.startMotor('prop_front_left', -1)
-    helper.startMotor('prop_front_right', +1)
-    helper.startMotor('prop_rear', +1)
+    helper.startMotor('prop_front_left', Helper.PROP_CW)
+    helper.startMotor('prop_front_right', Helper.PROP_CCW)
+    helper.startMotor('prop_rear', Helper.PROP_CW)
 
     left_rudder = helper.makeMotor('left_rudder')
     right_rudder = helper.makeMotor('right_rudder')
