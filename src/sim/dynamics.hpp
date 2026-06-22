@@ -184,11 +184,6 @@ namespace hf {
                 return omega * omega;
             }
 
-            static auto OmegaSquaredToRpm(const double omega2) -> double
-            {
-                return sqrt(omega2) / (2 * M_PI / 60);
-            }
-
         private:
 
             // Vehicle state first derivative (Equation 12)

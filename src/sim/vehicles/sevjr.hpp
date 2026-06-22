@@ -48,15 +48,17 @@ namespace hf {
                 const auto r_rpm = Dynamics::kRollPitchYawScale * setpoint.roll;
                 const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
 
+                // Mixer
                 const auto rpm_fl = t_rpm + r_rpm - p_rpm;
                 const auto rpm_fr = t_rpm - r_rpm - p_rpm;
-                const auto rpm_r  = t_rpm + p_rpm;
+                const auto tmp = t_rpm + p_rpm;
+                const auto rpm_r = sqrt(2 * tmp * tmp);
 
                 // See Equation 6 from Bouabdallah et al 2004 -----------------
 
                 const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
                 const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
-                const auto o_r  = 2 * Dynamics::RpmToOmegaSquared(rpm_r);
+                const auto o_r  = Dynamics::RpmToOmegaSquared(rpm_r);
 
                 const auto t =  o_fl + o_fr + o_r;
                 const auto r = o_fl - o_fr;
