@@ -20,6 +20,7 @@
 #include <datatypes.hpp>
 #include <mixers/quadx.hpp>
 #include <sim/dynamics.hpp>
+#include <sim/vehicles/quadx.hpp>
 
 namespace hf {
 
@@ -44,31 +45,9 @@ namespace hf {
 
             static auto Run(const Setpoint & setpoint) -> Setpoint
             {
-                // Scale up new setpoint to RPMs
-                const Setpoint setpoint_rpms = {
-                    (float)kVehicleParams.thrust_scale * setpoint.thrust,
-                    Dynamics::kRollPitchYawScale * setpoint.roll,
-                    Dynamics::kRollPitchYawScale * setpoint.pitch,
-                    Dynamics::kRollPitchYawScale * setpoint.yaw
-                };
+                return QuadX::Run(kVehicleParams.thrust_scale, setpoint);
 
-                static Mixer mixer_;
-                mixer_ = hf::Mixer::Run(setpoint_rpms);
-
-                // Equation 6 from Bouabdallah et al 2004 ---------------------
-
-                const auto o_rr_cw  = Dynamics::RpmToOmegaSquared(mixer_.rr_cw);
-                const auto o_rf_ccw = Dynamics::RpmToOmegaSquared(mixer_.rf_ccw);
-                const auto o_lr_ccw = Dynamics::RpmToOmegaSquared(mixer_.lr_ccw);
-                const auto o_lr_cw  = Dynamics::RpmToOmegaSquared(mixer_.lf_cw);
-
-                return Setpoint(
-                         o_rr_cw + o_rf_ccw + o_lr_ccw + o_lr_cw,
-                        -o_rr_cw - o_rf_ccw + o_lr_ccw + o_lr_cw,
-                         o_rr_cw - o_rf_ccw + o_lr_ccw - o_lr_cw,
-                         o_rr_cw - o_rf_ccw - o_lr_ccw + o_lr_cw);
             }
-
 
     }; // class ApexQuad
 

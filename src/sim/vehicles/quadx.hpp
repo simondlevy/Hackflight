@@ -23,31 +23,17 @@
 
 namespace hf {
 
-    class ApexQuad {
-
-        private:
-
-            static constexpr float kThrustScale = 70000;
+    class QuadX {
 
         public:
 
-            static constexpr Dynamics::VehicleParams kVehicleParams = {
-
-                // Actual values
-                9.0e-2,  // mass [kg]
-                5.0e-2,  // arm length L [m]
-
-                // Reverse-engineered by observation:
-                1.3e-8, // thrust coefficient B [F=b*w^2]
-                4.1e-7, // I [kg*m^2] for pitch, roll, yaw
-                3.9e-11 // drag coefficient D [T=d*w^2] for yaw
-            };
-
-            static auto Run(const Setpoint & setpoint) -> Setpoint
+            static auto Run(
+                    const float thrust_scale,
+                    const Setpoint & setpoint) -> Setpoint
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    kThrustScale * setpoint.thrust,
+                    thrust_scale * setpoint.thrust,
                     Dynamics::kRollPitchYawScale * setpoint.roll,
                     Dynamics::kRollPitchYawScale * setpoint.pitch,
                     Dynamics::kRollPitchYawScale * setpoint.yaw
@@ -70,7 +56,6 @@ namespace hf {
                          o_rr_cw - o_rf_ccw - o_lr_ccw + o_lr_cw);
             }
 
-
-    }; // class ApexQuad
+    }; // class QuadX
 
 } // namespace hf
