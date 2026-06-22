@@ -24,10 +24,10 @@ def main():
 
     helper = Helper()
 
-    helper.startMotor('motor1', Helper.PROP_CW)
-    helper.startMotor('motor2', Helper.PROP_CCW)
-    helper.startMotor('motor3', Helper.PROP_CCW)
-    helper.startMotor('motor4', Helper.PROP_CW)
+    helper.startMotor('motor_right_rear_cw', Helper.PROP_CW)
+    helper.startMotor('motor_right_front_ccw', Helper.PROP_CCW)
+    helper.startMotor('motor_left_rear_ccw', Helper.PROP_CCW)
+    helper.startMotor('motor_left_front_cw', Helper.PROP_CW)
 
     while True:
         if not helper.step():

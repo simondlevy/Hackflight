@@ -99,10 +99,10 @@ def main():
 
     quad = DiyQuad()
 
-    start_motor(quad, "motor1", -1)
-    start_motor(quad, "motor2", +1)
-    start_motor(quad, "motor3", +1)
-    start_motor(quad, "motor4", -1)
+    start_motor(quad, "motor_right_rear_cw", -1)
+    start_motor(quad, "motor_right_front_ccw", +1)
+    start_motor(quad, "motor_left_rear_ccw", +1)
+    start_motor(quad, "motor_left_front_cw", -1)
 
     timestep = quad.getBasicTimeStep()
 
