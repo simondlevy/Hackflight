@@ -99,8 +99,6 @@ namespace hf {
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
-                //printf("%f,%f,%f\n", forces.thrust, u1*m, ddz);
-
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
                     ddz > 0 ? true :
@@ -139,9 +137,6 @@ namespace hf {
                             l / I * u3,
                             s.dpsi,
                             -l / I * u4);
-
-                printf("%f,%f,%f\n",
-                        newdstate.dphi, newdstate.dtheta, newdstate.dpsi);
 
                 return dyn.airborne_ && !airborne ? // just landed ?
 

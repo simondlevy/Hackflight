@@ -39,7 +39,7 @@ namespace hf {
                 // Reverse-engineered
                 1.3e-6, // thrust coefficient B [F=b*w^2]
                 2.1e-5, // I [kg*m^2] for pitch, roll, yaw
-                3.9e-9*4  // drag coefficient D [T=d*w^2] for yaw
+                6.2e-8  // drag coefficient D [T=d*w^2] for yaw
             };
 
             static auto Run(const Setpoint & setpoint_in) -> Setpoint
