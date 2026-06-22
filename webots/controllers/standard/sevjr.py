@@ -19,7 +19,7 @@
 
 from helper import Helper
 
-RUDDER_NEUTRAL = 0.2
+RUDDER_NEUTRAL = 0
 
 
 def main():
@@ -38,7 +38,8 @@ def main():
         if not helper.step():
             break
 
-        pos = -helper.cmdinfo[4] + RUDDER_NEUTRAL
+        # pos = -helper.cmdinfo[4] + RUDDER_NEUTRAL
+        pos = RUDDER_NEUTRAL
 
         left_rudder.setPosition(pos)
         right_rudder.setPosition(pos)
