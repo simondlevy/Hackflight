@@ -16,7 +16,7 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/vehicles/apexquad.hpp>
+#include <sim/vehicles/quadx/apexquad.hpp>
 #include "../helper.hpp"
 
 static PluginHelper * _helper;
