@@ -25,6 +25,10 @@ namespace hf {
 
     class SevJr {
 
+        private:
+
+            static constexpr float YAW_SCALE = -10000;
+
         public:
 
             static constexpr VehicleParams kVehicleParams = {
@@ -68,13 +72,11 @@ namespace hf {
 
                 // Special handling for yaw force from rudder and rear prop
 
-                const auto out = Setpoint(
+                return Setpoint(
                         o_prop_fl_cw + o_prop_fr_ccw + o_prop_r_cw,
                         o_prop_fl_cw - o_prop_fr_ccw,
                         -(o_prop_fl_cw + o_prop_fr_ccw)/2 + o_prop_r_cw,
-                        mixer_.rudder * -10000);
-
-                return out;
+                        mixer_.rudder * YAW_SCALE);
             }
 
     }; // class SevJr
