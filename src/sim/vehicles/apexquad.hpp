@@ -56,24 +56,17 @@ namespace hf {
                 static Mixer mixer_;
                 mixer_ = hf::Mixer::Run(setpoint_rpms);
 
-                const auto motor_rpms = mixer_.motorvals;
-
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o1 = Dynamics::RpmToOmegaSquared(motor_rpms[0]);
-                const auto o2 = Dynamics::RpmToOmegaSquared(motor_rpms[1]);
-                const auto o3 = Dynamics::RpmToOmegaSquared(motor_rpms[2]);
-                const auto o4 = Dynamics::RpmToOmegaSquared(motor_rpms[3]);
-
-                /*
-                printf("%0.f %0.f\n",
-                        setpoint_rpms.thrust,
-                        Dynamics::OmegaSquaredToRpm(o1));*/
+                const auto o1 = Dynamics::RpmToOmegaSquared(mixer_.m_rr_cw);
+                const auto o2 = Dynamics::RpmToOmegaSquared(mixer_.m_rf_ccw);
+                const auto o3 = Dynamics::RpmToOmegaSquared(mixer_.m_lr_ccw);
+                const auto o4 = Dynamics::RpmToOmegaSquared(mixer_.m_lf_cw);
 
                 const auto t =  o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
                 const auto p =  o1 - o2 + o3 - o4;
-                const auto y =  0; // o1 - o2 - o3 + o4;
+                const auto y =  o1 - o2 - o3 + o4;
 
                 return Setpoint(t, r, p, y);
             }

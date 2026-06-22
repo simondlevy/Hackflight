@@ -1,11 +1,11 @@
 /*
- *  BetaFlight QuadX motor mixer for Hackflight
+ *  QuadX motor mixer for Hackflight
  *
- *               4:cw   2:ccw
+ *                 cw  ccw
  *                   \ /
  *                    X 
  *                   / \
- *               3:ccw  1:cw
+ *                 ccw  cw
  *
  * Copyright (C) 2024 Simon D. Levy
  *
@@ -33,21 +33,22 @@ namespace hf {
 
         public:
 
-            float motorvals[4];
+            float m_rr_cw;
+            float m_rf_ccw;
+            float m_lr_ccw;
+            float m_lf_cw;
 
             Mixer() = default;
 
             Mixer(
-                    const float m1,
-                    const float m2,
-                    const float m3,
-                    const float m4)
-            {
-                motorvals[0] = m1;
-                motorvals[1] = m2;
-                motorvals[2] = m3;
-                motorvals[3] = m4;
-            }
+                    const float m_rr_cw,
+                    const float m_rf_ccw,
+                    const float m_lr_ccw,
+                    const float m_lf_cw)
+                : m_rr_cw(m_rr_cw),
+                m_rf_ccw(m_rf_ccw),
+                m_lr_ccw(m_lr_ccw),
+                m_lf_cw(m_lf_cw) { }
 
             Mixer& operator=(const Mixer& other) = default;
 
@@ -58,12 +59,12 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m1 = t - r + p - y;
-                const float m2 = t - r - p + y;
-                const float m3 = t + r + p + y;
-                const float m4 = t + r - p - y;
+                const float m_rr_cw = t - r + p - y;
+                const float m_rf_ccw = t - r - p + y;
+                const float ml_lr_ccw = t + r + p + y;
+                const float m_lf_cw = t + r - p - y;
 
-                return Mixer(m1, m2, m3, m4);
+                return Mixer(m_rr_cw, m_rf_ccw, ml_lr_ccw, m_lf_cw);
             }
     };
 
