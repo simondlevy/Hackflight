@@ -25,15 +25,21 @@ namespace hf {
 
     class QuadX {
 
+        private:
+
+            static constexpr float motor_kv = 7000;
+            static constexpr float battery_voltage = 7.4;
+
         public:
 
             static auto Run(
-                    const float thrust_scale,
+                    const Dynamics::VehicleParams vparams,
                     const Setpoint & setpoint) -> Setpoint
             {
+
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    thrust_scale * setpoint.thrust,
+                    setpoint.thrust * (float)vparams.battery_voltage * (float)vparams.motor_kv,
                     Dynamics::kRollPitchYawScale * setpoint.roll,
                     Dynamics::kRollPitchYawScale * setpoint.pitch,
                     Dynamics::kRollPitchYawScale * setpoint.yaw

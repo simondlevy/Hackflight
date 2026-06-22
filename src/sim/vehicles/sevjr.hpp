@@ -29,14 +29,13 @@ namespace hf {
 
             static constexpr Dynamics::VehicleParams kVehicleParams = {
 
-                // Should be based on motor kV
-                10000, // thrust_scale
-
                 // Actual values
+                11.1,    // battery voltage
+                1050,    // motor kV
                 4.8e-1,  // mass [kg]
                 1.7e-1,  // arm length L [m]
 
-                // Reverse-engifrered by observation:
+                // Reverse-engineered
                 1.3e-6, // thrust coefficient B [F=b*w^2]
                 4.1e-5, // I [kg*m^2] for pitch, roll, yaw
                 3.9e-9  // drag coefficient D [T=d*w^2] for yaw
@@ -46,7 +45,7 @@ namespace hf {
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    (float)kVehicleParams.thrust_scale * setpoint.thrust,
+                    10000 * setpoint.thrust,
                     Dynamics::kRollPitchYawScale * setpoint.roll,
                     Dynamics::kRollPitchYawScale * setpoint.pitch,
                     Dynamics::kRollPitchYawScale * setpoint.yaw

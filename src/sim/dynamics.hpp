@@ -50,7 +50,7 @@ namespace hf {
 
         public:
 
-            static constexpr float kRollPitchYawScale = 1000;
+            static constexpr float kRollPitchYawScale = 500;
 
             // Vehicle state (Equation 11)
             SimState state;
@@ -60,10 +60,9 @@ namespace hf {
              */
             typedef struct {
 
-                // Proporitiona to motor kV
-                double thrust_scale;
-
-                // These can be measured directly
+                // These can be determined directly
+                double battery_voltage;
+                double motor_kv;
                 double m;  // mass [kg]
                 double l;  // arm length [m]
 
