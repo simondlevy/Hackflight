@@ -26,7 +26,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <mixers/bfquadx.hpp>
+#include <mixers/quadx.hpp>
 
 namespace hf {
 

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <datatypes.hpp>
-#include <mixers/bfquadx.hpp>
+#include <mixers/quadx.hpp>
 #include <sim/dynamics.hpp>
 
 namespace hf {
