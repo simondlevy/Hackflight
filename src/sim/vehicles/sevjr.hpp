@@ -45,7 +45,7 @@ namespace hf {
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    10000 * setpoint.thrust,
+                    Dynamics::GetThrustRpm(kVehicleParams, setpoint.thrust),
                     Dynamics::kRollPitchYawScale * setpoint.roll,
                     Dynamics::kRollPitchYawScale * setpoint.pitch,
                     Dynamics::kRollPitchYawScale * setpoint.yaw

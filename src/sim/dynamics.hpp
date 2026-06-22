@@ -179,6 +179,12 @@ namespace hf {
 
             } // update
 
+            static auto GetThrustRpm(
+                    const VehicleParams vparams, const double motor) -> float
+            {
+                return motor * vparams.battery_voltage * vparams.motor_kv;
+            }
+
             static auto RpmToOmegaSquared(const double rpm) -> double
             {
                 const auto omega = rpm * 2 * M_PI / 60;
