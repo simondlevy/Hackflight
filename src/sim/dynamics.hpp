@@ -60,6 +60,9 @@ namespace hf {
              */
             typedef struct {
 
+                // Proporitiona to motor kV
+                double thrust_scale;
+
                 // These can be measured directly
                 double m;  // mass [kg]
                 double l;  // arm length [m]

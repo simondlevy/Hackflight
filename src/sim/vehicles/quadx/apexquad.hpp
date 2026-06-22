@@ -25,13 +25,12 @@ namespace hf {
 
     class ApexQuad {
 
-        private:
-
-            static constexpr float kThrustScale = 70000;
-
         public:
 
             static constexpr Dynamics::VehicleParams kVehicleParams = {
+
+                // Should be based on motor kV
+                70000, // thrust_scale
 
                 // Actual values
                 9.0e-2,  // mass [kg]
@@ -47,7 +46,7 @@ namespace hf {
             {
                 // Scale up new setpoint to RPMs
                 const Setpoint setpoint_rpms = {
-                    kThrustScale * setpoint.thrust,
+                    (float)kVehicleParams.thrust_scale * setpoint.thrust,
                     Dynamics::kRollPitchYawScale * setpoint.roll,
                     Dynamics::kRollPitchYawScale * setpoint.pitch,
                     Dynamics::kRollPitchYawScale * setpoint.yaw

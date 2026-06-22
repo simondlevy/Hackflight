@@ -33,6 +33,9 @@ namespace hf {
 
             static constexpr Dynamics::VehicleParams kVehicleParams = {
 
+                // Should be based on motor kV
+                10000, // thrust_scale
+
                 // Actual values
                 4.8e-1,  // mass [kg]
                 1.7e-1,  // arm length L [m]
