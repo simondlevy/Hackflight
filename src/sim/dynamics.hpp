@@ -180,7 +180,7 @@ namespace hf {
 
             } // update
 
-            static auto RpmToOmega2(const double rpm) -> double
+            static auto RpmToOmegaSquared(const double rpm) -> double
             {
                 const auto omega = rpm * 2 * M_PI / 60;
 
