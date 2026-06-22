@@ -73,9 +73,6 @@ namespace hf {
                     const Setpoint & forces,
                     const WorldParams wparams = { 9.807, 1.225 }) -> Dynamics
             {
-                printf("t=%0.f r=%0.f p=%0.f\n",
-                        forces.thrust, forces.roll, forces.pitch);
-
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
                 const double u1 = vparams.b * wparams.rho * forces.thrust;

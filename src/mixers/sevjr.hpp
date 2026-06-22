@@ -36,14 +36,19 @@ namespace hf {
 
         public:
 
-            float fl_cw;
-            float fr_ccw;
-            float r_cw;
+            float prop_fl_cw;
+            float prop_fr_ccw;
+            float prop_r_cw;
 
             SevJrMixer() = default;
 
-            SevJrMixer( const float fl_cw, const float fr_ccw, const float r_cw)
-                : fl_cw(fl_cw), fr_ccw(fr_ccw), r_cw(r_cw) { }
+            SevJrMixer(
+                    const float prop_fl_cw,
+                    const float prop_fr_ccw,
+                    const float prop_r_cw)
+                : prop_fl_cw(prop_fl_cw),
+                prop_fr_ccw(prop_fr_ccw),
+                prop_r_cw(prop_r_cw) { }
 
             SevJrMixer& operator=(const SevJrMixer& other) = default;
 

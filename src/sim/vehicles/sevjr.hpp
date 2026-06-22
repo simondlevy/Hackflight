@@ -57,14 +57,19 @@ namespace hf {
 
                 // See Equation 6 from Bouabdallah et al 2004 -----------------
 
-                const auto o_fl_cw = Dynamics::RpmToOmegaSquared(mixer_.fl_cw);
-                const auto o_fr_ccw = Dynamics::RpmToOmegaSquared(mixer_.fr_ccw);
-                const auto o_r_cw  = Dynamics::RpmToOmegaSquared(mixer_.r_cw);
+                const auto o_prop_fl_cw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_fl_cw);
+
+                const auto o_prop_fr_ccw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_fr_ccw);
+
+                const auto o_prop_r_cw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_r_cw);
 
                 const auto out = Setpoint(
-                        o_fl_cw + o_fr_ccw + o_r_cw,
-                        o_fl_cw - o_fr_ccw,
-                        -(o_fl_cw + o_fr_ccw)/2 + o_r_cw,
+                        o_prop_fl_cw + o_prop_fr_ccw + o_prop_r_cw,
+                        o_prop_fl_cw - o_prop_fr_ccw,
+                        -(o_prop_fl_cw + o_prop_fr_ccw)/2 + o_prop_r_cw,
                         0);
 
                 return out;
