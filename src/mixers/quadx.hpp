@@ -29,7 +29,7 @@
 
 namespace hf {
 
-    class Mixer {
+    class QuadXMixer {
 
         public:
 
@@ -38,9 +38,9 @@ namespace hf {
             float lr_ccw;
             float lf_cw;
 
-            Mixer() = default;
+            QuadXMixer() = default;
 
-            Mixer(
+            QuadXMixer(
                     const float rr_cw,
                     const float rf_ccw,
                     const float lr_ccw,
@@ -50,16 +50,16 @@ namespace hf {
                 lr_ccw(lr_ccw),
                 lf_cw(lf_cw) { }
 
-            Mixer& operator=(const Mixer& other) = default;
+            QuadXMixer& operator=(const QuadXMixer& other) = default;
 
-            static auto Run(const Setpoint & setpoint)-> Mixer
+            static auto Run(const Setpoint & setpoint)-> QuadXMixer
             {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                return Mixer(
+                return QuadXMixer(
                         t - r + p - y,
                         t - r - p + y,
                         t + r + p + y,

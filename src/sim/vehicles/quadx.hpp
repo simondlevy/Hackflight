@@ -40,8 +40,8 @@ namespace hf {
                     Dynamics::kRollPitchYawScale * setpoint.yaw
                 };
 
-                static Mixer mixer_;
-                mixer_ = hf::Mixer::Run(setpoint_rpms);
+                static QuadXMixer mixer_;
+                mixer_ = hf::QuadXMixer::Run(setpoint_rpms);
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 

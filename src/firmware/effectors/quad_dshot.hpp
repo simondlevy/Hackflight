@@ -73,7 +73,7 @@ namespace hf {
 
             DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
-            hf::Mixer mixer_;
+            hf::QuadXMixer mixer_;
 
 
     }; // class QuadDshot

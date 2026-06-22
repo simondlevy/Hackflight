@@ -52,8 +52,8 @@ namespace hf {
                     Dynamics::kRollPitchYawScale * setpoint.yaw
                 };
 
-                static Mixer mixer_;
-                mixer_ = hf::Mixer::Run(setpoint_rpms);
+                static SevJrMixer mixer_;
+                mixer_ = hf::SevJrMixer::Run(setpoint_rpms);
 
                 // See Equation 6 from Bouabdallah et al 2004 -----------------
 
@@ -68,6 +68,6 @@ namespace hf {
                         0);
             }
 
-    }; // class ApexQuad
+    }; // class SevJr
 
 } // namespace hf

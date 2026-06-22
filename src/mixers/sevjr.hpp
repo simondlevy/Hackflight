@@ -30,7 +30,7 @@
 
 namespace hf {
 
-    class Mixer {
+    class SevJrMixer {
 
         public:
 
@@ -38,21 +38,21 @@ namespace hf {
             float fr_ccw;
             float r_cw;
 
-            Mixer() = default;
+            SevJrMixer() = default;
 
-            Mixer( const float fl_cw, const float fr_ccw, const float r_cw)
+            SevJrMixer( const float fl_cw, const float fr_ccw, const float r_cw)
                 : fl_cw(fl_cw), fr_ccw(fr_ccw), r_cw(r_cw) { }
 
-            Mixer& operator=(const Mixer& other) = default;
+            SevJrMixer& operator=(const SevJrMixer& other) = default;
 
-            static auto Run(const Setpoint & setpoint)-> Mixer
+            static auto Run(const Setpoint & setpoint)-> SevJrMixer
             {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
                 // const auto y = setpoint.yaw;
 
-                return Mixer(t + r - p, t - r - p, 1.414213 * (t + p));
+                return SevJrMixer(t + r - p, t - r - p, 1.414213 * (t + p));
             }
     };
 
