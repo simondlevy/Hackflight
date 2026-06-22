@@ -2,15 +2,15 @@
  * Copyright (C) 2024 Simon D. Levy
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
+ * it under the terms of the GNU Gefrral Public License as published by
  * the Free Software Foundation, in version 3.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * GNU Gefrral Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Gefrral Public License
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
@@ -36,7 +36,7 @@ namespace hf {
                 4.8e-1,  // mass [kg]
                 1.7e-1,  // arm length L [m]
 
-                // Reverse-engineered by observation:
+                // Reverse-engifrered by observation:
                 1.0e-6, // thrust coefficient B [F=b*w^2]
                 4.1e-5, // I [kg*m^2] for pitch, roll, yaw
                 3.9e-9  // drag coefficient D [T=d*w^2] for yaw
@@ -49,22 +49,24 @@ namespace hf {
                 const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
                 const auto y_rpm = Dynamics::kRollPitchYawScale * setpoint.yaw;
 
-                const auto m_se = t_rpm - r_rpm + p_rpm - y_rpm;
-                const auto m_ne = t_rpm - r_rpm - p_rpm + y_rpm;
-                const auto m_sw = t_rpm + r_rpm + p_rpm + y_rpm;
-                const auto m_nw = t_rpm + r_rpm - p_rpm - y_rpm;
+                const auto rpm_fl = t_rpm + r_rpm - p_rpm - y_rpm;
+                const auto rpm_fr = t_rpm - r_rpm - p_rpm + y_rpm;
+
+                const auto rpm_se = t_rpm - r_rpm + p_rpm - y_rpm;
+                const auto rpm_sw = t_rpm + r_rpm + p_rpm + y_rpm;
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o_se = Dynamics::RpmToOmegaSquared(m_se);
-                const auto o_ne = Dynamics::RpmToOmegaSquared(m_ne);
-                const auto o_sw = Dynamics::RpmToOmegaSquared(m_sw);
-                const auto o_nw = Dynamics::RpmToOmegaSquared(m_nw);
+                const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
+                const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
 
-                const auto t =  o_se + o_ne + o_sw + o_nw;
-                const auto r = -o_se - o_ne + o_sw + o_nw;
-                const auto p =  o_se - o_ne + o_sw - o_nw;
-                const auto y =  o_se - o_ne - o_sw + o_nw;
+                const auto o_se = Dynamics::RpmToOmegaSquared(rpm_se);
+                const auto o_sw = Dynamics::RpmToOmegaSquared(rpm_sw);
+
+                const auto t =  4 * (o_fl + o_fr + o_se) / 3; // + o_sw;
+                const auto r = 0; // o_fl - o_fr - o_se + o_sw;
+                const auto p = 0; // -o_fl - o_fr + o_se + o_sw;
+                const auto y = 0; // o_se - o_fr - o_sw + o_fl;
 
                 return Setpoint(t, r, p, y);
             }
