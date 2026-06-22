@@ -47,26 +47,21 @@ namespace hf {
                 const auto t_rpm = kThrustScale * setpoint.thrust;
                 const auto r_rpm = Dynamics::kRollPitchYawScale * setpoint.roll;
                 const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
-                const auto y_rpm = Dynamics::kRollPitchYawScale * setpoint.yaw;
 
-                const auto rpm_fl = t_rpm + r_rpm - p_rpm - y_rpm;
-                const auto rpm_fr = t_rpm - r_rpm - p_rpm + y_rpm;
-
-                const auto rpm_se = t_rpm - r_rpm + p_rpm - y_rpm;
-                const auto rpm_sw = t_rpm + r_rpm + p_rpm + y_rpm;
+                const auto rpm_fl = t_rpm + r_rpm - p_rpm;
+                const auto rpm_fr = t_rpm - r_rpm - p_rpm;
+                const auto rpm_r  = t_rpm + p_rpm;
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
                 const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
                 const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
+                const auto o_r = Dynamics::RpmToOmegaSquared(rpm_r);
 
-                const auto o_se = Dynamics::RpmToOmegaSquared(rpm_se);
-                const auto o_sw = Dynamics::RpmToOmegaSquared(rpm_sw);
-
-                const auto t =  4 * (o_fl + o_fr + o_se) / 3; // + o_sw;
-                const auto r = 0; // o_fl - o_fr - o_se + o_sw;
-                const auto p = 0; // -o_fl - o_fr + o_se + o_sw;
-                const auto y = 0; // o_se - o_fr - o_sw + o_fl;
+                const auto t =  4 * (o_fl + o_fr + o_r) / 3;
+                const auto r = 0; // o_fl - o_fr - o_r;
+                const auto p = 0; // -o_fl - o_fr + o_r;
+                const auto y = 0; // o_r - o_fr + o_fl;
 
                 return Setpoint(t, r, p, y);
             }
