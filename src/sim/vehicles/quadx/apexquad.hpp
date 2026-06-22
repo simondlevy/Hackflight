@@ -33,6 +33,7 @@ namespace hf {
                 // Actual values
                 7.4,     // battery voltage
                 7000,    // motor kV
+                0.014,   // leg height [m]
                 9.0e-2,  // mass [kg]
                 5.0e-2,  // arm length L [m]
 

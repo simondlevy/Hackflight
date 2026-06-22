@@ -26,13 +26,12 @@ DLLEXPORT void webots_physics_step()
 {
     const auto message = PluginHelper::GetMessage();
 
-    /*const*/ auto state = _helper->RunSimulator(
-            hf::ApexQuad::Run, hf::ApexQuad::kVehicleParams,
+    const auto vparams = hf::ApexQuad::kVehicleParams;
+
+    const auto state = _helper->RunSimulator( hf::ApexQuad::Run, vparams,
             message.mode, message.setpoint);
 
-    state.z += 0.014;
-
-    _helper->SetDbodyFromState(state);
+    _helper->SetDbodyFromState(vparams, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

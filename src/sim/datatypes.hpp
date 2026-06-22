@@ -99,8 +99,9 @@ namespace hf {
         // These can be determined directly
         double battery_voltage;
         double motor_kv;
-        double m;  // mass [kg]
-        double l;  // arm length [m]
+        double leg_height; // m
+        double m;          // mass [kg]
+        double l;          // arm length [m]
 
         // These should be estimated to get realistic behavior
         double b;  // thrust coefficient [F=b*w^2]

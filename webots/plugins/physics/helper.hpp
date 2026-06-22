@@ -110,10 +110,11 @@ class PluginHelper {
             return simulator_.pid_controller.setpoint;
         }
 
-        void SetDbodyFromState(const hf::SimState & state)
+        void SetDbodyFromState(const hf::VehicleParams vparams, const hf::SimState & state)
         {
             // Negate Y to make leftward positive
-            dBodySetPosition(robot_body, state.x, -state.y, state.z);
+            dBodySetPosition(robot_body, state.x, -state.y,
+                    state.z + vparams.leg_height);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
