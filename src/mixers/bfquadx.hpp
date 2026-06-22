@@ -59,10 +59,10 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m_rr_cw = t - r + p - y;
-                const float m_rf_ccw = t - r - p + y;
+                const float m_rr_cw   = t - r + p - y;
+                const float m_rf_ccw  = t - r - p + y;
                 const float ml_lr_ccw = t + r + p + y;
-                const float m_lf_cw = t + r - p - y;
+                const float m_lf_cw   = t + r - p - y;
 
                 return Mixer(m_rr_cw, m_rf_ccw, ml_lr_ccw, m_lf_cw);
             }
