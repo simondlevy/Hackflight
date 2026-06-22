@@ -2,18 +2,14 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sys import argv
 
 
 def main():
 
-    data = np.loadtxt(argv[1], delimiter=',')
-
-    hover_rpm = float(argv[2]) * np.ones(data.shape[0])
+    data = np.loadtxt('log.csv', delimiter=',')
 
     plt.subplot(3, 1, 1)
     plt.plot(data[:,0])
-    plt.plot(hover_rpm)
     plt.ylabel('RPM')
 
     plt.subplot(3, 1, 2)

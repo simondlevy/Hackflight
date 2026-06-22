@@ -126,6 +126,8 @@ namespace hf {
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
+                printf("%f,%f,%f\n", forces.thrust, u1, ddz);
+
                 //const auto rpm = 60 * sqrt(forces.thrust/4) /(2*M_PI); 
                 //printf("%f,%f,%f\n", rpm, u1, ddz);
 
@@ -178,7 +180,7 @@ namespace hf {
 
             } // update
 
-            static auto GetOmega2(const double rpm) -> double
+            static auto RpmToOmega2(const double rpm) -> double
             {
                 const auto omega = rpm * 2 * M_PI / 60;
 

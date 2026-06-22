@@ -60,10 +60,10 @@ namespace hf {
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o1 = Dynamics::GetOmega2(motor_rpms[0]);
-                const auto o2 = Dynamics::GetOmega2(motor_rpms[1]);
-                const auto o3 = Dynamics::GetOmega2(motor_rpms[2]);
-                const auto o4 = Dynamics::GetOmega2(motor_rpms[3]);
+                const auto o1 = Dynamics::RpmToOmega2(motor_rpms[0]);
+                const auto o2 = Dynamics::RpmToOmega2(motor_rpms[1]);
+                const auto o3 = Dynamics::RpmToOmega2(motor_rpms[2]);
+                const auto o4 = Dynamics::RpmToOmega2(motor_rpms[3]);
 
                 const auto t =  o1 + o2 + o3 + o4;
                 const auto r = -o1 - o2 + o3 + o4;
