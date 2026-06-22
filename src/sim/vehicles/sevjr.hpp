@@ -56,11 +56,11 @@ namespace hf {
 
                 const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
                 const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
-                const auto o_r = Dynamics::RpmToOmegaSquared(rpm_r);
+                const auto o_r  = 2 * Dynamics::RpmToOmegaSquared(rpm_r);
 
                 const auto t =  o_fl + o_fr + o_r;
-                const auto r = 0; // o_fl - o_fr - o_r;
-                const auto p = 0; // -o_fl - o_fr + o_r;
+                const auto r = o_fl - o_fr;
+                const auto p = -o_fl - o_fr + o_r;
                 const auto y = 0; // o_r - o_fr + o_fl;
 
                 return Setpoint(t, r, p, y);
