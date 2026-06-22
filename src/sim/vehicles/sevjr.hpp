@@ -18,6 +18,7 @@
 #pragma once
 
 #include <datatypes.hpp>
+#include <mixers/sevjr.hpp>
 #include <sim/dynamics.hpp>
 
 namespace hf {

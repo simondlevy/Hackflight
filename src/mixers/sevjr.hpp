@@ -1,11 +1,11 @@
 /*
- *  QuadX motor mixer for Hackflight
+ *  SEV Jr motor mixer for Hackflight
  *
  *                 cw  ccw
  *                   \ /
  *                    X 
- *                   / \
- *                 ccw  cw
+ *                    |
+ *                   cw
  *
  * Copyright (C) 2024 Simon D. Levy
  *
@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <math.h>
+
 #include <datatypes.hpp>
 
 namespace hf {
@@ -33,22 +35,14 @@ namespace hf {
 
         public:
 
-            float rr_cw;
-            float rf_ccw;
-            float lr_ccw;
-            float lf_cw;
+            float fl_cw;
+            float fr_ccw;
+            float r_cw;
 
             Mixer() = default;
 
-            Mixer(
-                    const float rr_cw,
-                    const float rf_ccw,
-                    const float lr_ccw,
-                    const float lf_cw)
-                : rr_cw(rr_cw),
-                rf_ccw(rf_ccw),
-                lr_ccw(lr_ccw),
-                lf_cw(lf_cw) { }
+            Mixer( const float fl_cw, const float fr_ccw, const float r_cw)
+                : fl_cw(fl_cw), fr_ccw(fr_ccw), r_cw(r_cw) { }
 
             Mixer& operator=(const Mixer& other) = default;
 
@@ -57,13 +51,11 @@ namespace hf {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
-                const auto y = setpoint.yaw;
+                // const auto y = setpoint.yaw;
 
-                return Mixer(
-                        t - r + p - y,
-                        t - r - p + y,
-                        t + r + p + y,
-                        t + r - p - y);
+                const auto tp = t + p;
+
+                return Mixer(t + r - p, t - r - p, sqrt(2 * tp * tp));
             }
     };
 
