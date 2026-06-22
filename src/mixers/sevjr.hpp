@@ -62,9 +62,7 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                printf("y=%+3.3f\n", y);
-
-                return SevJrMixer(t+r-p, t-r-p, t+p, 0);
+                return SevJrMixer(t+r-p, t-r-p, t+p, y);
             }
     };
 

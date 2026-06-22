@@ -38,24 +38,24 @@ namespace hf {
 
                 // Reverse-engineered
                 1.3e-6, // thrust coefficient B [F=b*w^2]
-                4.1e-5, // I [kg*m^2] for pitch, roll, yaw
-                3.9e-9  // drag coefficient D [T=d*w^2] for yaw
+                2.1e-5, // I [kg*m^2] for pitch, roll, yaw
+                3.9e-9*4  // drag coefficient D [T=d*w^2] for yaw
             };
 
-            static auto Run(const Setpoint & setpoint) -> Setpoint
+            static auto Run(const Setpoint & setpoint_in) -> Setpoint
             {
-                // Scale up new setpoint to RPMs
-                const Setpoint setpoint_rpms = {
-                    Dynamics::GetThrustRpm(kVehicleParams, setpoint.thrust),
-                    Dynamics::kRollPitchYawScale * setpoint.roll,
-                    Dynamics::kRollPitchYawScale * setpoint.pitch,
-                    Dynamics::kRollPitchYawScale * setpoint.yaw
+                const Setpoint setpoint_to_mixer = {
+                    Dynamics::GetThrustRpm(kVehicleParams, setpoint_in.thrust),
+                    Dynamics::kRollPitchYawScale * setpoint_in.roll,
+                    Dynamics::kRollPitchYawScale * setpoint_in.pitch,
+                    setpoint_in.yaw
                 };
 
                 static SevJrMixer mixer_;
-                mixer_ = hf::SevJrMixer::Run(setpoint_rpms);
+                mixer_ = hf::SevJrMixer::Run(setpoint_to_mixer);
 
-                // See Equation 6 from Bouabdallah et al 2004 -----------------
+                // Based on Equation 6 from Bouabdallah et al 2004 for RPM-to-force
+                // prop conversion
 
                 const auto o_prop_fl_cw =
                     Dynamics::RpmToOmegaSquared(mixer_.prop_fl_cw);
@@ -66,11 +66,13 @@ namespace hf {
                 const auto o_prop_r_cw =
                     Dynamics::RpmToOmegaSquared(mixer_.prop_r_cw);
 
+                // Special handling for yaw force from rudder and rear prop
+
                 const auto out = Setpoint(
                         o_prop_fl_cw + o_prop_fr_ccw + o_prop_r_cw,
                         o_prop_fl_cw - o_prop_fr_ccw,
                         -(o_prop_fl_cw + o_prop_fr_ccw)/2 + o_prop_r_cw,
-                        0);
+                        mixer_.rudder * -10000);
 
                 return out;
             }

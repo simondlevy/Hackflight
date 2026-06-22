@@ -140,6 +140,9 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
+                printf("%f,%f,%f\n",
+                        newdstate.dphi, newdstate.dtheta, newdstate.dpsi);
+
                 return dyn.airborne_ && !airborne ? // just landed ?
 
                     // yes: reset dynamics, keeping current pose
