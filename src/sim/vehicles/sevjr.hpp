@@ -62,14 +62,12 @@ namespace hf {
                 const auto o_fr_ccw = Dynamics::RpmToOmegaSquared(mixer_.fr_ccw);
                 const auto o_r_cw  = Dynamics::RpmToOmegaSquared(mixer_.r_cw);
 
-                const auto t =  o_fl_cw + o_fr_ccw + o_r_cw;
-                const auto r = o_fl_cw - o_fr_ccw;
-                const auto p = -o_fl_cw - o_fr_ccw + o_r_cw;
-                const auto y = 0; // o_r_cw - o_fr_ccw + o_fl_cw;
-
-                return Setpoint(t, r, p, y);
+                return Setpoint(
+                        o_fl_cw + o_fr_ccw + o_r_cw,
+                        o_fl_cw - o_fr_ccw,
+                        -o_fl_cw - o_fr_ccw + o_r_cw,
+                        0);
             }
-
 
     }; // class ApexQuad
 
