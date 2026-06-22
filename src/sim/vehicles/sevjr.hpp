@@ -45,26 +45,27 @@ namespace hf {
 
             static auto Run(const Setpoint & setpoint) -> Setpoint
             {
-                const auto t_rpm = kThrustScale * setpoint.thrust;
-                const auto r_rpm = Dynamics::kRollPitchYawScale * setpoint.roll;
-                const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
+                // Scale up new setpoint to RPMs
+                const Setpoint setpoint_rpms = {
+                    kThrustScale * setpoint.thrust,
+                    Dynamics::kRollPitchYawScale * setpoint.roll,
+                    Dynamics::kRollPitchYawScale * setpoint.pitch,
+                    Dynamics::kRollPitchYawScale * setpoint.yaw
+                };
 
-                // Mixer
-                const auto rpm_fl = t_rpm + r_rpm - p_rpm;
-                const auto rpm_fr = t_rpm - r_rpm - p_rpm;
-                const auto tmp = t_rpm + p_rpm;
-                const auto rpm_r = sqrt(2 * tmp * tmp);
+                static Mixer mixer_;
+                mixer_ = hf::Mixer::Run(setpoint_rpms);
 
                 // See Equation 6 from Bouabdallah et al 2004 -----------------
 
-                const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
-                const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
-                const auto o_r  = Dynamics::RpmToOmegaSquared(rpm_r);
+                const auto o_fl_cw = Dynamics::RpmToOmegaSquared(mixer_.fl_cw);
+                const auto o_fr_ccw = Dynamics::RpmToOmegaSquared(mixer_.fr_ccw);
+                const auto o_r_cw  = Dynamics::RpmToOmegaSquared(mixer_.r_cw);
 
-                const auto t =  o_fl + o_fr + o_r;
-                const auto r = o_fl - o_fr;
-                const auto p = -o_fl - o_fr + o_r;
-                const auto y = 0; // o_r - o_fr + o_fl;
+                const auto t =  o_fl_cw + o_fr_ccw + o_r_cw;
+                const auto r = o_fl_cw - o_fr_ccw;
+                const auto p = -o_fl_cw - o_fr_ccw + o_r_cw;
+                const auto y = 0; // o_r_cw - o_fr_ccw + o_fl_cw;
 
                 return Setpoint(t, r, p, y);
             }
