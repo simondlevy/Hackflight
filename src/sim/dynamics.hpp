@@ -126,10 +126,7 @@ namespace hf {
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
-                printf("%f,%f,%f\n", forces.thrust, u1, ddz);
-
-                //const auto rpm = 60 * sqrt(forces.thrust/4) /(2*M_PI); 
-                //printf("%f,%f,%f\n", rpm, u1, ddz);
+                //printf("%f,%f,%f\n", forces.thrust, u1*m, ddz);
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
@@ -185,6 +182,11 @@ namespace hf {
                 const auto omega = rpm * 2 * M_PI / 60;
 
                 return omega * omega;
+            }
+
+            static auto OmegaSquaredToRpm(const double omega2) -> double
+            {
+                return sqrt(omega2) / (2 * M_PI / 60);
             }
 
         private:

@@ -49,22 +49,22 @@ namespace hf {
                 const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
                 const auto y_rpm = Dynamics::kRollPitchYawScale * setpoint.yaw;
 
-                const auto m1 = t_rpm - r_rpm + p_rpm - y_rpm;
-                const auto m2 = t_rpm - r_rpm - p_rpm + y_rpm;
-                const auto m3 = t_rpm + r_rpm + p_rpm + y_rpm;
-                const auto m4 = t_rpm + r_rpm - p_rpm - y_rpm;
+                const auto m_se = t_rpm - r_rpm + p_rpm - y_rpm;
+                const auto m_ne = t_rpm - r_rpm - p_rpm + y_rpm;
+                const auto m_sw = t_rpm + r_rpm + p_rpm + y_rpm;
+                const auto m_nw = t_rpm + r_rpm - p_rpm - y_rpm;
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o1 = Dynamics::RpmToOmegaSquared(m1);
-                const auto o2 = Dynamics::RpmToOmegaSquared(m2);
-                const auto o3 = Dynamics::RpmToOmegaSquared(m3);
-                const auto o4 = Dynamics::RpmToOmegaSquared(m4);
+                const auto o_se = Dynamics::RpmToOmegaSquared(m_se);
+                const auto o_ne = Dynamics::RpmToOmegaSquared(m_ne);
+                const auto o_sw = Dynamics::RpmToOmegaSquared(m_sw);
+                const auto o_nw = Dynamics::RpmToOmegaSquared(m_nw);
 
-                const auto t =  o1 + o2 + o3 + o4;
-                const auto r = -o1 - o2 + o3 + o4;
-                const auto p =  o1 - o2 + o3 - o4;
-                const auto y =  o1 - o2 - o3 + o4;
+                const auto t =  o_se + o_ne + o_sw + o_nw;
+                const auto r = -o_se - o_ne + o_sw + o_nw;
+                const auto p =  o_se - o_ne + o_sw - o_nw;
+                const auto y =  o_se - o_ne - o_sw + o_nw;
 
                 return Setpoint(t, r, p, y);
             }
