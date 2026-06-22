@@ -5,7 +5,8 @@
  *                   \ /
  *                    X 
  *                    |
- *                   cw
+ *                cw / rudder
+ *             
  *
  * Copyright (C) 2024 Simon D. Levy
  *
