@@ -37,7 +37,7 @@ namespace hf {
                 1.7e-1,  // arm length L [m]
 
                 // Reverse-engifrered by observation:
-                1.0e-6, // thrust coefficient B [F=b*w^2]
+                1.3e-6, // thrust coefficient B [F=b*w^2]
                 4.1e-5, // I [kg*m^2] for pitch, roll, yaw
                 3.9e-9  // drag coefficient D [T=d*w^2] for yaw
             };
@@ -52,13 +52,13 @@ namespace hf {
                 const auto rpm_fr = t_rpm - r_rpm - p_rpm;
                 const auto rpm_r  = t_rpm + p_rpm;
 
-                // Equation 6 from Bouabdallah et al 2004 ---------------------
+                // See Equation 6 from Bouabdallah et al 2004 -----------------
 
                 const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
                 const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
                 const auto o_r = Dynamics::RpmToOmegaSquared(rpm_r);
 
-                const auto t =  4 * (o_fl + o_fr + o_r) / 3;
+                const auto t =  o_fl + o_fr + o_r;
                 const auto r = 0; // o_fl - o_fr - o_r;
                 const auto p = 0; // -o_fl - o_fr + o_r;
                 const auto y = 0; // o_r - o_fr + o_fl;
