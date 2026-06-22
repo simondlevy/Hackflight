@@ -33,22 +33,22 @@ namespace hf {
 
         public:
 
-            float m_rr_cw;
-            float m_rf_ccw;
-            float m_lr_ccw;
-            float m_lf_cw;
+            float rr_cw;
+            float rf_ccw;
+            float lr_ccw;
+            float lf_cw;
 
             Mixer() = default;
 
             Mixer(
-                    const float m_rr_cw,
-                    const float m_rf_ccw,
-                    const float m_lr_ccw,
-                    const float m_lf_cw)
-                : m_rr_cw(m_rr_cw),
-                m_rf_ccw(m_rf_ccw),
-                m_lr_ccw(m_lr_ccw),
-                m_lf_cw(m_lf_cw) { }
+                    const float rr_cw,
+                    const float rf_ccw,
+                    const float lr_ccw,
+                    const float lf_cw)
+                : rr_cw(rr_cw),
+                rf_ccw(rf_ccw),
+                lr_ccw(lr_ccw),
+                lf_cw(lf_cw) { }
 
             Mixer& operator=(const Mixer& other) = default;
 
@@ -59,12 +59,12 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m_rr_cw   = t - r + p - y;
-                const float m_rf_ccw  = t - r - p + y;
-                const float ml_lr_ccw = t + r + p + y;
-                const float m_lf_cw   = t + r - p - y;
+                const float rr_cw  = t - r + p - y;
+                const float rf_ccw = t - r - p + y;
+                const float lr_ccw = t + r + p + y;
+                const float lf_cw  = t + r - p - y;
 
-                return Mixer(m_rr_cw, m_rf_ccw, ml_lr_ccw, m_lf_cw);
+                return Mixer(rr_cw, rf_ccw, lr_ccw, lf_cw);
             }
     };
 

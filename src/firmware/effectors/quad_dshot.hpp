@@ -47,6 +47,13 @@ namespace hf {
             {
                 mixer_ = hf::Mixer::Run(setpoint);
 
+                const float motorvals[4] = {
+                    float m_rr_cw,
+                    float m_rf_ccw,
+                    float m_lr_ccw,
+                    float m_lf_cw,
+                };
+
                 // Run motors if safe
                 if (fc.IsSafeToFly()) {
                     motors_.run(fc.IsArmed(), mixer_.motorvals);

@@ -58,10 +58,10 @@ namespace hf {
 
                 // Equation 6 from Bouabdallah et al 2004 ---------------------
 
-                const auto o_rr_cw = Dynamics::RpmToOmegaSquared(mixer_.m_rr_cw);
-                const auto o_rf_ccw = Dynamics::RpmToOmegaSquared(mixer_.m_rf_ccw);
-                const auto o_lr_ccw = Dynamics::RpmToOmegaSquared(mixer_.m_lr_ccw);
-                const auto o_lr_cw = Dynamics::RpmToOmegaSquared(mixer_.m_lf_cw);
+                const auto o_rr_cw = Dynamics::RpmToOmegaSquared(mixer_.rr_cw);
+                const auto o_rf_ccw = Dynamics::RpmToOmegaSquared(mixer_.rf_ccw);
+                const auto o_lr_ccw = Dynamics::RpmToOmegaSquared(mixer_.lr_ccw);
+                const auto o_lr_cw = Dynamics::RpmToOmegaSquared(mixer_.lf_cw);
 
                 const auto t =  o_rr_cw + o_rf_ccw + o_lr_ccw + o_lr_cw;
                 const auto r = -o_rr_cw - o_rf_ccw + o_lr_ccw + o_lr_cw;
