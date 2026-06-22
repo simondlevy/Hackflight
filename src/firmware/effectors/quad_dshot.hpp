@@ -45,27 +45,28 @@ namespace hf {
 
             void Run(FlightController & fc, const Setpoint & setpoint)
             {
-                mixer_ = hf::Mixer::Run(setpoint);
-
-                const float motorvals[4] = {
-                    float m_rr_cw,
-                    float m_rf_ccw,
-                    float m_lr_ccw,
-                    float m_lf_cw,
-                };
+                const auto motorvals = GetMotorValues();
 
                 // Run motors if safe
                 if (fc.IsSafeToFly()) {
-                    motors_.run(fc.IsArmed(), mixer_.motorvals);
+                    motors_.run(fc.IsArmed(), motorvals);
                 }
 
-                fc.SendTelemetry(setpoint, kMspQuadrotorTelemetry,
-                        mixer_.motorvals, 4);
+                fc.SendTelemetry(
+                        setpoint, kMspQuadrotorTelemetry, motorvals, 4);
             }
 
             auto GetMotorValues() -> float *
             {
-                return mixer_.motorvals;
+
+                static float motorvals[4] = {
+                    mixer_.rr_cw,
+                    mixer_.rf_ccw,
+                    mixer_.lr_ccw,
+                    mixer_.lf_cw,
+                };
+
+                return motorvals;
             }
 
         private:
