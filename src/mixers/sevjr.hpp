@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <math.h>
-
 #include <datatypes.hpp>
 
 namespace hf {
@@ -53,9 +51,7 @@ namespace hf {
                 const auto p = setpoint.pitch;
                 // const auto y = setpoint.yaw;
 
-                const auto tp = t + p;
-
-                return Mixer(t + r - p, t - r - p, sqrt(2 * tp * tp));
+                return Mixer(t + r - p, t - r - p, 1.414213 * (t + p));
             }
     };
 
