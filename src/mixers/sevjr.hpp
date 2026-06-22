@@ -39,16 +39,19 @@ namespace hf {
             float prop_fl_cw;
             float prop_fr_ccw;
             float prop_r_cw;
+            float rudder;
 
             SevJrMixer() = default;
 
             SevJrMixer(
                     const float prop_fl_cw,
                     const float prop_fr_ccw,
-                    const float prop_r_cw)
+                    const float prop_r_cw,
+                    const float rudder)
                 : prop_fl_cw(prop_fl_cw),
                 prop_fr_ccw(prop_fr_ccw),
-                prop_r_cw(prop_r_cw) { }
+                prop_r_cw(prop_r_cw),
+                rudder(rudder) { }
 
             SevJrMixer& operator=(const SevJrMixer& other) = default;
 
@@ -57,9 +60,11 @@ namespace hf {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
-                // const auto y = setpoint.yaw;
+                const auto y = setpoint.yaw;
 
-                return SevJrMixer(t + r - p, t - r - p, t + p);
+                printf("y=%+3.3f\n", y);
+
+                return SevJrMixer(t+r-p, t-r-p, t+p, 0);
             }
     };
 
