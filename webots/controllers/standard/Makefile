@@ -15,7 +15,7 @@
 # Command-line variable; e.g. make run world=twoexit
 world = simple
 
-WORLDS_DIR = ../../worlds
+WORLDS_DIR = ../../worlds/apex2
 
 # https://stackoverflow.com/a/49524393
 .EXPORT_ALL_VARIABLES:

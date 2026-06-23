@@ -115,7 +115,7 @@ Pipe {
   appearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "../worlds/textures/light_asphalt.jpg"
+        "../textures/light_asphalt.jpg"
       ]
     }
     roughness 1
