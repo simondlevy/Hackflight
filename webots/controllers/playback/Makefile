@@ -16,6 +16,7 @@
 #   make run log=../controller/twoexit.csv
 #
 
+log=../standard/log.csv
 WORLD = $(shell head -1 $(log))
 WORLDS_DIR = ../../worlds
 WORLD_FILE = $(WORLDS_DIR)/$(WORLD).wbt
