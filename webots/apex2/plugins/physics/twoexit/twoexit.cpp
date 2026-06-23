@@ -28,8 +28,6 @@
 
 static const uint8_t kRangefinderDisplayScaleup = 64;
 
-static PluginHelper * helper_;
-
 static AutopilotHelper * ahelper_;
 
 static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
@@ -69,12 +67,10 @@ DLLEXPORT void webots_physics_step()
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete helper_;
+    delete ahelper_;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
     ahelper_ = new AutopilotHelper("twoexit");
-
-    helper_ = new PluginHelper();
 }

@@ -29,13 +29,3 @@ DLLEXPORT void webots_physics_step()
             rangefinder.max_distance_m,
             8, 1, kRangefinderDisplayScaleup);
 }
-
-DLLEXPORT void webots_physics_cleanup() 
-{
-    delete ahelper_;
-}
-
-DLLEXPORT void webots_physics_init() 
-{
-    ahelper_ = new AutopilotHelper("twoexit");
-}
