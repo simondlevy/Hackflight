@@ -64,8 +64,8 @@ DLLEXPORT void webots_physics_step()
 
     auto rangefinder = ahelper_->robot.rangefinders["VL53L5-forward"];
 
-    (void)pose;
-    (void)rangefinder;
+    // Grab rangefinder distances for next iteration
+    rangefinder.read(pose, ahelper_->world, _rangefinder_distances_mm);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
