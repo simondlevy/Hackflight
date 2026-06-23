@@ -19,7 +19,7 @@
 #include <sim/vehicles/quadx/apexquad.hpp>
 #include "../helper.hpp"
 
-static PluginHelper * _helper;
+static PluginHelper * helper_;
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
@@ -28,18 +28,18 @@ DLLEXPORT void webots_physics_step()
 
     const auto vparams = hf::ApexQuad::kVehicleParams;
 
-    const auto state = _helper->RunSimulator( hf::ApexQuad::Run, vparams,
+    const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
             message.mode, message.setpoint);
 
-    _helper->SetDbodyFromState(vparams, state);
+    helper_->SetDbodyFromState(vparams, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _helper;
+    delete helper_;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _helper = new PluginHelper();
+    helper_ = new PluginHelper();
 }

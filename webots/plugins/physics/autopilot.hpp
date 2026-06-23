@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+#include <sim/vehicles/quadx/apexquad.hpp>
+
 #include <simsensors/src/parsers/webots/world.hpp>
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/world.hpp>
@@ -74,14 +76,19 @@ class AutopilotHelper {
 
         auto GetState(const PluginHelper::message_t & message) -> hf::SimState
         {
-            return helper_->RunSimulator(message.mode, message.setpoint);
+            const auto vparams = hf::ApexQuad::kVehicleParams;
+
+            return helper_->RunSimulator( hf::ApexQuad::Run, vparams,
+                    message.mode, message.setpoint);
         }
 
-        auto GetPose(const hf::Mode mode, const hf::Setpoint & setpoint)
-            -> simsens::Pose
+        auto GetPose(const hf::Mode mode,
+                const hf::Setpoint & setpoint) -> simsens::Pose
         {
-            // Use setpoint to get new state
-            const auto state = helper_->RunSimulator(mode, setpoint);
+            const auto vparams = hf::ApexQuad::kVehicleParams;
+
+            const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
+                    mode, setpoint);
 
             // Extract pose from state
             const simsens::Pose pose = {
@@ -95,7 +102,7 @@ class AutopilotHelper {
             }
 
             // Otherwise, set normally
-            helper_->SetDbodyFromState(state);
+            helper_->SetDbodyFromState(vparams, state);
 
             return pose;
         }
