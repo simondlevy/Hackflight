@@ -91,7 +91,7 @@ PROTO Apex2 [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/apex2/apex2-frame.stl" ]
+                            url [ "../meshes/stl_files/frame.stl" ]
                         }
                     }
                     ]
@@ -171,7 +171,7 @@ PROTO Apex2 [
                             metalness IS fc_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/fc.stl" ]
+                        url [ "../meshes/stl_files/fc.stl" ]
                     }
                 }
                 ] 
@@ -188,7 +188,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/standoff.stl" ]
+                        url [ "../meshes/stl_files/standoff.stl" ]
                     }
                 }
                 ] 
@@ -205,7 +205,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/standoff.stl" ]
+                        url [ "../meshes/stl_files/standoff.stl" ]
                     }
                 }
                 ] 
@@ -222,7 +222,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/standoff.stl" ]
+                        url [ "../meshes/stl_files/standoff.stl" ]
                     }
                 }
                 ] 
@@ -239,7 +239,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/standoff.stl" ]
+                        url [ "../meshes/stl_files/standoff.stl" ]
                     }
                 }
                 ] 
@@ -255,7 +255,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/top.stl" ]
+                        url [ "../meshes/stl_files/top.stl" ]
                     }
                 }
                 ] 
@@ -271,7 +271,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/battery.stl" ]
+                        url [ "../meshes/stl_files/battery.stl" ]
                     }
                 }
                 ] 
@@ -287,7 +287,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/rubber-band.stl" ]
+                        url [ "../meshes/stl_files/rubber-band.stl" ]
                     }
                 }
                 ] 
@@ -303,7 +303,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/rubber-band.stl" ]
+                        url [ "../meshes/stl_files/rubber-band.stl" ]
                     }
                 }
                 ] 
@@ -321,7 +321,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/leg.stl" ]
+                        url [ "../meshes/stl_files/leg.stl" ]
                     }
                 }
                 ] 
@@ -337,7 +337,7 @@ PROTO Apex2 [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -391,7 +391,7 @@ PROTO Apex2 [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
+                            url [ "../meshes/stl_files/prop_cw.stl" ]
                         }
                     }
 
@@ -412,7 +412,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/leg.stl" ]
+                        url [ "../meshes/stl_files/leg.stl" ]
                     }
                 }
                 ] 
@@ -428,7 +428,7 @@ PROTO Apex2 [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -482,7 +482,7 @@ PROTO Apex2 [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
+                            url [ "../meshes/stl_files/prop_cw.stl" ]
                         }
                     }
 
@@ -504,7 +504,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/leg.stl" ]
+                        url [ "../meshes/stl_files/leg.stl" ]
                     }
                 }
                 ] 
@@ -520,7 +520,7 @@ PROTO Apex2 [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -574,7 +574,7 @@ PROTO Apex2 [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
+                            url [ "../meshes/stl_files/prop_cw.stl" ]
                         }
                     }
 
@@ -596,7 +596,7 @@ PROTO Apex2 [
                             metalness IS frame_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/leg.stl" ]
+                        url [ "../meshes/stl_files/leg.stl" ]
                     }
                 }
                 ] 
@@ -613,7 +613,7 @@ PROTO Apex2 [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/apex2/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -667,7 +667,7 @@ PROTO Apex2 [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files//apex2/prop_cw.stl" ]
+                            url [ "../meshes/stl_files/prop_cw.stl" ]
                         }
                     }
 

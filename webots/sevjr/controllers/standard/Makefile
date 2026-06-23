@@ -15,7 +15,7 @@
 # https://stackoverflow.com/a/49524393
 .EXPORT_ALL_VARIABLES:
 WEBOTS_PATH = $(shell pwd)
-WORLD_FILE = ../../worlds/sevjr.wbt
+WORLD_FILE = ../../worlds/simple.wbt
 
 FILES_TO_REMOVE += *.csv __pycache__/
 
