@@ -35,6 +35,8 @@ class PluginHelper {
 
         static constexpr char kRobotName[] = "robot";
 
+        static constexpr char kPathVariableName[] = "WEBOTS_PATH";
+
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;
 
@@ -56,6 +58,11 @@ class PluginHelper {
             simulator_ = hf::Simulator(starting_pose);
 
             robot_body = InitBody(kRobotName);
+
+            const auto pwd = getenv(kPathVariableName);
+            char log_path[256] = {};
+            sprintf(log_path, "%s/log.csv", pwd);
+            logfile_ = fopen(log_path, "w");
         }
 
         static dBodyID InitBody(const char * name)
@@ -102,7 +109,15 @@ class PluginHelper {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
                     effector_fun, vehicle_params);
 
-            return simulator_.dynamics.state;
+            const auto state = simulator_.dynamics.state;
+
+            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                    dWebotsGetTime()/1000,
+                    state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
+                    state.theta, state.dtheta, state.psi, state.dpsi);
+            fflush(logfile_);
+
+            return state;
         }
 
         auto GetSetpoint() -> hf::Setpoint
@@ -135,4 +150,8 @@ class PluginHelper {
 
             dBodySetQuaternion(robot_body, q);
         }
+
+    private:
+
+        FILE * logfile_;
 };

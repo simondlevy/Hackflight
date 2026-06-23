@@ -97,6 +97,9 @@ def show_rangefinder_distances(distances_mm, width, height,
 
 def main():
 
+    print(argv[1])
+    exit(0)
+
     quad = DiyQuad()
 
     start_motor(quad, "motor_right_rear_cw", -1)

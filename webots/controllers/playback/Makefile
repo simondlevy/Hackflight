@@ -22,8 +22,10 @@ WORLDS_DIR = ../../worlds
 WORLD_FILE = $(WORLDS_DIR)/$(WORLD).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
+foo:
+	@echo $(WORLD_FILE)
+
 run:
-	@echo $(BAZ)
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
 	elif [ ! -f $(log) ]; then\
