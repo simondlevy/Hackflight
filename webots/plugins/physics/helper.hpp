@@ -114,10 +114,11 @@ class PluginHelper {
 
             const auto state = simulator_.dynamics.state;
 
-            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
                     dWebotsGetTime()/1000,
-                    state.dx, state.dy, state.z, state.dz, state.phi, state.dphi,
-                    state.theta, state.dtheta, state.psi, state.dpsi);
+                    state.x, state.dx, state.dy, state.dy, state.z, state.dz,
+                    state.phi, state.dphi, state.theta, state.dtheta,
+                    state.psi, state.dpsi);
             fflush(logfile_);
 
             return state;

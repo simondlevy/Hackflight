@@ -108,10 +108,10 @@ def main():
 
         vals = list(map(float, line.split(',')))
 
-        translation_field.setSFVec3f([vals[0], -vals[1], vals[2]])
+        translation_field.setSFVec3f([vals[1], -vals[3], vals[5]])
 
         rotation_field.setSFRotation(
-                euler_to_rotation(vals[3], vals[4], -vals[5]))
+                euler_to_rotation(vals[7], vals[9], -vals[11]))
 
         rangefinder_distances = vals[6:]
 
