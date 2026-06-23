@@ -53,7 +53,7 @@ class AutopilotHelper {
             sprintf(world_path, "%s/../../worlds/%s.wbt", pwd, worldname);
 
             char robot_path[256] = {};
-            sprintf(robot_path, "%s/../../protos/DiyQuad.proto", pwd);
+            sprintf(robot_path, "%s/../../protos/Apex2.proto", pwd);
 
             simsens::WorldParser::parse(world_path, world, robot_path);
 

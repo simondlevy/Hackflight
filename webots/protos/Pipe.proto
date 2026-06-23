@@ -21,7 +21,7 @@ PROTO Pipe [
     field SFRotation rotation 0 0 0 0
     field SFNode appearance PBRAppearance {
         baseColorMap ImageTexture {
-            url [ "../worlds/textures/light_asphalt.jpg" ] 
+            url [ "worlds/apex2/textures/light_asphalt.jpg" ] 
         }
         metalness 1.0
             roughness 0.0 

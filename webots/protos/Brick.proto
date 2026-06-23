@@ -23,7 +23,7 @@ PROTO Brick [
     field SFRotation rotation 0.7071067811865476 0 0.7071067811865476 3.14159
     field SFNode appearance PBRAppearance {
         baseColorMap ImageTexture {
-            url [ "../worlds/textures/gray_brick_wall.jpg" ] 
+            url [ "../worlds/apex2/textures/gray_brick_wall.jpg" ] 
         }
         metalness 0 roughness 0.5 
     }  

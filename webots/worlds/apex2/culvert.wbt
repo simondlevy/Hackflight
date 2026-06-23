@@ -19,9 +19,9 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/SimpleTree.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-EXTERNPROTO "../protos/Pipe.proto"
-EXTERNPROTO "../protos/Brick.proto"
-EXTERNPROTO "../protos/Apex2.proto"
+EXTERNPROTO "../../protos/Pipe.proto"
+EXTERNPROTO "../../protos/Brick.proto"
+EXTERNPROTO "../../protos/Apex2.proto"
 
 WorldInfo {
   title "Hackflight"
@@ -115,7 +115,7 @@ Pipe {
   appearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "../textures/light_asphalt.jpg"
+        "textures/light_asphalt.jpg"
       ]
     }
     roughness 1
