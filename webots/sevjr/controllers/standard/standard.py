@@ -20,9 +20,6 @@
 import os
 import sys
 
-standard_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../standard/"))
-if standard_dir not in sys.path:
-    sys.path.insert(0, standard_dir)
 from helper import Helper
 
 RUDDER_NEUTRAL_RADIANS = -0.5

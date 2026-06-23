@@ -21,7 +21,7 @@ FILES_TO_REMOVE += *.csv __pycache__/
 
 run:
 	@webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
-	--stdout-redirect ./sevjr.py simple &> /dev/null;
+	--stdout-redirect ./standard.py simple &> /dev/null;
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

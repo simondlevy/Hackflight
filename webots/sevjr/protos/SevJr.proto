@@ -76,7 +76,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/body.stl" ]
+                            url [ "../meshes/stl_files/body.stl" ]
                         }
 
                     }
@@ -92,7 +92,7 @@ PROTO SevJr [
                             metalness 0
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/sevjr/logo.stl" ]
+                        url [ "../meshes/stl_files/logo.stl" ]
                     }
                 }
                 ] 
@@ -174,7 +174,7 @@ PROTO SevJr [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -227,7 +227,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                            url [ "../meshes/stl_files/prop.stl" ]
                         }
                     }
 
@@ -247,7 +247,7 @@ PROTO SevJr [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -300,7 +300,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                            url [ "../meshes/stl_files/prop.stl" ]
                         }
                     }
 
@@ -320,7 +320,7 @@ PROTO SevJr [
                             metalness IS motor_metalness
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/sevjr/motor.stl" ]
+                        url [ "../meshes/stl_files/motor.stl" ]
                     }
                 }
                 ] 
@@ -373,7 +373,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/prop.stl" ]
+                            url [ "../meshes/stl_files/prop.stl" ]
                         }
                     }
 
@@ -407,7 +407,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/rudder.stl" ]
+                            url [ "../meshes/stl_files/rudder.stl" ]
                         }
                     }
 
@@ -440,7 +440,7 @@ PROTO SevJr [
                         }
 
                         geometry Mesh {
-                            url [ "../meshes/stl_files/sevjr/rudder.stl" ]
+                            url [ "../meshes/stl_files/rudder.stl" ]
                         }
                     }
 
