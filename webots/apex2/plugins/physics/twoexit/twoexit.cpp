@@ -1,7 +1,7 @@
 /* 
- * Custom physics plugin for two-exit autopilot simuation
+ * Custom physics plugin custom for Hackflight Webots-based simulator
  *
- * Copyright (C) 2026 Simon D. Levy
+ *  Copyright (C) 2025 Simon D. Levy
  *
  *  This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,74 +16,30 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-// Hackflight
+#include <sim/vehicles/quadx/apexquad.hpp>
 #include "../helper.hpp"
-#include "../autopilot.hpp"
 
-// SimSensors
-#include <simsensors/src/world.hpp>
-#include <simsensors/src/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
-#include <simsensors/src/visualizers/rangefinder.hpp>
+static PluginHelper * helper_;
 
-static const uint8_t kRangefinderDisplayScaleup = 64;
-
-static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
-{
-    const int * d = rangefinder_distances_mm;
-
-    // Look for clear (infinity reading) in center of 1x8 readings
-    const bool center_is_clear = d[3] == -1 && d[4] == -1;
-
-    // If clear, pitch forward
-    const auto pitch = center_is_clear ? 0.4 : 0;
-
-    // Otherwise, yaw rightward
-    const auto yaw = center_is_clear ? 0 : 0.2;
-
-    return hf::Setpoint(0, 0, pitch, yaw);
-}        
-
-static AutopilotHelper * _ahelper;
-
-// Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
-    static int _rangefinder_distances_mm[8];
-
     const auto message = PluginHelper::GetMessage();
 
-    // Replace open-loop setpoint with setpoint from autopilot if
-    // available
-    const auto setpoint = message.mode == hf::kModeAutonomous ?
-        getSetpoint(_rangefinder_distances_mm) : message.setpoint;
+    const auto vparams = hf::ApexQuad::kVehicleParams;
 
-    // Get vehicle pose based on setpoint
-    const auto pose = _ahelper->GetPose(message.mode, setpoint);
+    const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
+            message.mode, message.setpoint);
 
-    auto rangefinder = _ahelper->robot.rangefinders["VL53L5-forward"];
-
-    // Grab rangefinder distances for next iteration
-    rangefinder.read(pose, _ahelper->world, _rangefinder_distances_mm);
-
-    // Log data to file
-    _ahelper->WriteToLog(pose, _rangefinder_distances_mm, 8);
-
-    // Display rangefinder distances
-    simsens::RangefinderVisualizer::show(
-            _rangefinder_distances_mm,
-            rangefinder.min_distance_m,
-            rangefinder.max_distance_m,
-            8, 1, kRangefinderDisplayScaleup);
+    helper_->SetDbodyFromState(vparams, state);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _ahelper;
+    delete helper_;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _ahelper = new AutopilotHelper("twoexit");
+    helper_ = new PluginHelper();
 }

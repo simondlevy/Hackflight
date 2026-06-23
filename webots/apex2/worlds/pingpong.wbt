@@ -40,8 +40,8 @@ Viewpoint {
   follow "Apex2"
 }
 DEF robot Apex2 {
-  translation 1.02 -0.05 0.0131967
-  rotation -1.56804e-18 -1.60403e-18 1 1.5708
+  frame_translation 1.02 -0.05 0.0131967
+  frame_rotation -1.56804e-18 -1.60403e-18 1 1.5708
 }
 TexturedBackground {
 }

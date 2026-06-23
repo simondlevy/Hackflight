@@ -23,7 +23,7 @@ EXTERNPROTO "../protos/Apex2.proto"
 WorldInfo {
   title "Hackflight"
   physics "twoexit"
-  ### gravity 0
+  gravity 0
   contactProperties [
     ContactProperties {
       coulombFriction [
@@ -40,8 +40,8 @@ Viewpoint {
   follow "Apex2"
 }
 DEF robot Apex2 {
-  translation -0.27 0.81 0.037985
-  rotation 0 0 1 1.5707999514237778
+  frame_translation -0.27 0.81 0.037985
+  frame_rotation 0 0 1 1.5707999514237778
 }
 TexturedBackground {
 }
