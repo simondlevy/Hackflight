@@ -30,6 +30,8 @@ static const uint8_t kRangefinderDisplayScaleup = 64;
 
 static PluginHelper * helper_;
 
+static AutopilotHelper * ahelper_;
+
 static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
 {
     const int * d = rangefinder_distances_mm;
@@ -58,6 +60,7 @@ DLLEXPORT void webots_physics_step()
     // available
     const auto setpoint = message.mode == hf::kModeAutonomous ?
         getSetpoint(_rangefinder_distances_mm) : message.setpoint;
+    (void)setpoint;
 
     const auto vparams = hf::ApexQuad::kVehicleParams;
 
@@ -74,5 +77,7 @@ DLLEXPORT void webots_physics_cleanup()
 
 DLLEXPORT void webots_physics_init() 
 {
+    ahelper_ = new AutopilotHelper("twoexit");
+
     helper_ = new PluginHelper();
 }

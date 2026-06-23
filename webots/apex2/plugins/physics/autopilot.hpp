@@ -59,6 +59,7 @@ class AutopilotHelper {
 
             simsens::RobotParser::parse(robot_path, robot);
 
+            /*
             char log_path[256] = {};
             sprintf(log_path, "%s/%s.csv", pwd, worldname);
             fprintf(logfile_, "%s\n", worldname);
@@ -66,7 +67,7 @@ class AutopilotHelper {
             _collided = false;
             
             const auto p = world.robotPose;
-            helper_ = new PluginHelper({p.x, p.y, p.z, p.phi, p.theta, p.psi});
+            helper_ = new PluginHelper({p.x, p.y, p.z, p.phi, p.theta, p.psi});*/
         }
 
         ~AutopilotHelper()
