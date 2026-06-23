@@ -16,11 +16,12 @@
 world = simple
 
 WORLDS_DIR = ../../worlds
+WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 
 # https://stackoverflow.com/a/49524393
 .EXPORT_ALL_VARIABLES:
-WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
 WEBOTS_PATH = $(shell pwd)
+WORLD_NAME = $(world)
 
 FILES_TO_REMOVE += *.csv __pycache__/
 

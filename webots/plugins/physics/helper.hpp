@@ -37,6 +37,8 @@ class PluginHelper {
 
         static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
+        static constexpr char kWorldVariableName[] = "WORLD_NAME";
+
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;
 
@@ -63,6 +65,7 @@ class PluginHelper {
             char log_path[256] = {};
             sprintf(log_path, "%s/log.csv", pwd);
             logfile_ = fopen(log_path, "w");
+            fprintf(logfile_, "%s\n", getenv(kWorldVariableName));
         }
 
         static dBodyID InitBody(const char * name)
