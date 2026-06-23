@@ -16,8 +16,9 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <sim/vehicles/quadx/apexquad.hpp>
+// Hackflight
 #include "../helper.hpp"
+#include "../autopilot.hpp"
 
 static const uint8_t kRangefinderDisplayScaleup = 64;
 
