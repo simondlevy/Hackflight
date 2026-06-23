@@ -17,13 +17,10 @@
 #
 
 log=../standard/log.csv
-WORLD = $(shell head -1 $(log))
-WORLDS_DIR = ../../worlds
-WORLD_FILE = $(WORLDS_DIR)/$(WORLD).wbt
-PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
-foo:
-	@echo $(WORLD)
+WORLDS_DIR = ../../worlds
+WORLD_FILE = $(shell head -1 $(log))
+PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
 run:
 	@if [ ! -f $(WORLD_FILE) ]; then\

@@ -37,7 +37,7 @@ class PluginHelper {
 
         static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
-        static constexpr char kWorldVariableName[] = "WORLD_NAME";
+        static constexpr char kWorldVariableName[] = "WORLD_FILE";
 
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;

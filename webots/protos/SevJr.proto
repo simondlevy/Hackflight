@@ -55,14 +55,12 @@ PROTO SevJr [
     ]
 
 {
-    DEF ROBOT Robot {
+    DEF robot Robot {
 
-        translation  IS translation
+            translation  IS translation
             rotation IS rotation
             controller "<extern>"
             supervisor TRUE
-            name "SevJr"
-            model "SevJr"
 
             children [ # =========================================================
 
@@ -85,7 +83,7 @@ PROTO SevJr [
                 ]
             }
 
-        DEF LOGO Solid {
+        DEF logo Solid {
             translation IS logo_translation
                 children [
                 Shape {

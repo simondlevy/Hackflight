@@ -30,19 +30,6 @@ except Exception:
     cv2 = None
 
 
-class DiyQuad(Supervisor):
-
-    ROBOT_NAME = "diyquad"
-
-    def __init__(self):
-
-        Supervisor.__init__(self)
-
-    def getFromDef(self):
-
-        return Supervisor.getFromDef(self, self.ROBOT_NAME)
-
-
 def euler_to_rotation(phi, theta, psi):
     '''
     https://www.euclideanspace.com/maths/geometry/rotations/conversions/
@@ -62,9 +49,9 @@ def euler_to_rotation(phi, theta, psi):
             2 * acos(c1*c2*c3 - s1*s2*s3)]
 
 
-def start_motor(quad, motor_name, direction):
+def start_motor(robot, motor_name, direction):
 
-    motor = quad.getDevice(motor_name)
+    motor = robot.getDevice(motor_name)
     motor.setPosition(float('inf'))
     motor.setVelocity(direction * 60)
 
@@ -97,29 +84,26 @@ def show_rangefinder_distances(distances_mm, width, height,
 
 def main():
 
-    print(argv[1])
-    exit(0)
+    robot = Supervisor()
 
-    quad = DiyQuad()
+    start_motor(robot, "motor_right_rear_cw", -1)
+    start_motor(robot, "motor_right_front_ccw", +1)
+    start_motor(robot, "motor_left_rear_ccw", +1)
+    start_motor(robot, "motor_left_front_cw", -1)
 
-    start_motor(quad, "motor_right_rear_cw", -1)
-    start_motor(quad, "motor_right_front_ccw", +1)
-    start_motor(quad, "motor_left_rear_ccw", +1)
-    start_motor(quad, "motor_left_front_cw", -1)
+    timestep = robot.getBasicTimeStep()
 
-    timestep = quad.getBasicTimeStep()
+    robot_node = robot.getFromDef("robot")
 
-    robot_node = quad.getFromDef()
+    translation_field = robot_node.getField("frame_translation")
 
-    translation_field = robot_node.getField("translation")
-
-    rotation_field = robot_node.getField("rotation")
+    rotation_field = robot_node.getField("frame_rotation")
 
     logfile = open(argv[1])
 
     for line in logfile.readlines()[1:]:  # First line is world name
 
-        if quad.step(int(timestep)) == -1:
+        if robot.step(int(timestep)) == -1:
             break
 
         vals = list(map(float, line.split(',')))
