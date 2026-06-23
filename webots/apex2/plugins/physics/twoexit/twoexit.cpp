@@ -47,6 +47,11 @@ DLLEXPORT void webots_physics_step()
 
     const auto message = PluginHelper::GetMessage();
 
+    // Replace open-loop setpoint with setpoint from autopilot if
+    // available
+    const auto setpoint = message.mode == hf::kModeAutonomous ?
+        getSetpoint(_rangefinder_distances_mm) : message.setpoint;
+
     const auto vparams = hf::ApexQuad::kVehicleParams;
 
     const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
