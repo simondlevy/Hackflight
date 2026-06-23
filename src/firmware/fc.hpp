@@ -20,7 +20,7 @@
 
 #include <hackflight.h>
 #include <firmware/datatypes.hpp>
-#include <firmware/debugging.hpp>
+#include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
@@ -29,7 +29,6 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/profiling.hpp>
 #include <firmware/receivers/gamepad.hpp>
 #include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>

@@ -26,7 +26,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <mixers/bfquadx.hpp>
+#include <mixers/quadx.hpp>
 
 namespace hf {
 
@@ -45,28 +45,37 @@ namespace hf {
 
             void Run(FlightController & fc, const Setpoint & setpoint)
             {
-                mixer_ = hf::Mixer::Run(setpoint);
+                mixer_ = QuadXMixer::Run(setpoint);
+
+                const auto motorvals = GetMotorValues();
 
                 // Run motors if safe
                 if (fc.IsSafeToFly()) {
-                    motors_.run(fc.IsArmed(), mixer_.motorvals);
+                    motors_.run(fc.IsArmed(), motorvals);
                 }
 
-                fc.SendTelemetry(setpoint, kMspQuadrotorTelemetry,
-                        mixer_.motorvals, 4);
+                fc.SendTelemetry(
+                        setpoint, kMspQuadrotorTelemetry, motorvals, 4);
             }
 
             auto GetMotorValues() -> float *
             {
-                return mixer_.motorvals;
+
+                motorvals_[0] = mixer_.rr_cw;
+                motorvals_[1] = mixer_.rf_ccw;
+                motorvals_[2] = mixer_.lr_ccw;
+                motorvals_[3] = mixer_.lf_cw;
+
+                return motorvals_;
             }
 
         private:
 
             DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
-            hf::Mixer mixer_;
+            hf::QuadXMixer mixer_;
 
+           float motorvals_[4];
 
     }; // class QuadDshot
 

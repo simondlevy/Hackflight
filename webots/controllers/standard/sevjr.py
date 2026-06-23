@@ -19,16 +19,16 @@
 
 from helper import Helper
 
-RUDDER_NEUTRAL = 0.2
+RUDDER_NEUTRAL_RADIANS = -0.5
 
 
 def main():
 
     helper = Helper()
 
-    helper.startMotor('prop_front_left', -1)
-    helper.startMotor('prop_front_right', +1)
-    helper.startMotor('prop_rear', +1)
+    helper.startMotor('prop_front_left_cw', Helper.PROP_CW)
+    helper.startMotor('prop_front_right_ccw', Helper.PROP_CCW)
+    helper.startMotor('prop_rear_cw', Helper.PROP_CW)
 
     left_rudder = helper.makeMotor('left_rudder')
     right_rudder = helper.makeMotor('right_rudder')
@@ -38,7 +38,7 @@ def main():
         if not helper.step():
             break
 
-        pos = -helper.cmdinfo[4] + RUDDER_NEUTRAL
+        pos = -helper.cmdinfo[4] + RUDDER_NEUTRAL_RADIANS
 
         left_rudder.setPosition(pos)
         right_rudder.setPosition(pos)

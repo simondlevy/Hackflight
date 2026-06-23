@@ -26,6 +26,11 @@ class Helper:
     # These should agree with modes in hackflight/src/datatypes.hpp
     MODES = {'armed': 1, 'hovering': 2, 'autonomous': 3}
 
+    PROP_CW = -1
+    PROP_CCW = +1
+
+    PROP_SPEED_SCALE = 60
+
     def __init__(self):
 
         self.joystick_method_map = {
@@ -70,7 +75,7 @@ class Helper:
     def startMotor(self, name, direction):
 
         motor = self.makeMotor(name)
-        motor.setVelocity(direction * 60)
+        motor.setVelocity(direction * self.PROP_SPEED_SCALE)
 
     def step(self):
 

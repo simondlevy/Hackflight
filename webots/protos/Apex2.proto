@@ -39,19 +39,19 @@ PROTO Apex2 [
     field SFVec3f fc_translation 0.002 0.001 0.001
 
     field SFVec3f leg1_translation   -0.029 -0.038 -0.013
-    field SFVec3f motor1_translation -0.028 -0.041  0.001
+    field SFVec3f motor_right_rear_cw_translation -0.028 -0.041  0.001
     field SFVec3f prop1_translation  -0.028 -0.041  0.012
 
     field SFVec3f leg2_translation   0.029 -0.038 -0.013
-    field SFVec3f motor2_translation 0.028 -0.041  0.001
+    field SFVec3f motor_right_front_ccw_translation 0.028 -0.041  0.001
     field SFVec3f prop2_translation  0.028 -0.041  0.012
 
     field SFVec3f leg3_translation   -0.029 0.046 -0.013
-    field SFVec3f motor3_translation -0.028 0.044  0.001
+    field SFVec3f motor_left_rear_ccw_translation -0.028 0.044  0.001
     field SFVec3f prop3_translation  -0.028 0.043  0.012
 
     field SFVec3f leg4_translation   0.031 0.045 -0.013
-    field SFVec3f motor4_translation 0.028 0.043 0.001
+    field SFVec3f motor_left_front_cw_translation 0.028 0.043 0.001
     field SFVec3f prop4_translation  0.028 0.041 0.012
 
     field SFColor rear_prop_color  0.5 0 0.25
@@ -328,8 +328,8 @@ PROTO Apex2 [
         }
 
         DEF MOTOR1 Solid {
-            translation IS motor1_translation
-                name "motor1"
+            translation IS motor_right_rear_cw_translation
+                name "motor_right_rear_cw"
                 children [
                 Shape {
                     appearance PBRAppearance {
@@ -351,7 +351,7 @@ PROTO Apex2 [
                 torqueConstants 0 0
                 fastHelixThreshold IS prop_fast_helix_threshold
                 device RotationalMotor {
-                    name "motor1"
+                    name "motor_right_rear_cw"
                         maxVelocity IS motor_max_velocity
                         maxTorque IS motor_max_torque
                 }
@@ -419,8 +419,8 @@ PROTO Apex2 [
         }
 
         DEF MOTOR2 Solid {
-            translation IS motor2_translation
-                name "motor2"
+            translation IS motor_right_front_ccw_translation
+                name "motor_right_front_ccw"
                 children [
                 Shape {
                     appearance PBRAppearance {
@@ -442,7 +442,7 @@ PROTO Apex2 [
                 torqueConstants 0 0
                 fastHelixThreshold IS prop_fast_helix_threshold
                 device RotationalMotor {
-                    name "motor2"
+                    name "motor_right_front_ccw"
                         maxVelocity IS motor_max_velocity
                         maxTorque IS motor_max_torque
                 }
@@ -511,8 +511,8 @@ PROTO Apex2 [
         }
 
         DEF MOTOR3 Solid {
-            translation IS motor3_translation
-                name "motor3"
+            translation IS motor_left_rear_ccw_translation
+                name "motor_left_rear_ccw"
                 children [
                 Shape {
                     appearance PBRAppearance {
@@ -534,7 +534,7 @@ PROTO Apex2 [
                 torqueConstants 0 0
                 fastHelixThreshold IS prop_fast_helix_threshold
                 device RotationalMotor {
-                    name "motor3"
+                    name "motor_left_rear_ccw"
                         maxVelocity IS motor_max_velocity
                         maxTorque IS motor_max_torque
                 }
@@ -604,8 +604,8 @@ PROTO Apex2 [
 
 
         DEF MOTOR4 Solid {
-            translation IS motor4_translation
-                name "motor4"
+            translation IS motor_left_front_cw_translation
+                name "motor_left_front_cw"
                 children [
                 Shape {
                     appearance PBRAppearance {
@@ -627,7 +627,7 @@ PROTO Apex2 [
                 torqueConstants 0 0
                 fastHelixThreshold IS prop_fast_helix_threshold
                 device RotationalMotor {
-                    name "motor4"
+                    name "motor_left_front_cw"
                         maxVelocity IS motor_max_velocity
                         maxTorque IS motor_max_torque
                 }

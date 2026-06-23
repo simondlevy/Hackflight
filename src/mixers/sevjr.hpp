@@ -1,11 +1,12 @@
 /*
- *  BetaFlight QuadX motor mixer for Hackflight
+ *  SEV Jr motor mixer for Hackflight
  *
- *               4:cw   2:ccw
+ *                 cw  ccw
  *                   \ /
  *                    X 
- *                   / \
- *               3:ccw  1:cw
+ *                    |
+ *                cw / rudder
+ *             
  *
  * Copyright (C) 2024 Simon D. Levy
  *
@@ -25,45 +26,43 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <datatypes.hpp>
 
 namespace hf {
 
-    class Mixer {
+    class SevJrMixer {
 
         public:
 
-            float motorvals[4];
+            float prop_fl_cw;
+            float prop_fr_ccw;
+            float prop_r_cw;
+            float rudder;
 
-            Mixer() = default;
+            SevJrMixer() = default;
 
-            Mixer(
-                    const float m1,
-                    const float m2,
-                    const float m3,
-                    const float m4)
-            {
-                motorvals[0] = m1;
-                motorvals[1] = m2;
-                motorvals[2] = m3;
-                motorvals[3] = m4;
-            }
+            SevJrMixer(
+                    const float prop_fl_cw,
+                    const float prop_fr_ccw,
+                    const float prop_r_cw,
+                    const float rudder)
+                : prop_fl_cw(prop_fl_cw),
+                prop_fr_ccw(prop_fr_ccw),
+                prop_r_cw(prop_r_cw),
+                rudder(rudder) { }
 
-            Mixer& operator=(const Mixer& other) = default;
+            SevJrMixer& operator=(const SevJrMixer& other) = default;
 
-            static auto Run(const Setpoint & setpoint)-> Mixer
+            static auto Run(const Setpoint & setpoint)-> SevJrMixer
             {
                 const auto t = setpoint.thrust;
                 const auto r = setpoint.roll;
                 const auto p = setpoint.pitch;
                 const auto y = setpoint.yaw;
 
-                const float m1 = t - r + p - y;
-                const float m2 = t - r - p + y;
-                const float m3 = t + r + p + y;
-                const float m4 = t + r - p - y;
-
-                return Mixer(m1, m2, m3, m4);
+                return SevJrMixer(t+r-p, t-r-p, t+p, y);
             }
     };
 

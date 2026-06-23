@@ -50,37 +50,10 @@ namespace hf {
 
         public:
 
-            static constexpr float kRollPitchYawScale = 1000;
+            static constexpr float kRollPitchYawScale = 500;
 
             // Vehicle state (Equation 11)
             SimState state;
-
-            /**
-             *  Vehicle parameters
-             */
-            typedef struct {
-
-                // These can be measured directly
-                double m;  // mass [kg]
-                double l;  // arm length [m]
-
-                // These should be estimated to get realistic behavior
-                double b;  // thrust coefficient [F=b*w^2]
-                double I;  // body inertia [kg*m^2]  for roll, pitch
-                double d;  // drag coefficient [T=d*w^2] for yaw
-
-            } VehicleParams; 
-
-            /**
-             *  World parameters
-             */
-            typedef struct {
-
-                // These can be measured directly
-                double g;   // gravitational constant [m/s/s]
-                double rho; // air density [kg/m^3]
-
-            } WorldParams; 
 
             Dynamics() = default;
 
@@ -125,8 +98,6 @@ namespace hf {
                 const auto ds = dyn.dstate_;
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
-
-                //printf("%f,%f,%f\n", forces.thrust, u1*m, ddz);
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
@@ -176,6 +147,12 @@ namespace hf {
                         Dynamics(newstate, newdstate, airborne); 
 
             } // update
+
+            static auto GetThrustRpm(
+                    const VehicleParams vparams, const double motor) -> float
+            {
+                return motor * vparams.battery_voltage * vparams.motor_kv;
+            }
 
             static auto RpmToOmegaSquared(const double rpm) -> double
             {

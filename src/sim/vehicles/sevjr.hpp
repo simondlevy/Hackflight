@@ -18,6 +18,7 @@
 #pragma once
 
 #include <datatypes.hpp>
+#include <mixers/sevjr.hpp>
 #include <sim/dynamics.hpp>
 
 namespace hf {
@@ -26,49 +27,58 @@ namespace hf {
 
         private:
 
-            static constexpr float kThrustScale = 10000;
+            static constexpr float YAW_SCALE = -10000;
 
         public:
 
-            static constexpr Dynamics::VehicleParams kVehicleParams = {
+            static constexpr VehicleParams kVehicleParams = {
 
                 // Actual values
+                11.1,    // battery voltage
+                1050,    // motor kV
+                0.00,    // leg height [m]
                 4.8e-1,  // mass [kg]
                 1.7e-1,  // arm length L [m]
 
-                // Reverse-engifrered by observation:
+                // Reverse-engineered
                 1.3e-6, // thrust coefficient B [F=b*w^2]
-                4.1e-5, // I [kg*m^2] for pitch, roll, yaw
-                3.9e-9  // drag coefficient D [T=d*w^2] for yaw
+                2.1e-5, // I [kg*m^2] for pitch, roll, yaw
+                6.2e-8  // drag coefficient D [T=d*w^2] for yaw
             };
 
-            static auto Run(const Setpoint & setpoint) -> Setpoint
+            static auto Run(const Setpoint & setpoint_in) -> Setpoint
             {
-                const auto t_rpm = kThrustScale * setpoint.thrust;
-                const auto r_rpm = Dynamics::kRollPitchYawScale * setpoint.roll;
-                const auto p_rpm = Dynamics::kRollPitchYawScale * setpoint.pitch;
+                const Setpoint setpoint_to_mixer = {
+                    Dynamics::GetThrustRpm(kVehicleParams, setpoint_in.thrust),
+                    Dynamics::kRollPitchYawScale * setpoint_in.roll,
+                    Dynamics::kRollPitchYawScale * setpoint_in.pitch,
+                    setpoint_in.yaw
+                };
 
-                // Mixer
-                const auto rpm_fl = t_rpm + r_rpm - p_rpm;
-                const auto rpm_fr = t_rpm - r_rpm - p_rpm;
-                const auto tmp = t_rpm + p_rpm;
-                const auto rpm_r = sqrt(2 * tmp * tmp);
+                static SevJrMixer mixer_;
+                mixer_ = hf::SevJrMixer::Run(setpoint_to_mixer);
 
-                // See Equation 6 from Bouabdallah et al 2004 -----------------
+                // Based on Equation 6 from Bouabdallah et al 2004 for RPM-to-force
+                // prop conversion
 
-                const auto o_fl = Dynamics::RpmToOmegaSquared(rpm_fl);
-                const auto o_fr = Dynamics::RpmToOmegaSquared(rpm_fr);
-                const auto o_r  = Dynamics::RpmToOmegaSquared(rpm_r);
+                const auto o_prop_fl_cw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_fl_cw);
 
-                const auto t =  o_fl + o_fr + o_r;
-                const auto r = o_fl - o_fr;
-                const auto p = -o_fl - o_fr + o_r;
-                const auto y = 0; // o_r - o_fr + o_fl;
+                const auto o_prop_fr_ccw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_fr_ccw);
 
-                return Setpoint(t, r, p, y);
+                const auto o_prop_r_cw =
+                    Dynamics::RpmToOmegaSquared(mixer_.prop_r_cw);
+
+                // Special handling for yaw force from rudder and rear prop
+
+                return Setpoint(
+                        o_prop_fl_cw + o_prop_fr_ccw + o_prop_r_cw,
+                        o_prop_fl_cw - o_prop_fr_ccw,
+                        -(o_prop_fl_cw + o_prop_fr_ccw)/2 + o_prop_r_cw,
+                        mixer_.rudder * YAW_SCALE);
             }
 
-
-    }; // class ApexQuad
+    }; // class SevJr
 
 } // namespace hf
