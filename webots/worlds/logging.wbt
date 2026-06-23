@@ -14,7 +14,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-XTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/Floor.proto"
 EXTERNPROTO "../protos/Apex2.proto"
@@ -39,7 +39,6 @@ Viewpoint {
   follow "Apex2"
 }
 DEF robot Apex2 {
-  rotation 0 0 -1 0
 }
 TexturedBackground {
 }
