@@ -62,7 +62,10 @@ DLLEXPORT void webots_physics_step()
     // Get vehicle pose based on setpoint
     const auto pose = ahelper_->GetPose(message.mode, setpoint);
 
+    auto rangefinder = ahelper_->robot.rangefinders["VL53L5-forward"];
+
     (void)pose;
+    (void)rangefinder;
 }
 
 DLLEXPORT void webots_physics_cleanup() 
