@@ -19,13 +19,13 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/SimpleTree.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-EXTERNPROTO "../../protos/Pipe.proto"
-EXTERNPROTO "../../protos/Brick.proto"
-EXTERNPROTO "../../protos/Apex2.proto"
+EXTERNPROTO "../protos/Pipe.proto"
+EXTERNPROTO "../protos/Brick.proto"
+EXTERNPROTO "../protos/Apex2.proto"
 
 WorldInfo {
   title "Hackflight"
-  physics "simple"
+  physics "experimental"
   contactProperties [
     ContactProperties {
       coulombFriction [
@@ -42,6 +42,8 @@ Viewpoint {
   follow "Apex2"
 }
 DEF robot Apex2 {
+  translation -2.78143 0.000765464 0.013756
+  rotation 0.5502315303325688 0.6058370816373146 0.5746361401278736 9.894336960962855e-07
 }
 TexturedBackground {
   texture "dusk"
@@ -115,7 +117,7 @@ Pipe {
   appearance PBRAppearance {
     baseColorMap ImageTexture {
       url [
-        "textures/light_asphalt.jpg"
+        "../worlds/textures/light_asphalt.jpg"
       ]
     }
     roughness 1

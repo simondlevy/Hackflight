@@ -18,8 +18,8 @@ PROTO Apex2 [
 
     field SFColor frame_color  0 0 0
     field SFFloat frame_metalness 0.0
-    field SFVec3f frame_translation 0 0 0.014
-    field SFRotation frame_rotation 0 0 1 0
+    #field SFVec3f frame_translation 0 0 0.014
+    #field SFRotation frame_rotation 0 0 1 0
 
     field SFVec3f standoff1_translation -0.030 -0.008 0.000
     field SFVec3f standoff2_translation  0.022 -0.008 0.000
@@ -73,8 +73,8 @@ PROTO Apex2 [
 
     DEF robot Robot {
 
-            translation  IS frame_translation
-            rotation  IS frame_rotation
+            #translation  IS frame_translation
+            #rotation  IS frame_rotation
             controller "<extern>"
             supervisor TRUE
             children [
