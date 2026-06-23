@@ -18,7 +18,7 @@
 
 log=../standard/log.csv
 
-WORLDS_DIR = ../../worlds
+WORLDS_DIR = ../../worlds/apex2
 WORLD_FILE = $(shell head -1 $(log))
 PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
