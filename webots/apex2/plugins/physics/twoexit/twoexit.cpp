@@ -20,6 +20,12 @@
 #include "../helper.hpp"
 #include "../autopilot.hpp"
 
+// SimSensors
+#include <simsensors/src/world.hpp>
+#include <simsensors/src/robot.hpp>
+#include <simsensors/src/sensors/rangefinder.hpp>
+#include <simsensors/src/visualizers/rangefinder.hpp>
+
 static const uint8_t kRangefinderDisplayScaleup = 64;
 
 static PluginHelper * helper_;

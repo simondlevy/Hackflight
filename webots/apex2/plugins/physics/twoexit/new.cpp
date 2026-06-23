@@ -1,27 +1,3 @@
-// SimSensors
-#include <simsensors/src/world.hpp>
-#include <simsensors/src/robot.hpp>
-#include <simsensors/src/sensors/rangefinder.hpp>
-#include <simsensors/src/visualizers/rangefinder.hpp>
-
-static const uint8_t kRangefinderDisplayScaleup = 64;
-
-static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
-{
-    const int * d = rangefinder_distances_mm;
-
-    // Look for clear (infinity reading) in center of 1x8 readings
-    const bool center_is_clear = d[3] == -1 && d[4] == -1;
-
-    // If clear, pitch forward
-    const auto pitch = center_is_clear ? 0.4 : 0;
-
-    // Otherwise, yaw rightward
-    const auto yaw = center_is_clear ? 0 : 0.2;
-
-    return hf::Setpoint(0, 0, pitch, yaw);
-}        
-
 static AutopilotHelper * ahelper_;
 
 // Returns false on collision, true otherwise
