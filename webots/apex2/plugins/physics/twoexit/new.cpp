@@ -1,5 +1,3 @@
-static AutopilotHelper * ahelper_;
-
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 

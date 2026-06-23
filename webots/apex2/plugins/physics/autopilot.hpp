@@ -34,7 +34,7 @@ class AutopilotHelper {
 
         static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
-        FILE * logfile_;
+        // FILE * logfile_;
 
         PluginHelper * helper_;
 
@@ -59,9 +59,11 @@ class AutopilotHelper {
 
             simsens::RobotParser::parse(robot_path, robot);
 
+            /*
             char log_path[256] = {};
             sprintf(log_path, "%s/%s.csv", pwd, worldname);
-            //fprintf(logfile_, "%s\n", worldname);
+            fprintf(logfile_, "%s\n", worldname);
+            */
 
             _collided = false;
             
@@ -107,6 +109,7 @@ class AutopilotHelper {
             return pose;
         }
 
+        /*
         auto WriteToLog(
                 const simsens::Pose & pose,
                 const int * rangefinder_distances,
@@ -121,5 +124,5 @@ class AutopilotHelper {
             }
 
             fprintf(logfile_, "\n");
-        }
+        }*/
 };

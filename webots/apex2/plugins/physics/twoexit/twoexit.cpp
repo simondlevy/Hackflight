@@ -60,14 +60,11 @@ DLLEXPORT void webots_physics_step()
     // available
     const auto setpoint = message.mode == hf::kModeAutonomous ?
         getSetpoint(_rangefinder_distances_mm) : message.setpoint;
-    (void)setpoint;
 
-    const auto vparams = hf::ApexQuad::kVehicleParams;
+    // Get vehicle pose based on setpoint
+    const auto pose = ahelper_->GetPose(message.mode, setpoint);
 
-    const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
-            message.mode, message.setpoint);
-
-    helper_->SetDbodyFromState(vparams, state);
+    (void)pose;
 }
 
 DLLEXPORT void webots_physics_cleanup() 
