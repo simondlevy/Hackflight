@@ -44,7 +44,7 @@ static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
     return hf::Setpoint(0, 0, pitch, yaw);
 }        
 
-static AutopilotHelper * _ahelper;
+static AutopilotHelper * ahelper_;
 
 // Returns false on collision, true otherwise
 // This is called by Webots in the outer (display, kinematics) loop
@@ -60,15 +60,15 @@ DLLEXPORT void webots_physics_step()
         getSetpoint(_rangefinder_distances_mm) : message.setpoint;
 
     // Get vehicle pose based on setpoint
-    const auto pose = _ahelper->GetPose(message.mode, setpoint);
+    const auto pose = ahelper_->GetPose(message.mode, setpoint);
 
-    auto rangefinder = _ahelper->robot.rangefinders["VL53L5-forward"];
+    auto rangefinder = ahelper_->robot.rangefinders["VL53L5-forward"];
 
     // Grab rangefinder distances for next iteration
-    rangefinder.read(pose, _ahelper->world, _rangefinder_distances_mm);
+    rangefinder.read(pose, ahelper_->world, _rangefinder_distances_mm);
 
     // Log data to file
-    _ahelper->WriteToLog(pose, _rangefinder_distances_mm, 8);
+    ahelper_->WriteToLog(pose, _rangefinder_distances_mm, 8);
 
     // Display rangefinder distances
     simsens::RangefinderVisualizer::show(
@@ -80,10 +80,10 @@ DLLEXPORT void webots_physics_step()
 
 DLLEXPORT void webots_physics_cleanup() 
 {
-    delete _ahelper;
+    delete ahelper_;
 }
 
 DLLEXPORT void webots_physics_init() 
 {
-    _ahelper = new AutopilotHelper("twoexit");
+    ahelper_ = new AutopilotHelper("twoexit");
 }

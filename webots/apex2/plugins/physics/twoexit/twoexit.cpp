@@ -19,11 +19,32 @@
 #include <sim/vehicles/quadx/apexquad.hpp>
 #include "../helper.hpp"
 
+static const uint8_t kRangefinderDisplayScaleup = 64;
+
 static PluginHelper * helper_;
+
+static auto getSetpoint(const int * rangefinder_distances_mm) -> hf::Setpoint
+{
+    const int * d = rangefinder_distances_mm;
+
+    // Look for clear (infinity reading) in center of 1x8 readings
+    const bool center_is_clear = d[3] == -1 && d[4] == -1;
+
+    // If clear, pitch forward
+    const auto pitch = center_is_clear ? 0.4 : 0;
+
+    // Otherwise, yaw rightward
+    const auto yaw = center_is_clear ? 0 : 0.2;
+
+    return hf::Setpoint(0, 0, pitch, yaw);
+}        
+
 
 // This is called by Webots in the outer (display, kinematics) loop
 DLLEXPORT void webots_physics_step() 
 {
+    static int _rangefinder_distances_mm[8];
+
     const auto message = PluginHelper::GetMessage();
 
     const auto vparams = hf::ApexQuad::kVehicleParams;
