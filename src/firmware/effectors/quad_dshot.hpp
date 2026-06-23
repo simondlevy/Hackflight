@@ -45,6 +45,8 @@ namespace hf {
 
             void Run(FlightController & fc, const Setpoint & setpoint)
             {
+                mixer_ = QuadXMixer::Run(setpoint);
+
                 const auto motorvals = GetMotorValues();
 
                 // Run motors if safe
@@ -59,14 +61,12 @@ namespace hf {
             auto GetMotorValues() -> float *
             {
 
-                static float motorvals[4] = {
-                    mixer_.rr_cw,
-                    mixer_.rf_ccw,
-                    mixer_.lr_ccw,
-                    mixer_.lf_cw,
-                };
+                motorvals_[0] = mixer_.rr_cw;
+                motorvals_[1] = mixer_.rf_ccw;
+                motorvals_[2] = mixer_.lr_ccw;
+                motorvals_[3] = mixer_.lf_cw;
 
-                return motorvals;
+                return motorvals_;
             }
 
         private:
@@ -75,6 +75,7 @@ namespace hf {
 
             hf::QuadXMixer mixer_;
 
+           float motorvals_[4];
 
     }; // class QuadDshot
 

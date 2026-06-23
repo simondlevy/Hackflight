@@ -18,7 +18,7 @@
 #include <Adafruit_VL53L1X.h>
 
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
+#include <firmware/debugger.hpp>
 #include <firmware/zranger/sensor.hpp>
 
 static Adafruit_VL53L1X _vl53l1x;

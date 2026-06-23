@@ -23,7 +23,7 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/debugging.hpp>
+#include <firmware/debugger.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 
 static PMW3901 _pmw3901;

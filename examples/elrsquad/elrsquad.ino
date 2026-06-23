@@ -23,6 +23,7 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
+#include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
