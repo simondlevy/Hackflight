@@ -114,13 +114,6 @@ class PluginHelper {
 
             const auto state = simulator_.dynamics.state;
 
-            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
-                    dWebotsGetTime()/1000,
-                    state.x, state.dx, state.dy, state.dy, state.z, state.dz,
-                    state.phi, state.dphi, state.theta, state.dtheta,
-                    state.psi, state.dpsi);
-            fflush(logfile_);
-
             return state;
         }
 
@@ -131,9 +124,18 @@ class PluginHelper {
 
         void SetDbodyFromState(const hf::VehicleParams vparams, const hf::SimState & state)
         {
+            // Add leg height to altitude to avoid sinking below floor
+            const auto z = state.z + vparams.leg_height;
+
             // Negate Y to make leftward positive
-            dBodySetPosition(robot_body, state.x, -state.y,
-                    state.z + vparams.leg_height);
+            dBodySetPosition(robot_body, state.x, -state.y, z);
+
+            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+                    dWebotsGetTime()/1000, state.x, state.dx, state.y,
+                    state.dy, z, state.dz, state.phi, state.dphi, state.theta,
+                    state.dtheta, state.psi, state.dpsi);
+
+            fflush(logfile_);
 
             // Turn Euler angles into quaternion, negating psi for nose-left
             // positive
