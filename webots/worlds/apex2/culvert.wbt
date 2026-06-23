@@ -42,8 +42,6 @@ Viewpoint {
   follow "Apex2"
 }
 DEF robot Apex2 {
-  translation -2.78143 0.000765464 0.013756
-  rotation 0.5502315303325688 0.6058370816373146 0.5746361401278736 9.894336960962855e-07
 }
 TexturedBackground {
   texture "dusk"
@@ -116,9 +114,7 @@ Pipe {
   rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
   appearance PBRAppearance {
     baseColorMap ImageTexture {
-      url [
-        "../worlds/textures/light_asphalt.jpg"
-      ]
+      url [ "textures/light_asphalt.jpg" ]
     }
     roughness 1
   }
