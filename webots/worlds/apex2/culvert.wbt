@@ -1,31 +1,16 @@
 #VRML_SIM R2025a utf8
 
-#   Copyright (C) 2026 Simon D. Levy
-#
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, in version 3.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#   GNU General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with this program. If not, see <http:--www.gnu.org/licenses/>.
-
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Grass.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/trees/protos/SimpleTree.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/rocks/protos/Rock.proto"
-EXTERNPROTO "../../protos/Pipe.proto"
-EXTERNPROTO "../../protos/Brick.proto"
-EXTERNPROTO "../../protos/Apex2.proto"
+EXTERNPROTO "/home/levys/Desktop/hackflight/webots/protos/Pipe.proto"
+EXTERNPROTO "/home/levys/Desktop/hackflight/webots/protos/Brick.proto"
+EXTERNPROTO "/home/levys/Desktop/hackflight/webots/protos/Apex2.proto"
 
 WorldInfo {
   title "Hackflight"
-  physics "experimental"
   contactProperties [
     ContactProperties {
       coulombFriction [
@@ -37,11 +22,12 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.017811667834530715 -0.9985736341425941 0.05033330591372672 5.899498367038858
-  position -9.747321728038077 -0.30587707207325604 3.316139995717208
+  orientation 0.010889810184977249 -0.9991962532403661 0.03857796708679402 5.769637465620805
+  position -9.676136711317852 -0.03889460209356768 3.62797441716398
   follow "Apex2"
 }
 DEF robot Apex2 {
+  frame_translation -3.71 0 0.014
 }
 TexturedBackground {
   texture "dusk"
@@ -114,7 +100,9 @@ Pipe {
   rotation -0.6785987877241534 -0.28108491207243697 -0.6785977877244662 -2.593565307179586
   appearance PBRAppearance {
     baseColorMap ImageTexture {
-      url [ "textures/light_asphalt.jpg" ]
+      url [
+        "textures/light_asphalt.jpg"
+      ]
     }
     roughness 1
   }
