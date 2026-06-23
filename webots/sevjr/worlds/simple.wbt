@@ -8,7 +8,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 WorldInfo {
   title "Hackflight"
   gravity 0
-  physics "sevjr"
+  physics "simple"
   contactProperties [
     ContactProperties {
       coulombFriction [

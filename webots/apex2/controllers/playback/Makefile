@@ -12,28 +12,33 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http:--www.gnu.org/licenses/>.
 
-# Command-line variable; e.g. make run world=twoexit
-world = simple
+# Command-line variables; e.g.:
+#   make run log=../controller/twoexit.csv
+#
 
-WORLDS_DIR = ../../worlds/apex2
+log=../standard/log.csv
 
-# https://stackoverflow.com/a/49524393
-.EXPORT_ALL_VARIABLES:
-WEBOTS_PATH = $(shell pwd)
-WORLD_FILE = $(WORLDS_DIR)/$(world).wbt
-
-FILES_TO_REMOVE += *.csv __pycache__/
+WORLDS_DIR = ../../worlds/
+WORLD_FILE = $(shell head -1 $(log))
+PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
 run:
 	@if [ ! -f $(WORLD_FILE) ]; then\
         echo "World file" $(WORLD_FILE) "not found";\
+	elif [ ! -f $(log) ]; then\
+        echo "Log file" $(log) "not found";\
 	else \
-	    webots $(WORLD_FILE) & /usr/local/webots/webots-controller \
-		--stdout-redirect ./apex2.py $(world) &> /dev/null;\
+		sed 's/physics.*//' $(WORLD_FILE) | sed 's/###//' > $(PLAYBACK_FILE);\
+	    webots $(PLAYBACK_FILE) & /usr/local/webots/webots-controller \
+		--stdout-redirect ./playback.py $(log);\
 	fi
+
+edit:
+	vim playback.py
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
 space := $(null) $(null)
 WEBOTS_HOME_PATH=$(subst $(space),\ ,$(strip $(subst \,/,$(WEBOTS_HOME))))
 include $(WEBOTS_HOME_PATH)/resources/Makefile.include
+

@@ -18,7 +18,7 @@ NAME = $(shell basename "`pwd`")
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
-SRC = ../../../../src
+SRC = ../../../../../src/
 
 INCLUDE = -I$(SRC) -I$(SRC)/control
 

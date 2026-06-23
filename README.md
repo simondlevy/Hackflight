@@ -54,7 +54,7 @@ under 3,000 lines of code.
 # Simulator
 
 For flight simulation, Hackflight uses [Webots](https://cyberbotics.com/),
-a free, open-source robotics simulator. Click [here](webots) to get started.
+a free, open-source robotics simulator. Click [here](webots/apex2) to get started.
 
 # Citing Hackflight
 

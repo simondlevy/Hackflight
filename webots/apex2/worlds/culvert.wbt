@@ -11,6 +11,8 @@ EXTERNPROTO "/home/levys/Desktop/hackflight/webots/protos/Apex2.proto"
 
 WorldInfo {
   title "Hackflight"
+  gravity 0
+  physics "simple"
   contactProperties [
     ContactProperties {
       coulombFriction [
@@ -23,11 +25,14 @@ WorldInfo {
 }
 Viewpoint {
   orientation 0.010889810184977249 -0.9991962532403661 0.03857796708679402 5.769637465620805
-  position -9.676136711317852 -0.03889460209356768 3.62797441716398
+  position -19.940637608901923 0.2009868537522778 9.412025277120975
   follow "Apex2"
 }
 DEF robot Apex2 {
-  frame_translation -3.71 0 0.014
+  hidden linearVelocity_0 -0.10463594996316906 0.008624703575273132 0.06562297711097846
+  hidden angularVelocity_0 -0.018162385238022587 -0.6204373326023348 1.6615359126311107
+  frame_translation -5.401433637854624 -0.14937091848208545 0.016093521429186273
+  frame_rotation 0.008404596616000496 -0.31800564521647834 -0.948051566301208 0.06285961801295371
 }
 TexturedBackground {
   texture "dusk"
