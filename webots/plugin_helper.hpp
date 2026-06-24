@@ -37,7 +37,7 @@ class PluginHelper {
 
         static constexpr char kPathVariableName[] = "WEBOTS_PATH";
 
-        static constexpr char kWorldVariableName[] = "WORLD_FILE";
+        static constexpr char kWorldVariableName[] = "WORLD";
 
         // Platform-independent simulator simulator loop
         hf::Simulator simulator_;
@@ -130,10 +130,8 @@ class PluginHelper {
             // Negate Y to make leftward positive
             dBodySetPosition(robot_body, state.x, -state.y, z);
 
-            fprintf(logfile_, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
-                    dWebotsGetTime()/1000, state.x, state.dx, state.y,
-                    state.dy, z, state.dz, state.phi, state.dphi, state.theta,
-                    state.dtheta, state.psi, state.dpsi);
+            fprintf(logfile_, "%f,%f,%f,%f,%f,%f\n", state.x, state.y, z,
+                    state.phi, state.theta, state.psi);
 
             fflush(logfile_);
 

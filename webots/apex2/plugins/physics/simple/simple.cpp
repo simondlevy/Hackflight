@@ -28,7 +28,7 @@ DLLEXPORT void webots_physics_step()
 
     const auto vparams = hf::ApexQuad::kVehicleParams;
 
-    const auto state = helper_->RunSimulator( hf::ApexQuad::Run, vparams,
+    const auto state = helper_->RunSimulator(hf::ApexQuad::Run, vparams,
             message.mode, message.setpoint);
 
     helper_->SetDbodyFromState(vparams, state);

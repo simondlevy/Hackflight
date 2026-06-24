@@ -19,7 +19,8 @@
 log=../standard/log.csv
 
 WORLDS_DIR = ../../worlds/
-WORLD_FILE = $(shell head -1 $(log))
+WORLD = $(shell head -1 $(log))
+WORLD_FILE = $(WORLDS_DIR)/$(WORLD).wbt
 PLAYBACK_FILE = $(WORLDS_DIR)/.playback_$(world).wbt
 
 run:
