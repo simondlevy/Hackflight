@@ -17,8 +17,12 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-from helper import Helper
+from pathlib import Path
+import sys
 
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent))
+
+from controller_helper import Helper
 
 def main():
 

@@ -17,10 +17,12 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
 '''
 
-import os
+from pathlib import Path
 import sys
 
-from helper import Helper
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent.parent))
+
+from controller_helper import Helper
 
 RUDDER_NEUTRAL_RADIANS = -0.5
 
