@@ -66,6 +66,13 @@ DLLEXPORT void webots_physics_step()
 
     // Grab rangefinder distances for next iteration
     rangefinder.read(pose, ahelper_->world, _rangefinder_distances_mm);
+
+    // Display rangefinder distances
+    simsens::RangefinderVisualizer::show(
+            _rangefinder_distances_mm,
+            rangefinder.min_distance_m,
+            rangefinder.max_distance_m,
+            8, 1, kRangefinderDisplayScaleup);
 }
 
 DLLEXPORT void webots_physics_cleanup() 
