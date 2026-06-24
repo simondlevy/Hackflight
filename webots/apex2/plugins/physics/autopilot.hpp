@@ -26,7 +26,7 @@
 #include <simsensors/src/parsers/webots/robot.hpp>
 #include <simsensors/src/world.hpp>
 
-#include "helper.hpp"
+#include "plugin_helper.hpp"
 
 class AutopilotHelper {
 

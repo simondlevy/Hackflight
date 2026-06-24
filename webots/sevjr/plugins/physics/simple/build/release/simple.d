@@ -2,7 +2,8 @@ build/release/simple.o: simple.cpp \
  ../../../../../src/sim/vehicles/sevjr.hpp \
  ../../../../../src/datatypes.hpp ../../../../../src/mixers/sevjr.hpp \
  ../../../../../src/sim/dynamics.hpp ../../../../../src/sim/datatypes.hpp \
- ../../../../helper.hpp /usr/local/webots/include/plugins/physics.h \
+ ../../../../plugin_helper.hpp \
+ /usr/local/webots/include/plugins/physics.h \
  /usr/local/webots/include/ode/ode/ode.h \
  /usr/local/webots/include/ode/ode/odeconfig.h \
  /usr/local/webots/include/ode/ode/precision.h \
