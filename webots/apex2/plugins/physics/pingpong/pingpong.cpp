@@ -21,7 +21,7 @@
 
 // Hackflight
 #include <sim/dynamics.hpp>
-#include "../helper.hpp"
+#include <helper.hpp>
 #include "../autopilot.hpp"
 
 // SimSensors

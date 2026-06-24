@@ -20,7 +20,7 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRC = ../../../../../src/
 
-INCLUDE = -I$(SRC) -I$(SRC)/control
+INCLUDE = -I../../../../ -I$(SRC) -I$(SRC)/control/
 
 CXX_SOURCES = $(NAME).cpp
 

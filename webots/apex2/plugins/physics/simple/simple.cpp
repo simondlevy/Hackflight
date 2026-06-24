@@ -17,7 +17,7 @@
  */
 
 #include <sim/vehicles/quadx/apexquad.hpp>
-#include "../helper.hpp"
+#include <helper.hpp>
 
 static PluginHelper * helper_;
 

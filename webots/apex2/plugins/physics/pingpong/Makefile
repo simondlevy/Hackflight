@@ -16,15 +16,15 @@
 
 NAME = $(shell basename "`pwd`")
 
-OPENCV_DIR = /usr/include/opencv4
+OPENCV_DIR = /usr/include/opencv4/
 
-SIMSENSORS_DIR = $(HOME)/Desktop
+SIMSENSORS_DIR = $(HOME)/Desktop/
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
-SRC_DIR = ../../../../../src
+SRC_DIR = ../../../../../src/
 
-INCLUDE = -I$(SRC_DIR) -I$(SRC_DIR)/control \
+INCLUDE = -I../../../.. -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(NAME).cpp

@@ -17,7 +17,6 @@
  */
 
 // Hackflight
-#include "../helper.hpp"
 #include "../autopilot.hpp"
 
 // SimSensors

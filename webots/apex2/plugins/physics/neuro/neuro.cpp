@@ -22,7 +22,7 @@
 
 // Hackflight
 #include <sim/dynamics.hpp>
-#include "../helper.hpp"
+#include <helper.hpp>
 #include "../autopilot.hpp"
 
 // SimSensors
@@ -99,8 +99,8 @@ DLLEXPORT void webots_physics_step()
             _ahelper->robot, _ahelper->world, pose);
 
     // Log data to file
-    const int distances[] = {_distance_forward_mm, _distance_backward_mm};
-    _ahelper->WriteToLog(pose, distances, 2);
+    //const int distances[] = {_distance_forward_mm, _distance_backward_mm};
+    //_ahelper->WriteToLog(pose, distances, 2);
 }
 
 DLLEXPORT void webots_physics_cleanup() 

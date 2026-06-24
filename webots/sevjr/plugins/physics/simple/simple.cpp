@@ -17,7 +17,7 @@
  */
 
 #include <sim/vehicles/sevjr.hpp>
-#include "helper.hpp"
+#include <helper.hpp>
 
 static PluginHelper * _helper;
 
