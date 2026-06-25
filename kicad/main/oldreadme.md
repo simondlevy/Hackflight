@@ -25,10 +25,6 @@ using a kit like
 
 6. 220Ω resistor, on bottom, using 1-2mm chisel/bevel tip.
 
-7. [LED](https://lighthouseleds.com/1-8mm-2mm-led-red-ultra-bright.html), on top, using 1-2mm chisel/bevel tip.
-
-# Teensy / ESP32 Xiao C6
-
 https://www.amazon.com/Breakaway-Headers-Connector-Breadboard-Electronic/dp/B0FLJVHSRN/
 
 
