@@ -6,19 +6,19 @@
 
 * Teensy 4.0
 
-* Xiao ESP32 C-6
-
 * BMI088 breakout
+
+* 1x14 0.1" pitch male header pins
 
 * [1.25mm Pitch JST Molex Picoblade connectors and Pre-Crimped Cables](https://www.amazon.com/dp/B07S18D3RN)
 
 * [Pololu 5V Step-Up/Step-Down Voltage Regulator S7V7F5](https://www.pololu.com/product/2119)
 
-* [1x14 short female headers](https://www.digikey.com/en/products/detail/adafruit-industries-llc/4174/10130489) on 
-
 * [LED](https://lighthouseleds.com/1-8mm-2mm-led-red-ultra-bright.html)
 
 * [8-pin 1.25mm Pitch JST Molex Picoblade connector, male pins, right angle](https://www.digikey.com/en/products/detail/molex/0530480810/242870)
+
+* Resistors: 100 Ohm, 1000 Ohm, 3300 Ohm
 
 # Soldering instuctions
 
@@ -29,11 +29,11 @@ Main Board
 
 1. Solder BMI088 breakout to front of board.
 
-2. Solder voltage regulator on front.
+2. Solder voltage regulator on back.
 
-3. Solder two 1x14 short female headers on front.
+3. Solder 1x14 headers on front.
 
-4. Solder the four resistors on back.
+4. Solder the three resistors on back.
 
 5. Solder the LED on front
 
