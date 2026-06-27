@@ -45,7 +45,9 @@ Main Board
 
 8. Mount the flight controller to the airframe with four M2 screws and nuts, and rubber grommets.
 
-9. Solder the Teensy 4.0 onto the header pins on the flight controller header pins.
+9. After covering the Teensy 4.00 bottom middle with electrical tape to
+insulate it from any conact with the components on the flight controller,
+solder the Teensy 4.0 onto the header pins on the flight controller. 
 
 Hover Deck: Solder right-angle male PicoBlade connector to board
 

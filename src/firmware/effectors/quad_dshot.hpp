@@ -34,7 +34,7 @@ namespace hf {
 
         private:
 
-            std::vector<uint8_t> kMotorPins = {2, 3, 4, 5};
+            std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
 
         public:
 
