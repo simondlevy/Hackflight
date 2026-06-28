@@ -55,10 +55,11 @@ namespace hf {
             static constexpr float kLedFastBlink_Rate = 3;
             static constexpr uint32_t kLedPulseDurationMsec = 50;
 
-            // Rate constants
+            // Rate constants for timer tasks
             static constexpr float kCoreLoopRate = 1000;
             static constexpr float kEkfPredictionRate = 100;
             static constexpr float kFlyingCheckRate   = 25;
+            static constexpr float kVoltageSensingRate = 10;
             static constexpr float kHoverDeckAcquisitionRate = 100;
             static constexpr float kTelemetryRate = 50;
 
@@ -327,9 +328,13 @@ namespace hf {
             ZRanger zranger_;
             OpticalFlowSensor flow_sensor_;
 
+            // Voltage sensing
+            float voltage_;
+
             // Timers
             Timer ekf_prediction_timer_ = Timer(kEkfPredictionRate);
             Timer flying_check_timer_ = Timer(kFlyingCheckRate);
+            Timer voltage_sensing_timer_ = Timer(kVoltageSensingRate);
             Timer hover_deck_timer_ = Timer(kHoverDeckAcquisitionRate);
             Timer telemetry_timer_ = Timer(kTelemetryRate);
 
@@ -404,6 +409,13 @@ namespace hf {
 
                     is_flying_;
 
+                // Sense voltage periodically
+                voltage_ = voltage_sensing_timer_.Ready() ? 
+                    analogRead(kVoltageInputPin) / 1024.f * 3.3 * kVoltageScaleup:
+                    voltage_;
+
+                debugger_.ReportFloat("voltage", voltage_);
+
                 // Blink LED to indicate status
                 BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
@@ -462,7 +474,7 @@ namespace hf {
             {
                 const auto ready = isimu__calibrated ?
                     heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
-                
+
                 if (ready) {
                     digitalWrite(kLedPin, true);
                     is_led_pusing_ = true;
