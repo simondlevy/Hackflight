@@ -410,9 +410,8 @@ namespace hf {
                     is_flying_;
 
                 // Sense voltage periodically
-                voltage_ = voltage_sensing_timer_.Ready() ? 
-                    analogRead(kVoltageInputPin) / 1024.f * 3.3 * kVoltageScaleup:
-                    voltage_;
+                voltage_ =
+                    voltage_sensing_timer_.Ready() ? ReadVoltage() : voltage_;
 
                 debugger_.ReportFloat("voltage", voltage_);
 
@@ -436,6 +435,12 @@ namespace hf {
 
                 // Get vehicle state from EKF
                 state_ = EKF::getVehicleState(ekf_);
+            }
+
+            static auto ReadVoltage() -> float
+            {
+                return analogRead(kVoltageInputPin) / 1024.f * 3.3 *
+                    kVoltageScaleup;
             }
 
             auto AreMotorsAboveIdle(
