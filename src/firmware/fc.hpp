@@ -45,9 +45,10 @@ namespace hf {
 
         private:
 
-            // Voltage sensing
+            // Voltage divider sensing
             static constexpr uint8_t kVoltageInputPin = A9;
-            static constexpr float kVoltageScaleup = 4.29;
+            static constexpr float kR1Ohms = 3300;
+            static constexpr float kR2Ohms = 1000;
 
             // LED indicator
             static const uint8_t kLedPin = 9;
@@ -440,7 +441,7 @@ namespace hf {
             static auto ReadVoltage() -> float
             {
                 return analogRead(kVoltageInputPin) / 1024.f * 3.3 *
-                    kVoltageScaleup;
+                    (kR1Ohms + kR2Ohms) / kR2Ohms;
             }
 
             auto AreMotorsAboveIdle(
