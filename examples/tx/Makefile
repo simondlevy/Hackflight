@@ -2,7 +2,7 @@ SKETCH = $(shell basename "`pwd`")
 
 ROOT = $(HOME)/Desktop/
 
-FQBN = teensy:avr:teensy40
+FQBN = esp32:esp32:um_tinypico
 
 PORT = /dev/ttyACM0
 
