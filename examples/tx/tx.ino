@@ -16,8 +16,9 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-static const uint32_t THROTTLE_INPUT_PIN = 4;
-static const uint32_t ROLL_INPUT_PIN = 14;
+static const uint8_t THROTTLE_INPUT_PIN = 4;
+static const uint8_t ROLL_INPUT_PIN = 14;
+static const uint8_t PITCH_INPUT_PIN = 15;
 
 void setup()
 {
@@ -26,7 +27,8 @@ void setup()
 
 void loop()
 {
-    Serial.printf("t=%d r=%d\n",
+    Serial.printf("t=%d r=%d p=%d\n",
             analogRead(THROTTLE_INPUT_PIN),
-            analogRead(ROLL_INPUT_PIN));
+            analogRead(ROLL_INPUT_PIN),
+            analogRead(PITCH_INPUT_PIN));
 }
