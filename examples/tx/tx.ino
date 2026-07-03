@@ -17,6 +17,7 @@
  */
 
 static const uint32_t THROTTLE_INPUT_PIN = 4;
+static const uint32_t ROLL_INPUT_PIN = 14;
 
 void setup()
 {
@@ -25,5 +26,7 @@ void setup()
 
 void loop()
 {
-    Serial.println(analogRead(THROTTLE_INPUT_PIN));
+    Serial.printf("t=%d r=%d\n",
+            analogRead(THROTTLE_INPUT_PIN),
+            analogRead(ROLL_INPUT_PIN));
 }
