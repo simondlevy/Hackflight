@@ -1,5 +1,4 @@
-/*
-   Hackflight ESP32 transmitter sketch
+/* Hackflight ESP32 transmitter sketch
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -19,6 +18,7 @@
 static const uint8_t THROTTLE_INPUT_PIN = 4;
 static const uint8_t ROLL_INPUT_PIN = 14;
 static const uint8_t PITCH_INPUT_PIN = 15;
+static const uint8_t YAW_INPUT_PIN = 27;
 
 void setup()
 {
@@ -27,8 +27,9 @@ void setup()
 
 void loop()
 {
-    Serial.printf("t=%d r=%d p=%d\n",
+    Serial.printf("t=%d r=%d p=%d y=%d\n",
             analogRead(THROTTLE_INPUT_PIN),
             analogRead(ROLL_INPUT_PIN),
-            analogRead(PITCH_INPUT_PIN));
+            analogRead(PITCH_INPUT_PIN),
+            analogRead(YAW_INPUT_PIN));
 }
