@@ -306,6 +306,12 @@ namespace hf {
                 }
             }
 
+            static auto ReadVoltage() -> float
+            {
+                return analogRead(kVoltageInputPin) / 1024.f * 3.3 *
+                    (kR1Ohms + kR2Ohms) / kR2Ohms;
+            }
+
             // Instance variables ---------------------------------------------
 
             // Vehicle state
@@ -436,12 +442,6 @@ namespace hf {
 
                 // Get vehicle state from EKF
                 state_ = EKF::getVehicleState(ekf_);
-            }
-
-            static auto ReadVoltage() -> float
-            {
-                return analogRead(kVoltageInputPin) / 1024.f * 3.3 *
-                    (kR1Ohms + kR2Ohms) / kR2Ohms;
             }
 
             auto AreMotorsAboveIdle(

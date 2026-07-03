@@ -1,6 +1,6 @@
 /*
-   Hackflight main sketch for Teensy quadcopter using ESP32 receiver
-   with MSP protocol
+   Hackflight flight-controller sketch for Teensy quadcopter using ESP32
+   receiver with MSP protocol
 
    Copyright (C) 2026 Simon D. Levy
 

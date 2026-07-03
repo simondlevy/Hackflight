@@ -1,6 +1,6 @@
 /*
-   Hackflight main sketch for Teensy quadcopter using ELRS receiver without
-   hover
+   Hackflight flight-controller sketch for Teensy quadcopter using ELRS
+   receiver with springy throttle
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -23,28 +23,43 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
 
 static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
 
 static hf::FlightController _fc;
 
-static hf::TraditionalReceiver _rxdata;
+static hf::SpringyReceiver _rxdata;
 
 static hf::QuadDshot _effector;
 
-static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
+static const auto kHoldPosition = false;
+
+static void onReceiveRcChannels(
+        serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
-        _rxdata = hf::TraditionalReceiver::Update(
+        const auto button_val = _crsf.readRcChannel(6);
+
+        static uint16_t _button_val;
+
+        static bool _aux2_on;
+
+        if (button_val == 1000 && _button_val == 2000) {
+            _aux2_on = !_aux2_on;
+        }
+
+        _button_val = button_val;
+
+        _rxdata = hf::SpringyReceiver::Update(
                 _rxdata,
                 _crsf.readRcChannel(3),
                 _crsf.readRcChannel(1),
                 _crsf.readRcChannel(2),
                 _crsf.readRcChannel(4),
                 _crsf.readRcChannel(5),
+                _aux2_on ? 2000 : 1000, 
                 millis());
     }
 }
@@ -58,8 +73,8 @@ void setup()
     }
     _crsf.setRcChannelsCallback(onReceiveRcChannels);
 
-    // Start flight control, no hoverdeck
-    _fc.Begin(false);
+    // Start flight control
+    _fc.Begin();
 
     // Start motors
     _effector.Begin();
@@ -71,7 +86,8 @@ void loop()
     _crsf.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4,
+            kHoldPosition);
 
     // Run the mixer and motors
     _effector.Run(_fc, setpoint);
