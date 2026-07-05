@@ -16,11 +16,19 @@ static const uint8_t YAW_INPUT_PIN = 27;
 
 static const uint8_t ARMING_INPUT_PIN = 26;
 
+static const float ANALOG_MIN = 240;
+static const float ANALOG_MAX = 3900;
+
 static bool arming_prev_;
 
-static bool ReadArmingSwitch()
+static auto ReadArmingSwitch() -> bool
 {
     return digitalRead(ARMING_INPUT_PIN);
+}
+
+static auto ReadGimbal(const uint8_t pin) -> float
+{
+    return (analogRead(pin) - ANALOG_MIN) / (ANALOG_MAX - ANALOG_MIN);
 }
 
 void setup()
@@ -44,10 +52,14 @@ void loop()
 
     arming_prev_ = arming_curr;
 
-    Serial.printf("t=%d r=%d p=%d y=%d | a=%d\n",
-            analogRead(THROTTLE_INPUT_PIN),
-            analogRead(ROLL_INPUT_PIN),
-            analogRead(PITCH_INPUT_PIN),
-            analogRead(YAW_INPUT_PIN),
-            armed_);
+    const auto throttle = 1 - ReadGimbal(THROTTLE_INPUT_PIN);
+
+    const auto roll = 2 * (0.5 - ReadGimbal(ROLL_INPUT_PIN));
+
+    const auto pitch = 2 * (ReadGimbal(PITCH_INPUT_PIN) - 0.5);
+
+    const auto yaw = 2 * ReadGimbal(YAW_INPUT_PIN) - 1;
+
+    Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d\n",
+            throttle, roll, pitch, yaw, armed_);
 }
