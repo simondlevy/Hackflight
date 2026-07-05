@@ -54,7 +54,7 @@ void loop()
     const auto hover_button_is_down = digitalRead(HOVER_INPUT_PIN);
     static bool hovering_;
     static bool hover_button_was_down_;
-    if (!hover_button_is_down && hover_button_was_down_) {
+    if (hover_button_is_down && !hover_button_was_down_) {
         hovering_ = !hovering_;
     }
     hover_button_was_down_ = hover_button_is_down;
@@ -67,6 +67,6 @@ void loop()
 
     const auto yaw = 2 * ReadGimbal(YAW_INPUT_PIN) - 1;
 
-    Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d h=%d\n",
+    Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | armed=%d hovering=%d\n",
             throttle, roll, pitch, yaw, armed_, hovering_);
 }
