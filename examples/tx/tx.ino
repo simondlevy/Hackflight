@@ -15,6 +15,7 @@ static const uint8_t PITCH_INPUT_PIN = 15;
 static const uint8_t YAW_INPUT_PIN = 27;
 
 static const uint8_t ARMING_INPUT_PIN = 26;
+static const uint8_t HOVER_INPUT_PIN = 25;
 
 static const float ANALOG_MIN = 240;
 static const float ANALOG_MAX = 3900;
@@ -24,6 +25,11 @@ static bool arming_prev_;
 static auto ReadArmingSwitch() -> bool
 {
     return digitalRead(ARMING_INPUT_PIN);
+}
+
+static auto ReadHoverSwitch() -> bool
+{
+    return digitalRead(HOVER_INPUT_PIN);
 }
 
 static auto ReadGimbal(const uint8_t pin) -> float
@@ -36,6 +42,7 @@ void setup()
     Serial.begin(115200);
 
     pinMode(ARMING_INPUT_PIN, INPUT);
+    pinMode(HOVER_INPUT_PIN, INPUT);
 
     arming_prev_ = ReadArmingSwitch();
 }
@@ -60,6 +67,8 @@ void loop()
 
     const auto yaw = 2 * ReadGimbal(YAW_INPUT_PIN) - 1;
 
-    Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d\n",
-            throttle, roll, pitch, yaw, armed_);
+    Serial.printf("h=%d\n", ReadHoverSwitch());
+
+    //Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d\n",
+    //        throttle, roll, pitch, yaw, armed_);
 }
