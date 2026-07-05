@@ -27,11 +27,6 @@ static auto ReadArmingSwitch() -> bool
     return digitalRead(ARMING_INPUT_PIN);
 }
 
-static auto ReadHoverSwitch() -> bool
-{
-    return digitalRead(HOVER_INPUT_PIN);
-}
-
 static auto ReadGimbal(const uint8_t pin) -> float
 {
     return (analogRead(pin) - ANALOG_MIN) / (ANALOG_MAX - ANALOG_MIN);
@@ -50,14 +45,19 @@ void setup()
 void loop()
 {
     const auto arming_curr = ReadArmingSwitch();
-
     static bool armed_;
-
     if (arming_prev_ != arming_curr) {
         armed_ = !armed_;
     }
-
     arming_prev_ = arming_curr;
+
+    const auto hover_button_is_down = digitalRead(HOVER_INPUT_PIN);
+    static bool hovering_;
+    static bool hover_button_was_down_;
+    if (!hover_button_is_down && hover_button_was_down_) {
+        hovering_ = !hovering_;
+    }
+    hover_button_was_down_ = hover_button_is_down;
 
     const auto throttle = 1 - ReadGimbal(THROTTLE_INPUT_PIN);
 
@@ -67,8 +67,6 @@ void loop()
 
     const auto yaw = 2 * ReadGimbal(YAW_INPUT_PIN) - 1;
 
-    Serial.printf("h=%d\n", ReadHoverSwitch());
-
-    //Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d\n",
-    //        throttle, roll, pitch, yaw, armed_);
+    Serial.printf("t=%3.2f r=%+3.2f p=%+3.2f y=%+3.2f | a=%d h=%d\n",
+            throttle, roll, pitch, yaw, armed_, hovering_);
 }
