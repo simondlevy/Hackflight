@@ -16,6 +16,7 @@ static const uint8_t YAW_INPUT_PIN = 27;
 
 static const uint8_t ARMING_INPUT_PIN = 26;
 static const uint8_t HOVER_INPUT_PIN = 25;
+static const uint8_t AUTOPILOT_INPUT_PIN = 23;
 
 static const float ANALOG_MIN = 240;
 static const float ANALOG_MAX = 3900;
@@ -38,6 +39,7 @@ void setup()
 
     pinMode(ARMING_INPUT_PIN, INPUT);
     pinMode(HOVER_INPUT_PIN, INPUT);
+    pinMode(AUTOPILOT_INPUT_PIN, INPUT);
 
     arming_prev_ = ReadArmingSwitch();
 }
@@ -59,6 +61,14 @@ void loop()
     }
     hover_button_was_down_ = hover_button_is_down;
 
+    const auto autopilot_button_is_down = digitalRead(AUTOPILOT_INPUT_PIN);
+    static bool autopiloting_;
+    static bool autopilot_button_was_down_;
+    if (autopilot_button_is_down && !autopilot_button_was_down_) {
+        autopiloting_ = !autopiloting_;
+    }
+    autopilot_button_was_down_ = autopilot_button_is_down;
+
     const auto throttle = 1 - ReadGimbal(THROTTLE_INPUT_PIN);
 
     const auto roll = 2 * (0.5 - ReadGimbal(ROLL_INPUT_PIN));
@@ -67,6 +77,8 @@ void loop()
 
     const auto yaw = 2 * ReadGimbal(YAW_INPUT_PIN) - 1;
 
-    Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | armed=%d hovering=%d\n",
-            throttle, roll, pitch, yaw, armed_, hovering_);
+    Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
+                  "armed=%d hovering=%d autopilot=%d\n",
+                  throttle, roll, pitch, yaw,
+                  armed_, hovering_, autopiloting_);
 }
