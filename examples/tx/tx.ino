@@ -16,19 +16,38 @@ static const uint8_t YAW_INPUT_PIN = 27;
 
 static const uint8_t ARMING_INPUT_PIN = 26;
 
+static bool arming_prev_;
+
+static bool ReadArmingSwitch()
+{
+    return digitalRead(ARMING_INPUT_PIN);
+}
+
 void setup()
 {
     Serial.begin(115200);
 
     pinMode(ARMING_INPUT_PIN, INPUT);
+
+    arming_prev_ = ReadArmingSwitch();
 }
 
 void loop()
 {
+    const auto arming_curr = ReadArmingSwitch();
+
+    static bool armed_;
+
+    if (arming_prev_ != arming_curr) {
+        armed_ = !armed_;
+    }
+
+    arming_prev_ = arming_curr;
+
     Serial.printf("t=%d r=%d p=%d y=%d | a=%d\n",
             analogRead(THROTTLE_INPUT_PIN),
             analogRead(ROLL_INPUT_PIN),
             analogRead(PITCH_INPUT_PIN),
             analogRead(YAW_INPUT_PIN),
-            digitalRead(ARMING_INPUT_PIN));
+            armed_);
 }
