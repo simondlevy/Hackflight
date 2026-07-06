@@ -87,6 +87,116 @@
 			(outputdirectory "")
 		)
 	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "0a01cde6-4343-45db-8860-438664a1b91c")
+		(at 166.394729 83.029955 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J5"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "6781d842-51ab-48d3-86e9-b84fb4a0b665")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "acce489e-2060-46eb-b3e8-c7b34e134340")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9f3c0117-561c-42e1-8f60-5c58e5adf110")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8ef3fef0-d634-4cec-a0f8-5c811cf9b6e1")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/4ad76b93-e7b2-4193-a23a-c310a3a2874e")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "c3271d2d-dcf4-4362-88ac-db3c57793143")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "05c5aa03-a996-4aed-84fc-994b37ca2ff7")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "b609ba45-25e7-432d-a81f-b59200066ed2")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/GND")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "b3100ae4-815e-4fde-9124-c02ebbd6d73e")
+		)
+		(embedded_fonts no)
+	)
 	(footprint ""
 		(layer "F.Cu")
 		(uuid "0fce448d-fe29-4c1e-9e05-11d523ddcfba")
@@ -225,6 +335,413 @@
 			(drill 4)
 			(layers "*.Cu" "*.Mask")
 			(uuid "f02501d4-e611-4455-8791-bb7e119b30bc")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "240ecc59-9135-497e-aa9c-2e108edc29ae")
+		(at 162.469595 112.091103 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J10"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "7cc0554f-96ff-47e2-952b-93ef3ac7e6a4")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9b72ea61-9a5a-49a7-bbd5-5fa42f825b99")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "e5ac4af0-be95-4828-8dfd-7497e8edcad5")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "09291f63-d1c0-4768-8592-3141b4432e9d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/016daad8-3e72-4c04-b9d8-4bac396c0bce")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "64834b38-ba93-4e33-a589-dd1451f55fb7")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "f2148fbe-5178-4988-a33c-e8f7166b1946")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/3V3")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "091b7afc-0cd6-4c67-a324-82d9ae5fddb8")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "339789d1-bb7a-4397-998d-37346a3c2f68")
+		(at 166.394729 86.616273 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J16"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "f9d6fe46-b3e5-4059-8dc9-31901a05a965")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "9c1c02e9-14ae-4ebd-8662-87c6fa2b5e6f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "fc3a9fd8-477c-478d-b50a-df9c7aa53c2a")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3bf5297e-f4b9-4231-8395-5164e29f5f5c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/b602edd1-de67-4726-ad2d-3fbb9a148001")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "59ba9a5e-7aab-4305-8596-57a0dac4195b")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "ced6bc12-5c5b-48f2-8473-bc8cddfa4743")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/YAW")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "160b53bc-a561-4bc3-9978-fb805bc023fc")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "42b0c5f8-2abd-47be-8cbb-a337f06b28f4")
+		(at 128.329319 90.218661 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J12"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "fc2fa43d-0146-4c03-89ae-eebd2fff536d")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c04db52d-a8da-4c02-810c-948e5916d487")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "15cfd5dd-e8ca-44cc-9973-2467dac35dfd")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "35d13966-080c-4549-b4a2-4a20831e7ca7")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/b33713af-45db-4850-b61b-7ee3b301a760")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "12e5550f-642c-4ed9-aaca-ed7b0cf64286")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "96bdd9bd-04b3-471b-bf0f-156e2697978f")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/3V3")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "b30fcb7b-fac5-4399-9353-bf68b412d96e")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "4ba3b1b6-b2c6-4ab3-aacd-1ac9e7e29f43")
+		(at 128.356566 83.597765 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J7"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "e5def006-17f4-4e1a-a867-e6d13765e5f1")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "611a79d2-7261-4b7f-86b3-2d5f2a4d729b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "a4fd3c1f-8df0-4bb0-9995-08e37f1c8820")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "90835323-b550-4938-8d86-694ffe0e3cc4")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/32fc8f39-6b65-4365-a7ca-cbd480927682")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "20077806-318f-46dc-88ea-96b4a1d1e442")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "003a9a2f-d461-429e-bc9f-ee3767993f10")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "4312499c-e5bb-4685-b943-110ef67b9b1e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/GND")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "b4a21232-e49d-49cd-b462-517a852ae3ac")
 		)
 		(embedded_fonts no)
 	)
@@ -487,6 +1004,198 @@
 				(xyz 0 0 0)
 			)
 		)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "60d64a68-8e68-4b8e-86aa-9cef369d0315")
+		(at 114.957992 85.214865 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J17"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "d18c28b7-cc14-491d-aa54-9b4c015dd303")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "0ae668d2-54af-40da-b578-03421b6cd48b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "5cd02f34-97b4-4fa1-aac9-16ba8b0d11ae")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "8c756fd3-3156-47ff-b022-0a076e96057f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/64dbd342-ac56-4609-a4a7-1043df135a03")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "56f8df34-afd7-4909-bc3f-a00d53adc584")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "27e04857-73a3-40ac-8678-ba446c3246fd")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/3V3")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "ae6d1f7a-80a9-4efe-a1e9-1a0034fc69c3")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "626b5c5b-0abe-4a00-8174-2b25d85ecc3a")
+		(at 128.356566 86.81285 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J15"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "0518378a-8045-47f7-b3bc-7938181782ff")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "437a0935-b796-4cbe-b6b0-7ed3a9de13b5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "6faaeb07-e988-4714-8c23-12146c062345")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "00b1b2c7-7f35-464f-8c06-6c366cca348b")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/0d506301-2a13-4a2a-921e-46d3177adeab")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "2126e5f0-3d7f-4018-b8b5-21a198a0b247")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "af283890-8897-4bd0-999f-7d7f83cf16a9")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/PIT")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "9bc4adc5-c115-49f9-b6f9-0d16055d50ee")
+		)
+		(embedded_fonts no)
 	)
 	(footprint "Connector_PinSocket_2.54mm:PinSocket_1x10_P2.54mm_Vertical"
 		(layer "F.Cu")
@@ -815,6 +1524,314 @@
 		)
 		(embedded_fonts no)
 	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "91fce310-a153-48d5-8703-64212299f5a1")
+		(at 162.496842 108.848772 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J6"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "849e1163-013a-49b3-aa83-7382c57f6d5f")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "59731c7f-409b-4c00-b816-8339dfd7c192")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "c1351619-0234-4799-aec4-b6713cbc0779")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "706a6e9f-6c23-4a2e-962c-bafd37365b29")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/3c42945b-7aab-424d-b162-454372c5811d")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "800e2f6a-46fd-4e06-8e94-ea0306907c7a")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "21b8e06b-0b02-4454-a84a-0b8b82da225b")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "7cc4a6ba-6f1c-4ebe-b8af-45810ceebd10")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/GND")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "f8ac1325-c231-4cb2-92e9-8fb2e5f906b6")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "969fffc2-2eed-4499-9ce0-0772ed240f46")
+		(at 127.871225 112.056428 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J14"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "57fc0363-de88-45b9-b920-8aab427b3bd3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "f574f58f-c91e-4175-892d-05d11a19f83a")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "69dfd5b5-5c4c-40f9-b2d8-ff59cd44000f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "aaef96da-974a-4c28-92b3-3d9c2a76a23d")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/eab79341-187c-4c00-b678-9074893b7baa")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "e3123a2b-a203-4dc0-861b-8169ea0f195b")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "18de212b-566a-43ab-84e8-0c1aa6f03882")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/ROL")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "86328e9e-14e3-432d-af0a-89b990ecbb5c")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "974789b6-a4d0-4123-be18-9b9535571b54")
+		(at 127.85552 108.371648 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J8"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "46432325-2e85-40e7-a1ff-cd1dc1cbd1d0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4506e0a6-272a-4544-a174-cf34e50e0351")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "2edb9953-cb9d-494b-8f3e-29e47e08271e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "97f9b35e-0210-41fd-bf1c-68c9ff4abe5e")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/dedf3902-dfb9-4db5-a3dc-a9ebe7a2a38f")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "686ca0e7-cae5-4eba-afe7-7b4e0d22df74")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "18eaa831-47c2-4712-a982-0d0e5c19dc44")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/GND")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "26e5bb47-e7a7-445d-9d39-cd0475943fd4")
+		)
+		(embedded_fonts no)
+	)
 	(footprint ""
 		(layer "F.Cu")
 		(uuid "c98be895-4e56-4474-827a-94367bbab38a")
@@ -868,6 +1885,418 @@
 			(drill 11)
 			(layers "*.Cu" "*.Mask")
 			(uuid "3ba7817d-b4e3-4ccc-9e75-638732fdaeac")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "db89508c-029c-4583-b133-6c8f5997e346")
+		(at 127.80992 115.734703 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J11"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "98e6cc82-5609-4873-8991-60f4157648a9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "14cf3b1d-93ae-48f4-bb52-d0b611b8b779")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "80cb1a8f-2a27-4e44-a663-a182cc9ff919")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "3ddf33d2-a538-44fd-a444-ea1fd023d390")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/60de051e-6010-4010-a0cb-b897ae8e3278")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "6b25861d-10df-4668-8515-86464264deb3")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "2a9cfa24-7588-4e47-ae4e-bb4783e67962")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/3V3")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "82d00387-cb5f-47a8-8831-44597870a97c")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "df5a551e-ee2c-4b82-bab4-071489e512db")
+		(at 166.118858 90.294548 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J9"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "da47f09c-00d1-475c-b4b2-0c79c8d91546")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "942fb07c-d680-4426-88b8-fcbdb2be9a90")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "02b0b5f4-04eb-4812-8cb7-8a50907dc09f")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4bd98078-4a18-47bf-a086-d57ae4f860b6")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/1ba97fe8-dc20-4ac5-9a70-a2300f5d551a")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "c52ad092-869a-4307-88d2-4332673da21c")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "509b9c49-e50e-401e-b9cf-519fea576507")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "e6fc0f59-fc1f-41d5-b89d-04f6c441e115")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/3V3")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "996122e5-10dc-4600-a59a-15d14250a1d0")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "e961e0d9-9c24-43c9-a4c0-c5e575435fb6")
+		(at 162.387856 115.360681 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J13"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "691a20b2-c19f-4b97-a485-bdeb74bd6bab")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "4227eca5-01e0-4a0a-b750-921eccfd25e9")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "97262009-7c77-4941-90fe-9c30e0578212")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "aa49acbb-b8cd-42e9-a6b9-0aba7fbff1bf")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/22d79069-35bd-4e8d-bd3b-e37c90d120bc")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "29857923-9cae-41fc-8fef-8b759e7199ed")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "3c0c2434-a27e-42eb-a96c-5979de78cb4a")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "0d3c6d33-9134-48de-87e7-7aef3ae6d6e2")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/THR")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "44cc0a11-c9fb-490f-ab4a-bab98c3140da")
+		)
+		(embedded_fonts no)
+	)
+	(footprint "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+		(layer "F.Cu")
+		(uuid "f66867b4-a3e8-40b6-9e98-409df861662b")
+		(at 114.957992 81.163679 -90)
+		(descr "Wire Pad, Square, SMD Pad,  2mm x 4mm")
+		(tags "MeasurementPoint Square SMDPad 2mmx4mm ")
+		(property "Reference" "J18"
+			(at 0 -2.8 90)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "de7e522e-ef6f-46ce-be65-4040a52cbc19")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 0 2.54 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "930f52ec-50b9-4f96-8a06-1ec27cfeb761")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "abcd9b4e-cbd9-49ba-9031-b8c4d7d2800c")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(hide yes)
+			(uuid "07f9b421-7109-4b50-ae2f-56f93e2a44cf")
+			(effects
+				(font
+					(size 1.27 1.27)
+					(thickness 0.15)
+				)
+			)
+		)
+		(property ki_fp_filters "Connector*:*_1x??_*")
+		(path "/8b75a5ad-2fec-4564-b78a-0e3b34426d74")
+		(sheetname "/")
+		(sheetfile "tx.kicad_sch")
+		(duplicate_pad_numbers_are_jumpers no)
+		(fp_rect
+			(start -1.25 -2.25)
+			(end 1.25 2.25)
+			(stroke
+				(width 0.05)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.CrtYd")
+			(uuid "3547eee4-7d31-4f5d-9367-47c0dda4c80e")
+		)
+		(fp_rect
+			(start -1.15 -2.15)
+			(end 1.15 2.15)
+			(stroke
+				(width 0.1)
+				(type default)
+			)
+			(fill no)
+			(layer "F.Fab")
+			(uuid "0a40e9db-c0ba-4dc9-96bf-b34543e9151f")
+		)
+		(pad "1" smd roundrect
+			(at 0 0 270)
+			(size 2 4)
+			(layers "F.Cu" "F.Mask")
+			(roundrect_rratio 0.25)
+			(net "/ARM")
+			(pinfunction "Pin_1_1")
+			(pintype "passive")
+			(uuid "966c16c6-3532-404a-9016-551460dfc183")
 		)
 		(embedded_fonts no)
 	)
@@ -1288,6 +2717,294 @@
 		)
 		(layer "Edge.Cuts")
 		(uuid "f3c592a6-6448-4093-8026-49af7295b5f9")
+	)
+	(gr_text "3V3"
+		(at 130.380928 116.1982 0)
+		(layer "Edge.Cuts")
+		(uuid "9af9b9ad-1b55-4d4f-a3db-adfdaeab3e2d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "ROL"
+		(at 130.462668 112.438186 0)
+		(layer "Edge.Cuts")
+		(uuid "21006880-a358-4bd4-aa2b-1e826657cd51")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 130.707886 108.92339 0)
+		(layer "Edge.Cuts")
+		(uuid "4f2bdc5d-07b5-46c5-a038-0d1a96c986f3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 130.931421 90.816506 0)
+		(layer "Edge.Cuts")
+		(uuid "e68a0d51-0c3e-45e0-83af-4dc76357eb08")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "PIT"
+		(at 131.17664 87.546929 0)
+		(layer "Edge.Cuts")
+		(uuid "3ff456da-4fd6-4370-b757-e9c85aea2c7a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 131.299249 84.236481 0)
+		(layer "Edge.Cuts")
+		(uuid "2f932c00-cc18-4361-8f36-73b96394c18a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "AUT"
+		(at 139.79882 88.076735 0)
+		(layer "Edge.Cuts")
+		(uuid "c1d6296d-d424-45f0-905a-2b423a9f6ea2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 139.839689 110.595952 0)
+		(layer "Edge.Cuts")
+		(uuid "e88fd6c1-1d57-45fd-ad1a-304623308220")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "YAW"
+		(at 151.48756 105.487237 0)
+		(layer "Edge.Cuts")
+		(uuid "eeb61976-deff-487e-bc4f-c08b2025bc94")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "HOV"
+		(at 151.610169 110.595952 0)
+		(layer "Edge.Cuts")
+		(uuid "a6f8f579-06cd-4fd8-a4e4-937363ea1f11")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "ARM"
+		(at 151.691909 107.898551 0)
+		(layer "Edge.Cuts")
+		(uuid "ebd49861-c04d-4fd7-96dc-3179621a6324")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "THR"
+		(at 151.773648 97.967208 0)
+		(layer "Edge.Cuts")
+		(uuid "59d48926-6ad0-47e0-bc7c-83dd6d4de985")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 151.814518 95.310676 0)
+		(layer "Edge.Cuts")
+		(uuid "1abbf677-5909-4245-ba3e-fa1cdabd511e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "ROL"
+		(at 151.855388 100.460261 0)
+		(layer "Edge.Cuts")
+		(uuid "68705d60-b5ae-489c-9b40-f3c309bc0acd")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "PIT"
+		(at 152.264085 102.994184 0)
+		(layer "Edge.Cuts")
+		(uuid "c1d87284-ddec-4a25-8e3a-b79016d766e3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "VB"
+		(at 152.468434 87.668038 0)
+		(layer "Edge.Cuts")
+		(uuid "e3b6e2e8-97f2-4ad6-b8c5-9e2707558ce6")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 152.591043 90.406309 0)
+		(layer "Edge.Cuts")
+		(uuid "6e67b1e9-6787-40e0-b300-bc7e59a19630")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "5V"
+		(at 152.631913 92.817623 0)
+		(layer "Edge.Cuts")
+		(uuid "566bc9b6-291d-461b-b5f6-ad061c3adb37")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "THR"
+		(at 156.759755 115.949886 0)
+		(layer "Edge.Cuts")
+		(uuid "c12616b0-bbef-4e4e-a297-32d6e04c79a3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 157.086712 112.925526 0)
+		(layer "Edge.Cuts")
+		(uuid "d8e532d1-8b8e-4d85-9df8-56191232c55d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 161.745861 107.367244 0)
+		(layer "Edge.Cuts")
+		(uuid "5f758b8c-db98-40b2-af57-326cbdedd632")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "3V3"
+		(at 168.734583 90.651528 0)
+		(layer "Edge.Cuts")
+		(uuid "67e6bcc6-b127-4676-9cc6-9511befc838e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 169.143281 83.662805 0)
+		(layer "Edge.Cuts")
+		(uuid "b474e891-554e-4b82-ba59-b979cfbea520")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "YAW"
+		(at 169.143281 87.177601 0)
+		(layer "Edge.Cuts")
+		(uuid "922e5747-f6bf-46a9-ac6a-6d00bc31d0a5")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
 	)
 	(embedded_fonts no)
 )
