@@ -3314,7 +3314,7 @@
 	(footprint ""
 		(layer "F.Cu")
 		(uuid "c98be895-4e56-4474-827a-94367bbab38a")
-		(at 157 127)
+		(at 157 123)
 		(property "Reference" ""
 			(at 0 0 0)
 			(layer "F.SilkS")
