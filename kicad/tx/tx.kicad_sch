@@ -1135,6 +1135,16 @@
 		)
 		(uuid "3513bfdb-1505-49f2-887f-88533e1c1fd1")
 	)
+	(label "IO14"
+		(at 135.89 104.14 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "36185b6e-6fd6-48ac-9553-5f5284bcb3c4")
+	)
 	(label "3V3"
 		(at 60.96 139.7 0)
 		(effects
@@ -1345,6 +1355,16 @@
 		)
 		(uuid "a7d3129a-79ce-4063-893f-b4cb6f98ad5c")
 	)
+	(label "IO27"
+		(at 135.89 109.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a83cde7e-49af-42c5-950f-eaec91b97397")
+	)
 	(label "VBAT"
 		(at 116.84 127 0)
 		(effects
@@ -1375,6 +1395,16 @@
 		)
 		(uuid "b0920d05-d1b7-42e2-84e1-76da95d78505")
 	)
+	(label "IO26"
+		(at 135.89 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d3336079-85b1-4f7d-898a-8a42acec7279")
+	)
 	(label "3V3"
 		(at 82.55 139.7 0)
 		(effects
@@ -1384,6 +1414,16 @@
 			(justify left bottom)
 		)
 		(uuid "d72d2dec-b65c-45b7-8ebd-0d97c8e9b5e5")
+	)
+	(label "IO15"
+		(at 135.89 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d7cd5c2b-00ae-4e18-a035-8ef980c9b3b2")
 	)
 	(label "AUT"
 		(at 118.11 96.52 0)
