@@ -8140,7 +8140,7 @@
 	)
 	(gr_poly
 		(pts
-			(xy 137.776727 74.723946) (xy 136.765857 76.385017) (xy 138.742761 76.385017)
+			(xy 137.653965 73.560514) (xy 136.643095 75.221585) (xy 138.619999 75.221585)
 		)
 		(stroke
 			(width 0.1)
@@ -8149,6 +8149,46 @@
 		(fill yes)
 		(layer "F.SilkS")
 		(uuid "9edcca51-ef7e-42de-9b35-9f6b0f44eeda")
+	)
+	(gr_line
+		(start 134.552221 77.763758)
+		(end 135.922991 77.088306)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "2076b3f7-f065-43a7-9d4a-7db65b7c5f6e")
+	)
+	(gr_line
+		(start 134.573355 76.100307)
+		(end 135.944125 76.775759)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "ea7f4132-c163-4f30-b7cd-2d0dca78e45a")
+	)
+	(gr_line
+		(start 141.01988 77.648117)
+		(end 140.121627 77.205499)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "91b1e8e9-f201-489c-98a4-ccc1ac1678e1")
+	)
+	(gr_line
+		(start 141.04466 76.086958)
+		(end 140.154263 76.525704)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "8f67ae17-be1a-41ef-8513-9ad1a4d1c012")
 	)
 	(gr_line
 		(start 142.12024 78.614956)
@@ -8496,10 +8536,34 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "[BACK]"
+		(at 134.755052 94.771076 0)
+		(layer "F.SilkS")
+		(uuid "66b65a1c-a75e-49a1-95cd-8fe693f510b7")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "GD"
 		(at 135.826693 91.585418 0)
 		(layer "F.SilkS")
 		(uuid "bb719984-70ce-43fb-8be3-976b9a906fea")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "[BACK]"
+		(at 135.891504 77.476719 0)
+		(layer "F.SilkS")
+		(uuid "d6e2c522-d71c-40de-bfad-8a87e6853483")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -8815,6 +8879,18 @@
 		(effects
 			(font
 				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "[BACK]"
+		(at 137.022449 99.268701 270)
+		(layer "F.SilkS")
+		(uuid "d5fad55d-c87c-4755-b68a-dc9be0d94c89")
+		(effects
+			(font
+				(size 1 1)
 				(thickness 0.15)
 			)
 			(justify left bottom)
