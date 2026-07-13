@@ -14,27 +14,30 @@
 
 #include "pushbutton.hpp"
 
-static const uint8_t THROTTLE_INPUT_PIN = 4;
-static const uint8_t ROLL_INPUT_PIN = 14;
-static const uint8_t PITCH_INPUT_PIN = 15;
-static const uint8_t YAW_INPUT_PIN = 27;
+static const uint8_t THROTTLE_INPUT_PIN = 25;
+static const uint8_t ROLL_INPUT_PIN = 33;
+static const uint8_t PITCH_INPUT_PIN = 32;
+static const uint8_t YAW_INPUT_PIN = 4;
 
-static const uint8_t ARMING_INPUT_PIN = 26;
-static const uint8_t HOVER_INPUT_PIN = 25;
-static const uint8_t AUTOPILOT_INPUT_PIN = 23;
+//static const uint8_t ARMING_INPUT_PIN = 26;
+//static const uint8_t HOVER_INPUT_PIN = 25;
+//static const uint8_t AUTOPILOT_INPUT_PIN = 23;
+
+//static const uint8_t LED_PIN = 15;
 
 static const float ANALOG_MIN = 240;
 static const float ANALOG_MAX = 3900;
 
 static bool arming_prev_;
 
-static PushButton hoverButton_ = PushButton(HOVER_INPUT_PIN);;
-static PushButton autopilotButton_ = PushButton(AUTOPILOT_INPUT_PIN);;
+//static PushButton hoverButton_ = PushButton(HOVER_INPUT_PIN);;
+//static PushButton autopilotButton_ = PushButton(AUTOPILOT_INPUT_PIN);;
 
+/*
 static auto ReadArmingSwitch() -> bool
 {
     return digitalRead(ARMING_INPUT_PIN);
-}
+}*/
 
 static auto ReadGimbal(const uint8_t pin) -> float
 {
@@ -45,26 +48,32 @@ void setup()
 {
     Serial.begin(115200);
 
-    pinMode(ARMING_INPUT_PIN, INPUT);
+    //pinMode(ARMING_INPUT_PIN, INPUT);
+    //pinMode(HOVER_INPUT_PIN, INPUT);
+    //pinMode(AUTOPILOT_INPUT_PIN, INPUT);
 
-    hoverButton_.begin();
-    autopilotButton_.begin();
+    //pinMode(LED_PIN, OUTPUT);
 
-    arming_prev_ = ReadArmingSwitch();
+    //hoverButton_.begin();
+    //autopilotButton_.begin();
+
+    //arming_prev_ = ReadArmingSwitch();
 }
 
 void loop()
 {
-    const auto arming_curr = ReadArmingSwitch();
     static bool armed_;
+    /*
+    const auto arming_curr = ReadArmingSwitch();
     if (arming_prev_ != arming_curr) {
         armed_ = !armed_;
     }
     arming_prev_ = arming_curr;
+    */
 
-    const auto hovering = hoverButton_.read();
+    const auto hovering = false;//hoverButton_.read();
 
-    const auto autopilot = autopilotButton_.read();
+    const auto autopilot = false;//autopilotButton_.read();
 
     const auto throttle = 1 - ReadGimbal(THROTTLE_INPUT_PIN);
 
