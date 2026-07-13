@@ -1584,7 +1584,7 @@
 		)
 		(uuid "fb0352ea-84bb-4040-a6a0-cc114f1da546")
 	)
-	(label "HOV"
+	(label "AUT"
 		(at 102.87 147.32 0)
 		(effects
 			(font
@@ -1764,7 +1764,7 @@
 		)
 		(uuid "58f8996b-d4cd-4bee-a854-8716c7fec8b9")
 	)
-	(label "HOV"
+	(label "AUT"
 		(at 140.97 125.73 0)
 		(effects
 			(font
@@ -1944,7 +1944,7 @@
 		)
 		(uuid "a7d3129a-79ce-4063-893f-b4cb6f98ad5c")
 	)
-	(label "AUT"
+	(label "HOV"
 		(at 158.75 140.97 0)
 		(effects
 			(font
@@ -2074,7 +2074,7 @@
 		)
 		(uuid "faa84698-afc2-4f76-993e-6ab7102eeac1")
 	)
-	(label "AUT"
+	(label "HOV"
 		(at 119.38 147.32 0)
 		(effects
 			(font
