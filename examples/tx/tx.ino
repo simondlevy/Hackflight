@@ -20,8 +20,8 @@ static const uint8_t PITCH_INPUT_PIN = 32;
 static const uint8_t YAW_INPUT_PIN = 4;
 
 //static const uint8_t ARMING_INPUT_PIN = 26;
-//static const uint8_t HOVER_INPUT_PIN = 25;
-//static const uint8_t AUTOPILOT_INPUT_PIN = 23;
+static const uint8_t HOVER_INPUT_PIN = 19;
+static const uint8_t AUTOPILOT_INPUT_PIN = 18;
 
 //static const uint8_t LED_PIN = 15;
 
@@ -30,8 +30,8 @@ static const float ANALOG_MAX = 3900;
 
 static bool arming_prev_;
 
-//static PushButton hoverButton_ = PushButton(HOVER_INPUT_PIN);;
-//static PushButton autopilotButton_ = PushButton(AUTOPILOT_INPUT_PIN);;
+static PushButton hoverButton_ = PushButton(HOVER_INPUT_PIN);;
+static PushButton autopilotButton_ = PushButton(AUTOPILOT_INPUT_PIN);;
 
 /*
 static auto ReadArmingSwitch() -> bool
@@ -49,13 +49,13 @@ void setup()
     Serial.begin(115200);
 
     //pinMode(ARMING_INPUT_PIN, INPUT);
-    //pinMode(HOVER_INPUT_PIN, INPUT);
-    //pinMode(AUTOPILOT_INPUT_PIN, INPUT);
+    pinMode(HOVER_INPUT_PIN, INPUT);
+    pinMode(AUTOPILOT_INPUT_PIN, INPUT);
 
     //pinMode(LED_PIN, OUTPUT);
 
-    //hoverButton_.begin();
-    //autopilotButton_.begin();
+    hoverButton_.begin();
+    autopilotButton_.begin();
 
     //arming_prev_ = ReadArmingSwitch();
 }
@@ -71,9 +71,9 @@ void loop()
     arming_prev_ = arming_curr;
     */
 
-    const auto hovering = false;//hoverButton_.read();
+    const auto hovering = hoverButton_.read();
 
-    const auto autopilot = false;//autopilotButton_.read();
+    const auto autopilot = autopilotButton_.read();
 
     const auto throttle = 1 - ReadGimbal(THROTTLE_INPUT_PIN);
 
