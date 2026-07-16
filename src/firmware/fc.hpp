@@ -33,6 +33,7 @@
 #include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>
 #include <firmware/timer.hpp>
+#include <firmware/voltage_divider.hpp>
 #include <firmware/zranger/filter.hpp>
 #include <firmware/zranger/sensor.hpp>
 #include <pidcontrol/hover.hpp>
@@ -306,12 +307,6 @@ namespace hf {
                 }
             }
 
-            static auto ReadVoltage() -> float
-            {
-                return analogRead(kVoltageInputPin) / 1024.f * 3.3 *
-                    (kR1Ohms + kR2Ohms) / kR2Ohms;
-            }
-
             // Instance variables ---------------------------------------------
 
             // Vehicle state
@@ -368,6 +363,10 @@ namespace hf {
             Timer heartbeat_timer_ = Timer(kLedHeartbeat_Rate);
             Timer fast_blink_timer_ = Timer(kLedFastBlink_Rate);
 
+            // Support for voltage sensing
+            VoltageDivider voltage_divider_ = VoltageDivider(
+                    kVoltageInputPin, kR1Ohms, kR2Ohms);
+
             // Instance methods ---------------------------------------------0
 
             auto Update(
@@ -417,8 +416,8 @@ namespace hf {
                     is_flying_;
 
                 // Sense voltage periodically
-                voltage_ =
-                    voltage_sensing_timer_.Ready() ? ReadVoltage() : voltage_;
+                voltage_ = voltage_sensing_timer_.Ready() ?
+                    voltage_divider_.read() : voltage_;
 
                 debugger_.ReportFloat("voltage", voltage_);
 
