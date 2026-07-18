@@ -20,8 +20,8 @@ static const uint8_t PITCH_INPUT_PIN = 32;
 static const uint8_t YAW_INPUT_PIN = 4;
 
 //static const uint8_t ARMING_INPUT_PIN = 26;
-static const uint8_t HOVER_INPUT_PIN = 19;
-static const uint8_t AUTOPILOT_INPUT_PIN = 18;
+static const uint8_t HOVER_INPUT_PIN = 27;
+static const uint8_t AUTOPILOT_INPUT_PIN = 19;
 
 //static const uint8_t LED_PIN = 15;
 
