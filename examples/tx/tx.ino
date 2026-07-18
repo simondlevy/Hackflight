@@ -19,7 +19,7 @@ static const uint8_t ROLL_INPUT_PIN = 33;
 static const uint8_t PITCH_INPUT_PIN = 32;
 static const uint8_t YAW_INPUT_PIN = 4;
 
-//static const uint8_t ARMING_INPUT_PIN = 26;
+static const uint8_t ARMING_INPUT_PIN = 23;
 static const uint8_t HOVER_INPUT_PIN = 27;
 static const uint8_t AUTOPILOT_INPUT_PIN = 19;
 
@@ -33,11 +33,10 @@ static bool arming_prev_;
 static PushButton hoverButton_ = PushButton(HOVER_INPUT_PIN);;
 static PushButton autopilotButton_ = PushButton(AUTOPILOT_INPUT_PIN);;
 
-/*
 static auto ReadArmingSwitch() -> bool
 {
     return digitalRead(ARMING_INPUT_PIN);
-}*/
+}
 
 static auto ReadGimbal(const uint8_t pin) -> float
 {
@@ -57,19 +56,17 @@ void setup()
     hoverButton_.begin();
     autopilotButton_.begin();
 
-    //arming_prev_ = ReadArmingSwitch();
+    arming_prev_ = ReadArmingSwitch();
 }
 
 void loop()
 {
     static bool armed_;
-    /*
     const auto arming_curr = ReadArmingSwitch();
     if (arming_prev_ != arming_curr) {
         armed_ = !armed_;
     }
     arming_prev_ = arming_curr;
-    */
 
     const auto hovering = hoverButton_.read();
 
