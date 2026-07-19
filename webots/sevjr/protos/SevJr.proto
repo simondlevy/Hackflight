@@ -92,7 +92,7 @@ PROTO SevJr [
                             metalness 0
                     }
                     geometry Mesh {
-                        url [ "../meshes/stl_files/logo.stl" ]
+                        url [ "../meshes/stl_files/scorpion.stl" ]
                     }
                 }
                 ] 
