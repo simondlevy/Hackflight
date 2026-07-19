@@ -26,26 +26,30 @@ namespace hf {
 
         private:
 
-            static constexpr float SIGNAL_VOLTS = 3.3;
-
             uint8_t input_pin_;
             float r1_ohms_;
             float r2_ohms_;
+            uint8_t nbits_;
+            float signal_volts_;
 
         public:
 
             VoltageDivider(
                     const uint8_t input_pin,
                     const float r1_ohms,
-                    const float r2_ohms)
+                    const float r2_ohms,
+                    const uint8_t nbits=10,
+                    const float signal_volts=3.3)
                 : input_pin_(input_pin),
                 r1_ohms_(r1_ohms),
-                r2_ohms_(r2_ohms) {}
+                r2_ohms_(r2_ohms),
+                nbits_(nbits),
+                signal_volts_(signal_volts) {}
 
             auto read() -> float
             {
-                return analogRead(input_pin_) / 1024.f * SIGNAL_VOLTS *
-                    r2_ohms_ / (r1_ohms_ + r2_ohms_);
+                return (float)analogRead(input_pin_) / (1 << nbits_) * signal_volts_ *
+                    (r1_ohms_ + r2_ohms_) / r2_ohms_;
             }
 
     }; // class VoltageDivider

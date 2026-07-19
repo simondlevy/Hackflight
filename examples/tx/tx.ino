@@ -44,8 +44,9 @@ static PushButton autopilotButton_ = PushButton(AUTOPILOT_PIN);;
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         VOLTAGE_DIVIDER_PIN,
+        VOLTAGE_DIVIDER_R1_OHMS,
         VOLTAGE_DIVIDER_R2_OHMS,
-        VOLTAGE_DIVIDER_R1_OHMS);
+        12);
 
 static auto ReadArmingSwitch() -> bool
 {
