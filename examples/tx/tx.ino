@@ -55,9 +55,11 @@ static auto AnalogThreshold(const uint8_t pin) -> bool
     return analogRead(pin) > kAnalogThreshold;
 }
 
-static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin);
+static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin,
+        kAnalogThreshold);
 
-static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin);
+static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin,
+        kAnalogThreshold);
 
 static void blinkLeds()
 {

@@ -18,7 +18,7 @@ class AnalogPushButton {
     
     public:
 
-        AnalogPushButton(const uint8_t pin, const uint16_t threshold=4000)
+        AnalogPushButton(const uint8_t pin, const uint16_t threshold)
             : pin_(pin), threshold_(threshold) {}
 
         auto Read() -> bool
