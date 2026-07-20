@@ -1764,7 +1764,7 @@
 		)
 		(uuid "58f8996b-d4cd-4bee-a854-8716c7fec8b9")
 	)
-	(label "AUT"
+	(label "IO19"
 		(at 140.97 125.73 0)
 		(effects
 			(font
