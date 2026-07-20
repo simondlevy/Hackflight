@@ -15,7 +15,7 @@
 #include <hackflight.h>
 #include <firmware/voltage_divider.hpp>
 
-#include "pushbutton.hpp"
+#include "analog_pushbutton.hpp"
 
 static const uint8_t kThrottlePin = 25;
 static const uint8_t kRollPin = 33;
@@ -57,6 +57,7 @@ static auto AnalogThreshold(const uint8_t pin) -> bool
     return analogRead(pin) > kAnalogThreshold;
 }
 
+static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin);
 
 static void blinkLeds()
 {
@@ -91,7 +92,7 @@ void loop()
     }
     arming_prev_ = arming_curr;
 
-    const auto hovering = AnalogThreshold(kHoverPin);
+    const auto hovering = hoverButton_.Read();
 
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
 
