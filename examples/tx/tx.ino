@@ -82,13 +82,15 @@ void setup()
     pinMode(KLedPin, OUTPUT);
     digitalWrite(KLedPin, HIGH);
 
-    arming_prev_ = AnalogThreshold(kArmingPin);
+    pinMode(kArmingPin, INPUT);
+
+    arming_prev_ = digitalRead(kArmingPin);
 }
 
 void loop()
 {
     static bool armed_;
-    const auto arming_curr = AnalogThreshold(kArmingPin);
+    const auto arming_curr = digitalRead(kArmingPin);
     if (arming_prev_ != arming_curr) {
         armed_ = !armed_;
     }
