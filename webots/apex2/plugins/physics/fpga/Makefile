@@ -30,7 +30,7 @@ INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(NAME).cpp \
-			  $(fr)/cpp-apps/applications/dronepong/embedded_dronepong.cpp
+			  $(fr)/cpp-apps/applications/dronepong/embedded/dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
