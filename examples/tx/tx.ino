@@ -16,19 +16,18 @@
 #include <firmware/voltage_divider.hpp>
 #include <firmware/analog_pushbutton.hpp>
 
+static const uint8_t kYawPin = 4;
+static const uint8_t kVoltageDividerPin = 14;
+static const uint8_t KLedPin = 15;
+static const uint8_t kHoverPin = 15;
+static const uint8_t kArmingPin = 23;
 static const uint8_t kThrottlePin = 25;
+static const uint8_t kAutopilotPin = 26;
 static const uint8_t kRollPin = 33;
 static const uint8_t kPitchPin = 32;
-static const uint8_t kYawPin = 4;
 
-static const uint8_t kArmingPin = 23;
-static const uint8_t kHoverPin = 15;
-
-static const uint8_t kVoltageDividerPin = 14;
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
-
-static const uint8_t KLedPin = 15;
 
 static const float kAnalogMin = 240;
 static const float kAnalogMax = 3900;
@@ -57,6 +56,8 @@ static auto AnalogThreshold(const uint8_t pin) -> bool
 }
 
 static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin);
+
+static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin);
 
 static void blinkLeds()
 {
@@ -93,6 +94,8 @@ void loop()
 
     const auto hovering = hoverButton_.Read();
 
+    const auto autopilot = autopilotButton_.Read();
+
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
 
     const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
@@ -108,6 +111,6 @@ void loop()
     }
 
     Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-            "armed=%d hovering=%d | voltage=%3.3f\n",
-            throttle, roll, pitch, yaw, armed_, hovering, volts);
+            "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
+            throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
 }
