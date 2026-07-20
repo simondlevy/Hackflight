@@ -23,8 +23,7 @@ static const uint8_t kPitchPin = 32;
 static const uint8_t kYawPin = 4;
 
 static const uint8_t kArmingPin = 23;
-static const uint8_t kHoverPin = 27;
-static const uint8_t kAutopilotPin = 19;
+static const uint8_t kHoverPin = 15;
 
 static const uint8_t kVoltageDividerPin = 14;
 static const float kVoltageDividerR1Ohms = 1000;
@@ -38,10 +37,9 @@ static const float kAnalogMax = 3900;
 static const float kLowVoltage = 3.0;
 static const float kLedBlinkHz = 2;
 
-static bool arming_prev_;
+static const uint16_t kAnalogThreshold = 4000;
 
-static PushButton hoverButton_ = PushButton(kHoverPin);;
-static PushButton autopilotButton_ = PushButton(kAutopilotPin);;
+static bool arming_prev_;
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerPin,
@@ -49,15 +47,16 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-static auto ReadArmingSwitch() -> bool
-{
-    return digitalRead(kArmingPin);
-}
-
 static auto ReadGimbal(const uint8_t pin) -> float
 {
     return (analogRead(pin) - kAnalogMin) / (kAnalogMax - kAnalogMin);
 }
+
+static auto AnalogThreshold(const uint8_t pin) -> bool
+{
+    return analogRead(pin) > kAnalogThreshold;
+}
+
 
 static void blinkLeds()
 {
@@ -77,31 +76,22 @@ void setup()
 {
     Serial.begin(115200);
 
-    pinMode(kArmingPin, INPUT);
-    pinMode(kHoverPin, INPUT);
-    pinMode(kAutopilotPin, INPUT);
-
     pinMode(KLedPin, OUTPUT);
     digitalWrite(KLedPin, HIGH);
 
-    hoverButton_.begin();
-    autopilotButton_.begin();
-
-    arming_prev_ = ReadArmingSwitch();
+    arming_prev_ = AnalogThreshold(kArmingPin);
 }
 
 void loop()
 {
     static bool armed_;
-    const auto arming_curr = ReadArmingSwitch();
+    const auto arming_curr = AnalogThreshold(kArmingPin);
     if (arming_prev_ != arming_curr) {
         armed_ = !armed_;
     }
     arming_prev_ = arming_curr;
 
-    const auto hovering = hoverButton_.read();
-
-    const auto autopilot = autopilotButton_.read();
+    const auto hovering = AnalogThreshold(kHoverPin);
 
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
 
@@ -118,6 +108,6 @@ void loop()
     }
 
     Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-            "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
-            throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
+            "armed=%d hovering=%d | voltage=%3.3f\n",
+            throttle, roll, pitch, yaw, armed_, hovering, volts);
 }
