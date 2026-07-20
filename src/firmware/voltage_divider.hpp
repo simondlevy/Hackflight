@@ -48,7 +48,8 @@ namespace hf {
 
             auto read() -> float
             {
-                return (float)analogRead(input_pin_) / (1 << nbits_) * signal_volts_ *
+                return (float)analogRead(input_pin_) /
+                    (1 << nbits_) * signal_volts_ *
                     (r1_ohms_ + r2_ohms_) / r2_ohms_;
             }
 

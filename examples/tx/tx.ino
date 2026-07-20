@@ -12,8 +12,6 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <TinyPICO.h>
-
 #include <hackflight.h>
 #include <firmware/voltage_divider.hpp>
 
@@ -32,10 +30,13 @@ static const uint8_t VOLTAGE_DIVIDER_PIN = 14;
 static const float VOLTAGE_DIVIDER_R1_OHMS = 1000;
 static const float VOLTAGE_DIVIDER_R2_OHMS = 2200;
 
-//static const uint8_t LED_PIN = 15;
+static const uint8_t LED_PIN = 15;
 
 static const float ANALOG_MIN = 240;
 static const float ANALOG_MAX = 3900;
+
+static const float LOW_VOLTAGE = 3.0;
+static const float LED_BLINK_HZ = 2;
 
 static bool arming_prev_;
 
@@ -58,24 +59,35 @@ static auto ReadGimbal(const uint8_t pin) -> float
     return (analogRead(pin) - ANALOG_MIN) / (ANALOG_MAX - ANALOG_MIN);
 }
 
-static TinyPICO tp = TinyPICO();
+static void blinkLeds()
+{
+    static uint32_t msec_;
+    static bool on_;
+
+    const auto msec = millis();
+    
+    if (msec - msec_ > 1000/LED_BLINK_HZ) {
+        digitalWrite(LED_PIN, on_);
+        msec_ = msec;
+        on_ = !on_;
+    }
+}
 
 void setup()
 {
     Serial.begin(115200);
 
-    //pinMode(ARMING_PIN, INPUT);
+    pinMode(ARMING_PIN, INPUT);
     pinMode(HOVER_PIN, INPUT);
     pinMode(AUTOPILOT_PIN, INPUT);
 
-    //pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, HIGH);
 
     hoverButton_.begin();
     autopilotButton_.begin();
 
     arming_prev_ = ReadArmingSwitch();
-
-    tp.DotStar_SetPixelColor(255, 0, 0);
 }
 
 void loop()
@@ -99,10 +111,13 @@ void loop()
 
     const auto yaw = 2 * ReadGimbal(YAW_PIN) - 1;
 
-    Serial.printf("%f\n", voltage_divider_.read());
+    const auto volts = voltage_divider_.read();
 
-    /*
+    if (volts < LOW_VOLTAGE) {
+        blinkLeds();
+    }
+
     Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-            "armed=%d hovering=%d autopilot=%d\n",
-            throttle, roll, pitch, yaw, armed_, hovering, autopilot);*/
+            "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
+            throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
 }
