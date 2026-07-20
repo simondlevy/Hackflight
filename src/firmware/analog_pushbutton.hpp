@@ -14,20 +14,16 @@
 
 #include <Arduino.h>
 
-class PushButton {
-
+class AnalogPushButton {
+    
     public:
 
-        PushButton(const uint8_t pin) : pin_(pin) { }
+        AnalogPushButton(const uint8_t pin, const uint16_t threshold)
+            : pin_(pin), threshold_(threshold) {}
 
-        void begin()
+        auto Read() -> bool
         {
-            pinMode(pin_, INPUT);
-        }
-
-        auto read() -> bool
-        {
-            const auto button_is_down = digitalRead(pin_);
+            const auto button_is_down = analogRead(pin_) > threshold_;
 
             if (button_is_down && !button_was_down_) {
                 value_ = !value_;
@@ -40,6 +36,7 @@ class PushButton {
     private:
 
         uint8_t pin_;
+        uint16_t threshold_;
         bool value_;
         bool button_was_down_;
 };
