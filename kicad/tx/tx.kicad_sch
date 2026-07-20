@@ -1994,7 +1994,7 @@
 		)
 		(uuid "b0920d05-d1b7-42e2-84e1-76da95d78505")
 	)
-	(label "IO26"
+	(label "AUT"
 		(at 158.75 143.51 0)
 		(effects
 			(font
