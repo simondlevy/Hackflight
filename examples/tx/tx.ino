@@ -19,12 +19,12 @@
 static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
 static const uint8_t KLedPin = 15;
-static const uint8_t kHoverPin = 15;
 static const uint8_t kArmingPin = 23;
 static const uint8_t kThrottlePin = 25;
 static const uint8_t kAutopilotPin = 26;
-static const uint8_t kRollPin = 33;
+static const uint8_t kHoverPin = 27;
 static const uint8_t kPitchPin = 32;
+static const uint8_t kRollPin = 33;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
