@@ -16,17 +16,14 @@
 
 class AnalogPushButton {
     
-    private:
-
-        const uint16_t kThreshold = 4000;
-
     public:
 
-        AnalogPushButton(const uint8_t pin) : pin_(pin) { }
+        AnalogPushButton(const uint8_t pin, const uint16_t threshold=4000)
+            : pin_(pin), threshold_(threshold) {}
 
         auto Read() -> bool
         {
-            const auto button_is_down = analogRead(pin_) > kThreshold;
+            const auto button_is_down = analogRead(pin_) > threshold_;
 
             if (button_is_down && !button_was_down_) {
                 value_ = !value_;
@@ -39,6 +36,7 @@ class AnalogPushButton {
     private:
 
         uint8_t pin_;
+        uint16_t threshold_;
         bool value_;
         bool button_was_down_;
 };
