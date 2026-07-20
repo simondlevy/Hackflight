@@ -14,8 +14,7 @@
 
 #include <hackflight.h>
 #include <firmware/voltage_divider.hpp>
-
-#include "analog_pushbutton.hpp"
+#include <firmware/analog_pushbutton.hpp>
 
 static const uint8_t kThrottlePin = 25;
 static const uint8_t kRollPin = 33;
