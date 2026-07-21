@@ -18,6 +18,8 @@ NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 
+FPGA_DIR = $(HOME)/Desktop/fpga/levy/cpp
+
 APP = dronepong
 
 SIMSENSORS_DIR = $(HOME)/Desktop
@@ -27,7 +29,8 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) \
+		  -I$(FPGA_DIR)
 
 CXX_SOURCES = $(NAME).cpp \
 			  $(fr)/cpp-apps/applications/dronepong/embedded/dronepong.cpp
