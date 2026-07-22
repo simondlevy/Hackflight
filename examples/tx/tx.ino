@@ -120,7 +120,17 @@ void loop()
         blinkLeds();
     }
 
+    /*
     Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
             "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
             throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
+     */
+
+    const uint8_t data = 'A';
+
+    if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
+        Serial.println("Error sending the data");
+    }
+
+    delay(10);
 }

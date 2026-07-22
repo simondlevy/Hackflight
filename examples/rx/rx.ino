@@ -18,6 +18,14 @@
 static const uint8_t kTransmitterAddress[6] = {0xD4,0xD4,0xDA,0xAA,0x2E,0xF0};
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
+static void OnDataRecv(
+        const uint8_t * mac, const uint8_t * data, int len)
+{
+    (void)mac;
+
+    Serial.println(len);
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -25,6 +33,8 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kTransmitterAddress);
     hf::EspNow::WifiAddPeer(kDongleAddress);
+
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 }
 
 void loop()
