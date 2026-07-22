@@ -40,6 +40,8 @@ static const float kLedBlinkHz = 2;
 
 static const uint16_t kAnalogThreshold = 4000;
 
+static auto _blinkTimer = hf::Timer(kLedBlinkHz);
+
 static bool arming_prev_;
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
@@ -103,27 +105,25 @@ void loop()
     arming_prev_ = arming_curr;
 
     const auto hovering = hoverButton_.Read();
-
     const auto autopilot = autopilotButton_.Read();
-
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
-
     const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
-
     const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
-
     const auto yaw = 2 * ReadGimbal(kYawPin) - 1;
-
     const auto volts = voltage_divider_.read();
 
     if (volts < kLowVoltage) {
-        blinkLeds();
+        if (_blinkTimer.Ready()) {
+            static bool on_;
+            digitalWrite(KLedPin, on_);
+            on_ = !on_;
+        }
     }
 
     /*
-    Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-            "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
-            throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
+       Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
+       "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
+       throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
      */
 
     const uint8_t data = 'A';
