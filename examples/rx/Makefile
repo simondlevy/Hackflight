@@ -4,7 +4,7 @@ ROOT = $(HOME)/Desktop/
 
 FQBN = esp32:esp32:um_omgs3
 
-PORT = /dev/ttyACM0
+PORT = /dev/ttyACM1
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 

@@ -12,9 +12,6 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <esp_now.h>
-#include <WiFi.h>
-
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/voltage_divider.hpp>
