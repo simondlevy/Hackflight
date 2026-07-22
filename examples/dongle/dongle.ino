@@ -15,8 +15,7 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 
-static const uint8_t kTransmitterAddress[6] = {0xD4,0xD4,0xDA,0xAA,0x2E,0xF0};
-static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
+static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
@@ -31,19 +30,11 @@ void setup()
     Serial.begin(115200);
 
     hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kTransmitterAddress);
-    hf::EspNow::WifiAddPeer(kDongleAddress);
+    hf::EspNow::WifiAddPeer(kReceiverAddress);
 
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
 }
 
 void loop()
 {
-    const uint8_t data = 'A';
-
-    if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
-        Serial.println("Error sending the data");
-    }
-
-    delay(10);
 }
