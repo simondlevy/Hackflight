@@ -12,9 +12,14 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <esp_now.h>
+#include <WiFi.h>
+
 #include <hackflight.h>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/analog_pushbutton.hpp>
+
+static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
 static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
@@ -72,6 +77,32 @@ static void blinkLeds()
         digitalWrite(KLedPin, on_);
         msec_ = msec;
         on_ = !on_;
+    }
+}
+
+static void ReportForever(const char * msg)
+{
+    while (true) {
+        Serial.println(msg);
+        delay(500);
+    }
+}
+
+static void SetupWifi()
+{
+    WiFi.mode(WIFI_STA);
+
+    if (esp_now_init() != ESP_OK) {
+        ReportForever("Error initializing ESP-NOW");
+    }
+
+    esp_now_peer_info_t peerInfo = {};
+    memcpy(peerInfo.peer_addr, kReceiverAddress, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
+
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        ReportForever("Failed to add peer");
     }
 }
 
