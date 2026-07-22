@@ -16,68 +16,26 @@
 #include <WiFi.h>
 
 #include <hackflight.h>
-#include <firmware/espnow.hpp>
-#include <firmware/voltage_divider.hpp>
-#include <firmware/analog_pushbutton.hpp>
+#include <firmware/debugger.hpp>
 
-static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
+static const uint8_t kTransmitterAddress[6] = {0xD4,0xD4,0xDA,0xAA,0x2E,0xF0};
+static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
-static const uint8_t kYawPin = 4;
-static const uint8_t kVoltageDividerPin = 14;
-static const uint8_t KLedPin = 15;
-static const uint8_t kArmingPin = 23;
-static const uint8_t kThrottlePin = 25;
-static const uint8_t kAutopilotPin = 26;
-static const uint8_t kHoverPin = 27;
-static const uint8_t kPitchPin = 32;
-static const uint8_t kRollPin = 33;
-
-static const float kVoltageDividerR1Ohms = 1000;
-static const float kVoltageDividerR2Ohms = 2200;
-
-static const float kAnalogMin = 240;
-static const float kAnalogMax = 3900;
-
-static const float kLowVoltage = 3.0;
-static const float kLedBlinkHz = 2;
-
-static const uint16_t kAnalogThreshold = 4000;
-
-static bool arming_prev_;
-
-static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
-        kVoltageDividerPin,
-        kVoltageDividerR1Ohms,
-        kVoltageDividerR2Ohms,
-        12);
-
-static auto ReadGimbal(const uint8_t pin) -> float
+static void SetupWifi()
 {
-    return (analogRead(pin) - kAnalogMin) / (kAnalogMax - kAnalogMin);
-}
+    WiFi.mode(WIFI_STA);
 
-static auto AnalogThreshold(const uint8_t pin) -> bool
-{
-    return analogRead(pin) > kAnalogThreshold;
-}
+    if (esp_now_init() != ESP_OK) {
+        ReportForever("Error initializing ESP-NOW");
+    }
 
-static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin,
-        kAnalogThreshold);
+    esp_now_peer_info_t peerInfo = {};
+    memcpy(peerInfo.peer_addr, kReceiverAddress, 6);
+    peerInfo.channel = 0;
+    peerInfo.encrypt = false;
 
-static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin,
-        kAnalogThreshold);
-
-static void blinkLeds()
-{
-    static uint32_t msec_;
-    static bool on_;
-
-    const auto msec = millis();
-    
-    if (msec - msec_ > 1000/kLedBlinkHz) {
-        digitalWrite(KLedPin, on_);
-        msec_ = msec;
-        on_ = !on_;
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        ReportForever("Failed to add peer");
     }
 }
 
@@ -91,9 +49,6 @@ void setup()
     pinMode(kArmingPin, INPUT);
 
     arming_prev_ = digitalRead(kArmingPin);
-
-    hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
