@@ -19,6 +19,8 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
+static const bool kDebug = false;
+
 static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
 static const uint8_t KLedPin = 15;
@@ -82,8 +84,8 @@ void setup()
 
     arming_prev_ = digitalRead(kArmingPin);
 
-    //hf::EspNow::WifiSetup();
-    //hf::EspNow::WifiAddPeer(kReceiverAddress);
+    hf::EspNow::WifiSetup();
+    hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
@@ -110,12 +112,23 @@ void loop()
         }
     }
 
-       Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-       "armed=%d hovering=%d | voltage=%3.3f\n",
-       throttle, roll, pitch, yaw, armed_, hovering, volts);
+    if (kDebug) {
+        Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
+                "armed=%d hovering=%d | voltage=%3.3f\n",
+                throttle, roll, pitch, yaw, armed_, hovering, volts);
+    }
 
-       /*
-    if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
-        Serial.println("Error sending the data");
-    }*/
+    const uint8_t data = 'A';
+
+    static uint32_t msec_;
+    const auto msec = millis();
+
+    if (msec - msec_ > 10) {
+        if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
+            Serial.println("Error sending the data");
+        }
+        msec_ = msec;
+    }
+
+    delay(10);
 }
