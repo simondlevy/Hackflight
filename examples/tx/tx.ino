@@ -24,7 +24,6 @@ static const uint8_t kVoltageDividerPin = 14;
 static const uint8_t KLedPin = 15;
 static const uint8_t kArmingPin = 23;
 static const uint8_t kThrottlePin = 25;
-static const uint8_t kAutopilotPin = 26;
 static const uint8_t kHoverPin = 27;
 static const uint8_t kPitchPin = 32;
 static const uint8_t kRollPin = 33;
@@ -56,9 +55,6 @@ static auto ReadGimbal(const uint8_t pin) -> float
 }
 
 static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin,
-        kAnalogPushbuttonThreshold);
-
-static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin,
         kAnalogPushbuttonThreshold);
 
 static void blinkLeds()
@@ -100,7 +96,6 @@ void loop()
     arming_prev_ = arming_curr;
 
     const auto hovering = hoverButton_.Read();
-    //const auto autopilot = autopilotButton_.Read();
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
     const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
     const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
@@ -115,16 +110,12 @@ void loop()
         }
     }
 
-    Serial.println(hovering);
-
-    /*
        Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-       "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
-       throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
+       "armed=%d hovering=%d | voltage=%3.3f\n",
+       throttle, roll, pitch, yaw, armed_, hovering, volts);
 
+       /*
     if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
         Serial.println("Error sending the data");
     }*/
-
-    //delay(10);
 }
