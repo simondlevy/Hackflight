@@ -38,7 +38,7 @@ static const float kAnalogMax = 3900;
 static const float kLowVoltage = 3.0;
 static const float kLedBlinkHz = 2;
 
-static const uint16_t kAnalogThreshold = 4000;
+static const uint16_t kAnalogPushbuttonThreshold = 4094;
 
 static auto _blinkTimer = hf::Timer(kLedBlinkHz);
 
@@ -55,16 +55,11 @@ static auto ReadGimbal(const uint8_t pin) -> float
     return (analogRead(pin) - kAnalogMin) / (kAnalogMax - kAnalogMin);
 }
 
-static auto AnalogThreshold(const uint8_t pin) -> bool
-{
-    return analogRead(pin) > kAnalogThreshold;
-}
-
 static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin,
-        kAnalogThreshold);
+        kAnalogPushbuttonThreshold);
 
 static AnalogPushButton autopilotButton_ = AnalogPushButton(kAutopilotPin,
-        kAnalogThreshold);
+        kAnalogPushbuttonThreshold);
 
 static void blinkLeds()
 {
@@ -91,8 +86,8 @@ void setup()
 
     arming_prev_ = digitalRead(kArmingPin);
 
-    hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kReceiverAddress);
+    //hf::EspNow::WifiSetup();
+    //hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
@@ -105,7 +100,7 @@ void loop()
     arming_prev_ = arming_curr;
 
     const auto hovering = hoverButton_.Read();
-    const auto autopilot = autopilotButton_.Read();
+    //const auto autopilot = autopilotButton_.Read();
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
     const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
     const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
@@ -120,17 +115,16 @@ void loop()
         }
     }
 
+    Serial.println(hovering);
+
     /*
        Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
        "armed=%d hovering=%d autopilot=%d | voltage=%3.3f\n",
        throttle, roll, pitch, yaw, armed_, hovering, autopilot, volts);
-     */
-
-    const uint8_t data = 'A';
 
     if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
         Serial.println("Error sending the data");
-    }
+    }*/
 
-    delay(10);
+    //delay(10);
 }
