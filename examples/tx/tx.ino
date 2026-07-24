@@ -43,9 +43,9 @@ static const float kTransmitHz = 100;
 
 static const uint16_t kAnalogPushbuttonThreshold = 4094;
 
-static auto _blinkTimer = hf::Timer(kLedBlinkHz);
+static auto _blink_timer = hf::Timer(kLedBlinkHz);
 
-static auto _transmitTimer = hf::Timer(kTransmitHz);
+static auto _transmit_timer = hf::Timer(kTransmitHz);
 
 static bool arming_prev_;
 
@@ -88,8 +88,8 @@ void setup()
 
     arming_prev_ = digitalRead(kArmingPin);
 
-    //hf::EspNow::WifiSetup();
-    //hf::EspNow::WifiAddPeer(kReceiverAddress);
+    hf::EspNow::WifiSetup();
+    hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
@@ -101,6 +101,7 @@ void loop()
     }
     arming_prev_ = arming_curr;
 
+    /*
     const auto hovering = hoverButton_.Read();
     const auto throttle = 1 - ReadGimbal(kThrottlePin);
     const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
@@ -109,7 +110,7 @@ void loop()
     const auto volts = voltage_divider_.read();
 
     if (volts < kLowVoltage) {
-        if (_blinkTimer.Ready()) {
+        if (_blink_timer.Ready()) {
             static bool on_;
             digitalWrite(KLedPin, on_);
             on_ = !on_;
@@ -120,14 +121,13 @@ void loop()
         Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
                 "armed=%d hovering=%d | voltage=%3.3f\n",
                 throttle, roll, pitch, yaw, armed_, hovering, volts);
-    }
+    }*/
 
     const uint8_t data = 'A';
 
-    if (_transmitTimer.Ready()) {
-        /*
+    if (_transmit_timer.Ready()) {
         if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
             Serial.println("Error sending the data");
-        }*/
+        }
     }
 }

@@ -16,34 +16,37 @@
 
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
+#include <firmware/timer.hpp>
 
 static const uint8_t kTransmitterAddress[6] = {0x00,0x4B,0x12,0xCD,0x9E,0x08};
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
-static UMS3 ums3;
-static int color;
+static const uint32_t kTimeoutMsec = 50;
+
+static const float kBlinkFreqHz = 2;
+
+static auto blink_timer_ = hf::Timer(kBlinkFreqHz);
+
+
+static UMS3 ums3_;
+
+static uint32_t last_received_msec_;
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
-    Serial.println(len);
+    last_received_msec_ = millis();
 }
 
 void setup()
 {
     Serial.begin(115200);
 
-    // Initialize all board peripherals, call this first
-    ums3.begin();
-
-    // Brightness is 0-255. We set it to 1/3 brightness here
-    ums3.setPixelBrightness(255 / 3);
-
-    // Enable the power to the RGB LED.
-    // Off by default so it doesn't use current when the LED is not required.
-    ums3.setPixelPower(true);
+    ums3_.begin();
+    ums3_.setPixelBrightness(255 / 3);
+    ums3_.setPixelPower(true);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kTransmitterAddress);
@@ -60,9 +63,19 @@ void loop()
         Serial.println("Error sending the data");
     }
 
-    // colorWheel cycles red, orange, ..., back to red at 256
-    ums3.setPixelColor(UMS3::colorWheel(color));
-    color++;
+    // connected
+    if (millis() - last_received_msec_ < kTimeoutMsec) {
+            ums3_.setPixelColor(0, 255, 0);
+    }
+
+    // not connected
+    else {
+        if (blink_timer_.Ready()) {
+            static bool on_;
+            ums3_.setPixelColor(on_ ? 255 : 0, 0, 0);
+            on_ = !on_;
+        }
+     }
 
     delay(10);
 }
