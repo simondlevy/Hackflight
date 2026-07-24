@@ -39,9 +39,13 @@ static const float kAnalogMax = 3900;
 static const float kLowVoltage = 3.0;
 static const float kLedBlinkHz = 2;
 
+static const float kTransmitHz = 100;
+
 static const uint16_t kAnalogPushbuttonThreshold = 4094;
 
 static auto _blinkTimer = hf::Timer(kLedBlinkHz);
+
+static auto _transmitTimer = hf::Timer(kTransmitHz);
 
 static bool arming_prev_;
 
@@ -120,15 +124,9 @@ void loop()
 
     const uint8_t data = 'A';
 
-    static uint32_t msec_;
-    const auto msec = millis();
-
-    if (msec - msec_ > 10) {
+    if (_transmitTimer.Ready()) {
         if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
             Serial.println("Error sending the data");
         }
-        msec_ = msec;
     }
-
-    delay(10);
 }
