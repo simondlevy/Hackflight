@@ -19,7 +19,7 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const bool kDebug = false;
+static const bool kDebug = true;
 
 static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
@@ -88,8 +88,8 @@ void setup()
 
     arming_prev_ = digitalRead(kArmingPin);
 
-    hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kReceiverAddress);
+    //hf::EspNow::WifiSetup();
+    //hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
@@ -125,8 +125,9 @@ void loop()
     const uint8_t data = 'A';
 
     if (_transmitTimer.Ready()) {
+        /*
         if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
             Serial.println("Error sending the data");
-        }
+        }*/
     }
 }
