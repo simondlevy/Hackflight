@@ -15,28 +15,51 @@
 #include <Arduino.h>
 
 class AnalogPushButton {
+
+    private:
+
+        static const uint32_t kDebounceDelayMsec = 50; 
     
     public:
 
         AnalogPushButton(const uint8_t pin, const uint16_t threshold)
-            : pin_(pin), threshold_(threshold) {}
+            :
+                pin_(pin),
+                threshold_(threshold),
+                output_(true),
+                button_state_(HIGH),
+                last_button_state_(HIGH) {}
 
         auto Read() -> bool
         {
-            const auto button_is_down = analogRead(pin_) > threshold_;
+            const auto button_state =  analogRead(pin_) > 4094;
 
-            if (button_is_down && !button_was_down_) {
-                value_ = !value_;
+            if (button_state != last_button_state_) {
+                debounce_time_msec_ = millis();
             }
-            button_was_down_ = button_is_down;
 
-            return value_;
+            if ((millis() - debounce_time_msec_) > kDebounceDelayMsec) {
+
+                if (button_state != button_state_) {
+
+                    button_state_ = button_state;
+
+                    if (button_state_ == LOW) {
+                        output_ = !output_; 
+                    }
+                }
+            }
+
+            last_button_state_ = button_state;
+            return output_;
         }
 
     private:
 
         uint8_t pin_;
         uint16_t threshold_;
-        bool value_;
-        bool button_was_down_;
+        bool output_;
+        uint8_t button_state_;
+        uint8_t last_button_state_;
+        uint32_t debounce_time_msec_;
 };

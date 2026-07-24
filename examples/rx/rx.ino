@@ -12,23 +12,39 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <hackflight.h>
-#include <firmware/espnow.hpp>
+#include <UMS3.h>
 
-static const uint8_t kTransmitterAddress[6] = {0xD4,0xD4,0xDA,0xAA,0x2E,0xF0};
+#include <hackflight.h>
+#include <firmware/blink_timer.hpp>
+#include <firmware/espnow.hpp>
+#include <firmware/timer.hpp>
+
+static const uint8_t kTransmitterAddress[6] = {0x00,0x4B,0x12,0xCD,0x9E,0x08};
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
+
+static const uint32_t kTimeoutMsec = 50;
+
+static auto blink_timer_ = hf::BlinkTimer();
+
+static UMS3 ums3_;
+
+static uint32_t last_received_msec_;
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
-    Serial.println(len);
+    last_received_msec_ = millis();
 }
 
 void setup()
 {
     Serial.begin(115200);
+
+    ums3_.begin();
+    ums3_.setPixelBrightness(255 / 3);
+    ums3_.setPixelPower(true);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kTransmitterAddress);
@@ -43,6 +59,16 @@ void loop()
 
     if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
         Serial.println("Error sending the data");
+    }
+
+    // connected
+    if (millis() - last_received_msec_ < kTimeoutMsec) {
+            ums3_.setPixelColor(0, 255, 0);
+    }
+
+    // not connected
+    else {
+        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
 
     delay(10);
