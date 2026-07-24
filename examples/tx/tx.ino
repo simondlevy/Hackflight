@@ -13,6 +13,7 @@
  */
 
 #include <hackflight.h>
+#include <firmware/blink_timer.hpp>
 #include <firmware/espnow.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/analog_pushbutton.hpp>
@@ -23,7 +24,7 @@ static const bool kDebug = true;
 
 static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
-static const uint8_t KLedPin = 15;
+static const uint8_t kLedPin = 15;
 static const uint8_t kArmingPin = 23;
 static const uint8_t kThrottlePin = 25;
 static const uint8_t kHoverPin = 27;
@@ -37,15 +38,14 @@ static const float kAnalogMin = 240;
 static const float kAnalogMax = 3900;
 
 static const float kLowVoltage = 3.0;
-static const float kLedBlinkHz = 2;
 
 static const float kTransmitHz = 100;
 
 static const uint16_t kAnalogPushbuttonThreshold = 4094;
 
-static auto _blink_timer = hf::Timer(kLedBlinkHz);
+static auto blink_timer_ = hf::BlinkTimer();
 
-static auto _transmit_timer = hf::Timer(kTransmitHz);
+static auto transmit_timer_ = hf::Timer(kTransmitHz);
 
 static bool arming_prev_;
 
@@ -63,26 +63,12 @@ static auto ReadGimbal(const uint8_t pin) -> float
 static AnalogPushButton hoverButton_ = AnalogPushButton(kHoverPin,
         kAnalogPushbuttonThreshold);
 
-static void blinkLeds()
-{
-    static uint32_t msec_;
-    static bool on_;
-
-    const auto msec = millis();
-    
-    if (msec - msec_ > 1000/kLedBlinkHz) {
-        digitalWrite(KLedPin, on_);
-        msec_ = msec;
-        on_ = !on_;
-    }
-}
-
 void setup()
 {
     Serial.begin(115200);
 
-    pinMode(KLedPin, OUTPUT);
-    digitalWrite(KLedPin, HIGH);
+    pinMode(kLedPin, OUTPUT);
+    digitalWrite(kLedPin, HIGH);
 
     pinMode(kArmingPin, INPUT);
 
@@ -101,31 +87,26 @@ void loop()
     }
     arming_prev_ = arming_curr;
 
-    /*
-    const auto hovering = hoverButton_.Read();
-    const auto throttle = 1 - ReadGimbal(kThrottlePin);
-    const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
-    const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
-    const auto yaw = 2 * ReadGimbal(kYawPin) - 1;
-    const auto volts = voltage_divider_.read();
+    // const auto hovering = hoverButton_.Read();
+    // const auto throttle = 1 - ReadGimbal(kThrottlePin);
+    // const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
+    // const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
+    // const auto yaw = 2 * ReadGimbal(kYawPin) - 1;
+    const auto volts = 0; //voltage_divider_.read();
 
     if (volts < kLowVoltage) {
-        if (_blink_timer.Ready()) {
-            static bool on_;
-            digitalWrite(KLedPin, on_);
-            on_ = !on_;
-        }
+        digitalWrite(kLedPin, blink_timer_.On());
     }
 
-    if (kDebug) {
-        Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
-                "armed=%d hovering=%d | voltage=%3.3f\n",
-                throttle, roll, pitch, yaw, armed_, hovering, volts);
-    }*/
+    //if (kDebug) {
+    //    Serial.printf("throttle=%3.2f roll=%+3.2f pitch=%+3.2f yaw=%+3.2f | "
+    //            "armed=%d hovering=%d | voltage=%3.3f\n",
+    //            throttle, roll, pitch, yaw, armed_, hovering, volts);
+    //}
 
     const uint8_t data = 'A';
 
-    if (_transmit_timer.Ready()) {
+    if (transmit_timer_.Ready()) {
         if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
             Serial.println("Error sending the data");
         }
