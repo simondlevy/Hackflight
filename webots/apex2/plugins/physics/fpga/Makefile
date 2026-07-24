@@ -18,7 +18,7 @@ NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 
-FPGA_DIR = $(HOME)/Desktop/fpga/levy/cpp
+DRONEPONG_DIR = $(HOME)/Desktop/dronepong
 
 APP = dronepong
 
@@ -30,10 +30,9 @@ SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) \
-		  -I$(FPGA_DIR)
+		  -I$(DRONEPONG_DIR)
 
-CXX_SOURCES = $(NAME).cpp \
-			  $(fr)/cpp-apps/applications/dronepong/embedded/dronepong.cpp
+CXX_SOURCES = $(NAME).cpp $(DRONEPONG_DIR)/dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc

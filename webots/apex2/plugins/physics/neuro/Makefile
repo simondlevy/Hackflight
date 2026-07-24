@@ -29,7 +29,8 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) \
+          -I$(fr)/include
 
 CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp
 

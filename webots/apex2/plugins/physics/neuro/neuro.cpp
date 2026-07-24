@@ -64,7 +64,6 @@ static auto getSetpoint(
     encode_run_decode();
 
     extern double decoder_vals[1];
-
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
     return hf::Setpoint(0, 0, direction * kSpeed, 0);
