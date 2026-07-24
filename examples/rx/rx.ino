@@ -15,6 +15,7 @@
 #include <UMS3.h>
 
 #include <hackflight.h>
+#include <firmware/blink_timer.hpp>
 #include <firmware/espnow.hpp>
 #include <firmware/timer.hpp>
 
@@ -23,10 +24,7 @@ static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
 static const uint32_t kTimeoutMsec = 50;
 
-static const float kBlinkFreqHz = 2;
-
-static auto blink_timer_ = hf::Timer(kBlinkFreqHz);
-
+static auto blink_timer_ = hf::BlinkTimer();
 
 static UMS3 ums3_;
 
@@ -70,12 +68,8 @@ void loop()
 
     // not connected
     else {
-        if (blink_timer_.Ready()) {
-            static bool on_;
-            ums3_.setPixelColor(on_ ? 255 : 0, 0, 0);
-            on_ = !on_;
-        }
-     }
+        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+    }
 
     delay(10);
 }
