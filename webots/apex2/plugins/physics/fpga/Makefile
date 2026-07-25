@@ -29,8 +29,7 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) \
-		  -I$(DRONEPONG_DIR)
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
 CXX_SOURCES = $(NAME).cpp $(DRONEPONG_DIR)/dronepong.cpp
 

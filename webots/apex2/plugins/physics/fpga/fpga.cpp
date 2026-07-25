@@ -56,14 +56,39 @@ static auto getSetpoint(
 {
     const auto diff = distance_forward_mm - distance_backward_mm;
 
+    extern int decoder_counts[2];
+    extern double decoder_vals[1];
     extern double encoder_vals[2];
+    extern unsigned int num_encoded_spikes;
+
+    extern void apply_spike(unsigned int input_ind, unsigned int time, double value);
+    extern void clear_encoded_spikes();
+    extern void decode();
+    extern void encode();
+    extern void encode_run_decode();
+    extern int get_encoded_spike_id(const int index);
+    extern double get_encoded_spike_time(const int index);
+    extern double get_encoded_spike_value(const int index);
+    extern unsigned int get_sim_time();
+    extern void run(double duration);
+    extern unsigned int output_count(unsigned int output_ind);
+
     encoder_vals[0] = diff;
     encoder_vals[1] = dydt;
 
-    extern void encode_run_decode();
-    encode_run_decode();
+    clear_encoded_spikes();
+    encode();
+    
+    for (unsigned int i = 0; i < num_encoded_spikes; i++) {
+        apply_spike(get_encoded_spike_id(i), get_encoded_spike_time(i), get_encoded_spike_value(i));
+    }
+    
+    run(get_sim_time());
+    
+    decoder_counts[0] = output_count(0);
+    decoder_counts[1] = output_count(1);
 
-    extern double decoder_vals[1];
+    decode();
 
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
