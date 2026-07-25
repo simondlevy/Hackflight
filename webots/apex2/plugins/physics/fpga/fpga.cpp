@@ -76,12 +76,9 @@ static auto getSetpoint(
     extern double encoder_vals[2];
     extern unsigned int num_encoded_spikes;
 
-    extern void apply_spike(unsigned int input_ind, unsigned int time, double value);
     extern void clear_encoded_spikes();
     extern void decode();
     extern void encode();
-    extern void run(double duration);
-    extern unsigned int output_count(unsigned int output_ind);
 
     extern int encoded_spike_id(const int index);
     extern double encoded_spike_time(const int index);
@@ -98,27 +95,13 @@ static auto getSetpoint(
 
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
 
-        apply_spike(
-                encoded_spike_id(i),
-                encoded_spike_time(i),
-                encoded_spike_value(i));
-
         _fpga.ApplySpike(
                 encoded_spike_id(i),
                 encoded_spike_time(i),
                 encoded_spike_value(i));
      }
 
-    run(sim_time());
-
     _fpga.Run(sim_time());
-
-    printf("cpu=%02d %02d | fpga=%02d %02d\n",
-            output_count(0), output_count(1),
-            _fpga.GetOutputCount(0), _fpga.GetOutputCount(1));
-
-    //decoder_counts[0] = output_count(0);
-    //decoder_counts[0] = output_count(0);
 
     decoder_counts[1] = _fpga.GetOutputCount(1);
     decoder_counts[1] = _fpga.GetOutputCount(1);
