@@ -17,21 +17,21 @@
 NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
-
 DRONEPONG_DIR = $(HOME)/Desktop/dronepong
+FPGA_DIR = $(HOME)/Desktop/fpga/levy/cpp
+SIMSENSORS_DIR = $(HOME)/Desktop
 
 APP = dronepong
-
-SIMSENSORS_DIR = $(HOME)/Desktop
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(FPGA_DIR) -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(NAME).cpp $(DRONEPONG_DIR)/dronepong.cpp
+CXX_SOURCES = $(NAME).cpp $(DRONEPONG_DIR)/dronepong.cpp \
+			  $(FPGA_DIR)/serial.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
