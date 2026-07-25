@@ -40,7 +40,7 @@ static AutopilotHelper * _ahelper;
 static constexpr float kFpgaClockFreq = 100000000;
 static constexpr int kFpgaChargeWidth = 5;
 static constexpr int kFpgaEntryValueFactor = 10;
-
+static constexpr int kFpgaSimTime = 50;
 
 static auto _fpga = neuro::FpgaConnection(
         2,
@@ -83,7 +83,6 @@ static auto getSetpoint(
     extern int encoded_spike_id(const int index);
     extern double encoded_spike_time(const int index);
     extern double encoded_spike_value(const int index);
-    extern unsigned int sim_time();
 
     encoder_vals[0] = diff;
     encoder_vals[1] = dydt;
@@ -101,7 +100,7 @@ static auto getSetpoint(
                 encoded_spike_value(i));
      }
 
-    _fpga.Run(sim_time());
+    _fpga.Run(kFpgaSimTime);
 
     decoder_counts[1] = _fpga.GetOutputCount(1);
     decoder_counts[1] = _fpga.GetOutputCount(1);
