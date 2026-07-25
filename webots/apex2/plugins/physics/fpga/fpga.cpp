@@ -94,19 +94,34 @@ static auto getSetpoint(
     clear_encoded_spikes();
     encode();
 
+    _fpga.ClearActivity();
+
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
+
         apply_spike(
                 encoded_spike_id(i),
                 encoded_spike_time(i),
                 encoded_spike_value(i));
-    }
+
+        _fpga.ApplySpike(
+                encoded_spike_id(i),
+                encoded_spike_time(i),
+                encoded_spike_value(i));
+     }
 
     run(sim_time());
 
-    printf("cpu=%d %d\n", output_count(0), output_count(1));
+    _fpga.Run(sim_time());
 
-    decoder_counts[0] = output_count(0);
-    decoder_counts[1] = output_count(1);
+    printf("cpu=%02d %02d | fpga=%02d %02d\n",
+            output_count(0), output_count(1),
+            _fpga.GetOutputCount(0), _fpga.GetOutputCount(1));
+
+    //decoder_counts[0] = output_count(0);
+    //decoder_counts[0] = output_count(0);
+
+    decoder_counts[1] = _fpga.GetOutputCount(1);
+    decoder_counts[1] = _fpga.GetOutputCount(1);
 
     decode();
 
