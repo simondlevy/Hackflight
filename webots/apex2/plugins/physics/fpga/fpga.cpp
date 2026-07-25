@@ -37,6 +37,18 @@ static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * _ahelper;
 
+static constexpr float kFpgaClockFreq = 100000000;
+static constexpr int kFpgaChargeWidth = 5;
+static constexpr int kFpgaEntryValueFactor = 10;
+
+
+static auto _fpga = neuro::FpgaConnection(
+        2,
+        2,
+        kFpgaChargeWidth,
+        kFpgaClockFreq,
+        kFpgaEntryValueFactor);
+
 static int readRangefinder(
         const string name,
         simsens::Robot & robot,
@@ -81,18 +93,18 @@ static auto getSetpoint(
 
     clear_encoded_spikes();
     encode();
-    
+
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
         apply_spike(
                 encoded_spike_id(i),
                 encoded_spike_time(i),
                 encoded_spike_value(i));
     }
-    
+
     run(sim_time());
 
     printf("cpu=%d %d\n", output_count(0), output_count(1));
-    
+
     decoder_counts[0] = output_count(0);
     decoder_counts[1] = output_count(1);
 
