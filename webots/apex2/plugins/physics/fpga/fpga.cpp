@@ -65,13 +65,13 @@ static auto getSetpoint(
     extern void clear_encoded_spikes();
     extern void decode();
     extern void encode();
-    extern void encode_run_decode();
-    extern int get_encoded_spike_id(const int index);
-    extern double get_encoded_spike_time(const int index);
-    extern double get_encoded_spike_value(const int index);
-    extern unsigned int get_sim_time();
     extern void run(double duration);
     extern unsigned int output_count(unsigned int output_ind);
+
+    extern int encoded_spike_id(const int index);
+    extern double encoded_spike_time(const int index);
+    extern double encoded_spike_value(const int index);
+    extern unsigned int sim_time();
 
     encoder_vals[0] = diff;
     encoder_vals[1] = dydt;
@@ -80,10 +80,15 @@ static auto getSetpoint(
     encode();
     
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
-        apply_spike(get_encoded_spike_id(i), get_encoded_spike_time(i), get_encoded_spike_value(i));
+        apply_spike(
+                encoded_spike_id(i),
+                encoded_spike_time(i),
+                encoded_spike_value(i));
     }
     
-    run(get_sim_time());
+    run(sim_time());
+
+    printf("cpu=%d %d\n", output_count(0), output_count(1));
     
     decoder_counts[0] = output_count(0);
     decoder_counts[1] = output_count(1);
