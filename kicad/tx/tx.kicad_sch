@@ -1724,6 +1724,16 @@
 	)
 	(wire
 		(pts
+			(xy 163.83 137.16) (xy 170.18 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3a063294-6604-4d77-b21a-24ada227e110")
+	)
+	(wire
+		(pts
 			(xy 128.27 97.79) (xy 128.27 87.63)
 		)
 		(stroke
@@ -2044,6 +2054,16 @@
 	)
 	(wire
 		(pts
+			(xy 163.83 139.7) (xy 170.18 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cc924fcc-c51d-4a11-bc5a-e773cd120b3f")
+	)
+	(wire
+		(pts
 			(xy 113.03 97.79) (xy 118.11 97.79)
 		)
 		(stroke
@@ -2161,6 +2181,16 @@
 			(type default)
 		)
 		(uuid "f90e5140-0337-433e-8ee1-00cd6e76a036")
+	)
+	(wire
+		(pts
+			(xy 200.66 142.24) (xy 205.74 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fae3bda2-7aab-4d0b-9faa-11ebfdfe60bd")
 	)
 	(label "5V"
 		(at 182.88 96.52 0)
@@ -2432,6 +2462,16 @@
 		)
 		(uuid "9b52d66b-31e4-4675-8b92-1f55a84d80ba")
 	)
+	(label "PIT"
+		(at 165.1 137.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a0f3d8fb-8f45-4548-9c5e-06bea0801335")
+	)
 	(label "VBAT"
 		(at 102.87 130.81 0)
 		(effects
@@ -2492,6 +2532,16 @@
 		)
 		(uuid "c11438d3-f13c-47e4-9692-0944b79b8fe8")
 	)
+	(label "ROL"
+		(at 165.1 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c8fc680b-6095-4117-8bb6-8d1617a9d709")
+	)
 	(label "D+"
 		(at 190.5 96.52 0)
 		(effects
@@ -2551,6 +2601,16 @@
 			(justify left bottom)
 		)
 		(uuid "e776d5fb-725c-43ad-84d2-4faa3b903090")
+	)
+	(label "THR"
+		(at 201.93 142.24 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e87594a4-2916-4d81-a7d4-349724772160")
 	)
 	(label "PIT"
 		(at 60.96 128.27 0)
