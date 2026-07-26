@@ -2,9 +2,9 @@ SKETCH = $(shell basename "`pwd`")
 
 ROOT = $(HOME)/Desktop/
 
-FQBN = esp32:esp32:um_tinypico
+FQBN = esp32:esp32:esp32
 
-PORT = /dev/ttyACM0
+PORT = /dev/ttyUSB0
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
@@ -13,7 +13,7 @@ build: $(SKETCH).ino
 		--fqbn $(FQBN) $(SKETCH).ino
 
 flash:
-	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) $(SKETCH).ino
 
 clean:
 	rm -rf /tmp/arduino/
