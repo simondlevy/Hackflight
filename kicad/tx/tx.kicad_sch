@@ -1664,6 +1664,16 @@
 	)
 	(wire
 		(pts
+			(xy 200.66 139.7) (xy 205.74 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "232ed7ec-1f5e-41d6-818a-77c015fc71f9")
+	)
+	(wire
+		(pts
 			(xy 177.8 99.06) (xy 177.8 96.52)
 		)
 		(stroke
@@ -2241,6 +2251,16 @@
 			(justify left bottom)
 		)
 		(uuid "170fd753-d487-4b85-abfc-9203148a8fc8")
+	)
+	(label "YAW"
+		(at 201.93 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1b6fbf2b-48dc-4acd-9142-38857d0a3b3b")
 	)
 	(label "GND"
 		(at 60.96 120.65 0)
