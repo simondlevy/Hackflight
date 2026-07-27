@@ -31,7 +31,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 // FPGA
-#include <fpga_connection.hpp>
+#include <connection.hpp>
 
 static constexpr float kSpeed = 0.5;
 
@@ -42,7 +42,7 @@ static constexpr int kFpgaChargeWidth = 5;
 static constexpr int kFpgaEntryValueFactor = 10;
 static constexpr int kFpgaSimTime = 50;
 
-static auto _fpga = neuro::FpgaConnection(
+static auto _fpga = neuro::Connection(
         2,
         2,
         kFpgaChargeWidth,
