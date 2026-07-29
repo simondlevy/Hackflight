@@ -3,7 +3,7 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const uint8_t DIGITAL_PIN = 35;
+static const uint8_t DIGITAL_PIN_1 = 35;
 
 void setup()
 {
@@ -12,7 +12,7 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
-    pinMode(DIGITAL_PIN, INPUT);
+    pinMode(DIGITAL_PIN_1, INPUT);
 }
 
 void loop()
@@ -25,7 +25,7 @@ void loop()
             "A3=%04d "
             "A4=%04d "
             "\n"
-            , DIGITAL_PIN, digitalRead(DIGITAL_PIN)
+            , DIGITAL_PIN_1, digitalRead(DIGITAL_PIN_1)
             , analogRead(A0)
             , analogRead(A1)
             , analogRead(A2)
