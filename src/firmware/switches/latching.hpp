@@ -26,6 +26,7 @@ namespace hf {
 
             void Begin()
             {
+                pinMode(pin_, INPUT);
                 prev_ = digitalRead(pin_);
             }
 

@@ -37,7 +37,6 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
-    pinMode(kArmingDigitalPin, INPUT);
     pinMode(kHoverDigitalPin, INPUT);
     pinMode(kAutopilotDigitalPin, INPUT);
 

@@ -17,11 +17,11 @@
 
 namespace hf {
 
-    class LatchingSwitch {
+    class IntermittentSwitch {
 
         public:
 
-            LatchingSwitch(const uint8_t pin) 
+            IntermittentSwitch(const uint8_t pin) 
                 : pin_(pin), state_(false), prev_(false) {}
 
             void Begin()
