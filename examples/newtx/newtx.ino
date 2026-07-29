@@ -14,6 +14,7 @@
 
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
+#include <firmware/switches/latching.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
@@ -27,7 +28,7 @@ static const uint8_t kArmingDigitalPin = 35;
 static const uint8_t kHoverDigitalPin = 9;
 static const uint8_t kAutopilotDigitalPin = 8;
 
-static bool arming_prev_;
+static auto armingSwitch_ = hf::LatchingSwitch(kArmingDigitalPin);
 
 void setup()
 {
@@ -40,18 +41,11 @@ void setup()
     pinMode(kHoverDigitalPin, INPUT);
     pinMode(kAutopilotDigitalPin, INPUT);
 
-    arming_prev_ = digitalRead(kArmingDigitalPin);
+    armingSwitch_.Begin();
 }
 
 void loop()
 {
-    static bool armed_;
-    const auto arming_curr = digitalRead(kArmingDigitalPin);
-    if (arming_prev_ != arming_curr) {
-        armed_ = !armed_;
-    }
-    arming_prev_ = arming_curr;
-
     static bool hovering_;
     static bool hovering_prev_;
     const auto hovering_curr = digitalRead(kHoverDigitalPin);
@@ -78,7 +72,7 @@ void loop()
             "Yaw=%04d "
             "Divider=%04d "
             "\n"
-            , armed_
+            , armingSwitch_.Read()
             , hovering_
             , autopilot_
             , analogRead(kThrottleAnalogPin)
