@@ -2392,7 +2392,7 @@
 		)
 		(uuid "5a35bde4-eb4a-4eaf-b15b-dea8e9dc63a2")
 	)
-	(label "3V3"
+	(label "GND"
 		(at 102.87 143.51 0)
 		(effects
 			(font
@@ -2452,7 +2452,7 @@
 		)
 		(uuid "8bd15d26-9a13-4154-b52a-ae0895860d2d")
 	)
-	(label "3V3"
+	(label "GND"
 		(at 119.38 143.51 0)
 		(effects
 			(font
