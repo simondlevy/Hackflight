@@ -25,12 +25,9 @@ static const uint8_t kPitchAnalogPin = A3;
 static const uint8_t kYawAnalogPin = A1;
 static const uint8_t kDividerAnalogPin = A4;
 
-static const uint8_t kArmingDigitalPin = 35;
-static const uint8_t kHoverDigitalPin = 9;
-static const uint8_t kAutopilotDigitalPin = 8;
-
-static auto armingSwitch_ = hf::LatchingSwitch(kArmingDigitalPin);
-static auto hoveringSwitch_ = hf::IntermittentSwitch(kHoverDigitalPin);
+static auto armingSwitch_ = hf::LatchingSwitch(35);
+static auto hoveringSwitch_ = hf::IntermittentSwitch(9);
+static auto autopilotSwitch_ = hf::IntermittentSwitch(8);
 
 void setup()
 {
@@ -39,23 +36,13 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
-    pinMode(kHoverDigitalPin, INPUT);
-    pinMode(kAutopilotDigitalPin, INPUT);
-
     armingSwitch_.Begin();
     hoveringSwitch_.Begin();
+    autopilotSwitch_.Begin();
 }
 
 void loop()
 {
-    static bool autopilot_;
-    static bool autopilot_prev_;
-    const auto autopilot_curr = digitalRead(kAutopilotDigitalPin);
-    if (!autopilot_curr && autopilot_prev_) {
-        autopilot_ = !autopilot_;
-    }
-    autopilot_prev_ = autopilot_curr;
-
     Serial.printf(
             "Armed=%d "
             "Hovering=%d "
@@ -68,7 +55,7 @@ void loop()
             "\n"
             , armingSwitch_.Read()
             , hoveringSwitch_.Read()
-            , autopilot_
+            , autopilotSwitch_.Read()
             , analogRead(kThrottleAnalogPin)
             , analogRead(kRollAnalogPin)
             , analogRead(kPitchAnalogPin)

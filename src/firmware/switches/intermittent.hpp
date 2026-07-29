@@ -1,5 +1,4 @@
-/* Code for a latching switch: initial output off, then pushing toggles
- * output.
+/* Code for an intermittent switch: changes state on push/release.
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -27,6 +26,7 @@ namespace hf {
             void Begin()
             {
                 pinMode(pin_, INPUT);
+                prev_ = digitalRead(pin_);
             }
 
             auto Read() -> bool

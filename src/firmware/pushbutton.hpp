@@ -1,5 +1,4 @@
-/* Code for a latching switch: initial output off, then pushing toggles
- * output.
+/* Code for a pushbutton switch
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -14,23 +13,41 @@
  */
 
 #include <hackflight.h>
-#include <firmware/pushbutton.hpp>
 
 namespace hf {
 
-    class LatchingSwitch : public PushbuttonSwitch {
+    class PushbuttonSwitch {
 
         public:
 
-            LatchingSwitch(const uint8_t pin) 
-                : PushbuttonSwitch(pin) {}
+            PushbuttonSwitch(const uint8_t pin) 
+                : pin_(pin), state_(false), prev_(false) {}
+
+            void Begin()
+            {
+                pinMode(pin_, INPUT);
+                prev_ = digitalRead(pin_);
+            }
+
+            auto Read() -> bool
+            {
+                const auto curr = digitalRead(pin_);
+
+                if (Test(curr, prev_)) {
+                   state_  = !state_;
+                }
+                prev_ = curr;
+
+                return state_;
+            }
 
         private:
 
-            bool Test(const bool curr, const bool prev)
-            {
-                return prev != curr;
-            }
+            virtual bool Test(const bool curr, const bool prev) = 0;
+
+            uint8_t pin_;
+            bool state_;
+            bool prev_;
     };
 }
 
