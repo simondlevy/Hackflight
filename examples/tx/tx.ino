@@ -21,7 +21,10 @@ static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
 static const bool kDebug = true;
 
-
+static const uint8_t kThrottlePin = 25;
+static const uint8_t kPitchPin = 32;
+static const uint8_t kRollPin = 33;
+static const uint8_t kYawPin = 4;
 static const uint8_t kVoltageDividerPin = 14;
 
 static const uint8_t kLedPin = 15;
@@ -29,11 +32,6 @@ static const uint8_t kLedPin = 15;
 static const uint8_t kArmingPin = 23;
 static const uint8_t kHoverPin = 22;
 static const uint8_t kAutopilotPin = 1;
-
-static const uint8_t kThrottlePin = 25;
-static const uint8_t kPitchPin = 32;
-static const uint8_t kRollPin = 33;
-static const uint8_t kYawPin = 4;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
@@ -73,8 +71,8 @@ void setup()
 
     arming_prev_ = digitalRead(kArmingPin);
 
-    //hf::EspNow::WifiSetup();
-    //hf::EspNow::WifiAddPeer(kReceiverAddress);
+    hf::EspNow::WifiSetup();
+    hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
 void loop()
