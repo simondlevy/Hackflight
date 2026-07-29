@@ -5,6 +5,7 @@ static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
 static const uint8_t DPIN1 = 35;
 static const uint8_t DPIN2 = 9;
+static const uint8_t DPIN3 = 8;
 
 void setup()
 {
@@ -15,11 +16,13 @@ void setup()
 
     pinMode(DPIN1, INPUT);
     pinMode(DPIN2, INPUT);
+    pinMode(DPIN3, INPUT);
 }
 
 void loop()
 {
     Serial.printf(
+            "D%d=%d "
             "D%d=%d "
             "D%d=%d "
             "A0=%04d "
@@ -30,6 +33,7 @@ void loop()
             "\n"
             , DPIN1, digitalRead(DPIN1)
             , DPIN2, digitalRead(DPIN2)
+            , DPIN3, digitalRead(DPIN3)
             , analogRead(A0)
             , analogRead(A1)
             , analogRead(A2)
