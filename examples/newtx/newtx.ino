@@ -14,6 +14,7 @@
 
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
+#include <firmware/switches/intermittent.hpp>
 #include <firmware/switches/latching.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
@@ -29,6 +30,7 @@ static const uint8_t kHoverDigitalPin = 9;
 static const uint8_t kAutopilotDigitalPin = 8;
 
 static auto armingSwitch_ = hf::LatchingSwitch(kArmingDigitalPin);
+static auto hoveringSwitch_ = hf::IntermittentSwitch(kHoverDigitalPin);
 
 void setup()
 {
@@ -41,18 +43,11 @@ void setup()
     pinMode(kAutopilotDigitalPin, INPUT);
 
     armingSwitch_.Begin();
+    hoveringSwitch_.Begin();
 }
 
 void loop()
 {
-    static bool hovering_;
-    static bool hovering_prev_;
-    const auto hovering_curr = digitalRead(kHoverDigitalPin);
-    if (!hovering_curr && hovering_prev_) {
-        hovering_ = !hovering_;
-    }
-    hovering_prev_ = hovering_curr;
-
     static bool autopilot_;
     static bool autopilot_prev_;
     const auto autopilot_curr = digitalRead(kAutopilotDigitalPin);
@@ -72,7 +67,7 @@ void loop()
             "Divider=%04d "
             "\n"
             , armingSwitch_.Read()
-            , hovering_
+            , hoveringSwitch_.Read()
             , autopilot_
             , analogRead(kThrottleAnalogPin)
             , analogRead(kRollAnalogPin)

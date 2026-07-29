@@ -26,17 +26,16 @@ namespace hf {
 
             void Begin()
             {
-                prev_ = digitalRead(pin_);
+                pinMode(pin_, INPUT);
             }
 
             auto Read() -> bool
             {
                 const auto curr = digitalRead(pin_);
 
-                if (prev_ != curr) {
-                    state_ = !state_;
+                if (!curr && prev_) {
+                   state_  = !state_;
                 }
-
                 prev_ = curr;
 
                 return state_;
