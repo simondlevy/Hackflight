@@ -60,6 +60,14 @@ void loop()
     }
     hovering_prev_ = hovering_curr;
 
+    static bool autopilot_;
+    static bool autopilot_prev_;
+    const auto autopilot_curr = digitalRead(kAutopilotDigitalPin);
+    if (!autopilot_curr && autopilot_prev_) {
+        autopilot_ = !autopilot_;
+    }
+    autopilot_prev_ = autopilot_curr;
+
     Serial.printf(
             "Armed=%d "
             "Hovering=%d "
@@ -72,7 +80,7 @@ void loop()
             "\n"
             , armed_
             , hovering_
-            , digitalRead(kAutopilotDigitalPin)
+            , autopilot_
             , analogRead(kThrottleAnalogPin)
             , analogRead(kRollAnalogPin)
             , analogRead(kPitchAnalogPin)
