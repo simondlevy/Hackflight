@@ -21,10 +21,10 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const uint8_t kThrottleAnalogPin = A0;
+static const uint8_t kYawAnalogPin = A0;
+static const uint8_t kThrottleAnalogPin = A1;
 static const uint8_t kRollAnalogPin = A2;
 static const uint8_t kPitchAnalogPin = A3;
-static const uint8_t kYawAnalogPin = A1;
 static const uint8_t kVoltageDividerAnalogPin = A4;
 
 static const uint8_t kLedPin = 15;
