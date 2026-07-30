@@ -15,38 +15,24 @@
 #pragma once
 
 #include <hackflight.h>
+#include <firmware/pushbutton.hpp>
 
 namespace hf {
 
-    class IntermittentSwitch {
+    class IntermittentSwitch : public PushbuttonSwitch {
 
         public:
 
             IntermittentSwitch(const uint8_t pin) 
-                : pin_(pin), state_(false), prev_(false) {}
-
-            void Begin()
-            {
-                pinMode(pin_, INPUT);
-                prev_ = digitalRead(pin_);
-            }
-
-            auto Read() -> bool
-            {
-                const auto curr = digitalRead(pin_);
-
-                if (!curr && prev_) {
-                   state_  = !state_;
-                }
-                prev_ = curr;
-
-                return state_;
-            }
+                : PushbuttonSwitch(pin) {}
 
         private:
 
-            uint8_t pin_;
-            bool state_;
-            bool prev_;
+            bool Test(const bool curr, const bool prev)
+            {
+                return !curr && prev;
+            }
     };
 }
+
+
