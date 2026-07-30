@@ -17,9 +17,10 @@
 NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
-SPIKESERIAL_DIR = $(HOME)/Desktop/spikeserial
+EMBEDDED_DIR = $(HOME)/Desktop/embedded-framework-simon
+EMBEDDER = $(EMBEDDED_DIR)/bin/framework_embedder
+FPGA_DIR = $(EMBEDDED_DIR)/fpga
 SIMSENSORS_DIR = $(HOME)/Desktop
-EMBEDDER = $(HOME)/Desktop/embedded-framework-simon/bin/framework_embedder
 
 APP = dronepong
 
@@ -28,9 +29,9 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SPIKESERIAL_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(SPIKESERIAL_DIR)/posix/serial.cpp
+CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(FPGA_DIR)/posix/serial.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
@@ -40,7 +41,7 @@ FILES_TO_REMOVE += embedded_$(APP).cpp
 all: lib$(NAME).so
 
 embedded_$(APP).cpp:
-	$(EMBEDDER) < $(SPIKESERIAL_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
+	$(EMBEDDER) < $(FPGA_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
 
 edit:
 	vim $(NAME).cpp
