@@ -1,4 +1,5 @@
-/* Code for an intermittent switch: changes state on push/release.
+/* Code for a latching switch: initial output off, then pushing toggles
+ * output.
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -12,40 +13,26 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include <hackflight.h>
+#include <firmware/pushbutton.hpp>
 
 namespace hf {
 
-    class IntermittentSwitch {
+    class LatchingSwitch : public PushbuttonSwitch {
 
         public:
 
-            IntermittentSwitch(const uint8_t pin) 
-                : pin_(pin), state_(false), prev_(false) {}
-
-            void Begin()
-            {
-                pinMode(pin_, INPUT);
-                prev_ = digitalRead(pin_);
-            }
-
-            auto Read() -> bool
-            {
-                const auto curr = digitalRead(pin_);
-
-                if (!curr && prev_) {
-                   state_  = !state_;
-                }
-                prev_ = curr;
-
-                return state_;
-            }
+            LatchingSwitch(const uint8_t pin) 
+                : PushbuttonSwitch(pin) {}
 
         private:
 
-            uint8_t pin_;
-            bool state_;
-            bool prev_;
+            bool Test(const bool curr, const bool prev)
+            {
+                return prev != curr;
+            }
     };
 }
 
