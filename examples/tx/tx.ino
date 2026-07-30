@@ -13,25 +13,21 @@
  */
 
 #include <hackflight.h>
-#include <firmware/blink_timer.hpp>
 #include <firmware/espnow.hpp>
+#include <firmware/blink_timer.hpp>
+#include <firmware/pushbuttons/intermittent.hpp>
+#include <firmware/pushbuttons/latching.hpp>
 #include <firmware/voltage_divider.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const bool kDebug = true;
-
-static const uint8_t kThrottlePin = 25;
-static const uint8_t kPitchPin = 32;
-static const uint8_t kRollPin = 33;
-static const uint8_t kYawPin = 4;
-static const uint8_t kVoltageDividerPin = 14;
+static const uint8_t kThrottleAnalogPin = A0;
+static const uint8_t kRollAnalogPin = A2;
+static const uint8_t kPitchAnalogPin = A3;
+static const uint8_t kYawAnalogPin = A1;
+static const uint8_t kVoltageDividerAnalogPin = A4;
 
 static const uint8_t kLedPin = 15;
-
-static const uint8_t kArmingPin = 23;
-static const uint8_t kHoverPin = 22;
-static const uint8_t kAutopilotPin = 1;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
@@ -43,68 +39,67 @@ static const float kLowVoltage = 3.0;
 
 static const float kTransmitHz = 100;
 
+
+static auto armingSwitch_ = hf::LatchingSwitch(35);
+static auto hoveringSwitch_ = hf::IntermittentSwitch(9);
+static auto autopilotSwitch_ = hf::IntermittentSwitch(8);
+
 static auto blink_timer_ = hf::BlinkTimer();
 
 static auto transmit_timer_ = hf::Timer(kTransmitHz);
 
-static bool arming_prev_;
-
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
-        kVoltageDividerPin,
+        kVoltageDividerAnalogPin,
         kVoltageDividerR1Ohms,
         kVoltageDividerR2Ohms,
         12);
-
-static auto ReadGimbal(const uint8_t pin) -> float
-{
-    return (analogRead(pin) - kAnalogMin) / (kAnalogMax - kAnalogMin);
-}
 
 void setup()
 {
     Serial.begin(115200);
 
-    pinMode(kLedPin, OUTPUT);
-    digitalWrite(kLedPin, HIGH);
-
-    pinMode(kArmingPin, INPUT);
-
-    arming_prev_ = digitalRead(kArmingPin);
-
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
+
+    armingSwitch_.Begin();
+    hoveringSwitch_.Begin();
+    autopilotSwitch_.Begin();
 }
 
 void loop()
 {
-    static bool armed_;
-    const auto arming_curr = digitalRead(kArmingPin);
-    if (arming_prev_ != arming_curr) {
-        armed_ = !armed_;
-    }
-    arming_prev_ = arming_curr;
-
-    // const auto hovering = hoverButton_.Read();
-    // const auto throttle = 1 - ReadGimbal(kThrottlePin);
-    // const auto roll = 2 * (0.5 - ReadGimbal(kRollPin));
-    // const auto pitch = 2 * (ReadGimbal(kPitchPin) - 0.5);
-    // const auto yaw = 2 * ReadGimbal(kYawPin) - 1;
     const auto volts = 0; //voltage_divider_.read();
 
     if (volts < kLowVoltage) {
         digitalWrite(kLedPin, blink_timer_.On());
     }
 
-    if (kDebug) {
-        Serial.printf("armed=%d\n", armed_);
-    }
-
-    const uint8_t data = 'A';
-
     /*
+    const uint8_t data = 'A';
     if (transmit_timer_.Ready()) {
         if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
             Serial.println("Error sending the data");
         }
     }*/
+
+    Serial.printf(
+            "Armed=%d "
+            "Hovering=%d "
+            "Autopilot=%d "
+            "Throttle=%04d "
+            "Roll=%04d "
+            "Pitch=%04d "
+            "Yaw=%04d "
+            "Divider=%04d "
+            "\n"
+            , armingSwitch_.Read()
+            , hoveringSwitch_.Read()
+            , autopilotSwitch_.Read()
+            , analogRead(kThrottleAnalogPin)
+            , analogRead(kRollAnalogPin)
+            , analogRead(kPitchAnalogPin)
+            , analogRead(kYawAnalogPin)
+            , analogRead(kVoltageDividerAnalogPin)
+            );
+
 }
