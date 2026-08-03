@@ -10543,6 +10543,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "AUT"
+		(at 141.992728 106.873914 0)
+		(layer "F.SilkS")
+		(uuid "666f8da8-66b2-438a-92ce-548597f29a6a")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "DIV"
 		(at 150.513649 117.049897 0)
 		(layer "F.SilkS")
@@ -10571,6 +10583,18 @@
 		(at 144.6 94.5 90)
 		(layer "F.SilkS")
 		(uuid "fcf8efe7-2e4d-487b-abba-545dfecb8070")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "5V"
+		(at 147.127289 94.564104 90)
+		(layer "F.SilkS")
+		(uuid "ebf26ea1-a976-4488-93ca-31346f6f58d0")
 		(effects
 			(font
 				(size 0.8 0.8)
