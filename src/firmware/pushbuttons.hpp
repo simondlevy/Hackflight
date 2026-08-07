@@ -45,7 +45,6 @@ namespace hf {
 
                 reading_ = reading;
 
-
                 return state_;
             }
 

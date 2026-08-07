@@ -71,7 +71,8 @@ void loop()
 
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
-    Serial.printf("hovering=%d autopilot=%d\n"
+    Serial.printf("armed=%d hovering=%d autopilot=%d\n"
+            , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
 }
