@@ -83,13 +83,13 @@ namespace hf {
 
                 reading_ = reading;
 
-                if (state_ && !foo_) {
-                    bar_ = !bar_;
+                if (state_ && !oldstate_) {
+                    output_ = !output_;
                 }
 
-                foo_ = state_;
+                oldstate_ = state_;
 
-                return bar_;
+                return output_;
             }
 
         private:
@@ -98,8 +98,8 @@ namespace hf {
             uint8_t reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
-            bool foo_;
-            bool bar_;
+            bool oldstate_;
+            bool output_;
     };
 
 }
