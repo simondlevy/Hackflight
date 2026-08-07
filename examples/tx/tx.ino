@@ -79,16 +79,16 @@ void loop()
        }
        }*/
 
-    static bool butt_;
-    static bool hovering_;
+    static bool foo_;
+    static bool bar_;
 
-    const auto butt = hoveringButton.Read();
+    const auto state_ = hoveringButton.Read();
 
-    if (butt && !butt_) {
-        hovering_ = !hovering_;
+    if (state_ && !foo_) {
+        bar_ = !bar_;
     }
 
-    Serial.printf("hovering=%d\n", hovering_);
+    Serial.printf("hovering=%d\n", bar_);
 
-    butt_ = butt;
+    foo_ = state_;
 }

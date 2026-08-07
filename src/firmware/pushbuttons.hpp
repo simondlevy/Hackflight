@@ -83,7 +83,6 @@ namespace hf {
 
                 reading_ = reading;
 
-
                 return state_;
             }
 
@@ -93,7 +92,6 @@ namespace hf {
             uint8_t reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
-
     };
 
 }
