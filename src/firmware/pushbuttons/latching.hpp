@@ -35,22 +35,7 @@ namespace hf {
             }
     };
 
-    class LatchingPushbutton : public GroundedAnalogButton {
 
-        public:
-
-            LatchingPushbutton(const uint8_t pin) 
-                : GroundedAnalogButton(pin) {}
-    };
-
-
-    class IntermittentPushbutton : public GroundedAnalogButton {
-
-        public:
-
-            IntermittentPushbutton(const uint8_t pin) 
-                : GroundedAnalogButton(pin) {}
-    };
 
 
 }

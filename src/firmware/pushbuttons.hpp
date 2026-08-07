@@ -22,7 +22,7 @@ namespace hf {
 
         private:
 
-            static constexpr uint16_t kThreshold = 10;
+            static constexpr uint16_t kThreshold = 5;
             static constexpr uint32_t kDebounceDelayMsec = 50;
 
         public:
@@ -48,7 +48,7 @@ namespace hf {
                 // save the reading. Next time through the loop, it'll be the reading_:
                 reading_ = reading;
 
-                return state_;
+                return Test(state_, reading_);
             }
 
         private:
@@ -58,42 +58,40 @@ namespace hf {
             uint32_t last_debounce_msec_;
             uint8_t state_;
 
+            virtual bool Test(const bool curr, const bool prev) = 0;
     };
 
-
-    class PushbuttonSwitch {
+    class LatchingPushbutton : public GroundedAnalogButton {
 
         public:
 
-            PushbuttonSwitch(const uint8_t pin) 
-                : pin_(pin), state_(false), prev_(false) {}
-
-            void Begin()
-            {
-                pinMode(pin_, INPUT);
-                prev_ = digitalRead(pin_);
-            }
-
-            auto Read() -> bool
-            {
-                const auto curr = digitalRead(pin_);
-
-                if (Test(curr, prev_)) {
-                    state_  = !state_;
-                }
-                prev_ = curr;
-
-                return state_;
-            }
+            LatchingPushbutton(const uint8_t pin) 
+                : GroundedAnalogButton(pin) {}
 
         private:
 
-            virtual bool Test(const bool curr, const bool prev) = 0;
+            virtual bool Test(const bool curr, const bool prev) 
+            {
+                return curr;
+            }
 
-            uint8_t pin_;
-            bool state_;
-            bool prev_;
     };
+
+    class IntermittentPushbutton : public GroundedAnalogButton {
+
+        public:
+
+            IntermittentPushbutton(const uint8_t pin) 
+                : GroundedAnalogButton(pin) {}
+        private:
+
+            virtual bool Test(const bool curr, const bool prev) 
+            {
+                return curr;
+            }
+
+    };
+
 }
 
 

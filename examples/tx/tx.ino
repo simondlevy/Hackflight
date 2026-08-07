@@ -15,8 +15,7 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
-#include <firmware/pushbuttons/latching.hpp>
-#include <firmware/pushbuttons/intermittent.hpp>
+#include <firmware/pushbuttons.hpp>
 #include <firmware/voltage_divider.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
