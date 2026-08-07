@@ -79,6 +79,7 @@ void loop()
        }
        }*/
 
+    /*
     static bool foo_;
     static bool bar_;
 
@@ -90,5 +91,7 @@ void loop()
 
     Serial.printf("hovering=%d\n", bar_);
 
-    foo_ = state_;
+    foo_ = state_;*/
+
+    Serial.printf("hovering=%d\n", hoveringButton.Read());
 }
