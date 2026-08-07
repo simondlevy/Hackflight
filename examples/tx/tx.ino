@@ -27,7 +27,7 @@ static const uint8_t kRollAnalogPin = A2;
 static const uint8_t kPitchAnalogPin = A3;
 static const uint8_t kVoltageDividerAnalogPin = A4;
 
-static const uint8_t kLedPin = 15;
+static const uint8_t kLedPin = 33;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
@@ -58,6 +58,8 @@ void setup()
 {
     Serial.begin(115200);
 
+    pinMode(kLedPin, OUTPUT);
+
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
@@ -70,9 +72,7 @@ void loop()
 {
     const auto volts = 0; //voltage_divider_.read();
 
-    if (volts < kLowVoltage) {
-        digitalWrite(kLedPin, blink_timer_.On());
-    }
+    digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
     /*
     const uint8_t data = 'A';
