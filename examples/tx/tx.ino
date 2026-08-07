@@ -15,8 +15,6 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
-#include <firmware/pushbuttons/intermittent.hpp>
-#include <firmware/pushbuttons/latching.hpp>
 #include <firmware/voltage_divider.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
@@ -40,10 +38,6 @@ static const float kLowVoltage = 3.0;
 static const float kTransmitHz = 100;
 
 
-static auto armingSwitch_ = hf::LatchingSwitch(35);
-static auto hoveringSwitch_ = hf::IntermittentSwitch(9);
-static auto autopilotSwitch_ = hf::IntermittentSwitch(8);
-
 static auto blink_timer_ = hf::BlinkTimer();
 
 static auto transmit_timer_ = hf::Timer(kTransmitHz);
@@ -54,6 +48,53 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
+class GroundedAnalogButton {
+
+    private:
+
+        static constexpr uint16_t kThreshold = 10;
+        static constexpr uint32_t kDebounceDelayMsec = 50;
+
+    public:
+
+        GroundedAnalogButton(const uint8_t pin) 
+            : pin_(pin) {}
+
+        auto Read() -> bool
+        {
+            int reading = analogRead(pin_) < kThreshold;
+
+            if (reading != reading_) {
+                last_debounce_msec_ = millis();
+            }
+
+            if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
+
+                if (reading != state_) {
+                    state_ = reading;
+                }
+            }
+
+            // save the reading. Next time through the loop, it'll be the reading_:
+            reading_ = reading;
+
+            return state_;
+        }
+
+    private:
+
+        uint8_t pin_;
+        uint8_t reading_;
+        uint32_t last_debounce_msec_;
+        uint8_t state_;
+
+};
+
+static auto hoveringButton = GroundedAnalogButton(9);
+
+static auto autopilotButton = GroundedAnalogButton(8);
+
+
 void setup()
 {
     Serial.begin(115200);
@@ -63,24 +104,21 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
-    armingSwitch_.Begin();
-    hoveringSwitch_.Begin();
-    autopilotSwitch_.Begin();
 }
 
 void loop()
 {
-    const auto volts = 0; //voltage_divider_.read();
+    const auto volts = voltage_divider_.read();
 
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
     /*
-    const uint8_t data = 'A';
-    if (transmit_timer_.Ready()) {
-        if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
-            Serial.println("Error sending the data");
-        }
-    }*/
+       const uint8_t data = 'A';
+       if (transmit_timer_.Ready()) {
+       if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
+       Serial.println("Error sending the data");
+       }
+       }*/
 
     Serial.printf(
             "Armed=%d "
@@ -92,9 +130,9 @@ void loop()
             "Yaw=%04d "
             "Divider=%04d "
             "\n"
-            , armingSwitch_.Read()
-            , hoveringSwitch_.Read()
-            , autopilotSwitch_.Read()
+            , 0
+            , hoveringButton.Read()
+            , autopilotButton.Read()
             , analogRead(kThrottleAnalogPin)
             , analogRead(kRollAnalogPin)
             , analogRead(kPitchAnalogPin)
