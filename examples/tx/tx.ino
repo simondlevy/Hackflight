@@ -90,8 +90,8 @@ class GroundedAnalogButton {
 
 };
 
+static auto armingButton = GroundedAnalogButton(A1);
 static auto hoveringButton = GroundedAnalogButton(A8);
-
 static auto autopilotButton = GroundedAnalogButton(A7);
 
 
@@ -121,7 +121,7 @@ void loop()
        }*/
 
     Serial.printf("Armed=%d Hovering=%d Autopilot=%d\n"
-            , 0
+            , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read()
             );
