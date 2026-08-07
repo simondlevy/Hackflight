@@ -53,7 +53,6 @@ static auto armingButton = hf::LatchingPushbutton(A1);
 static auto hoveringButton = hf::IntermittentPushbutton(A8);
 static auto autopilotButton = hf::IntermittentPushbutton(A7);
 
-
 void setup()
 {
     Serial.begin(115200);
