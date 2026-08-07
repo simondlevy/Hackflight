@@ -71,27 +71,7 @@ void loop()
 
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
-    /*
-       const uint8_t data = 'A';
-       if (transmit_timer_.Ready()) {
-       if (esp_now_send(kReceiverAddress, &data, 1) != ESP_OK) {
-       Serial.println("Error sending the data");
-       }
-       }*/
-
-    /*
-    static bool foo_;
-    static bool bar_;
-
-    const auto state_ = hoveringButton.Read();
-
-    if (state_ && !foo_) {
-        bar_ = !bar_;
-    }
-
-    Serial.printf("hovering=%d\n", bar_);
-
-    foo_ = state_;*/
-
-    Serial.printf("hovering=%d\n", hoveringButton.Read());
+    Serial.printf("hovering=%d autopilot=%d\n"
+            , hoveringButton.Read()
+            , autopilotButton.Read());
 }
