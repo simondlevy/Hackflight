@@ -15,7 +15,8 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
-#include <firmware/pushbutton.hpp>
+#include <firmware/pushbuttons/latching.hpp>
+#include <firmware/pushbuttons/intermittent.hpp>
 #include <firmware/voltage_divider.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
@@ -49,9 +50,9 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-static auto armingButton = hf::GroundedAnalogButton(A1);
-static auto hoveringButton = hf::GroundedAnalogButton(A8);
-static auto autopilotButton = hf::GroundedAnalogButton(A7);
+static auto armingButton = hf::IntermittentPushbutton(A1);
+static auto hoveringButton = hf::IntermittentPushbutton(A8);
+static auto autopilotButton = hf::LatchingPushbutton(A7);
 
 
 void setup()
