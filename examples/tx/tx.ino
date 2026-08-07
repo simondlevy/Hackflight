@@ -49,9 +49,9 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-static auto armingButton = hf::IntermittentPushbutton(A1);
+static auto armingButton = hf::LatchingPushbutton(A1);
 static auto hoveringButton = hf::IntermittentPushbutton(A8);
-static auto autopilotButton = hf::LatchingPushbutton(A7);
+static auto autopilotButton = hf::IntermittentPushbutton(A7);
 
 
 void setup()
@@ -79,10 +79,16 @@ void loop()
        }
        }*/
 
-    Serial.printf("Armed=%d Hovering=%d Autopilot=%d\n"
-            , armingButton.Read()
-            , hoveringButton.Read()
-            , autopilotButton.Read()
-            );
+    static bool butt_;
+    static bool hovering_;
 
+    const auto butt = hoveringButton.Read();
+
+    if (butt && !butt_) {
+        hovering_ = !hovering_;
+    }
+
+    Serial.printf("hovering=%d\n", hovering_);
+
+    butt_ = butt;
 }

@@ -45,10 +45,10 @@ namespace hf {
                     }
                 }
 
-                // save the reading. Next time through the loop, it'll be the reading_:
                 reading_ = reading;
 
-                return Test(state_, reading_);
+
+                return state_;
             }
 
         private:
@@ -58,7 +58,7 @@ namespace hf {
             uint32_t last_debounce_msec_;
             uint8_t state_;
 
-            virtual bool Test(const bool curr, const bool prev) = 0;
+            //virtual bool Test(const bool curr, const bool prev) = 0;
     };
 
     class LatchingPushbutton : public GroundedAnalogButton {
@@ -67,14 +67,6 @@ namespace hf {
 
             LatchingPushbutton(const uint8_t pin) 
                 : GroundedAnalogButton(pin) {}
-
-        private:
-
-            virtual bool Test(const bool curr, const bool prev) 
-            {
-                return curr;
-            }
-
     };
 
     class IntermittentPushbutton : public GroundedAnalogButton {
@@ -83,13 +75,6 @@ namespace hf {
 
             IntermittentPushbutton(const uint8_t pin) 
                 : GroundedAnalogButton(pin) {}
-        private:
-
-            virtual bool Test(const bool curr, const bool prev) 
-            {
-                return curr;
-            }
-
     };
 
 }
