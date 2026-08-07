@@ -18,16 +18,14 @@
 
 namespace hf {
 
-    class GroundedAnalogButton {
+    static constexpr uint16_t kThreshold = 5;
+    static constexpr uint32_t kDebounceDelayMsec = 50;
 
-        private:
-
-            static constexpr uint16_t kThreshold = 5;
-            static constexpr uint32_t kDebounceDelayMsec = 50;
+    class LatchingPushbutton {
 
         public:
 
-            GroundedAnalogButton(const uint8_t pin) 
+            LatchingPushbutton(const uint8_t pin) 
                 : pin_(pin) {}
 
             auto Read() -> bool
@@ -58,23 +56,44 @@ namespace hf {
             uint32_t last_debounce_msec_;
             uint8_t state_;
 
-            //virtual bool Test(const bool curr, const bool prev) = 0;
+
     };
 
-    class LatchingPushbutton : public GroundedAnalogButton {
-
-        public:
-
-            LatchingPushbutton(const uint8_t pin) 
-                : GroundedAnalogButton(pin) {}
-    };
-
-    class IntermittentPushbutton : public GroundedAnalogButton {
+    class IntermittentPushbutton {
 
         public:
 
             IntermittentPushbutton(const uint8_t pin) 
-                : GroundedAnalogButton(pin) {}
+                : pin_(pin) {}
+
+            auto Read() -> bool
+            {
+                int reading = analogRead(pin_) < kThreshold;
+
+                if (reading != reading_) {
+                    last_debounce_msec_ = millis();
+                }
+
+                if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
+
+                    if (reading != state_) {
+                        state_ = reading;
+                    }
+                }
+
+                reading_ = reading;
+
+
+                return state_;
+            }
+
+        private:
+
+            uint8_t pin_;
+            uint8_t reading_;
+            uint32_t last_debounce_msec_;
+            uint8_t state_;
+
     };
 
 }
