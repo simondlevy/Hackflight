@@ -1904,16 +1904,6 @@
 	)
 	(wire
 		(pts
-			(xy 163.83 134.62) (xy 170.18 134.62)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "91d0bffc-15fa-4813-abd6-d92121aa8123")
-	)
-	(wire
-		(pts
 			(xy 88.9 133.35) (xy 93.98 133.35)
 		)
 		(stroke
@@ -2011,6 +2001,16 @@
 			(type default)
 		)
 		(uuid "b5a83397-1f5e-44de-9427-8ce17bd98ec3")
+	)
+	(wire
+		(pts
+			(xy 200.66 137.16) (xy 205.74 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b684b853-26b9-4bc1-a305-41732b5595b8")
 	)
 	(wire
 		(pts
@@ -2282,17 +2282,7 @@
 		)
 		(uuid "182b1d8b-c004-4a1c-8c29-fa1c8e01d0ee")
 	)
-	(label "A5_ARM"
-		(at 49.53 118.11 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "1d497e96-4c00-4386-8726-5b52e29a967f")
-	)
-	(label "A1_THR"
+	(label "A1_ARM"
 		(at 163.83 137.16 0)
 		(effects
 			(font
@@ -2452,16 +2442,6 @@
 		)
 		(uuid "64c0d0bc-7e85-4257-aa6d-a669bf785179")
 	)
-	(label "A0_YAW"
-		(at 163.83 134.62 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "6860c838-3d0e-4ace-9734-41de049a4434")
-	)
 	(label "A8_HOV"
 		(at 162.56 119.38 0)
 		(effects
@@ -2492,15 +2472,15 @@
 		)
 		(uuid "71b995eb-8a1b-42ed-8e51-f6110489951b")
 	)
-	(label "A1_THR"
-		(at 87.63 149.86 0)
+	(label "A6_YAW"
+		(at 201.93 137.16 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "837837f2-4bca-4fb6-a933-89e6985d262d")
+		(uuid "78cef145-0e80-4eb5-9b66-d07500ef46a1")
 	)
 	(label "D33_LED"
 		(at 137.16 77.47 0)
@@ -2572,6 +2552,16 @@
 		)
 		(uuid "9b52d66b-31e4-4675-8b92-1f55a84d80ba")
 	)
+	(label "A1_ARM"
+		(at 49.53 118.11 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9b9dae76-8f6a-4883-b65a-992556a16675")
+	)
 	(label "A7_AUT"
 		(at 33.02 123.19 0)
 		(effects
@@ -2592,16 +2582,6 @@
 		)
 		(uuid "a26f371d-886a-4283-9117-6ed88553c4a3")
 	)
-	(label "A0_YAW"
-		(at 86.36 125.73 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a5d1bb69-4fe1-4aed-a3c7-9286fabe34b1")
-	)
 	(label "VBAT"
 		(at 201.93 109.22 0)
 		(effects
@@ -2621,6 +2601,16 @@
 			(justify left bottom)
 		)
 		(uuid "ac92f8f2-e6ac-4a9d-b2d7-205cbcd36ba4")
+	)
+	(label "A5_THR"
+		(at 87.63 149.86 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bdc7bfa0-4d15-4532-aafd-4d9ad96d16ff")
 	)
 	(label "5V"
 		(at 139.7 132.08 0)
@@ -2672,7 +2662,7 @@
 		)
 		(uuid "dce791f9-cc78-4c25-9948-0942b2d5f1b2")
 	)
-	(label "A5_ARM"
+	(label "A5_THR"
 		(at 201.93 139.7 0)
 		(effects
 			(font
@@ -2691,6 +2681,16 @@
 			(justify left bottom)
 		)
 		(uuid "e2dd711e-f99a-4373-9cab-97c4845af306")
+	)
+	(label "A6_YAW"
+		(at 86.36 125.73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fe98993f-4816-492b-8858-32336cf9d216")
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x01_Pin")
