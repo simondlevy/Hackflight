@@ -21,11 +21,18 @@ namespace hf {
     static constexpr uint16_t kThreshold = 5;
     static constexpr uint32_t kDebounceDelayMsec = 50;
 
-    class LatchingPushbutton {
+    class DebouncedAnalogPushbutton {
+
+        private:
+
+            static constexpr uint16_t kThreshold = 5;
+            static constexpr uint32_t kDebounceDelayMsec = 50;
 
         public:
 
-            LatchingPushbutton(const uint8_t pin) 
+            DebouncedAnalogPushbutton() = default;
+
+            DebouncedAnalogPushbutton(const uint8_t pin) 
                 : pin_(pin) {}
 
             auto Read() -> bool
@@ -54,8 +61,23 @@ namespace hf {
             uint8_t reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
+    };
 
+    class LatchingPushbutton {
 
+        public:
+
+            LatchingPushbutton(const uint8_t pin) 
+                : debouncer_(pin) {}
+
+            auto Read() -> bool
+            {
+                return debouncer_.Read();
+            }
+
+        private:
+
+            DebouncedAnalogPushbutton debouncer_;
     };
 
     class IntermittentPushbutton {
@@ -93,10 +115,13 @@ namespace hf {
 
         private:
 
+            DebouncedAnalogPushbutton debouncer_;
+
             uint8_t pin_;
             uint8_t reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
+
             bool oldstate_;
             bool output_;
     };
