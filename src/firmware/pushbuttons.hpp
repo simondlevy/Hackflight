@@ -21,7 +21,7 @@ namespace hf {
     static constexpr uint16_t kThreshold = 5;
     static constexpr uint32_t kDebounceDelayMsec = 50;
 
-    class DebouncedAnalogPushbutton {
+    class Debouncer {
 
         private:
 
@@ -30,9 +30,9 @@ namespace hf {
 
         public:
 
-            DebouncedAnalogPushbutton() = default;
+            Debouncer() = default;
 
-            DebouncedAnalogPushbutton(const uint8_t pin) 
+            Debouncer(const uint8_t pin) 
                 : pin_(pin) {}
 
             auto Read() -> bool
@@ -77,7 +77,7 @@ namespace hf {
 
         private:
 
-            DebouncedAnalogPushbutton debouncer_;
+            Debouncer debouncer_;
     };
 
     class IntermittentPushbutton {
@@ -102,7 +102,7 @@ namespace hf {
 
         private:
 
-            DebouncedAnalogPushbutton debouncer_;
+            Debouncer debouncer_;
 
             bool oldstate_;
             bool output_;
