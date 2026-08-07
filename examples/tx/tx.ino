@@ -15,6 +15,7 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
+#include <firmware/pushbutton.hpp>
 #include <firmware/voltage_divider.hpp>
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
@@ -48,51 +49,9 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-class GroundedAnalogButton {
-
-    private:
-
-        static constexpr uint16_t kThreshold = 10;
-        static constexpr uint32_t kDebounceDelayMsec = 50;
-
-    public:
-
-        GroundedAnalogButton(const uint8_t pin) 
-            : pin_(pin) {}
-
-        auto Read() -> bool
-        {
-            int reading = analogRead(pin_) < kThreshold;
-
-            if (reading != reading_) {
-                last_debounce_msec_ = millis();
-            }
-
-            if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
-
-                if (reading != state_) {
-                    state_ = reading;
-                }
-            }
-
-            // save the reading. Next time through the loop, it'll be the reading_:
-            reading_ = reading;
-
-            return state_;
-        }
-
-    private:
-
-        uint8_t pin_;
-        uint8_t reading_;
-        uint32_t last_debounce_msec_;
-        uint8_t state_;
-
-};
-
-static auto armingButton = GroundedAnalogButton(A1);
-static auto hoveringButton = GroundedAnalogButton(A8);
-static auto autopilotButton = GroundedAnalogButton(A7);
+static auto armingButton = hf::GroundedAnalogButton(A1);
+static auto hoveringButton = hf::GroundedAnalogButton(A8);
+static auto autopilotButton = hf::GroundedAnalogButton(A7);
 
 
 void setup()

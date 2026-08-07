@@ -18,6 +18,49 @@
 
 namespace hf {
 
+    class GroundedAnalogButton {
+
+        private:
+
+            static constexpr uint16_t kThreshold = 10;
+            static constexpr uint32_t kDebounceDelayMsec = 50;
+
+        public:
+
+            GroundedAnalogButton(const uint8_t pin) 
+                : pin_(pin) {}
+
+            auto Read() -> bool
+            {
+                int reading = analogRead(pin_) < kThreshold;
+
+                if (reading != reading_) {
+                    last_debounce_msec_ = millis();
+                }
+
+                if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
+
+                    if (reading != state_) {
+                        state_ = reading;
+                    }
+                }
+
+                // save the reading. Next time through the loop, it'll be the reading_:
+                reading_ = reading;
+
+                return state_;
+            }
+
+        private:
+
+            uint8_t pin_;
+            uint8_t reading_;
+            uint32_t last_debounce_msec_;
+            uint8_t state_;
+
+    };
+
+
     class PushbuttonSwitch {
 
         public:
@@ -36,7 +79,7 @@ namespace hf {
                 const auto curr = digitalRead(pin_);
 
                 if (Test(curr, prev_)) {
-                   state_  = !state_;
+                    state_  = !state_;
                 }
                 prev_ = curr;
 
