@@ -85,30 +85,17 @@ namespace hf {
         public:
 
             IntermittentPushbutton(const uint8_t pin) 
-                : pin_(pin) {}
+                : debouncer_(pin) {}
 
             auto Read() -> bool
             {
-                int reading = analogRead(pin_) < kThreshold;
+                const auto state = debouncer_.Read();
 
-                if (reading != reading_) {
-                    last_debounce_msec_ = millis();
-                }
-
-                if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
-
-                    if (reading != state_) {
-                        state_ = reading;
-                    }
-                }
-
-                reading_ = reading;
-
-                if (state_ && !oldstate_) {
+                if (state && !oldstate_) {
                     output_ = !output_;
                 }
 
-                oldstate_ = state_;
+                oldstate_ = state;
 
                 return output_;
             }
@@ -116,11 +103,6 @@ namespace hf {
         private:
 
             DebouncedAnalogPushbutton debouncer_;
-
-            uint8_t pin_;
-            uint8_t reading_;
-            uint32_t last_debounce_msec_;
-            uint8_t state_;
 
             bool oldstate_;
             bool output_;
