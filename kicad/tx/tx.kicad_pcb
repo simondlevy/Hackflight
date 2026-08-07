@@ -10586,18 +10586,6 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "LED↓"
-		(at 128.792976 84.41625 0)
-		(layer "F.SilkS")
-		(uuid "51e1b71a-5567-4256-a818-88eaa9b36c72")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "VB"
 		(at 130.35 105.903749 0)
 		(layer "F.SilkS")
@@ -10734,6 +10722,18 @@
 		(at 133.05 110.2 0)
 		(layer "F.SilkS")
 		(uuid "6d7bfdf2-0d03-4934-9042-4503b1c64f28")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "LED↓"
+		(at 133.86003 87.945451 0)
+		(layer "F.SilkS")
+		(uuid "28e0a7ce-379b-4ca3-ade2-efb585094b6a")
 		(effects
 			(font
 				(size 1 1)
