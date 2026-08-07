@@ -1713,7 +1713,7 @@
 		)
 		(fp_text user "1000Ω"
 			(at 3.81 0 90)
-			(layer "F.Fab")
+			(layer "F.SilkS")
 			(uuid "85871cab-0a59-491a-8cb9-a4aa5ce8a972")
 			(effects
 				(font
@@ -1906,7 +1906,7 @@
 		)
 		(fp_text user "100Ω"
 			(at 3.81 0 90)
-			(layer "F.Fab")
+			(layer "F.SilkS")
 			(uuid "91f592cd-0071-447f-a465-51f2fdd9e78d")
 			(effects
 				(font
@@ -2622,7 +2622,7 @@
 		)
 		(fp_text user "2200Ω"
 			(at 3.81 0 90)
-			(layer "F.Fab")
+			(layer "F.SilkS")
 			(uuid "87fca497-d9f3-4456-8af2-7a0bed04dd9f")
 			(effects
 				(font
@@ -10922,7 +10922,7 @@
 		)
 	)
 	(gr_text "DIV"
-		(at 136.85 119.55 0)
+		(at 136.122739 119.343493 0)
 		(layer "F.SilkS")
 		(uuid "18ece8f0-c4df-44aa-8652-8c00bbaf2f56")
 		(effects
@@ -11161,42 +11161,6 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "BACK"
-		(at 135.35 111.5 270)
-		(layer "F.SilkS")
-		(uuid "b5bcb0e2-2828-4c46-aebc-543bd336a731")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
-	(gr_text "BACK"
-		(at 135.85 100.75 270)
-		(layer "F.SilkS")
-		(uuid "5ee1a718-62d0-4569-bcb9-1b253f27b221")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
-	(gr_text "BACK"
-		(at 138.15 111.5 270)
-		(layer "F.SilkS")
-		(uuid "dfaad2cc-7129-493d-9505-94c0bb4071bd")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "USB"
 		(at 124.618517 78.363933 0)
 		(layer "F.SilkS")
@@ -11249,42 +11213,6 @@
 		(at 163.329032 88.70118 0)
 		(layer "B.SilkS")
 		(uuid "88a3ddad-ad51-4cc4-9c1f-bb2fbf8799be")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom mirror)
-		)
-	)
-	(gr_text "2200Ω"
-		(at 135.55 116 270)
-		(layer "B.SilkS")
-		(uuid "01133aeb-be88-4d50-a05a-247a9d20d6d5")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom mirror)
-		)
-	)
-	(gr_text "100Ω"
-		(at 135.85 104.85 270)
-		(layer "B.SilkS")
-		(uuid "119465c0-f697-4534-861e-d248248aca0e")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom mirror)
-		)
-	)
-	(gr_text "1000Ω"
-		(at 138.35 116 270)
-		(layer "B.SilkS")
-		(uuid "cc7136fa-0e92-4e61-b9c7-7da4e87e04a6")
 		(effects
 			(font
 				(size 1 1)
