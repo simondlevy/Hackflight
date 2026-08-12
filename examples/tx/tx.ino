@@ -53,9 +53,15 @@ static auto armingButton = hf::LatchingPushbutton(A1);
 static auto hoveringButton = hf::IntermittentPushbutton(A8);
 static auto autopilotButton = hf::IntermittentPushbutton(A7);
 
+static auto ReadAxis(
+        const uint8_t pin, const float lo, const float hi) -> float
+{
+    return (-analogRead(pin) - lo) / (hi - lo) - 0.5;
+}
+
 static auto ReadAxis(const uint8_t pin) -> float
 {
-    return 3883 - analogRead(pin);
+    return analogRead(pin);
 }
 
 void setup()
@@ -76,9 +82,11 @@ void loop()
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
     Serial.printf(
-            "thr=%+3.3f | "
+            "thr=%+5.3f rol=%+5.3f | "
             "armed=%d hovering=%d autopilot=%d\n"
-            , ReadAxis(kThrottlePin)
+            , ReadAxis(kThrottlePin, -3800, -280)
+            , ReadAxis(kRollPin, -3050, -740)
+            //, ReadAxis(kRollPin)
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
