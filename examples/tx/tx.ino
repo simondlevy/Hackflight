@@ -20,8 +20,9 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
+static const uint8_t kThrottlePin = A5;
+
 static const uint8_t kYawPin = A0;
-static const uint8_t kThrottlePin = A1;
 static const uint8_t kRollPin = A2;
 static const uint8_t kPitchPin = A3;
 static const uint8_t kVoltageDividerPin = A4;
@@ -37,7 +38,6 @@ static const float kAnalogMax = 3900;
 static const float kLowVoltage = 3.0;
 
 static const float kTransmitHz = 100;
-
 
 static auto blink_timer_ = hf::BlinkTimer();
 
@@ -70,7 +70,8 @@ void loop()
 
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
-    Serial.printf("armed=%d hovering=%d autopilot=%d\n"
+    Serial.printf("thr=%04d | armed=%d hovering=%d autopilot=%d\n"
+            , analogRead(kThrottlePin)
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
