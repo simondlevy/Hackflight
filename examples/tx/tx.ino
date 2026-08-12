@@ -18,7 +18,23 @@
 #include <firmware/pushbuttons.hpp>
 #include <firmware/voltage_divider.hpp>
 
+// Hardware-dependent --------------------------------------------------------
+
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
+
+static const float kThrottleLo = 280;
+static const float kThrottleHi = 3800;
+
+static const float kRollLo = 740;
+static const float kRollHi = 3050;
+
+static const float kPitchLo = 3980;
+static const float kPitchHi = 250;
+
+static const float kYawLo = 3680;
+static const float kYawHi = 320;
+ 
+// Fixed ---------------------------------------------------------------------
 
 static const uint8_t kThrottlePin = A5;
 static const uint8_t kRollPin = A2;
@@ -84,10 +100,10 @@ void loop()
     Serial.printf(
             "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
             "armed=%d hovering=%d autopilot=%d\n"
-            , ReadAxis(kThrottlePin, 280, 3800)
-            , ReadAxis(kRollPin, 740, 3050)
-            , ReadAxis(kPitchPin, 3980, 250)
-            , ReadAxis(kYawPin, 3680, 320)
+            , ReadAxis(kThrottlePin, kThrottleLo, kThrottleHi)
+            , ReadAxis(kRollPin, kRollLo, kRollHi)
+            , ReadAxis(kPitchPin, kPitchLo, kPitchHi)
+            , ReadAxis(kYawPin, kYawLo, kYawHi)
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
