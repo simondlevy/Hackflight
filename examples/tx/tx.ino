@@ -36,14 +36,25 @@ static const float kYawHi = 320;
 
 static const uint8_t kLedIntensity = 2;
  
-// Fixed ---------------------------------------------------------------------
+// Analog input ---------------------------------------------------------------
 
-static const uint8_t kThrottlePin = A5;
+static auto armingButton = hf::LatchingPushbutton(A1);
+
 static const uint8_t kRollPin = A2;
+
 static const uint8_t kPitchPin = A3;
-static const uint8_t kYawPin = A6;
 
 static const uint8_t kVoltageDividerPin = A4;
+
+static const uint8_t kThrottlePin = A5;
+
+static const uint8_t kYawPin = A6;
+
+static auto autopilotButton = hf::IntermittentPushbutton(A7);
+
+static auto hoveringButton = hf::IntermittentPushbutton(A8);
+
+// ----------------------------------------------------------------------------
 
 static const uint8_t kLedPin = 33;
 
@@ -67,10 +78,6 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-static auto armingButton = hf::LatchingPushbutton(A1);
-static auto hoveringButton = hf::IntermittentPushbutton(A8);
-static auto autopilotButton = hf::IntermittentPushbutton(A7);
-
 static auto ReadAxis(
         const uint8_t pin, const float lo, const float hi) -> float
 {
@@ -86,7 +93,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    pinMode(kLedPin, OUTPUT);
+    //pinMode(kLedPin, OUTPUT);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
@@ -99,7 +106,7 @@ void loop()
 
     const auto ledState = volts < kLowVoltage ? blink_timer_.On() : true;
 
-    analogWrite(kLedPin, ledState ? kLedIntensity : 0);
+    //analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
     Serial.printf(
             "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
