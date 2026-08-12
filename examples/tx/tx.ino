@@ -82,11 +82,11 @@ void loop()
     digitalWrite(kLedPin, volts < kLowVoltage ? blink_timer_.On() : HIGH);
 
     Serial.printf(
-            "thr=%+5.3f rol=%+5.3f | "
+            "thr=%+5.3f rol=%+5.3f pit=%+5.3f | "
             "armed=%d hovering=%d autopilot=%d\n"
             , ReadAxis(kThrottlePin, 280, 3800)
             , ReadAxis(kRollPin, 740, 3050)
-            //, ReadAxis(kRollPin)
+            , ReadAxis(kPitchPin, 3980, 250)
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
