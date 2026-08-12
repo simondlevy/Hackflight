@@ -56,7 +56,7 @@ static auto autopilotButton = hf::IntermittentPushbutton(A7);
 static auto ReadAxis(
         const uint8_t pin, const float lo, const float hi) -> float
 {
-    return (-analogRead(pin) - lo) / (hi - lo) - 0.5;
+    return (-analogRead(pin) + hi) / (-lo + hi) - 0.5;
 }
 
 static auto ReadAxis(const uint8_t pin) -> float
@@ -84,8 +84,8 @@ void loop()
     Serial.printf(
             "thr=%+5.3f rol=%+5.3f | "
             "armed=%d hovering=%d autopilot=%d\n"
-            , ReadAxis(kThrottlePin, -3800, -280)
-            , ReadAxis(kRollPin, -3050, -740)
+            , ReadAxis(kThrottlePin, 280, 3800)
+            , ReadAxis(kRollPin, 740, 3050)
             //, ReadAxis(kRollPin)
             , armingButton.Read()
             , hoveringButton.Read()
