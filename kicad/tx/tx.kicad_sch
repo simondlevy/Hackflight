@@ -1770,6 +1770,16 @@
 	)
 	(wire
 		(pts
+			(xy 80.01 76.2) (xy 85.09 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0ad3ba21-e186-40db-a652-9de978a8b1dc")
+	)
+	(wire
+		(pts
 			(xy 33.02 119.38) (xy 38.1 119.38)
 		)
 		(stroke
@@ -2130,16 +2140,6 @@
 	)
 	(wire
 		(pts
-			(xy 66.04 133.35) (xy 71.12 133.35)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c7c8295b-1cef-4553-b499-eb83aabcec5c")
-	)
-	(wire
-		(pts
 			(xy 86.36 121.92) (xy 91.44 121.92)
 		)
 		(stroke
@@ -2348,6 +2348,16 @@
 		)
 		(uuid "170fd753-d487-4b85-abfc-9203148a8fc8")
 	)
+	(label "BAT_POS"
+		(at 80.01 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1c6fb3fd-e93a-4b99-969d-0fee24593a1e")
+	)
 	(label "GND"
 		(at 68.58 119.38 0)
 		(effects
@@ -2367,16 +2377,6 @@
 			(justify left bottom)
 		)
 		(uuid "2c38805f-9b4f-4630-9d5e-5ae609ca80e0")
-	)
-	(label "GND"
-		(at 66.04 133.35 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "2e35b459-3acf-4057-82f8-8ce32af8f93f")
 	)
 	(label "GND"
 		(at 160.02 110.49 0)
@@ -4973,7 +4973,7 @@
 	)
 	(symbol
 		(lib_id "Connector:Conn_01x01_Pin")
-		(at 60.96 133.35 0)
+		(at 74.93 76.2 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -4982,9 +4982,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "cc80b5ad-bcdf-45ed-8310-545e1af4c8c1")
-		(property "Reference" "J22"
-			(at 61.595 128.27 0)
+		(uuid "d4026118-9355-40db-bc44-f87ed3e2bc8b")
+		(property "Reference" "J19"
+			(at 75.565 71.12 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4995,7 +4995,7 @@
 			)
 		)
 		(property "Value" "Conn_01x01_Pin"
-			(at 61.595 130.81 0)
+			(at 75.565 73.66 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5006,7 +5006,7 @@
 			)
 		)
 		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
-			(at 60.96 133.35 0)
+			(at 74.93 76.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5017,7 +5017,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 60.96 133.35 0)
+			(at 74.93 76.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5028,7 +5028,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x01, script generated"
-			(at 60.96 133.35 0)
+			(at 74.93 76.2 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5039,12 +5039,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "b9d4f384-0566-4b42-9b6e-7ea967843756")
+			(uuid "74eadd1c-1605-4cd9-8d5c-fa33d868a193")
 		)
 		(instances
 			(project "tx"
 				(path "/33c99085-6515-4c15-9e21-14e79544dc4e"
-					(reference "J22")
+					(reference "J19")
 					(unit 1)
 				)
 			)
