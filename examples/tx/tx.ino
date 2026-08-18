@@ -34,7 +34,7 @@ static const float kPitchHi = 250;
 static const float kYawLo = 3680;
 static const float kYawHi = 320;
 
-static const uint8_t kLedIntensity = 2;
+static const uint8_t kLedIntensity = 255;
  
 // Analog input ---------------------------------------------------------------
 
@@ -56,7 +56,7 @@ static auto hoveringButton = hf::IntermittentPushbutton(A0);
 
 // ----------------------------------------------------------------------------
 
-static const uint8_t kLedPin = 33;
+static const uint8_t kLedPin = 21;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
@@ -93,7 +93,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    //pinMode(kLedPin, OUTPUT);
+    pinMode(kLedPin, OUTPUT);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
@@ -106,7 +106,7 @@ void loop()
 
     const auto ledState = volts < kLowVoltage ? blink_timer_.On() : true;
 
-    //analogWrite(kLedPin, ledState ? kLedIntensity : 0);
+    analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
     Serial.printf(
             "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
