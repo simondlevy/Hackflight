@@ -10430,18 +10430,6 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "GD"
-		(at 126.448828 107.974827 0)
-		(layer "F.SilkS")
-		(uuid "df0dbb1e-c454-4fcd-a084-487ba7441b96")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "LED↓"
 		(at 129.112307 84.331772 0)
 		(layer "F.SilkS")
@@ -10458,6 +10446,18 @@
 		(at 129.221335 90.327192 0)
 		(layer "F.SilkS")
 		(uuid "a0a616cd-e9d5-43b3-8ecb-70aa00d22f4f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "GD"
+		(at 129.957164 110.313269 0)
+		(layer "F.SilkS")
+		(uuid "df0dbb1e-c454-4fcd-a084-487ba7441b96")
 		(effects
 			(font
 				(size 1 1)
