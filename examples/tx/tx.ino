@@ -38,8 +38,6 @@ static const uint8_t kLedIntensity = 255;
  
 // Analog input ---------------------------------------------------------------
 
-static auto armingButton = hf::LatchingPushbutton(A1);
-
 static const uint8_t kThrottlePin = A4;
 static const uint8_t kRollPin = A3;
 static const uint8_t kPitchPin = A2;
@@ -47,8 +45,9 @@ static const uint8_t kYawPin = A1;
 
 static const uint8_t kVoltageDividerPin = A6;
 
-static auto autopilotButton = hf::IntermittentPushbutton(A7);
+static auto armingButton = hf::LatchingPushbutton(A8);
 
+static auto autopilotButton = hf::IntermittentPushbutton(A7);
 static auto hoveringButton = hf::IntermittentPushbutton(A0);
 
 // ----------------------------------------------------------------------------
