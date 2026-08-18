@@ -52,7 +52,7 @@ static const uint8_t kYawPin = A6;
 
 static auto autopilotButton = hf::IntermittentPushbutton(A7);
 
-static auto hoveringButton = hf::IntermittentPushbutton(A8);
+static auto hoveringButton = hf::IntermittentPushbutton(A0);
 
 // ----------------------------------------------------------------------------
 
