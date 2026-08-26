@@ -19,7 +19,8 @@
 #include <firmware/espnow.hpp>
 #include <firmware/timer.hpp>
 
-static const uint8_t kTransmitterAddress[6] = {0x00,0x4B,0x12,0xCD,0x9E,0x08};
+static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
+
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
 static const uint32_t kTimeoutMsec = 50;
@@ -57,9 +58,10 @@ void loop()
 {
     const uint8_t data = 'A';
 
+    /*
     if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
         Serial.println("Error sending the data");
-    }
+    }*/
 
     // connected
     if (millis() - last_received_msec_ < kTimeoutMsec) {

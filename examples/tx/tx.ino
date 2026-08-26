@@ -35,7 +35,7 @@ static const float kYawLo = 3680;
 static const float kYawHi = 320;
 
 static const uint8_t kLedIntensity = 255;
- 
+
 // Analog input ---------------------------------------------------------------
 
 static const uint8_t kThrottlePin = A4;
@@ -114,4 +114,12 @@ void loop()
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
+
+
+
+      const uint8_t val = 0;
+
+      esp_now_send(kReceiverAddress, &val, 1);
+
+      delay(10);
 }
