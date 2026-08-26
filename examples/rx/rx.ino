@@ -33,7 +33,13 @@ static UMS3 ums3_;
 
 static uint32_t last_received_msec_;
 
-static int count_;
+static short throttle_;
+static short roll_;
+static short pitch_;
+static short yaw_;
+static short arm_;
+static short hover_;
+static short autopilot_;
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
@@ -46,12 +52,8 @@ static void OnDataRecv(
 
         parser_ = hf::MspParser::Parse(parser_, data[i]);
 
-        if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
-            count_++;
-        }
+        last_received_msec_ = millis();
     }
-
-    last_received_msec_ = millis();
 }
 
 void setup()
@@ -71,9 +73,9 @@ void setup()
 
 void loop()
 {
-    const uint8_t data = 'A';
 
     /*
+    const uint8_t data = 'A';
     if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
         Serial.println("Error sending the data");
     }*/
@@ -87,8 +89,6 @@ void loop()
     else {
         ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
-
-    Serial.printf("%d\n", count_);
 
     delay(10);
 }
