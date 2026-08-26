@@ -24,17 +24,17 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const float kThrottleLo = 280;
-static const float kThrottleHi = 3800;
+static const short kThrottleLo = 280;
+static const short kThrottleHi = 3800;
 
-static const float kRollLo = 750;
-static const float kRollHi = 3050;
+static const short kRollLo = 750;
+static const short kRollHi = 3050;
 
-static const float kPitchLo = 3980;
-static const float kPitchHi = 250;
+static const short kPitchLo = 3980;
+static const short kPitchHi = 250;
 
-static const float kYawLo = 3680;
-static const float kYawHi = 320;
+static const short kYawLo = 3680;
+static const short kYawHi = 320;
 
 static const uint8_t kLedIntensity = 255;
 
@@ -87,6 +87,12 @@ static auto ReadAxis(const uint8_t pin) -> float
     return analogRead(pin);
 }
 
+static auto ReadAxisShort(
+        const uint8_t pin, const short lo, const short hi) -> short
+{  
+    return map(analogRead(pin), hi, lo, 0, 4095);
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -106,7 +112,7 @@ void loop()
 
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
-    Serial.printf("rol=%04d\n",  map(analogRead(kRollPin), kRollHi, kRollLo, 0, 4095));
+    Serial.printf("rol=%04d\n", ReadAxisShort(kRollPin, kRollLo, kRollHi));
 
     const short vals[7] = {
             analogRead(kThrottlePin),
