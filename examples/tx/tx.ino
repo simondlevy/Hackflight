@@ -26,6 +26,7 @@ static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
 static const short kThrottleLo = 280;
 static const short kThrottleHi = 3800;
+static const short kThrottleMid = 1980;
 
 static const short kRollLo = 750;
 static const short kRollHi = 3050;
@@ -115,9 +116,10 @@ void loop()
 
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
+    Serial.printf("thr=%04d\n",  kThrottleMid - analogRead(kThrottlePin));
     //Serial.printf("rol=%04d\n", kRollMid - analogRead(kRollPin));
     // Serial.printf("pit=%04d\n",  analogRead(kPitchPin) - kPitchMid);
-    Serial.printf("yaw=%04d\n",  analogRead(kYawPin)- kYawMid);
+    //Serial.printf("yaw=%04d\n",  analogRead(kYawPin)- kYawMid);
 
     const short vals[7] = {
             analogRead(kThrottlePin),
