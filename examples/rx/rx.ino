@@ -31,10 +31,14 @@ static UMS3 ums3_;
 
 static uint32_t last_received_msec_;
 
+static int len_;
+
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
+
+    len_ = len;
 
     last_received_msec_ = millis();
 }
@@ -72,6 +76,8 @@ void loop()
     else {
         ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
+
+    Serial.printf("len=%d\n", len_);
 
     delay(10);
 }

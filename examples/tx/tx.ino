@@ -122,9 +122,24 @@ void loop()
             , hoveringButton.Read()
             , autopilotButton.Read());
 
-      const uint8_t val = 0;
+    const short vals[7] = {
+            analogRead(kThrottlePin),
+            analogRead(kRollPin),
+            analogRead(kPitchPin),
+            analogRead(kYawPin),
+            armingButton.Read(),
+            hoveringButton.Read(),
+            autopilotButton.Read()
+     };
 
-      esp_now_send(kReceiverAddress, &val, 1);
+    static hf::MspSerializer serializer_;
 
-      delay(10);
+    serializer_ = hf::MspSerializer::SerializeShorts(
+            serializer_, kMspSetChannels, vals, 7);
+
+    esp_now_send(kReceiverAddress,
+            hf::MspSerializer::GetPayloadBytes(serializer_),
+            hf::MspSerializer::GetPayloadSize(serializer_));
+
+    delay(10);
 }

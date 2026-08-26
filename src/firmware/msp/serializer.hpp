@@ -66,6 +66,27 @@ namespace hf {
                 return MspSerializer(payload, 6 + 4 * count);
             }
 
+            static auto SerializeShorts(
+                    const MspSerializer & serializer,
+                    const uint8_t id,
+                    const short src[],
+                    const uint8_t count)
+            {
+                Payload payload = {};
+
+                uint8_t checksum = 0;
+
+                PrepareToSerialize(id, count, 2, payload, checksum);
+
+                for (uint8_t k=0; k<count; ++k) {
+                    SerializeShort(5 + k*2, src[k], payload, checksum);
+                }
+
+                payload[5 + 2 * count] = checksum;
+
+                return MspSerializer(payload, 6 + 2 * count);
+            }
+
             static auto GetPayloadBytes(
                     const MspSerializer & serializer) -> uint8_t *
             {
@@ -94,6 +115,16 @@ namespace hf {
                 Serialize8((a >> 8) & 0xFF, k+1, payload, checksum);
                 Serialize8((a >> 16) & 0xFF, k+2, payload, checksum);
                 Serialize8((a >> 24) & 0xFF, k+3, payload, checksum);
+            }
+
+            static void serialize16(
+                    const uint8_t k,
+                    const int32_t a,
+                    Payload & payload,
+                    uint8_t & checksum)
+            {
+                Serialize8(a & 0xFF, k, payload, checksum);
+                Serialize8((a >> 8) & 0xFF, k+1, payload, checksum);
             }
 
             static void Serialize8(
@@ -131,6 +162,17 @@ namespace hf {
                 uint32_t a=0;
                 memcpy(&a, &src, 4);
                 serialize32(k, a, payload, checksum);
+            }
+
+            static void SerializeShort(
+                    const int k,
+                    const short src,
+                    Payload & payload,
+                    uint8_t & checksum)
+            {
+                uint16_t a=0;
+                memcpy(&a, &src, 2);
+                serialize16(k, a, payload, checksum);
             }
     };
 }
