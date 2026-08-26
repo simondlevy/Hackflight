@@ -53,6 +53,12 @@ static void OnDataRecv(
         parser_ = hf::MspParser::Parse(parser_, data[i]);
 
         throttle_ = hf::MspParser::GetShort(parser_, 0);
+        roll_ = hf::MspParser::GetShort(parser_, 1);
+        pitch_ = hf::MspParser::GetShort(parser_, 2);
+        yaw_ = hf::MspParser::GetShort(parser_, 3);
+        arm_ = hf::MspParser::GetShort(parser_, 4);
+        hover_ = hf::MspParser::GetShort(parser_, 5);
+        autopilot_ = hf::MspParser::GetShort(parser_, 6);
 
         last_received_msec_ = millis();
     }
@@ -92,7 +98,9 @@ void loop()
         ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
 
-    Serial.printf("thr=%04d\n", throttle_);
+    Serial.printf("thr=%04d rol=%04d pit=%04d yaw=%04d | "
+            "arm=%d hov=%d aut=%d\n",
+            throttle_, roll_, pitch_, yaw_, arm_, hover_, autopilot_);
 
     delay(10);
 }

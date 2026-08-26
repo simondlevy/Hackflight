@@ -97,7 +97,7 @@ namespace hf {
             static auto GetShort(const MspParser & p,
                     const uint8_t index_) -> short
             {
-                const uint8_t offset = 4 * index_;
+                const uint8_t offset = 2 * index_;
                 short value = (short) (
                         p.buffer_[offset+1] << 8 | p.buffer_[offset]);
                 return value;
