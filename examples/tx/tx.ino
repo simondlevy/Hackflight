@@ -105,17 +105,20 @@ void loop()
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
     Serial.printf(
-            "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
+            // "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
+            "thr=%04d rol=%04d pit=%04d yaw=%04d | "
             "armed=%d hovering=%d autopilot=%d\n"
-            , ReadAxis(kThrottlePin, kThrottleLo, kThrottleHi)
-            , ReadAxis(kRollPin, kRollLo, kRollHi)
-            , ReadAxis(kPitchPin, kPitchLo, kPitchHi)
-            , ReadAxis(kYawPin, kYawLo, kYawHi)
+            //, ReadAxis(kThrottlePin, kThrottleLo, kThrottleHi)
+            //, ReadAxis(kRollPin, kRollLo, kRollHi)
+            //, ReadAxis(kPitchPin, kPitchLo, kPitchHi)
+            //, ReadAxis(kYawPin, kYawLo, kYawHi)
+            , analogRead(kThrottlePin)
+            , analogRead(kRollPin)
+            , analogRead(kPitchPin)
+            , analogRead(kYawPin)
             , armingButton.Read()
             , hoveringButton.Read()
             , autopilotButton.Read());
-
-
 
       const uint8_t val = 0;
 
