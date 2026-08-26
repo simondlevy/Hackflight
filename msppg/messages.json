@@ -39,5 +39,15 @@
    {"vx":      "float"},
    {"vy":      "float"},
    {"yaw":     "float"}
+  ],
+
+  "SET_CHANNELS": 
+  [{"ID": 203},
+   {"comment": "Arm/hover/autopilot switches are set as bits"},
+   {"throttle": "short"},
+   {"roll":     "short"},
+   {"pitch":    "short"},
+   {"yaw":      "short"},
+   {"switches": "short"}
   ]
 }

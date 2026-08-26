@@ -15,6 +15,8 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/serializer.hpp>
 #include <firmware/pushbuttons.hpp>
 #include <firmware/voltage_divider.hpp>
 

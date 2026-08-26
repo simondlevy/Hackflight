@@ -204,7 +204,7 @@ namespace hf {
                         data[15+i] = motor_values[i];
                     }
 
-                    telemetry_serializer_ = MspSerializer::SerializeFloat(
+                    telemetry_serializer_ = MspSerializer::SerializeFloats(
                             telemetry_serializer_, message_id,
                             data, 15 + motor_count);
 
