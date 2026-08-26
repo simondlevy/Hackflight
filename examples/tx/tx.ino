@@ -27,7 +27,7 @@ static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 static const float kThrottleLo = 280;
 static const float kThrottleHi = 3800;
 
-static const float kRollLo = 740;
+static const float kRollLo = 750;
 static const float kRollHi = 3050;
 
 static const float kPitchLo = 3980;
@@ -106,21 +106,7 @@ void loop()
 
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
-    Serial.printf(
-            // "thr=%+5.3f rol=%+5.3f pit=%+5.3f yaw=%+5.3f | "
-            "thr=%04d rol=%04d pit=%04d yaw=%04d | "
-            "armed=%d hovering=%d autopilot=%d\n"
-            //, ReadAxis(kThrottlePin, kThrottleLo, kThrottleHi)
-            //, ReadAxis(kRollPin, kRollLo, kRollHi)
-            //, ReadAxis(kPitchPin, kPitchLo, kPitchHi)
-            //, ReadAxis(kYawPin, kYawLo, kYawHi)
-            , analogRead(kThrottlePin)
-            , analogRead(kRollPin)
-            , analogRead(kPitchPin)
-            , analogRead(kYawPin)
-            , armingButton.Read()
-            , hoveringButton.Read()
-            , autopilotButton.Read());
+    Serial.printf("rol=%04d\n",  map(analogRead(kRollPin), kRollHi, kRollLo, 0, 4095));
 
     const short vals[7] = {
             analogRead(kThrottlePin),

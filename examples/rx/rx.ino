@@ -1,4 +1,4 @@
-/* Hackflight ESP32 transmitter sketch
+/* Hackflight ESP32 receiver sketch
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
