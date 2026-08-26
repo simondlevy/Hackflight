@@ -58,7 +58,7 @@ namespace hf {
                 PrepareToSerialize(id, count, 4, payload, checksum);
 
                 for (uint8_t k=0; k<count; ++k) {
-                    SerializeFloats(5 + k*4, src[k], payload, checksum);
+                    SerializeFloat(5 + k*4, src[k], payload, checksum);
                 }
 
                 payload[5 + 4 * count] = checksum;
@@ -122,7 +122,7 @@ namespace hf {
                 Serialize8(id, 4, payload, checksum);
             }
 
-            static void SerializeFloats(
+            static void SerializeFloat(
                     const int k,
                     const float src,
                     Payload & payload,
