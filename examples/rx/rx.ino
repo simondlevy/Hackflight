@@ -52,6 +52,8 @@ static void OnDataRecv(
 
         parser_ = hf::MspParser::Parse(parser_, data[i]);
 
+        throttle_ = hf::MspParser::GetShort(parser_, 0);
+
         last_received_msec_ = millis();
     }
 }
@@ -89,6 +91,8 @@ void loop()
     else {
         ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
+
+    Serial.printf("thr=%04d\n", throttle_);
 
     delay(10);
 }
