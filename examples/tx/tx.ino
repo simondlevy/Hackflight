@@ -33,6 +33,7 @@ static const short kRollMid = 1980;
 
 static const short kPitchLo = 3980;
 static const short kPitchHi = 250;
+static const short kPitchMid = 1935;
 
 static const short kYawLo = 3680;
 static const short kYawHi = 320;
@@ -113,7 +114,8 @@ void loop()
 
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
-    Serial.printf("rol=%04d\n", kRollMid - analogRead(kRollPin));
+    //Serial.printf("rol=%04d\n", kRollMid - analogRead(kRollPin));
+    Serial.printf("pit=%04d\n",  analogRead(kPitchPin) - kPitchMid);
 
     const short vals[7] = {
             analogRead(kThrottlePin),
