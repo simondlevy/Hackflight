@@ -17,6 +17,8 @@
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 #include <firmware/espnow.hpp>
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/parser.hpp>
 #include <firmware/timer.hpp>
 
 static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
@@ -31,14 +33,23 @@ static UMS3 ums3_;
 
 static uint32_t last_received_msec_;
 
-static int len_;
+static int count_;
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
-    len_ = len;
+    static hf::MspParser parser_;
+
+    for (int i=0; i<len; ++i) {
+
+        parser_ = hf::MspParser::Parse(parser_, data[i]);
+
+        if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
+            count_++;
+        }
+    }
 
     last_received_msec_ = millis();
 }
@@ -77,7 +88,7 @@ void loop()
         ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
 
-    Serial.printf("len=%d\n", len_);
+    Serial.printf("%d\n", count_);
 
     delay(10);
 }
