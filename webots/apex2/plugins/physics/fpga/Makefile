@@ -17,7 +17,7 @@
 NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
-EMBEDDED_FPGA_DIR = $(HOME)/Desktop/embedded-fpga
+FPGA_DIR = $(HOME)/Desktop/embedded-fpga
 SIMSENSORS_DIR = $(HOME)/Desktop
 
 APP = dronepong
@@ -27,9 +27,9 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(EMBEDDED_FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(EMBEDDED_FPGA_DIR)/posix/serial.cpp
+CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(FPGA_DIR)/posix/serial.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
