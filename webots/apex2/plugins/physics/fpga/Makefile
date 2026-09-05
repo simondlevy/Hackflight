@@ -42,7 +42,7 @@ all: lib$(NAME).so
 
 embedded_$(APP).cpp:
 	$(EMBEDDER_DIR)/bin/framework_embedder < \
-		$(FPGA_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
+		$(EMBEDDER_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
 
 edit:
 	vim $(NAME).cpp
