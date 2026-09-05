@@ -17,10 +17,10 @@
 NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
-EMBEDDED_DIR = $(HOME)/Desktop/embedded-fpga
-EMBEDDER = $(EMBEDDED_DIR)/bin/framework_embedder
-FPGA_DIR = $(EMBEDDED_DIR)/fpga
 SIMSENSORS_DIR = $(HOME)/Desktop
+
+EMBEDDED_DIR = $(HOME)/Desktop/embedded-fpga
+FPGA_DIR = $(EMBEDDED_DIR)/fpga
 
 APP = dronepong
 
@@ -41,7 +41,7 @@ FILES_TO_REMOVE += embedded_$(APP).cpp
 all: lib$(NAME).so
 
 embedded_$(APP).cpp:
-	$(EMBEDDER) < $(FPGA_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
+	$(EMBEDDED_DIR)/bin/framework_embedder < $(FPGA_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
 
 edit:
 	vim $(NAME).cpp
