@@ -20,7 +20,7 @@ OPENCV_DIR = /usr/include/opencv4
 SIMSENSORS_DIR = $(HOME)/Desktop
 
 EMBEDDER_DIR = $(HOME)/Desktop/framework-embedder
-FPGA_DIR = $(EMBEDDER_DIR)/fpga
+FPGA_DIR = $(HOME)//Desktop/fpga/cpp
 
 APP = dronepong
 

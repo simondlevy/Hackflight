@@ -31,7 +31,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 // FPGA
-#include <connection.hpp>
+#include <processor.hpp>
 #include <serial.h>
 
 static constexpr float kSpeed = 0.5;
@@ -43,7 +43,7 @@ static constexpr int kFpgaChargeWidth = 5;
 static constexpr int kFpgaEntryValueFactor = 10;
 static constexpr int kFpgaSimTime = 50;
 
-static auto _fpga = neuro::Connection(
+static auto _proc = neuro::Processor(
         2,
         2,
         kFpgaChargeWidth,
@@ -90,20 +90,20 @@ static auto getSetpoint(
     clear_encoded_spikes();
     encode();
 
-    _fpga.ClearActivity();
+    _proc.ClearActivity();
 
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
 
-        _fpga.ApplySpike(
+        _proc.ApplySpike(
                 encoded_spike_id(i),
                 encoded_spike_time(i),
                 encoded_spike_value(i));
      }
 
-    _fpga.Run(kFpgaSimTime);
+    _proc.Run(kFpgaSimTime);
 
-    decoder_counts[1] = _fpga.GetOutputCount(1);
-    decoder_counts[1] = _fpga.GetOutputCount(1);
+    decoder_counts[1] = _proc.GetOutputCount(1);
+    decoder_counts[1] = _proc.GetOutputCount(1);
 
     decode();
 
