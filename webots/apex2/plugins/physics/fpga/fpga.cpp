@@ -32,7 +32,7 @@
 
 // FPGA
 #include <processor.hpp>
-#include <serial.h>
+#include <comms/posix.hpp>
 
 static constexpr float kSpeed = 0.5;
 
@@ -156,5 +156,5 @@ DLLEXPORT void webots_physics_init()
 
     _ahelper = new AutopilotHelper("pingpong");
 
-    neuro::Serial::Begin(kPortName);
+    _proc.Connect();
 }
