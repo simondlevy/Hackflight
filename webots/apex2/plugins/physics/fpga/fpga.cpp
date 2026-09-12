@@ -32,7 +32,6 @@
 
 // FPGA
 #include <processor.hpp>
-#include <comms/posix.hpp>
 
 static constexpr float kSpeed = 0.5;
 

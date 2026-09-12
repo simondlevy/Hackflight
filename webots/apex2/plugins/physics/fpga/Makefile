@@ -31,7 +31,7 @@ SRC_DIR = ../../../../../src
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp
+CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(FPGA_DIR)/posix/uart.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
