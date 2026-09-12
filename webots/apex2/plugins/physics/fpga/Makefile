@@ -22,7 +22,10 @@ SIMSENSORS_DIR = $(HOME)/Desktop
 EMBEDDER_DIR = $(HOME)/Desktop/framework-embedder
 FPGA_DIR = $(HOME)//Desktop/fpga/tennlab_fpga
 
-APP = dronepong
+NET = $(EMBEDDER_DIR)/networks/dronepong_risp_train.txt 
+
+CPP = embedded_dronepong.cpp
+HPP = dronepong_fpga.hpp
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
@@ -31,18 +34,20 @@ SRC_DIR = ../../../../../src
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp $(FPGA_DIR)/posix/uart.cpp
+CXX_SOURCES = fpga.cpp $(CPP) $(FPGA_DIR)/posix/uart.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-FILES_TO_REMOVE += embedded_$(APP).cpp
+FILES_TO_REMOVE += $(CPP) $(HPP)
 
 all: lib$(NAME).so
 
-embedded_$(APP).cpp:
-	$(EMBEDDER_DIR)/bin/framework_embedder < \
-		$(EMBEDDER_DIR)/networks/dronepong_risp_train.txt > embedded_$(APP).cpp
+embedded_dronepong.cpp: $(NET) $(HPP)
+	$(EMBEDDER_DIR)/bin/framework_embedder < $(NET) > embedded_dronepong.cpp
+
+$(HPP): $(NET)
+	$(FPGA_DIR)/utils/mkhdr.py $(NET) > $(HPP)
 
 edit:
 	vim $(NAME).cpp
