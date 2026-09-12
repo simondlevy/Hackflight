@@ -18,8 +18,6 @@ NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 
-APP = dronepong
-
 EMBEDDER = $(HOME)/Desktop/framework-embedder/bin/framework_embedder
 
 SIMSENSORS_DIR = $(HOME)/Desktop
@@ -32,17 +30,17 @@ INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) \
           -I$(fr)/include
 
-CXX_SOURCES = $(NAME).cpp embedded_$(APP).cpp
+CXX_SOURCES = $(NAME).cpp embedded_dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-FILES_TO_REMOVE += embedded_$(APP).cpp
+FILES_TO_REMOVE += embedded_dronepong.cpp
 
 all: lib$(NAME).so
 
-embedded_$(APP).cpp:
-	$(EMBEDDER) < $(fr)/cpp-apps/networks/$(APP)_risp_train.txt > embedded_$(APP).cpp
+embedded_dronepong.cpp:
+	$(EMBEDDER) < $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt > embedded_dronepong.cpp
 
 edit:
 	vim $(NAME).cpp

@@ -37,7 +37,6 @@ static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * _ahelper;
 
-static const std::string kPortName = "/dev/ttyUSB1";
 static constexpr int kFpgaChargeWidth = 5;
 static constexpr int kFpgaEntryValueFactor = 10;
 static constexpr int kFpgaSimTime = 50;
