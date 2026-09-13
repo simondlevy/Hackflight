@@ -66,6 +66,9 @@ static auto getSetpoint(
     extern double decoder_vals[1];
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
+    printf("%+05.0f,%+6.6f => %+1.0f\n",
+            encoder_vals[0], encoder_vals[1], decoder_vals[0]);
+
     return hf::Setpoint(0, 0, direction * kSpeed, 0);
 }
 
