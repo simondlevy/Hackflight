@@ -18,9 +18,11 @@ NAME = $(shell basename "`pwd`")
 
 OPENCV_DIR = /usr/include/opencv4
 
-EMBEDDER = $(HOME)/Desktop/framework-embedder/bin/framework_embedder
+EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
 
 SIMSENSORS_DIR = $(HOME)/Desktop
+
+NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
 CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
@@ -39,8 +41,8 @@ FILES_TO_REMOVE += embedded_dronepong.cpp
 
 all: lib$(NAME).so
 
-embedded_dronepong.cpp:
-	$(EMBEDDER) < $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt > embedded_dronepong.cpp
+embedded_dronepong.cpp: $(NET)
+	$(EMBEDDER) < $(NET) > embedded_dronepong.cpp
 
 edit:
 	vim $(NAME).cpp
