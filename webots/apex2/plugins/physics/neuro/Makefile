@@ -37,7 +37,7 @@ CXX_SOURCES = $(NAME).cpp embedded_dronepong.cpp
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-FILES_TO_REMOVE += embedded_dronepong.cpp
+# FILES_TO_REMOVE += embedded_dronepong.cpp
 
 all: lib$(NAME).so
 
