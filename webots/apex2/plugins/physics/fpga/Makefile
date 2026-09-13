@@ -25,7 +25,7 @@ FPGA_DIR = $(HOME)//Desktop/fpga/tennlab_fpga
 
 NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
-CFLAGS = -O3 -std=c++17 -Wall
+CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRC_DIR = ../../../../../src
 
@@ -46,6 +46,9 @@ embedded_dronepong.cpp: $(NET) dronepong_fpga.hpp
 
 dronepong_fpga.hpp: $(NET)
 	$(FPGA_DIR)/utils/mkhdr.py $(NET) > dronepong_fpga.hpp
+
+load: $(NET)
+	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
 
 edit:
 	vim $(NAME).cpp

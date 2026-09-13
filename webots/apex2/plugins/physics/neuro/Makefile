@@ -24,8 +24,7 @@ SIMSENSORS_DIR = $(HOME)/Desktop
 
 NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
-# CFLAGS = -O3 -std=c++17 -Wall -Wextra
-CFLAGS = -O3 -std=c++17 -Wall
+CFLAGS = -O3 -std=c++17 -Wall -Wextra
 
 SRC_DIR = ../../../../../src
 
