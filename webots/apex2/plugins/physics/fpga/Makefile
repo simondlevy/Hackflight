@@ -42,7 +42,7 @@ FILES_TO_REMOVE += embedded_dronepong.cpp dronepong_fpga.hpp
 all: lib$(NAME).so
 
 embedded_dronepong.cpp: $(NET) dronepong_fpga.hpp
-	$(EMBEDDER_DIR)/bin/framework_embedder < $(NET) > embedded_dronepong.cpp
+	$(EMBEDDER) < $(NET) > embedded_dronepong.cpp
 
 dronepong_fpga.hpp: $(NET)
 	$(FPGA_DIR)/utils/mkhdr.py $(NET) > dronepong_fpga.hpp
