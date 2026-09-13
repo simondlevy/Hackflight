@@ -21,7 +21,9 @@ SIMSENSORS_DIR = $(HOME)/Desktop
 
 EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
 
-FPGA_DIR = $(HOME)//Desktop/fpga/tennlab_fpga
+FPGA_DIR = $(HOME)//Desktop/fpga
+
+FPGA_TL_DIR = $(FPGA_DIR)/tennlab_fpga
 
 NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
@@ -30,9 +32,9 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(FPGA_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
+		  -I$(FPGA_TL_DIR)/src -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR)
 
-CXX_SOURCES = fpga.cpp $(FPGA_DIR)/posix/uart.cpp embedded_dronepong.cpp
+CXX_SOURCES = fpga.cpp $(FPGA_TL_DIR)/posix/uart.cpp embedded_dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
@@ -45,10 +47,11 @@ embedded_dronepong.cpp: $(NET) dronepong_fpga.hpp
 	$(EMBEDDER) < $(NET) > embedded_dronepong.cpp
 
 dronepong_fpga.hpp: $(NET)
-	$(FPGA_DIR)/utils/mkhdr.py $(NET) > dronepong_fpga.hpp
+	$(FPGA_TL_DIR)/utils/mkhdr.py $(NET) > dronepong_fpga.hpp
 
 load: $(NET)
-	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
+	# $(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
+	$(FPGA_DIR)/utils/load.py -t basys3 $(NET)
 
 edit:
 	vim $(NAME).cpp
