@@ -25,7 +25,7 @@ FPGA_DIR = $(HOME)//Desktop/fpga/tennlab_fpga
 
 NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
-CFLAGS = -O3 -std=c++17 -Wall -Wextra
+CFLAGS = -O3 -std=c++17 -Wall
 
 SRC_DIR = ../../../../../src
 
