@@ -34,6 +34,47 @@ static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
 
+typedef struct {
+    int id;       /* Represents the input id of the destination neuron */
+    double time;  /* Represents the timing of when the spike should arrive */
+    double value; /* Represents the charge to accumulate */
+} Spike;
+
+extern double encoder_vals[2];
+extern void encode_run_decode();
+extern double decoder_vals[1];
+extern unsigned int num_encoded_spikes;
+extern int decoder_counts[2];
+extern void encode_run_decode();
+extern void clear_encoded_spikes();
+extern void encode();
+extern void apply_spike(unsigned int input_ind, unsigned int time, double value);
+extern void run(double duration);
+extern unsigned int output_count(unsigned int output_ind);
+extern void decode();
+extern const unsigned int SIM_TIME; 
+static constexpr size_t NUM_OUTPUT_NEURONS = 2;
+extern Spike * encoded_spikes; 
+
+static void local_encode_run_decode()
+{
+    clear_encoded_spikes();
+    encode();
+
+    for (unsigned int i = 0; i < num_encoded_spikes; i++) {
+        apply_spike(encoded_spikes[i].id, encoded_spikes[i].time, encoded_spikes[i].value);
+    }
+
+    run(SIM_TIME);
+
+    for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
+        decoder_counts[i] = output_count(i);
+    }
+
+    decode();
+}
+
+
 static int readRangefinder(
         const string name,
         simsens::Robot & robot,
@@ -56,14 +97,12 @@ static auto getSetpoint(
 {
     const auto diff = distance_forward_mm - distance_backward_mm;
 
-    extern double encoder_vals[2];
     encoder_vals[0] = diff;
     encoder_vals[1] = dydt;
 
-    extern void encode_run_decode();
+    (void)local_encode_run_decode;
     encode_run_decode();
 
-    extern double decoder_vals[1];
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
     printf("%+05.0f,%+6.6f => %+1.0f\n",
