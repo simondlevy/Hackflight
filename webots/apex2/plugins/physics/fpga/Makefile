@@ -39,19 +39,18 @@ CXX_SOURCES = fpga.cpp $(FPGA_TL_DIR)/posix/uart.cpp embedded_dronepong.cpp
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-FILES_TO_REMOVE += embedded_dronepong.cpp dronepong_fpga.hpp
+FILES_TO_REMOVE += embedded_dronepong.cpp network_config.h
 
 all: lib$(NAME).so
 
-embedded_dronepong.cpp: $(NET) dronepong_fpga.hpp
+embedded_dronepong.cpp: $(NET) network_config.h
 	$(EMBEDDER) < $(NET) > embedded_dronepong.cpp
 
-dronepong_fpga.hpp: $(NET)
-	$(FPGA_TL_DIR)/utils/mkhdr.py $(NET) > dronepong_fpga.hpp
+network_config.h: $(NET)
+	$(FPGA_TL_DIR)/utils/compile.py $(NET) > network_config.h
 
 load: $(NET)
-	# $(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
-	$(FPGA_DIR)/utils/load.py -t basys3 $(NET)
+	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
 
 edit:
 	vim $(NAME).cpp

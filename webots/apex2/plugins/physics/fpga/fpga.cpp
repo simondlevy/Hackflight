@@ -33,11 +33,11 @@
 // FPGA
 #include <processor.hpp>
 
-#include "dronepong_fpga.hpp"
-
 static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
+
+static neuro::Processor proc_;
 
 static int readRangefinder(
         const string name,
