@@ -50,10 +50,13 @@ network_config.h: $(NET)
 	$(FPGA_TL_DIR)/utils/compile.py $(NET) > network_config.h
 
 load: $(NET)
-	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
+	$(FPGA_DIR)/utils/load.py -s -t cmoda7_35t $(NET)
 
 edit:
 	vim $(NAME).cpp
+
+fclean:
+	rm -rf ~/.cache/neuro_fpga/
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=

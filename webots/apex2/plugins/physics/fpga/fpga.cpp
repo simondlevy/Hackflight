@@ -39,6 +39,10 @@ static AutopilotHelper * ahelper_;
 
 static neuro::Processor proc_;
 
+extern double encoder_vals[2];
+extern double decoder_vals[1];
+extern void encode_run_decode();
+
 static int readRangefinder(
         const string name,
         simsens::Robot & robot,
@@ -61,10 +65,19 @@ static auto getSetpoint(
 {
     const auto diff = distance_forward_mm - distance_backward_mm;
 
+    encoder_vals[0] = diff;
+    encoder_vals[1] = dydt;
+
+    encode_run_decode();
+
+    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
+
+    printf("%+05.0f,%+6.6f => %+1.0f\n",
+            encoder_vals[0], encoder_vals[1], decoder_vals[0]);
+
+
+    /*
     extern int decoder_counts[2];
-    extern double decoder_vals[1];
-    extern double encoder_vals[2];
-    extern unsigned int num_encoded_spikes;
 
     extern void clear_encoded_spikes();
     extern void decode();
@@ -73,9 +86,6 @@ static auto getSetpoint(
     extern int encoded_spike_id(const int index);
     extern double encoded_spike_time(const int index);
     extern double encoded_spike_value(const int index);
-
-    encoder_vals[0] = diff;
-    encoder_vals[1] = dydt;
 
     clear_encoded_spikes();
     encode();
@@ -97,7 +107,7 @@ static auto getSetpoint(
 
     decode();
 
-    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
+    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;*/
 
     return hf::Setpoint(0, 0, direction * kSpeed, 0);
 }

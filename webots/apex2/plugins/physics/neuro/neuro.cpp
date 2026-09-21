@@ -30,6 +30,9 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
+
+
+
 static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
