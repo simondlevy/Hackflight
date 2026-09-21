@@ -30,9 +30,6 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-// FPGA
-#include <processor.hpp>
-
 extern int decoder_counts[2];
 
 extern void clear_encoded_spikes();
@@ -46,8 +43,6 @@ extern double encoded_spike_value(const int index);
 static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
-
-static neuro::Processor proc_;
 
 extern double encoder_vals[2];
 extern double decoder_vals[1];
@@ -155,6 +150,4 @@ DLLEXPORT void webots_physics_init()
     srand(time(NULL)); 
 
     ahelper_ = new AutopilotHelper("pingpong");
-
-    proc_.Connect();
 }
