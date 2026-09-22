@@ -23,8 +23,8 @@ EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
 
 DPSRC = $(HOME)/Desktop/dronepong/embedded_dronepong.cpp
 
-#FPGA_DIR = $(HOME)//Desktop/fpga
-#FPGA_TL_DIR = $(FPGA_DIR)/tennlab_fpga
+FPGA_DIR = $(HOME)//Desktop/fpga
+FPGA_TL_DIR = $(FPGA_DIR)/tennlab_fpga
 
 NET = $(fr)/cpp-apps/applications/dronepong/networks/dronepong_risp_train.txt 
 
@@ -33,10 +33,10 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(HOME)/Desktop/dronepong
-		  # -I$(FPGA_TL_DIR)/src 
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(HOME)/Desktop/dronepong \
+		  -I$(FPGA_TL_DIR)/src 
 
-CXX_SOURCES = fpga.cpp  $(DPSRC) # $(FPGA_TL_DIR)/posix/uart.cpp
+CXX_SOURCES = fpga.cpp  $(DPSRC) $(FPGA_TL_DIR)/posix/uart.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
@@ -45,10 +45,11 @@ FILES_TO_REMOVE += network_config.h
 
 all: lib$(NAME).so
 
-#network_config.h: $(NET)
-#	$(FPGA_TL_DIR)/utils/compile.py $(NET) > network_config.h
-#load: $(NET)
-#	$(FPGA_DIR)/utils/load.py -s -t cmoda7_35t $(NET)
+network_config.h: $(NET)
+	$(FPGA_TL_DIR)/utils/compile.py $(NET) > network_config.h
+
+load: $(NET)
+	$(FPGA_DIR)/utils/load.py -s -t cmoda7_35t $(NET)
 
 edit:
 	vim $(NAME).cpp

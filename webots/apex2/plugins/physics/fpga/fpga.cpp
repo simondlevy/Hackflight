@@ -70,16 +70,14 @@ static auto getSetpoint(
 
     encode();
 
+    printf("%+05.0f,%+6.6f => ", encoder_vals[0], encoder_vals[1]);
+
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
-        apply_spike(encoded_spikes[i].id, encoded_spikes[i].time, encoded_spikes[i].value);
+        const auto spike = encoded_spikes[i];
+        apply_spike(spike.id, spike.time, spike.value);
     }
  
     run(SIM_TIME);
-
-    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
-
-    printf("%+05.0f,%+6.6f => %+1.0f\n",
-            encoder_vals[0], encoder_vals[1], decoder_vals[0]);
 
 
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
@@ -103,8 +101,11 @@ static auto getSetpoint(
 
        decoder_counts[1] = proc_.GetOutputCount(1);
        decoder_counts[1] = proc_.GetOutputCount(1);
+     */
 
-       const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;*/
+    printf("%+1.0f\n", decoder_vals[0]);
+
+    const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
     return hf::Setpoint(0, 0, direction * kSpeed, 0);
 }
