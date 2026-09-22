@@ -90,10 +90,9 @@ static auto getSetpoint(
     
     decode();
 
-    printf("%+05.0f,%+6.6f => %2d %2d [%2d %2d] = > %1.0f\n",
+    printf("%+05.0f,%+6.6f => %2d %2d = > %1.0f\n",
             encoder_vals[0], encoder_vals[1],
             proc_.GetOutputCount(0), proc_.GetOutputCount(1),
-            decoder_counts[0], decoder_counts[1],
             decoder_vals[0]);
 
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
