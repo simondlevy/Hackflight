@@ -47,12 +47,7 @@ typedef struct {
 void clear_encoded_spikes();
 void decode();
 void encode();
-
-
-void apply_spike(unsigned int input_ind, unsigned int time, double value); 
 void run(double duration);
-unsigned int output_count(unsigned int output_ind); 
-
 
 //#include <embedded_dronepong.h>
 extern int decoder_counts[NUM_OUTPUT_NEURONS];
@@ -108,7 +103,7 @@ static auto getSetpoint(
     proc_.Run(SIM_TIME);
 
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
-        decoder_counts[i] = proc_.GetOutputCount(i); //output_count(i);
+        decoder_counts[i] = proc_.GetOutputCount(i);
     }
     
     decode();
