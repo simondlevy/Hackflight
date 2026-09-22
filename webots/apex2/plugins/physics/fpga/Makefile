@@ -44,7 +44,8 @@ LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 all: lib$(NAME).so
 
 load: $(NET)
-	$(FPGA_DIR)/utils/load.py -s -t cmoda7_35t $(NET)
+	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
+	$(FPGA_TL_DIR)/utils/compile.py -d $(NET)
 
 edit:
 	vim $(NAME).cpp
