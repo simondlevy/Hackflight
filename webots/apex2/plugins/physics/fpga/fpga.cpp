@@ -85,7 +85,7 @@ static auto getSetpoint(
     proc_.Run(SIM_TIME);
 
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
-        decoder_counts[i] = output_count(i);
+        decoder_counts[i] = proc_.GetOutputCount(i); //output_count(i);
     }
     
     decode();
