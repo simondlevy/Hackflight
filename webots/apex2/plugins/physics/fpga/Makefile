@@ -46,11 +46,11 @@ load: $(NET)
 	$(FPGA_TL_DIR)/utils/compile.py -d $(NET)
 	$(EMBEDDER_DIR)/bin/framework_embedder < $(NET) > embedded_dronepong.cpp
 
+unload:
+	rm -rf ~/.cache/neuro_fpga/ embedded_dronepong.cpp network_config.h
+
 edit:
 	vim $(NAME).cpp
-
-fclean:
-	rm -rf ~/.cache/neuro_fpga/
 
 ### Do not modify: this includes Webots global Makefile.include
 null :=
