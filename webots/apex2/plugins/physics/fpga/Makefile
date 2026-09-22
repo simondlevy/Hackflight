@@ -41,12 +41,7 @@ CXX_SOURCES = fpga.cpp  $(DPSRC) $(FPGA_TL_DIR)/posix/uart.cpp
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
-FILES_TO_REMOVE += network_config.h
-
 all: lib$(NAME).so
-
-network_config.h: $(NET)
-	$(FPGA_TL_DIR)/utils/compile.py $(NET) > network_config.h
 
 load: $(NET)
 	$(FPGA_DIR)/utils/load.py -s -t cmoda7_35t $(NET)

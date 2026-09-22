@@ -37,6 +37,9 @@ extern double decoder_vals[NUM_DECODERS];
 extern unsigned int num_encoded_spikes;
 extern Spike encoded_spikes[TOT_MAX_ENCODED_SPIKES]; 
 
+#include <processor.hpp>
+static neuro::Processor proc_;
+
 static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
@@ -68,16 +71,18 @@ static auto getSetpoint(
 
     clear_encoded_spikes();
 
-    encode();
+    proc_.ClearActivity();
 
-    printf("%+05.0f,%+6.6f => ", encoder_vals[0], encoder_vals[1]);
+    encode();
 
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
         const auto spike = encoded_spikes[i];
         apply_spike(spike.id, spike.time, spike.value);
+        proc_.ApplySpike(spike.id, spike.time, spike.value);
     }
  
     run(SIM_TIME);
+    proc_.Run(SIM_TIME);
 
 
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
@@ -86,24 +91,9 @@ static auto getSetpoint(
     
     decode();
 
-    /*
-       proc_.ClearActivity();
-
-       for (unsigned int i = 0; i < num_encoded_spikes; i++) {
-
-       proc_.ApplySpike(
-       encoded_spike_id(i),
-       encoded_spike_time(i),
-       encoded_spike_value(i));
-       }
-
-       proc_.Run(kSimTime);
-
-       decoder_counts[1] = proc_.GetOutputCount(1);
-       decoder_counts[1] = proc_.GetOutputCount(1);
-     */
-
-    printf("%+1.0f\n", decoder_vals[0]);
+    printf("%+05.0f,%+6.6f => %+1.0f\n",
+            encoder_vals[0], encoder_vals[1],
+            decoder_vals[0]);
 
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
