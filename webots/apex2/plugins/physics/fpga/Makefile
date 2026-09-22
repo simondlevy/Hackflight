@@ -42,8 +42,6 @@ LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 
 all: lib$(NAME).so
 
-embedded_dronepong.cpp:
-
 load: $(NET)
 	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
 	$(FPGA_TL_DIR)/utils/compile.py -d $(NET)

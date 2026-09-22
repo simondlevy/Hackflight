@@ -77,7 +77,6 @@ static auto getSetpoint(
 
     for (unsigned int i = 0; i < num_encoded_spikes; i++) {
         const auto spike = encoded_spikes[i];
-        apply_spike(spike.id, spike.time, spike.value);
         proc_.ApplySpike(spike.id, spike.time, spike.value);
     }
  
