@@ -32,8 +32,7 @@ CFLAGS = -O3 -std=c++17 -Wall -Wextra
 SRC_DIR = ../../../../../src
 
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
-		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(HOME)/Desktop/dronepong \
-		  -I$(FPGA_TL_DIR)/src 
+		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(FPGA_TL_DIR)/src 
 
 CXX_SOURCES = fpga.cpp  $(FPGA_TL_DIR)/posix/uart.cpp embedded_dronepong.cpp
 
