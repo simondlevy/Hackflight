@@ -84,7 +84,6 @@ static auto getSetpoint(
     run(SIM_TIME);
     proc_.Run(SIM_TIME);
 
-
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
         decoder_counts[i] = output_count(i);
     }
@@ -143,4 +142,6 @@ DLLEXPORT void webots_physics_init()
     srand(time(NULL)); 
 
     ahelper_ = new AutopilotHelper("pingpong");
+
+    proc_.Connect();
 }
