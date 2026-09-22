@@ -34,7 +34,7 @@ SRC_DIR = ../../../../../src
 INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(FPGA_TL_DIR)/src 
 
-CXX_SOURCES = fpga.cpp  $(FPGA_TL_DIR)/posix/uart.cpp embedded_dronepong.cpp
+CXX_SOURCES = fpga.cpp  $(FPGA_TL_DIR)/extras/posix/uart.cpp embedded_dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc

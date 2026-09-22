@@ -31,6 +31,7 @@
 #include <simsensors/src/sensors/rangefinder.hpp>
 
 // TennLab FPGS
+#include "network_config.h"
 #include <processor.hpp>
 
 #define NUM_DECODERS (1)
