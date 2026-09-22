@@ -43,7 +43,7 @@ all: lib$(NAME).so
 
 load: $(NET)
 	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
-	$(FPGA_TL_DIR)/utils/compile.py -d $(NET)
+	$(FPGA_TL_DIR)/utils/compile.py $(NET)
 	$(EMBEDDER_DIR)/bin/framework_embedder < $(NET) > embedded_dronepong.cpp
 
 unload:
