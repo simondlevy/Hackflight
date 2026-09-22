@@ -30,21 +30,9 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-#define NUM_NEURONS (11)
-#define NUM_INPUT_NEURONS (2)
-#define NUM_OUTPUT_NEURONS (2)
-#define NUM_SYNAPSES (14)
-#define MAX_NUM_TIMESTEPS (51)
-#define MAX_OUTGOING (2)
-#define MIN_POTENTIAL (-1.000000)
-#define SPIKE_VALUE_FACTOR (63.000000)
-
 #define NUM_DECODERS (1)
-#define NUM_UNIQUE_DECODERS (1)
 #define NUM_OUTPUT_NEURONS (2)
-
 #define NUM_ENCODERS (2)
-#define NUM_UNIQUE_ENCODERS (1)
 #define TOT_MAX_ENCODED_SPIKES (100)
 
 static const unsigned int SIM_TIME = 50;
@@ -59,9 +47,8 @@ typedef struct {
 void clear_encoded_spikes();
 void decode();
 void encode();
-int encoded_spike_id(const int index);
-double encoded_spike_time(const int index);
-double encoded_spike_value(const int index);
+
+
 void apply_spike(unsigned int input_ind, unsigned int time, double value); 
 void run(double duration);
 unsigned int output_count(unsigned int output_ind); 
