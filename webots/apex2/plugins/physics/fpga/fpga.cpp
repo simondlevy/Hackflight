@@ -30,23 +30,16 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
-extern int decoder_counts[2];
-
-extern void clear_encoded_spikes();
-extern void decode();
-extern void encode();
-
-extern int encoded_spike_id(const int index);
-extern double encoded_spike_time(const int index);
-extern double encoded_spike_value(const int index);
+#include <embedded_dronepong.h>
+extern int decoder_counts[NUM_OUTPUT_NEURONS];
+extern double encoder_vals[NUM_ENCODERS];
+extern double decoder_vals[NUM_DECODERS];
+extern unsigned int num_encoded_spikes;
+extern Spike encoded_spikes[TOT_MAX_ENCODED_SPIKES]; 
 
 static constexpr float kSpeed = 0.5;
 
 static AutopilotHelper * ahelper_;
-
-extern double encoder_vals[2];
-extern double decoder_vals[1];
-extern void encode_run_decode();
 
 static int readRangefinder(
         const string name,
@@ -73,7 +66,15 @@ static auto getSetpoint(
     encoder_vals[0] = diff;
     encoder_vals[1] = dydt;
 
-    encode_run_decode();
+    clear_encoded_spikes();
+
+    encode();
+
+    for (unsigned int i = 0; i < num_encoded_spikes; i++) {
+        apply_spike(encoded_spikes[i].id, encoded_spikes[i].time, encoded_spikes[i].value);
+    }
+ 
+    run(SIM_TIME);
 
     const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;
 
@@ -81,10 +82,13 @@ static auto getSetpoint(
             encoder_vals[0], encoder_vals[1], decoder_vals[0]);
 
 
-    /*
-       clear_encoded_spikes();
-       encode();
+    for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
+        decoder_counts[i] = output_count(i);
+    }
+    
+    decode();
 
+    /*
        proc_.ClearActivity();
 
        for (unsigned int i = 0; i < num_encoded_spikes; i++) {
@@ -99,8 +103,6 @@ static auto getSetpoint(
 
        decoder_counts[1] = proc_.GetOutputCount(1);
        decoder_counts[1] = proc_.GetOutputCount(1);
-
-       decode();
 
        const int8_t direction = decoder_vals[0] == 1 ? +1 : -1;*/
 
