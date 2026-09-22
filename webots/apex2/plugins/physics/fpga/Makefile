@@ -19,9 +19,8 @@ NAME = $(shell basename "`pwd`")
 OPENCV_DIR = /usr/include/opencv4
 SIMSENSORS_DIR = $(HOME)/Desktop
 
-EMBEDDER = $(HOME)/Desktop/embedded-framework/bin/framework_embedder
-
-DPSRC = $(HOME)/Desktop/dronepong/embedded_dronepong.cpp
+EMBEDDER_DIR = $(HOME)/Desktop/embedded-framework
+EMBEDDER = $(EMBEDDER_DIR)/bin/framework_embedder
 
 FPGA_DIR = $(HOME)//Desktop/fpga
 FPGA_TL_DIR = $(FPGA_DIR)/tennlab_fpga
@@ -36,16 +35,19 @@ INCLUDE = -I../../../../ -I$(SRC_DIR) -I$(SRC_DIR)/control \
 		  -I$(SIMSENSORS_DIR) -I$(OPENCV_DIR) -I$(HOME)/Desktop/dronepong \
 		  -I$(FPGA_TL_DIR)/src 
 
-CXX_SOURCES = fpga.cpp  $(DPSRC) $(FPGA_TL_DIR)/posix/uart.cpp
+CXX_SOURCES = fpga.cpp  $(FPGA_TL_DIR)/posix/uart.cpp embedded_dronepong.cpp
 
 LIBRARIES = -L/usr/lib/x86_64-linux-gnu/ \
 			-lopencv_highgui -lopencv_core -lopencv_imgproc
 
 all: lib$(NAME).so
 
+embedded_dronepong.cpp:
+
 load: $(NET)
 	$(FPGA_DIR)/utils/load.py -t cmoda7_35t $(NET)
 	$(FPGA_TL_DIR)/utils/compile.py -d $(NET)
+	$(EMBEDDER_DIR)/bin/framework_embedder < $(NET) > embedded_dronepong.cpp
 
 edit:
 	vim $(NAME).cpp
