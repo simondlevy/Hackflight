@@ -30,6 +30,9 @@
 #include <simsensors/src/robot.hpp>
 #include <simsensors/src/sensors/rangefinder.hpp>
 
+// TennLab FPGS
+#include <processor.hpp>
+
 #define NUM_DECODERS (1)
 #define NUM_OUTPUT_NEURONS (2)
 #define NUM_ENCODERS (2)
@@ -43,20 +46,16 @@ typedef struct {
     double value; /* Represents the charge to accumulate */
 } Spike;
 
-
 void clear_encoded_spikes();
 void decode();
 void encode();
-void run(double duration);
 
-//#include <embedded_dronepong.h>
 extern int decoder_counts[NUM_OUTPUT_NEURONS];
 extern double encoder_vals[NUM_ENCODERS];
 extern double decoder_vals[NUM_DECODERS];
 extern unsigned int num_encoded_spikes;
 extern Spike encoded_spikes[TOT_MAX_ENCODED_SPIKES]; 
 
-#include <processor.hpp>
 static neuro::Processor proc_;
 
 static constexpr float kSpeed = 0.5;
@@ -99,7 +98,6 @@ static auto getSetpoint(
         proc_.ApplySpike(spike.id, spike.time, spike.value);
     }
  
-    run(SIM_TIME);
     proc_.Run(SIM_TIME);
 
     for (unsigned int i = 0; i < NUM_OUTPUT_NEURONS; i++) {
