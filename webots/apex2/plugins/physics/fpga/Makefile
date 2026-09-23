@@ -49,6 +49,9 @@ load: $(NET)
 unload:
 	rm -rf ~/.cache/neuro_fpga/ embedded_dronepong.cpp network_config.h
 
+fclean:
+	rm -rf $(HOME)/.cache/neuro_fpga/
+
 edit:
 	vim $(NAME).cpp
 
