@@ -2236,7 +2236,7 @@
 	)
 	(text "RX"
 		(exclude_from_sim no)
-		(at 103.632 178.562 0)
+		(at 98.806 177.038 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2263,6 +2263,16 @@
 			)
 		)
 		(uuid "861dbbad-d038-4fd6-aac2-10332286e625")
+	)
+	(text "FPGA"
+		(exclude_from_sim no)
+		(at 117.856 178.308 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "aae419e1-96a5-4779-85c2-2062c4bbb0aa")
 	)
 	(wire
 		(pts
@@ -2346,6 +2356,16 @@
 	)
 	(wire
 		(pts
+			(xy 124.46 92.71) (xy 129.54 92.71)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2f6e6801-6093-4a96-b366-0d7aef381b3e")
+	)
+	(wire
+		(pts
 			(xy 96.52 107.95) (xy 101.6 107.95)
 		)
 		(stroke
@@ -2386,6 +2406,16 @@
 	)
 	(wire
 		(pts
+			(xy 116.84 170.18) (xy 121.92 170.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4074d9c1-9ce9-440f-b821-86ee4794b191")
+	)
+	(wire
+		(pts
 			(xy 195.58 93.98) (xy 199.39 93.98)
 		)
 		(stroke
@@ -2403,6 +2433,16 @@
 			(type default)
 		)
 		(uuid "4d58e118-bf84-45bf-af06-cdbde570b829")
+	)
+	(wire
+		(pts
+			(xy 116.84 162.56) (xy 121.92 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "55f0d140-a81a-4aa8-ba35-6febf6a5649e")
 	)
 	(wire
 		(pts
@@ -2443,6 +2483,16 @@
 			(type default)
 		)
 		(uuid "693bb6dc-02ac-4118-a3db-d9a709c65aa0")
+	)
+	(wire
+		(pts
+			(xy 116.84 166.37) (xy 121.92 166.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6aff7cef-3e6a-46f9-af71-42e1b2fdef06")
 	)
 	(wire
 		(pts
@@ -2553,6 +2603,16 @@
 			(type default)
 		)
 		(uuid "8efc49c6-b4f6-4083-b359-ce906c30d0d1")
+	)
+	(wire
+		(pts
+			(xy 124.46 90.17) (xy 129.54 90.17)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d99eb5d-4db2-485c-8255-8fa8ea98d2f5")
 	)
 	(wire
 		(pts
@@ -2703,6 +2763,16 @@
 			(type default)
 		)
 		(uuid "e2ee73aa-3473-43ef-9276-a6497941ee31")
+	)
+	(wire
+		(pts
+			(xy 116.84 173.99) (xy 121.92 173.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ecf02ab7-6c4c-465a-bbf9-2ed629b8d35e")
 	)
 	(wire
 		(pts
@@ -2924,6 +2994,26 @@
 		)
 		(uuid "2a626863-9f70-44ad-99bb-54d866113111")
 	)
+	(label "5V"
+		(at 116.84 166.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2e27947a-dfb9-4e95-a449-2021997544b5")
+	)
+	(label "TX5"
+		(at 124.46 92.71 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2ea21903-8591-4dcf-86fc-d2b313024dfd")
+	)
 	(label "GND"
 		(at 125.73 80.01 0)
 		(effects
@@ -2963,6 +3053,26 @@
 			(justify left bottom)
 		)
 		(uuid "4944ed18-6edf-4687-a371-1c7739e68af7")
+	)
+	(label "TX5"
+		(at 116.84 173.99 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4c981cc1-46c2-4dea-b531-c1cd8c600d06")
+	)
+	(label "GND"
+		(at 116.84 162.56 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "50062d81-fea6-445e-92d9-8fd44bf3905b")
 	)
 	(label "MISO"
 		(at 96.52 110.49 0)
@@ -3094,6 +3204,16 @@
 		)
 		(uuid "9554dc48-a59f-43df-b033-cc3e6b62a98f")
 	)
+	(label "RX5"
+		(at 124.46 90.17 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "97b7f30a-515e-4c7c-88f7-7096cd789ccf")
+	)
 	(label "GND"
 		(at 148.59 96.52 0)
 		(effects
@@ -3193,6 +3313,16 @@
 			(justify left bottom)
 		)
 		(uuid "c745397e-7382-49ae-be34-74dbb030e1da")
+	)
+	(label "RX5"
+		(at 116.84 170.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cbbaa8fa-1cbf-4020-bfd9-e3c287258207")
 	)
 	(label "MISO"
 		(at 147.32 147.32 0)
@@ -3904,6 +4034,85 @@
 			(project "main"
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "H3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 111.76 162.56 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3f00a9d1-159f-495d-83e0-564eb33bd576")
+		(property "Reference" "J19"
+			(at 112.395 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 112.395 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
+			(at 111.76 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 111.76 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e1868f24-eec2-48a1-9d65-0193887d75a3")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J19")
 					(unit 1)
 				)
 			)
@@ -4668,6 +4877,85 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 111.76 173.99 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8b61e880-749e-44fe-91ce-c59768f74e6a")
+		(property "Reference" "J22"
+			(at 112.395 168.91 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 112.395 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
+			(at 111.76 173.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 173.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 111.76 173.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5aa22d2c-3e1b-435b-86a1-e2fe196f1f00")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J22")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Mechanical:MountingHole")
 		(at 196.85 76.2 0)
 		(unit 1)
@@ -4739,6 +5027,85 @@
 			(project "main"
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "H4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 111.76 170.18 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "98608b76-bdf1-49f6-9620-cd0039dba74d")
+		(property "Reference" "J21"
+			(at 112.395 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 112.395 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
+			(at 111.76 170.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 170.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 111.76 170.18 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "9c5e3904-3cc8-40a1-8899-0cf4b016bada")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J21")
 					(unit 1)
 				)
 			)
@@ -5303,6 +5670,85 @@
 			(project "main"
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "J12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 111.76 166.37 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f20efab2-0962-431e-b54b-54b45c52b17c")
+		(property "Reference" "J20"
+			(at 112.395 161.29 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 112.395 163.83 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_1x2mm"
+			(at 111.76 166.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 111.76 166.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 111.76 166.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "fb254feb-3ad2-4a78-aad5-0b2324a6c28c")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J20")
 					(unit 1)
 				)
 			)
