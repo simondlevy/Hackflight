@@ -22,13 +22,13 @@
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 
-static int16_t chan1_;
-static int16_t chan2_;
-static int16_t chan3_;
-static int16_t chan4_;
-static int16_t chan5_;
-static int16_t chan6_;
-static int16_t chan7_;
+static int16_t thr_;
+static int16_t rol_;
+static int16_t pit_;
+static int16_t yaw_;
+static int16_t arm_;
+static int16_t hov_;
+static int16_t aut_;
 
 void serialEvent3()
 {
@@ -40,13 +40,13 @@ void serialEvent3()
 
         if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
 
-            chan1_ = hf::MspParser::GetShort(parser_, 0);
-            chan2_ = hf::MspParser::GetShort(parser_, 1);
-            chan3_ = hf::MspParser::GetShort(parser_, 2);
-            chan4_ = hf::MspParser::GetShort(parser_, 3);
-            chan5_ = hf::MspParser::GetShort(parser_, 4);
-            chan6_ = hf::MspParser::GetShort(parser_, 5);
-            chan7_ = hf::MspParser::GetShort(parser_, 6);
+            thr_ = hf::MspParser::GetShort(parser_, 0);
+            rol_ = hf::MspParser::GetShort(parser_, 1);
+            pit_ = hf::MspParser::GetShort(parser_, 2);
+            yaw_ = hf::MspParser::GetShort(parser_, 3);
+            arm_ = hf::MspParser::GetShort(parser_, 4);
+            hov_ = hf::MspParser::GetShort(parser_, 5);
+            aut_ = hf::MspParser::GetShort(parser_, 6);
         }
     }
 }
@@ -58,10 +58,13 @@ void setup()
 
 void loop()
 {
-    printf("c1=%+05d c2=%+05d c3=%+05d c4=%+05d "
-            "c5=%+05d c6=%+05d c7=%+05d\n", 
-            chan1_, chan2_, chan3_, chan4_, chan5_, chan6_, chan7_);
+    /*
+    printf("c1=%+0.3f c2=%+0.3f c3=%+0.3f c4=%+0.3f\n",
+            rolaxis(thr_), rolaxis(rol_), rolaxis(pit_),
+            rolaxis(yaw_));
+            */
+
+    printf("t=%04d 4=%04d p=%04d y=%04d\n", thr_, rol_, pit_, yaw_);
 
     delay(10);
-
 }

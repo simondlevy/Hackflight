@@ -24,13 +24,6 @@
 
 static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
 
-static const short kThrottleMid = 1980;
-static const short kRollMid = 1980;
-static const short kPitchMid = 1935;
-static const short kYawMid = 1880;
-
-static const uint8_t kLedIntensity = 255;
-
 // Analog input ---------------------------------------------------------------
 
 static const uint8_t kThrottlePin = A4;
@@ -47,17 +40,26 @@ static auto hoveringButton = hf::IntermittentPushbutton(A0);
 
 // ----------------------------------------------------------------------------
 
+// Axis extrema determined empirically
+static const uint16_t kThrottleLow = 3931;
+static const uint16_t kThrottleHigh = 252;;
+static const uint16_t kRollLow = 3093;
+static const uint16_t kRollHigh = 766;
+static const uint16_t kPitchLow = 217;
+static const uint16_t kPitchHigh = 4038;
+static const uint16_t kYawLow = 286;
+static const uint16_t kYawHigh = 3736;
+
 static const uint8_t kLedPin = 21;
 
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
 
-static const float kAnalogMin = 240;
-static const float kAnalogMax = 3900;
-
 static const float kLowVoltage = 3.0;
 
 static const float kTransmitHz = 100;
+
+static const uint8_t kLedIntensity = 255;
 
 static auto blink_timer_ = hf::BlinkTimer();
 
@@ -86,6 +88,8 @@ static auto ReadAxisShort(
     return map(analogRead(pin), hi, lo, 0, 4095);
 }
 
+static uint16_t low_, high_;
+
 void setup()
 {
     Serial.begin(115200);
@@ -95,6 +99,15 @@ void setup()
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 
+    low_ = 1000;
+    high_ = 0;
+}
+
+// Scale to [0, 4095]
+static auto ReadAxis(
+        const uint8_t pin, const uint16_t low, const uint16_t high) -> uint16_t
+{
+    return map(analogRead(pin), low, high, 0, 4095);
 }
 
 void loop()
@@ -106,10 +119,12 @@ void loop()
     analogWrite(kLedPin, ledState ? kLedIntensity : 0);
 
     const short vals[7] = {
-        kThrottleMid - analogRead(kThrottlePin),
-        kRollMid - analogRead(kRollPin),
-        analogRead(kPitchPin) - kPitchMid,
-        analogRead(kYawPin)- kYawMid,
+
+        ReadAxis(kThrottlePin, kThrottleLow, kThrottleHigh),
+        ReadAxis(kRollPin, kRollLow, kRollHigh),
+        ReadAxis(kPitchPin, kPitchLow, kPitchHigh),
+        ReadAxis(kYawPin, kYawLow, kYawHigh),
+
         armingButton.Read(),
         hoveringButton.Read(),
         autopilotButton.Read()
