@@ -26,6 +26,25 @@ namespace hf {
 
     class EspNowReceiver {
 
+        public:
+
+            EspNowReceiver() = default;
+
+            EspNowReceiver& operator=(
+                    const EspNowReceiver& other) = default;
+
+            static auto Update(
+                    const EspNowReceiver & tdata,
+                    const uint8_t byte
+                    ) -> EspNowReceiver
+            {
+                return tdata;
+            }
+
+         private:
+
+            MspParser parser_;
+
 #if 0
         private:
 
@@ -37,8 +56,6 @@ namespace hf {
 
             bool is_throttle_down;
 
-            EspNowReceiver() = default;
-
             EspNowReceiver(
                     const Setpoint & setpoint,
                     const bool requested_arming,
@@ -49,9 +66,6 @@ namespace hf {
                     data(setpoint, requested_arming, false, timestamp_msec),
                     is_throttle_down(is_throttle_down),
                     aux_(aux) {}
-
-            EspNowReceiver& operator=(
-                    const EspNowReceiver& other) = default;
 
             static auto Update(
                     const EspNowReceiver & tdata,

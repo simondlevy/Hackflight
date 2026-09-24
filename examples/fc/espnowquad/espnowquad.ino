@@ -25,6 +25,8 @@
 
 // Receiver ------------------------------------------------------------------
 
+static hf::EspNowReceiver rx_;
+
 static int16_t thr_;
 static int16_t rol_;
 static int16_t pit_;
@@ -39,7 +41,11 @@ void serialEvent3()
 
     while (Serial3.available()) {
 
-        parser_ = hf::MspParser::Parse(parser_, Serial3.read());
+        const auto b = Serial3.read();
+
+        rx_ = hf::EspNowReceiver::Update(rx_, b);
+
+        parser_ = hf::MspParser::Parse(parser_, b);
 
         if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
 
