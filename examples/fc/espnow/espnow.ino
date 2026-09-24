@@ -17,10 +17,34 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <hackflight.h>
+
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/parser.hpp>
+
 void serialEvent3()
 {
+    static hf::MspParser parser_;
+
     while (Serial3.available()) {
-        printf("x%02X\n", Serial3.read());
+
+        parser_ = hf::MspParser::Parse(parser_, Serial3.read());
+
+        if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
+
+            const auto throttle = hf::MspParser::GetShort(parser_, 0);
+
+            printf("%d\n", throttle);
+
+            /*
+            roll_ = hf::MspParser::GetShort(parser_, 1);
+            pitch_ = hf::MspParser::GetShort(parser_, 2);
+            yaw_ = hf::MspParser::GetShort(parser_, 3);
+            arm_ = hf::MspParser::GetShort(parser_, 4);
+            hover_ = hf::MspParser::GetShort(parser_, 5);
+            autopilot_ = hf::MspParser::GetShort(parser_, 6);*/
+
+        }
     }
 }
 

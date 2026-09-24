@@ -18,8 +18,6 @@
 #include <firmware/blink_timer.hpp>
 
 #include <firmware/espnow.hpp>
-#include <firmware/msp/__messages__.h>
-#include <firmware/msp/parser.hpp>
 
 static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
 
@@ -32,7 +30,6 @@ static const uint8_t kSerialRxPin = 44;
 static const uint8_t kSerialTxPin = 43;
 
 static const uint32_t kDelayMsec = 10;
-
 
 static auto blink_timer_ = hf::BlinkTimer();
 
