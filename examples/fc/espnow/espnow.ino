@@ -63,11 +63,12 @@ void setup()
 
 void loop()
 {
-    printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f\n",
+    printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f | arm=%d hov=%d aut=%d\n",
             AxisToFloat(thr_),
             AxisToFloat(rol_),
             AxisToFloat(pit_),
-            AxisToFloat(yaw_));
+            AxisToFloat(yaw_),
+            arm_, hov_, aut_);
 
     delay(10);
 }
