@@ -87,5 +87,11 @@ void loop()
             AxisToFloat(yaw_),
             arm_, hov_, aut_);
 
+    // Run core algorithm to get setpoint from PID controllers
+    //const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+
+    // Run the mixer and motors
+    //_effector.Run(_fc, setpoint);
+
     // Here we could send telemetry to base station over Serial3
 }

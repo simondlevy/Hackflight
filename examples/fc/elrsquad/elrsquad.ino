@@ -25,26 +25,27 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
+#include <firmware/receivers/traditional.hpp>
 
-static CRSFforArduino _crsf = CRSFforArduino(&Serial2);
+static CRSFforArduino crsf_ = CRSFforArduino(&Serial2);
 
-static hf::FlightController _fc;
+static hf::FlightController fc_;
 
-static hf::TraditionalReceiver _rxdata;
+static hf::TraditionalReceiver rxdata_;
 
-static hf::QuadDshot _effector;
+static hf::QuadDshot motors_;
 
 static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 {
     if (!rcChannels->failsafe) {
 
-        _rxdata = hf::TraditionalReceiver::Update(
-                _rxdata,
-                _crsf.readRcChannel(3),
-                _crsf.readRcChannel(1),
-                _crsf.readRcChannel(2),
-                _crsf.readRcChannel(4),
-                _crsf.readRcChannel(5),
+        rxdata_ = hf::TraditionalReceiver::Update(
+                rxdata_,
+                crsf_.readRcChannel(3),
+                crsf_.readRcChannel(1),
+                crsf_.readRcChannel(2),
+                crsf_.readRcChannel(4),
+                crsf_.readRcChannel(5),
                 millis());
     }
 }
@@ -52,27 +53,27 @@ static void onReceiveRcChannels(serialReceiverLayer::rcChannels_t *rcChannels)
 void setup()
 {
     // Start receiver
-    if (!_crsf.begin()) {
-        _crsf.end();
+    if (!crsf_.begin()) {
+        crsf_.end();
         hf::Debugger::ReportForever("Unable to start ELRS receiver");
     }
-    _crsf.setRcChannelsCallback(onReceiveRcChannels);
+    crsf_.setRcChannelsCallback(onReceiveRcChannels);
 
     // Start flight control, no hoverdeck
-    _fc.Begin(false);
+    fc_.Begin(false);
 
     // Start motors
-    _effector.Begin();
+    motors_.Begin();
 }
 
 void loop()
 {
     // This will trigger onReceiveRcChannels() above
-    _crsf.update();
+    crsf_.update();
 
     // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(rxdata_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
-    _effector.Run(_fc, setpoint);
+    motors_.Run(fc_, setpoint);
 }
