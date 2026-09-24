@@ -70,5 +70,10 @@ void loop()
             AxisToFloat(yaw_),
             arm_, hov_, aut_);
 
+    static uint8_t k;
+    const uint8_t data = 'A' + k;
+    Serial3.write(data);
+    k = (k + 1) % 26;
+
     delay(10);
 }

@@ -23,7 +23,7 @@ static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x4
 
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
-static const uint32_t kTimeoutMsec = 50;
+static const uint32_t kWifiTimeoutMsec = 50;
 
 static const uint32_t kSerialBaudRate = 115'200;
 static const uint8_t kSerialRxPin = 44;
@@ -35,16 +35,28 @@ static auto blink_timer_ = hf::BlinkTimer();
 
 static UMS3 ums3_;
 
-static uint32_t last_received_msec_;
+static uint32_t last_wifi_received_msec_;
 
-static void OnDataRecv(
+static void OnWifiDataReceive(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
     Serial1.write(data, len);
 
-    last_received_msec_ = millis();
+    last_wifi_received_msec_ = millis();
+}
+
+void serialEvent1()
+{
+    while (Serial1.available()) {
+
+        const uint8_t data = Serial1.read();
+
+        if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
+            // maybe do something here?
+        }
+    }
 }
 
 void setup()
@@ -61,13 +73,13 @@ void setup()
     hf::EspNow::WifiAddPeer(kTransmitterAddress);
     hf::EspNow::WifiAddPeer(kDongleAddress);
 
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
 }
 
 void loop()
 {
 
-    if (millis() - last_received_msec_ < kTimeoutMsec) {
+    if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
             ums3_.setPixelColor(0, 255, 0);
     }
 
