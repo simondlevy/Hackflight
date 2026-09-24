@@ -21,8 +21,7 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
-#include <firmware/msp/__messages__.h>
-#include <firmware/msp/parser.hpp>
+#include <firmware/receivers/espnow.hpp>
 
 // Receiver ------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 /**
- * Class for old-school R/C receiver (throttle must be down to arm)
+ * Class for mocking up old-school R/C receiver with ESP-NOW
  *
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -19,11 +19,14 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/parser.hpp>
 
 namespace hf {
 
-    class TraditionalReceiver {
+    class EspNowReceiver {
 
+#if 0
         private:
 
             static constexpr float kThrottleDownMax = -0.95;
@@ -34,9 +37,9 @@ namespace hf {
 
             bool is_throttle_down;
 
-            TraditionalReceiver() = default;
+            EspNowReceiver() = default;
 
-            TraditionalReceiver(
+            EspNowReceiver(
                     const Setpoint & setpoint,
                     const bool requested_arming,
                     const uint32_t timestamp_msec,
@@ -47,11 +50,11 @@ namespace hf {
                     is_throttle_down(is_throttle_down),
                     aux_(aux) {}
 
-            TraditionalReceiver& operator=(
-                    const TraditionalReceiver& other) = default;
+            EspNowReceiver& operator=(
+                    const EspNowReceiver& other) = default;
 
             static auto Update(
-                    const TraditionalReceiver & tdata,
+                    const EspNowReceiver & tdata,
                     const uint16_t throttle,
                     const uint16_t roll,
                     const uint16_t pitch,
@@ -59,7 +62,7 @@ namespace hf {
                     const uint16_t aux,
                     const uint32_t msec_curr,
                     const bool require_throttle_down_to_arm=true
-                    ) -> TraditionalReceiver
+                    ) -> EspNowReceiver
             {
                 const auto setpoint = Setpoint(
                         scale(throttle),
@@ -82,7 +85,7 @@ namespace hf {
                     didaux__change && safe_to_arm ? true :
                     tdata.data.requested_arming;
 
-                return TraditionalReceiver(setpoint, requested_arming,
+                return EspNowReceiver(setpoint, requested_arming,
                         msec_curr, is_throttle_down, aux);
             }
 
@@ -94,6 +97,7 @@ namespace hf {
             {
                 return 2 * (val - 1500.f) / 1024;
             }
+#endif
 
     };
 }
