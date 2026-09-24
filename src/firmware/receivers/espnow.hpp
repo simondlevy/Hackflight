@@ -26,7 +26,15 @@ namespace hf {
 
     class EspNowReceiver {
 
+        private:
+
+            static constexpr float kThrottleDownMax = -0.95;
+
         public:
+
+            ReceiverData data;
+
+            bool is_throttle_down;
 
             EspNowReceiver() = default;
 
@@ -38,17 +46,18 @@ namespace hf {
                     const uint8_t byte
                     ) -> EspNowReceiver
             {
-                const auto parser = hf::MspParser::Parse(rx.parser_, byte);
+                const auto parser = MspParser::Parse(rx.parser_, byte);
 
-                if (hf::MspParser::GetId(parser) == kMspSetChannels) {
+                if (MspParser::GetId(parser) == kMspSetChannels) {
 
-                    const auto thr = hf::MspParser::GetShort(parser, 0);
-                    const auto rol = hf::MspParser::GetShort(parser, 1);
-                    const auto pit = hf::MspParser::GetShort(parser, 2);
-                    const auto yaw = hf::MspParser::GetShort(parser, 3);
-                    const auto arm = hf::MspParser::GetShort(parser, 4);
-                    const auto hov = hf::MspParser::GetShort(parser, 5);
-                    const auto aut = hf::MspParser::GetShort(parser, 6);
+                    const auto thr = GetAxisValue(parser, 0);
+                    const auto rol = GetAxisValue(parser, 1);
+                    const auto pit = GetAxisValue(parser, 2);
+                    const auto yaw = GetAxisValue(parser, 3);
+
+                    const auto arm = MspParser::GetShort(parser, 4);
+                    const auto hov = MspParser::GetShort(parser, 5);
+                    const auto aut = MspParser::GetShort(parser, 6);
 
                     (void)thr;
                     (void)rol;
@@ -66,16 +75,16 @@ namespace hf {
 
             MspParser parser_;
 
+            static auto GetAxisValue(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                const auto val = MspParser::GetShort(parser, index);
+
+                return 2 * (val / 4095.f ) - 1;
+            }
+
 #if 0
-        private:
-
-            static constexpr float kThrottleDownMax = -0.95;
-
         public:
-
-            ReceiverData data;
-
-            bool is_throttle_down;
 
             EspNowReceiver(
                     const Setpoint & setpoint,
@@ -127,10 +136,6 @@ namespace hf {
         private:
 
             uint16_t aux_;
-
-            static auto scale(const uint16_t val) -> float
-            {
-                return 2 * (val - 1500.f) / 1024;
             }
 #endif
 
