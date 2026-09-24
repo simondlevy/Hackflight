@@ -59,13 +59,8 @@ namespace hf {
                     const auto hov = MspParser::GetShort(parser, 5);
                     const auto aut = MspParser::GetShort(parser, 6);
 
-                    (void)thr;
-                    (void)rol;
-                    (void)pit;
-                    (void)yaw;
-                    (void)arm;
-                    (void)hov;
-                    (void)aut;
+                    printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f | arm=%d hov=%d aut=%d\n",
+                            thr, rol, pit, yaw, arm, hov, aut);
                 }
 
                 return rx;
@@ -82,62 +77,5 @@ namespace hf {
 
                 return 2 * (val / 4095.f ) - 1;
             }
-
-#if 0
-        public:
-
-            EspNowReceiver(
-                    const Setpoint & setpoint,
-                    const bool requested_arming,
-                    const uint32_t timestamp_msec,
-                    const bool is_throttle_down,
-                    const uint16_t aux)
-                :
-                    data(setpoint, requested_arming, false, timestamp_msec),
-                    is_throttle_down(is_throttle_down),
-                    aux_(aux) {}
-
-            static auto Update(
-                    const EspNowReceiver & rx,
-                    const uint16_t throttle,
-                    const uint16_t roll,
-                    const uint16_t pitch,
-                    const uint16_t yaw,
-                    const uint16_t aux,
-                    const uint32_t msec_curr,
-                    const bool require_throttle_down_to_arm=true
-                    ) -> EspNowReceiver
-            {
-                const auto setpoint = Setpoint(
-                        scale(throttle),
-                        scale(roll),
-                        scale(pitch),
-                        scale(yaw));
-
-                const auto is_throttle_down = setpoint.thrust <
-                    kThrottleDownMax;
-
-                const auto safe_to_arm = require_throttle_down_to_arm ? 
-                    is_throttle_down : true;
-
-                // Push-button arming; ignores startup transient
-                const auto didaux__change = rx.aux_ >= 988 && aux !=
-                    rx.aux_;
-
-                const auto requested_arming = 
-                    didaux__change && rx.data.requested_arming ? false :
-                    didaux__change && safe_to_arm ? true :
-                    rx.data.requested_arming;
-
-                return EspNowReceiver(setpoint, requested_arming,
-                        msec_curr, is_throttle_down, aux);
-            }
-
-        private:
-
-            uint16_t aux_;
-            }
-#endif
-
     };
 }

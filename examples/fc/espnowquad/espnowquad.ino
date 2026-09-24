@@ -37,13 +37,13 @@ static int16_t aut_;
 
 void serialEvent3()
 {
-    static hf::MspParser parser_;
+     static hf::MspParser parser_;
 
     while (Serial3.available()) {
 
         const auto b = Serial3.read();
 
-        rx_ = hf::EspNowReceiver::Update(rx_, b);
+        //rx_ = hf::EspNowReceiver::Update(rx_, b);
 
         parser_ = hf::MspParser::Parse(parser_, b);
 
