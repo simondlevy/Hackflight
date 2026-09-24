@@ -101,6 +101,8 @@ namespace hf {
             {
                 const auto rxdata = rx.data;
 
+                debugger_.Report(rxdata);
+
                 Step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motor_vals, motor_count);
 
@@ -419,7 +421,7 @@ namespace hf {
                 voltage_ = voltage_sensing_timer_.Ready() ?
                     voltage_divider_.read() : voltage_;
 
-                debugger_.ReportFloat("voltage", voltage_);
+                //debugger_.ReportFloat("voltage", voltage_);
 
                 // Blink LED to indicate status
                 BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);

@@ -2,7 +2,7 @@ SKETCH = $(shell basename "`pwd`")
 
 ROOT = $(HOME)/Desktop/
 
-FQBN = esp32:esp32:um_omgs3
+FQBN = teensy:avr:teensy40
 
 PORT = /dev/ttyACM0
 
@@ -13,7 +13,7 @@ build: $(SKETCH).ino
 		--fqbn $(FQBN) $(SKETCH).ino
 
 flash:
-	arduino-cli upload -p $(PORT) --fqbn $(FQBN) $(SKETCH).ino
+	arduino-cli upload -p $(PORT) --fqbn $(FQBN) .
 
 clean:
 	rm -rf /tmp/arduino/
