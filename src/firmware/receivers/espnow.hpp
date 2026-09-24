@@ -34,14 +34,35 @@ namespace hf {
                     const EspNowReceiver& other) = default;
 
             static auto Update(
-                    const EspNowReceiver & tdata,
+                    const EspNowReceiver & rx,
                     const uint8_t byte
                     ) -> EspNowReceiver
             {
-                return tdata;
+                const auto parser = hf::MspParser::Parse(rx.parser_, byte);
+
+                if (hf::MspParser::GetId(parser) == kMspSetChannels) {
+
+                    const auto thr = hf::MspParser::GetShort(parser, 0);
+                    const auto rol = hf::MspParser::GetShort(parser, 1);
+                    const auto pit = hf::MspParser::GetShort(parser, 2);
+                    const auto yaw = hf::MspParser::GetShort(parser, 3);
+                    const auto arm = hf::MspParser::GetShort(parser, 4);
+                    const auto hov = hf::MspParser::GetShort(parser, 5);
+                    const auto aut = hf::MspParser::GetShort(parser, 6);
+
+                    (void)thr;
+                    (void)rol;
+                    (void)pit;
+                    (void)yaw;
+                    (void)arm;
+                    (void)hov;
+                    (void)aut;
+                }
+
+                return rx;
             }
 
-         private:
+        private:
 
             MspParser parser_;
 
@@ -68,7 +89,7 @@ namespace hf {
                     aux_(aux) {}
 
             static auto Update(
-                    const EspNowReceiver & tdata,
+                    const EspNowReceiver & rx,
                     const uint16_t throttle,
                     const uint16_t roll,
                     const uint16_t pitch,
@@ -91,13 +112,13 @@ namespace hf {
                     is_throttle_down : true;
 
                 // Push-button arming; ignores startup transient
-                const auto didaux__change = tdata.aux_ >= 988 && aux !=
-                    tdata.aux_;
+                const auto didaux__change = rx.aux_ >= 988 && aux !=
+                    rx.aux_;
 
                 const auto requested_arming = 
-                    didaux__change && tdata.data.requested_arming ? false :
+                    didaux__change && rx.data.requested_arming ? false :
                     didaux__change && safe_to_arm ? true :
-                    tdata.data.requested_arming;
+                    rx.data.requested_arming;
 
                 return EspNowReceiver(setpoint, requested_arming,
                         msec_curr, is_throttle_down, aux);
