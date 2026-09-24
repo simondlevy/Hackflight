@@ -18,9 +18,13 @@
  */
 
 #include <hackflight.h>
-
+#include <firmware/fc.hpp>
+#include <firmware/debugger.hpp>
+#include <firmware/effectors/quad_dshot.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
+
+// Receiver ------------------------------------------------------------------
 
 static int16_t thr_;
 static int16_t rol_;
@@ -56,9 +60,22 @@ static auto AxisToFloat(const uint16_t val) -> float
     return map((float)val, 0, 4095, -1.f, +1.f);
 }
 
+// ---------------------------------------------------------------------------
+
+static hf::FlightController fc_;
+
+static hf::QuadDshot motors_;
+
 void setup()
 {
+    // Start receiver comms
     Serial3.begin(115200);
+
+    // Start flight control, no hoverdeck
+    fc_.Begin(false);
+
+    // Start motors
+    motors_.Begin();
 }
 
 void loop()
@@ -70,10 +87,5 @@ void loop()
             AxisToFloat(yaw_),
             arm_, hov_, aut_);
 
-    static uint8_t k;
-    const uint8_t data = 'A' + k;
-    Serial3.write(data);
-    k = (k + 1) % 26;
-
-    delay(10);
+    // Here we could send telemetry to base station over Serial3
 }
