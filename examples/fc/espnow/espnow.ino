@@ -51,6 +51,11 @@ void serialEvent3()
     }
 }
 
+static auto AxisToFloat(const uint16_t val) -> float
+{
+    return map((float)val, 0, 4095, -1.f, +1.f);
+}
+
 void setup()
 {
     Serial3.begin(115200);
@@ -58,13 +63,11 @@ void setup()
 
 void loop()
 {
-    /*
-    printf("c1=%+0.3f c2=%+0.3f c3=%+0.3f c4=%+0.3f\n",
-            rolaxis(thr_), rolaxis(rol_), rolaxis(pit_),
-            rolaxis(yaw_));
-            */
-
-    printf("t=%04d 4=%04d p=%04d y=%04d\n", thr_, rol_, pit_, yaw_);
+    printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f\n",
+            AxisToFloat(thr_),
+            AxisToFloat(rol_),
+            AxisToFloat(pit_),
+            AxisToFloat(yaw_));
 
     delay(10);
 }
