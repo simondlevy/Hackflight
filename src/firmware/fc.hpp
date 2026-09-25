@@ -113,7 +113,7 @@ namespace hf {
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
                         PositionController::bypass(EspNowReceiver::GetYaw(rx)));
 
-                debugger_.Report(setpoint);
+                // debugger_.Report(setpoint);
 
                 stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);

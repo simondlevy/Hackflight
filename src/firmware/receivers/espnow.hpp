@@ -19,6 +19,7 @@
 #pragma once
 
 #include <firmware/datatypes.hpp>
+#include <firmware/debugger.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 
@@ -26,7 +27,11 @@ namespace hf {
 
     class EspNowReceiver {
 
-        public:
+        private:
+
+            static constexpr float kThrottleDownMax = -0.90;
+
+         public:
 
             EspNowReceiver() = default;
 
@@ -39,7 +44,28 @@ namespace hf {
                     const uint32_t time_msec
                     ) -> EspNowReceiver
             {
-                return EspNowReceiver(
+
+                const auto is_throttle_down =
+                    GetThrottle(rx) < kThrottleDownMax;
+
+                printf("throttle down=%d\n", is_throttle_down);
+
+                /*
+                const auto safe_to_arm = require_throttle_down_to_arm ? 
+                    is_throttle_down : true;
+
+                // Push-button arming; ignores startup transient
+                const auto did_aux_change_ = tdata.aux_ >= 988 && aux !=
+                    tdata.aux_;
+
+                const auto requested_arming = 
+                    did_aux_change_ && tdata.data.requested_arming ? false :
+                    did_aux_change_ && safe_to_arm ? true :
+                    tdata.data.requested_arming;
+                    */
+
+
+               return EspNowReceiver(
                         MspParser::Parse(rx.parser_, byte),
                         MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
                         rx.time_msec_);
