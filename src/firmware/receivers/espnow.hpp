@@ -46,9 +46,7 @@ namespace hf {
                     const uint8_t byte
                     ) -> EspNowReceiver
             {
-                const auto parser = MspParser::Parse(rx.parser_, byte);
-
-                return EspNowReceiver(parser);
+                return EspNowReceiver(MspParser::Parse(rx.parser_, byte));
             }
 
             static auto IsReady(const EspNowReceiver & rx) -> bool
