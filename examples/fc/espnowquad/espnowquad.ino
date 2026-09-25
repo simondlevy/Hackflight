@@ -57,8 +57,8 @@ void setup()
 
 void loop()
 {
-    if (rx_.IsReady()) {
-        printf("thr=%+0.3f\n", rx_.GetThrottleValue());
+    if (hf::EspNowReceiver::IsReady(rx_)) {
+        printf("thr=%+0.3f\n", hf::EspNowReceiver::GetThrottleValue(rx_));
     }
 
     // Run core algorithm to get setpoint from PID controllers

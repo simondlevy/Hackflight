@@ -51,14 +51,14 @@ namespace hf {
                 return EspNowReceiver(parser);
             }
 
-            auto IsReady() -> bool
+            static auto IsReady(const EspNowReceiver & rx) -> bool
             {
-                return MspParser::GetId(parser_) == kMspSetChannels;
+                return MspParser::GetId(rx.parser_) == kMspSetChannels;
             }
 
-            auto GetThrottleValue() -> float
+            static auto GetThrottleValue(const EspNowReceiver & rx) -> float
             {
-                return GetAxisValue(parser_, 0);
+                return GetAxisValue(rx.parser_, 0);
             }
 
         private:
