@@ -26,15 +26,7 @@ namespace hf {
 
     class EspNowReceiver {
 
-        private:
-
-            static constexpr float kThrottleDownMax = -0.95;
-
         public:
-
-            ReceiverData data;
-
-            bool is_throttle_down;
 
             EspNowReceiver() = default;
 
@@ -43,15 +35,14 @@ namespace hf {
 
             static auto Update(
                     const EspNowReceiver & rx,
-                    const uint8_t byte
+                    const uint8_t byte,
+                    const uint32_t time_msec
                     ) -> EspNowReceiver
             {
-                return EspNowReceiver(MspParser::Parse(rx.parser_, byte));
-            }
-
-            static auto IsReady(const EspNowReceiver & rx) -> bool
-            {
-                return MspParser::GetId(rx.parser_) == kMspSetChannels;
+                return EspNowReceiver(
+                        MspParser::Parse(rx.parser_, byte),
+                        MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
+                        rx.time_msec_);
             }
 
             static auto GetThrottleValue(const EspNowReceiver & rx) -> float
@@ -89,12 +80,19 @@ namespace hf {
                 return GetSwitchStatus(rx.parser_, 6);
             }
 
+            static auto GetTimeMsec(const EspNowReceiver & rx) -> uint32_t
+            {
+                return rx.time_msec_;
+            }
+
         private:
 
             MspParser parser_;
 
-            EspNowReceiver(const MspParser & parser) :
-                parser_(parser) {}
+            uint32_t time_msec_;
+
+            EspNowReceiver(const MspParser & parser, const uint32_t time_msec) :
+                parser_(parser), time_msec_(time_msec) {}
 
             static auto GetAxisValue(
                     const MspParser & parser, const uint8_t index) -> float

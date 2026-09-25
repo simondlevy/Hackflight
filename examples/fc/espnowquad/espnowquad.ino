@@ -31,9 +31,7 @@ void serialEvent3()
 {
     while (Serial3.available()) {
 
-        const auto b = Serial3.read();
-
-        rx_ = hf::EspNowReceiver::Update(rx_, b);
+        rx_ = hf::EspNowReceiver::Update(rx_, Serial3.read(), millis());
     }
 }
 
