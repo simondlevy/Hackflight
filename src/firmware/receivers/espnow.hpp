@@ -65,17 +65,17 @@ namespace hf {
                 return GetAxisValue(rx.parser_, 3);
             }
 
-            static auto IsArmed(const EspNowReceiver & rx) -> bool
+            static auto DidRequestArming(const EspNowReceiver & rx) -> bool
             {
                 return GetSwitchStatus(rx.parser_, 4);
             }
 
-            static auto IsHovering(const EspNowReceiver & rx) -> bool
+            static auto DidRequestHover(const EspNowReceiver & rx) -> bool
             {
                 return GetSwitchStatus(rx.parser_, 5);
             }
 
-            static auto IsAutopiloted(const EspNowReceiver & rx) -> bool
+            static auto DidRequestAutopilot(const EspNowReceiver & rx) -> bool
             {
                 return GetSwitchStatus(rx.parser_, 6);
             }

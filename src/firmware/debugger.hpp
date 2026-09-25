@@ -122,9 +122,9 @@ namespace hf {
                                 EspNowReceiver::GetYawValue(rx)));
 
                        printf(" | arm=%d hov=%d  aut=%d | time (msec) = %lu\n", 
-                                EspNowReceiver::IsArmed(rx),
-                                EspNowReceiver::IsHovering(rx),
-                                EspNowReceiver::IsAutopiloted(rx),
+                                EspNowReceiver::DidRequestArming(rx),
+                                EspNowReceiver::DidRequestHover(rx),
+                                EspNowReceiver::DidRequestAutopilot(rx),
                                 EspNowReceiver::GetTimeMsec(rx));
                 }
             }
