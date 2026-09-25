@@ -60,6 +60,8 @@ namespace hf {
                     // Otherwise leave arming status alone
                     rx.is_armed_;
 
+                printf("%d\n", is_armed);
+
                 return EspNowReceiver(
                         MspParser::Parse(rx.parser_, byte),
                         MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
