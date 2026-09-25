@@ -48,22 +48,17 @@ namespace hf {
             {
                 const auto parser = MspParser::Parse(rx.parser_, byte);
 
-                if (MspParser::GetId(parser) == kMspSetChannels) {
-
-                    const auto thr = GetAxisValue(parser, 0);
-                    const auto rol = GetAxisValue(parser, 1);
-                    const auto pit = GetAxisValue(parser, 2);
-                    const auto yaw = GetAxisValue(parser, 3);
-
-                    const auto arm = MspParser::GetShort(parser, 4);
-                    const auto hov = MspParser::GetShort(parser, 5);
-                    const auto aut = MspParser::GetShort(parser, 6);
-
-                    printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f | arm=%d hov=%d aut=%d\n",
-                            thr, rol, pit, yaw, arm, hov, aut);
-                }
-
                 return EspNowReceiver(parser);
+            }
+
+            auto IsReady() -> bool
+            {
+                return MspParser::GetId(parser_) == kMspSetChannels;
+            }
+
+            auto GetThrottleValue() -> float
+            {
+                return GetAxisValue(parser_, 0);
             }
 
         private:
