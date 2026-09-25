@@ -100,8 +100,6 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                debugger_.Report(rx);
-
                 Step(
                         EspNowReceiver::DidRequestArming(rx),
                         false, // false = no hover for now
@@ -114,6 +112,8 @@ namespace hf {
                         PositionController::bypass(EspNowReceiver::GetRoll(rx)),
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
                         PositionController::bypass(EspNowReceiver::GetYaw(rx)));
+
+                debugger_.Report(setpoint);
 
                 stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
