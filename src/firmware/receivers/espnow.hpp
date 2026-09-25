@@ -63,12 +63,15 @@ namespace hf {
                             thr, rol, pit, yaw, arm, hov, aut);
                 }
 
-                return rx;
+                return EspNowReceiver(parser);
             }
 
         private:
 
             MspParser parser_;
+
+            EspNowReceiver(const MspParser & parser) :
+                parser_(parser) {}
 
             static auto GetAxisValue(
                     const MspParser & parser, const uint8_t index) -> float

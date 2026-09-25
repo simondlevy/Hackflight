@@ -27,6 +27,7 @@
 
 static hf::EspNowReceiver rx_;
 
+/*
 static int16_t thr_;
 static int16_t rol_;
 static int16_t pit_;
@@ -34,36 +35,39 @@ static int16_t yaw_;
 static int16_t arm_;
 static int16_t hov_;
 static int16_t aut_;
+*/
 
 void serialEvent3()
 {
-     static hf::MspParser parser_;
+    //static hf::MspParser parser_;
 
     while (Serial3.available()) {
 
         const auto b = Serial3.read();
 
-        //rx_ = hf::EspNowReceiver::Update(rx_, b);
+        rx_ = hf::EspNowReceiver::Update(rx_, b);
 
-        parser_ = hf::MspParser::Parse(parser_, b);
+        /*
+           parser_ = hf::MspParser::Parse(parser_, b);
 
-        if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
+           if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
 
-            thr_ = hf::MspParser::GetShort(parser_, 0);
-            rol_ = hf::MspParser::GetShort(parser_, 1);
-            pit_ = hf::MspParser::GetShort(parser_, 2);
-            yaw_ = hf::MspParser::GetShort(parser_, 3);
-            arm_ = hf::MspParser::GetShort(parser_, 4);
-            hov_ = hf::MspParser::GetShort(parser_, 5);
-            aut_ = hf::MspParser::GetShort(parser_, 6);
-        }
+           thr_ = hf::MspParser::GetShort(parser_, 0);
+           rol_ = hf::MspParser::GetShort(parser_, 1);
+           pit_ = hf::MspParser::GetShort(parser_, 2);
+           yaw_ = hf::MspParser::GetShort(parser_, 3);
+           arm_ = hf::MspParser::GetShort(parser_, 4);
+           hov_ = hf::MspParser::GetShort(parser_, 5);
+           aut_ = hf::MspParser::GetShort(parser_, 6);
+           }*/
     }
 }
 
+/*
 static auto AxisToFloat(const uint16_t val) -> float
 {
     return map((float)val, 0, 4095, -1.f, +1.f);
-}
+}*/
 
 // ---------------------------------------------------------------------------
 
@@ -85,18 +89,20 @@ void setup()
 
 void loop()
 {
+    /*
     printf("t=%+0.3f r=%+0.3f p=%+0.3f y=%+0.3f | arm=%d hov=%d aut=%d\n",
-            AxisToFloat(thr_),
-            AxisToFloat(rol_),
-            AxisToFloat(pit_),
-            AxisToFloat(yaw_),
-            arm_, hov_, aut_);
+               AxisToFloat(thr_),
+               AxisToFloat(rol_),
+               AxisToFloat(pit_),
+               AxisToFloat(yaw_),
+               arm_, hov_, aut_);
+             */
 
-    // Run core algorithm to get setpoint from PID controllers
-    //const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+        // Run core algorithm to get setpoint from PID controllers
+        //const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
 
-    // Run the mixer and motors
-    //_effector.Run(_fc, setpoint);
+        // Run the mixer and motors
+        //_effector.Run(_fc, setpoint);
 
-    // Here we could send telemetry to base station over Serial3
+        // Here we could send telemetry to base station over Serial3
 }
