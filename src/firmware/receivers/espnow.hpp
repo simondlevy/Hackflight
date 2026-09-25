@@ -45,22 +45,22 @@ namespace hf {
                         rx.time_msec_);
             }
 
-            static auto GetThrottleValue(const EspNowReceiver & rx) -> float
+            static auto GetThrottle(const EspNowReceiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 0);
             }
 
-            static auto GetRollValue(const EspNowReceiver & rx) -> float
+            static auto GetRoll(const EspNowReceiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 1);
             }
 
-            static auto GetPitchValue(const EspNowReceiver & rx) -> float
+            static auto GetPitch(const EspNowReceiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 2);
             }
 
-            static auto GetYawValue(const EspNowReceiver & rx) -> float
+            static auto GetYaw(const EspNowReceiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 3);
             }
@@ -80,7 +80,7 @@ namespace hf {
                 return GetSwitchStatus(rx.parser_, 6);
             }
 
-            static auto GetTimeMsec(const EspNowReceiver & rx) -> uint32_t
+            static auto GetTimestampMsec(const EspNowReceiver & rx) -> uint32_t
             {
                 return rx.time_msec_;
             }

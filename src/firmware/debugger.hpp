@@ -116,16 +116,16 @@ namespace hf {
                 if (helper_.Ready()) {
 
                     ReportSetpoint(Setpoint(
-                                EspNowReceiver::GetThrottleValue(rx),
-                                EspNowReceiver::GetRollValue(rx),
-                                EspNowReceiver::GetPitchValue(rx),
-                                EspNowReceiver::GetYawValue(rx)));
+                                EspNowReceiver::GetThrottle(rx),
+                                EspNowReceiver::GetRoll(rx),
+                                EspNowReceiver::GetPitch(rx),
+                                EspNowReceiver::GetYaw(rx)));
 
                        printf(" | arm=%d hov=%d  aut=%d | time (msec) = %lu\n", 
                                 EspNowReceiver::DidRequestArming(rx),
                                 EspNowReceiver::DidRequestHover(rx),
                                 EspNowReceiver::DidRequestAutopilot(rx),
-                                EspNowReceiver::GetTimeMsec(rx));
+                                EspNowReceiver::GetTimestampMsec(rx));
                 }
             }
 

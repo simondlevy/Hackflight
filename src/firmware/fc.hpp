@@ -102,13 +102,23 @@ namespace hf {
             {
                 debugger_.Report(rx);
 
-                /*
-                Step(rxdata.requested_arming, false, // false = no hover
-                        rxdata.timestamp_msec, motor_vals, motor_count);*/
+                Step(
+                        EspNowReceiver::DidRequestArming(rx),
+                        false, // false = no hover for now
+                        EspNowReceiver::GetTimestampMsec(rx),
+                        motor_vals,
+                        motor_count);
 
+                const auto setpoint = Setpoint(
+                        (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
+                        PositionController::bypass(EspNowReceiver::GetRoll(rx)),
+                        PositionController::bypass(EspNowReceiver::GetPitch(rx)),
+                        PositionController::bypass(EspNowReceiver::GetYaw(rx)));
 
-                const Setpoint setpoint = {};
-                return setpoint;
+                stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
+                        is_flying_, GetDt(), state_, setpoint);
+
+                return stabilizer_pid_.setpoint;
             }
 
              auto Update(
