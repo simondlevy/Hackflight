@@ -52,10 +52,8 @@ void loop()
 {
     static hf::Debugger debugger_;
 
-    debugger_.Report(rx_);
-
     // Run core algorithm to get setpoint from PID controllers
-    //const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
     //motors_.Run(fc_, setpoint);

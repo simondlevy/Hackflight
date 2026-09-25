@@ -17,7 +17,7 @@
 #include <firmware/blink_timer.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/serializer.hpp>
-#include <firmware/pushbuttons.hpp>
+#include <firmware/pushbutton.hpp>
 #include <firmware/voltage_divider.hpp>
 
 // Hardware-dependent --------------------------------------------------------
@@ -33,10 +33,9 @@ static const uint8_t kYawPin = A1;
 
 static const uint8_t kVoltageDividerPin = A6;
 
-static auto armingButton = hf::LatchingPushbutton(A8);
-
-static auto autopilotButton = hf::IntermittentPushbutton(A7);
-static auto hoveringButton = hf::IntermittentPushbutton(A0);
+static auto armingButton = hf::Pushbutton(A8);
+static auto autopilotButton = hf::Pushbutton(A7);
+static auto hoveringButton = hf::Pushbutton(A0);
 
 // ----------------------------------------------------------------------------
 
@@ -129,6 +128,8 @@ void loop()
         hoveringButton.Read(),
         autopilotButton.Read()
     };
+
+    Serial.printf("arm=%d hov=%d aut=%d\n", vals[4], vals[5], vals[6]);
 
     static hf::MspSerializer serializer_;
 

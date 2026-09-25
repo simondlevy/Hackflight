@@ -63,11 +63,11 @@ namespace hf {
             uint8_t state_;
     };
 
-    class LatchingPushbutton {
+    class Pushbutton {
 
         public:
 
-            LatchingPushbutton(const uint8_t pin) 
+            Pushbutton(const uint8_t pin) 
                 : debouncer_(pin) {}
 
             auto Read() -> bool
@@ -79,35 +79,6 @@ namespace hf {
 
             Debouncer debouncer_;
     };
-
-    class IntermittentPushbutton {
-
-        public:
-
-            IntermittentPushbutton(const uint8_t pin) 
-                : debouncer_(pin) {}
-
-            auto Read() -> bool
-            {
-                const auto state = debouncer_.Read();
-
-                if (state && !oldstate_) {
-                    output_ = !output_;
-                }
-
-                oldstate_ = state;
-
-                return output_;
-            }
-
-        private:
-
-            Debouncer debouncer_;
-
-            bool oldstate_;
-            bool output_;
-    };
-
 }
 
 
