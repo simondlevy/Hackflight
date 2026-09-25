@@ -41,30 +41,31 @@ namespace hf {
             static auto Update(
                     const EspNowReceiver & rx,
                     const uint8_t byte,
-                    const uint32_t time_msec,
-                    const bool require_throttle_down_to_arm=true
+                    const uint32_t time_msec
                     ) -> EspNowReceiver
             {
+                const bool is_arming_button_up = !GetSwitchStatus(rx.parser_, 4);
 
-                const auto is_throttle_down =
-                    GetThrottle(rx) < kThrottleDownMax;
+                const bool is_armed  =
 
-                const auto safe_to_arm = require_throttle_down_to_arm ? 
-                    is_throttle_down : true;
+                    // Disarm when arming button is up
+                    is_arming_button_up ? false :
 
-                const bool is_arming_button_down = GetSwitchStatus(rx.parser_, 4);
+                    // Arm when arming button goes up to down and throttle is down
+                    (!rx.is_armed_ &&
+                    GetThrottle(rx) < kThrottleDownMax && 
+                    !is_arming_button_up &&
+                    rx.was_arming_button_up_) ? true :
 
-                if (is_arming_button_down && !rx.was_arming_button_down_) {
-                    printf("ARM!!!\n");
-                }
-
-                (void)safe_to_arm;
+                    // Otherwise leave arming status alone
+                    rx.is_armed_;
 
                 return EspNowReceiver(
                         MspParser::Parse(rx.parser_, byte),
                         MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
                         rx.time_msec_,
-                        is_arming_button_down);
+                        is_arming_button_up,
+                        is_armed);
             }
 
             static auto GetThrottle(const EspNowReceiver & rx) -> float
@@ -87,9 +88,9 @@ namespace hf {
                 return GetAxisValue(rx.parser_, 3);
             }
 
-            static auto DidRequestArming(const EspNowReceiver & rx) -> bool
+            static auto DidSafelyRequestArming(const EspNowReceiver & rx) -> bool
             {
-                return GetSwitchStatus(rx.parser_, 4);
+                return rx.is_armed_;
             }
 
             static auto DidRequestHover(const EspNowReceiver & rx) -> bool
@@ -110,18 +111,19 @@ namespace hf {
         private:
 
             MspParser parser_;
-
             uint32_t time_msec_;
-
-            bool was_arming_button_down_;
+            bool was_arming_button_up_;
+            bool is_armed_;
 
             EspNowReceiver(
                     const MspParser & parser,
                     const uint32_t time_msec,
-                    const bool is_arming_button_down)
+                    const bool is_arming_button_up,
+                    const bool is_armed)
                 : parser_(parser),
                 time_msec_(time_msec),
-                was_arming_button_down_(is_arming_button_down) {}
+                was_arming_button_up_(is_arming_button_up),
+                is_armed_(is_armed) {}
 
             static auto GetAxisValue(
                     const MspParser & parser, const uint8_t index) -> float

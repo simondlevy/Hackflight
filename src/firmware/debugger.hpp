@@ -122,7 +122,7 @@ namespace hf {
                                 EspNowReceiver::GetYaw(rx)));
 
                        printf(" | arm=%d hov=%d  aut=%d | time (msec) = %lu\n", 
-                                EspNowReceiver::DidRequestArming(rx),
+                                EspNowReceiver::DidSafelyRequestArming(rx),
                                 EspNowReceiver::DidRequestHover(rx),
                                 EspNowReceiver::DidRequestAutopilot(rx),
                                 EspNowReceiver::GetTimestampMsec(rx));

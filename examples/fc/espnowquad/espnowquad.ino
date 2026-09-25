@@ -23,19 +23,14 @@
 #include <firmware/effectors/quad_dshot.hpp>
 #include <firmware/receivers/espnow.hpp>
 
-// Receiver ------------------------------------------------------------------
-
 static hf::EspNowReceiver rx_;
 
 void serialEvent3()
 {
     while (Serial3.available()) {
-
         rx_ = hf::EspNowReceiver::Update(rx_, Serial3.read(), millis());
     }
 }
-
-// ---------------------------------------------------------------------------
 
 static hf::FlightController fc_;
 
@@ -55,10 +50,12 @@ void setup()
 
 void loop()
 {
-    // Run core algorithm to get setpoint from PID controllers
-    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
+    static hf::Debugger debugger_;
 
-    (void)setpoint;
+    debugger_.Report(rx_);
+
+    // Run core algorithm to get setpoint from PID controllers
+    //const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
     //motors_.Run(fc_, setpoint);
