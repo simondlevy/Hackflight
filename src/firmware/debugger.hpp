@@ -121,14 +121,10 @@ namespace hf {
                                 EspNowReceiver::GetPitchValue(rx),
                                 EspNowReceiver::GetYawValue(rx)));
 
-                    printf("\n");
-
-                    /*
-                       printf(" | requested_arming=%s requested_hover=%s "
-                            " timestamp=%lu msec\n",
-                            Bool2Str(rxdata.requested_arming),
-                            Bool2Str(rxdata.requested_hover),
-                            rxdata.timestamp_msec);*/
+                       printf(" | arm=%d hov=%d  aut=%d\n", 
+                                EspNowReceiver::IsArmed(rx),
+                                EspNowReceiver::IsHovering(rx),
+                                EspNowReceiver::IsAutopiloted(rx));
                 }
             }
 
