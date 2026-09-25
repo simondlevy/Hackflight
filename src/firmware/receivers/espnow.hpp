@@ -59,6 +59,36 @@ namespace hf {
                 return GetAxisValue(rx.parser_, 0);
             }
 
+            static auto GetRollValue(const EspNowReceiver & rx) -> float
+            {
+                return GetAxisValue(rx.parser_, 1);
+            }
+
+            static auto GetPitchValue(const EspNowReceiver & rx) -> float
+            {
+                return GetAxisValue(rx.parser_, 2);
+            }
+
+            static auto GetYawValue(const EspNowReceiver & rx) -> float
+            {
+                return GetAxisValue(rx.parser_, 3);
+            }
+
+            static auto IsArmed(const EspNowReceiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 4);
+            }
+
+            static auto IsHovering(const EspNowReceiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 5);
+            }
+
+            static auto IsAutopiloted(const EspNowReceiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 6);
+            }
+
         private:
 
             MspParser parser_;
@@ -72,6 +102,12 @@ namespace hf {
                 const auto val = MspParser::GetShort(parser, index);
 
                 return 2 * (val / 4095.f ) - 1;
+            }
+
+            static auto GetSwitchStatus(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                return MspParser::GetShort(parser, index) > 0;
             }
     };
 }

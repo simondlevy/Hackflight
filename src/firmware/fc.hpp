@@ -29,6 +29,7 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
+#include <firmware/receivers/espnow.hpp>
 #include <firmware/receivers/gamepad.hpp>
 #include <firmware/receivers/springy.hpp>
 #include <firmware/receivers/traditional.hpp>
@@ -95,6 +96,17 @@ namespace hf {
             }
 
             auto Update(
+                    const EspNowReceiver & rx,
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
+            {
+                debugger_.Report(rx);
+
+                const Setpoint setpoint = {};
+                return setpoint;
+            }
+
+             auto Update(
                     const TraditionalReceiver & rx,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
@@ -137,7 +149,7 @@ namespace hf {
             } 
 
             auto Update(
-                    GamepadReceiver & gamepad,
+                    const GamepadReceiver & gamepad,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {

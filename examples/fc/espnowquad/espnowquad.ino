@@ -57,15 +57,13 @@ void setup()
 
 void loop()
 {
-    if (hf::EspNowReceiver::IsReady(rx_)) {
-        printf("thr=%+0.3f\n", hf::EspNowReceiver::GetThrottleValue(rx_));
-    }
-
     // Run core algorithm to get setpoint from PID controllers
-    //const auto setpoint = _fc.Update(_rxdata, _effector.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
+
+    (void)setpoint;
 
     // Run the mixer and motors
-    //_effector.Run(_fc, setpoint);
+    //motors_.Run(fc_, setpoint);
 
     // Here we could send telemetry to base station over Serial3
 }
