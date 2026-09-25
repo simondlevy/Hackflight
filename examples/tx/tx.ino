@@ -129,8 +129,6 @@ void loop()
         autopilotButton.Read()
     };
 
-    Serial.printf("arm=%d hov=%d aut=%d\n", vals[4], vals[5], vals[6]);
-
     static hf::MspSerializer serializer_;
 
     serializer_ = hf::MspSerializer::SerializeShorts(

@@ -1,4 +1,4 @@
-/* Code for a pushbutton switch
+/* Code for a debounced pushbutton switch
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -18,10 +18,7 @@
 
 namespace hf {
 
-    static constexpr uint16_t kThreshold = 5;
-    static constexpr uint32_t kDebounceDelayMsec = 50;
-
-    class Debouncer {
+    class Pushbutton {
 
         private:
 
@@ -30,9 +27,9 @@ namespace hf {
 
         public:
 
-            Debouncer() = default;
+            Pushbutton() = default;
 
-            Debouncer(const uint8_t pin) 
+            Pushbutton(const uint8_t pin) 
                 : pin_(pin) {}
 
             auto Read() -> bool
@@ -61,23 +58,6 @@ namespace hf {
             uint8_t reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
-    };
-
-    class Pushbutton {
-
-        public:
-
-            Pushbutton(const uint8_t pin) 
-                : debouncer_(pin) {}
-
-            auto Read() -> bool
-            {
-                return debouncer_.Read();
-            }
-
-        private:
-
-            Debouncer debouncer_;
     };
 }
 
