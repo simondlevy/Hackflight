@@ -107,13 +107,13 @@ namespace hf {
                         motor_vals,
                         motor_count);
 
+                 debugger_.Report(rx);
+
                 const auto setpoint = Setpoint(
                         (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
                         PositionController::bypass(EspNowReceiver::GetRoll(rx)),
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
                         PositionController::bypass(EspNowReceiver::GetYaw(rx)));
-
-                // debugger_.Report(setpoint);
 
                 stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
