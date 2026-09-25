@@ -31,7 +31,7 @@ namespace hf {
 
             static constexpr float kThrottleDownMax = -0.90;
 
-         public:
+        public:
 
             EspNowReceiver() = default;
 
@@ -52,24 +52,19 @@ namespace hf {
                 const auto safe_to_arm = require_throttle_down_to_arm ? 
                     is_throttle_down : true;
 
-                printf("safe to arm: %d\n", safe_to_arm);
+                const bool is_arming_button_down = GetSwitchStatus(rx.parser_, 4);
 
-                /*
-                // Push-button arming; ignores startup transient
-                const auto did_aux_change_ = tdata.aux_ >= 988 && aux !=
-                    tdata.aux_;
+                if (is_arming_button_down && !rx.was_arming_button_down_) {
+                    printf("ARM!!!\n");
+                }
 
-                const auto requested_arming = 
-                    did_aux_change_ && tdata.data.requested_arming ? false :
-                    did_aux_change_ && safe_to_arm ? true :
-                    tdata.data.requested_arming;
-                    */
+                (void)safe_to_arm;
 
-
-               return EspNowReceiver(
+                return EspNowReceiver(
                         MspParser::Parse(rx.parser_, byte),
                         MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
-                        rx.time_msec_);
+                        rx.time_msec_,
+                        is_arming_button_down);
             }
 
             static auto GetThrottle(const EspNowReceiver & rx) -> float
@@ -118,8 +113,15 @@ namespace hf {
 
             uint32_t time_msec_;
 
-            EspNowReceiver(const MspParser & parser, const uint32_t time_msec) :
-                parser_(parser), time_msec_(time_msec) {}
+            bool was_arming_button_down_;
+
+            EspNowReceiver(
+                    const MspParser & parser,
+                    const uint32_t time_msec,
+                    const bool is_arming_button_down)
+                : parser_(parser),
+                time_msec_(time_msec),
+                was_arming_button_down_(is_arming_button_down) {}
 
             static auto GetAxisValue(
                     const MspParser & parser, const uint8_t index) -> float
