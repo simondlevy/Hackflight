@@ -41,19 +41,20 @@ namespace hf {
             static auto Update(
                     const EspNowReceiver & rx,
                     const uint8_t byte,
-                    const uint32_t time_msec
+                    const uint32_t time_msec,
+                    const bool require_throttle_down_to_arm=true
                     ) -> EspNowReceiver
             {
 
                 const auto is_throttle_down =
                     GetThrottle(rx) < kThrottleDownMax;
 
-                printf("throttle down=%d\n", is_throttle_down);
-
-                /*
                 const auto safe_to_arm = require_throttle_down_to_arm ? 
                     is_throttle_down : true;
 
+                printf("safe to arm: %d\n", safe_to_arm);
+
+                /*
                 // Push-button arming; ignores startup transient
                 const auto did_aux_change_ = tdata.aux_ >= 988 && aux !=
                     tdata.aux_;
