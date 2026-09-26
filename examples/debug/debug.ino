@@ -38,17 +38,12 @@ void loop()
         armed = false;
     }
 
-    //printf("was_down=%d\n", was_down);
-
     if (is_down && !was_down) {
         armed = true;
-        for (int k=0; k<1000; ++k) {
-            printf("ARM!!!\n");
-        }
     }
 
-
     was_down = is_down;
+
     printf("armed=%d\n", armed);
 
     delay(1);
