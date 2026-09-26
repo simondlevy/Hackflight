@@ -42,11 +42,13 @@ namespace hf {
                 return NewReceiver(parser, is_down, rx.was_down_, rx.armed_);
             }
 
-            static auto Update(const NewReceiver & rx) -> NewReceiver
+            void Update()
             {
-                return rx;
+                armed_ = !is_down_ ? false : is_down_ && !was_down_ ? true : armed_;
+                was_down_ = is_down_;
+
             }
-     };
+    };
 }
 
 static hf::NewReceiver rx_;
@@ -63,17 +65,12 @@ void setup()
 {
     Serial3.begin(115200);
 
-    //rx_.armed_ = false;
-    //rx_.was_down_ = true;
-
     delay(3000);
 }
 
 void loop()
 {
-    rx_.armed_ = !rx_.is_down_ ? false : rx_.is_down_ && !rx_.was_down_ ? true : rx_.armed_;
-
-    rx_.was_down_ = rx_.is_down_;
+    rx_.Update();
 
     printf("armed=%d\n", rx_.armed_);
 
