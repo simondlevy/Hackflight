@@ -44,9 +44,6 @@ namespace hf {
 
 static hf::NewReceiver rx_;
 
-static bool armed;
-static bool was_down;
-
 void serialEvent3()
 {
     while (Serial3.available()) {
@@ -59,21 +56,19 @@ void setup()
 {
     Serial3.begin(115200);
 
-    armed = false;
-    was_down = true;
+    rx_.armed_ = false;
+    rx_.was_down_ = true;
 
     delay(3000);
 }
 
 void loop()
 {
-    rx_ = hf::NewReceiver::Update(rx_);
+    rx_.armed_ = !rx_.is_down_ ? false : rx_.is_down_ && !rx_.was_down_ ? true : rx_.armed_;
 
-    armed = !rx_.is_down_ ? false : rx_.is_down_ && !was_down ? true : armed;
+    rx_.was_down_ = rx_.is_down_;
 
-    was_down = rx_.is_down_;
-
-    printf("armed=%d\n", armed);
+    printf("armed=%d\n", rx_.armed_);
 
     delay(1);
 }
