@@ -7,6 +7,7 @@ namespace hf {
     class NewReceiver {
 
         public:
+
             MspParser parser_;
             bool is_down_;
             bool was_down_;
@@ -42,6 +43,13 @@ namespace hf {
                 return NewReceiver(parser, is_down, rx.was_down_, rx.armed_);
             }
 
+            static auto Update(const NewReceiver & rx) -> NewReceiver
+            {
+                const auto armed = !rx.is_down_ ? false : rx.is_down_ && !rx.was_down_ ? true : rx.armed_;
+
+                return NewReceiver(rx.parser_, rx.is_down_, rx.is_down_, armed);
+            }
+
             void Update()
             {
                 armed_ = !is_down_ ? false : is_down_ && !was_down_ ? true : armed_;
@@ -70,7 +78,9 @@ void setup()
 
 void loop()
 {
-    rx_.Update();
+    //rx_.Update();
+
+    rx_ = hf::NewReceiver::Update(rx_);
 
     printf("armed=%d\n", rx_.armed_);
 
