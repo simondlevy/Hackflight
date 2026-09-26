@@ -8,11 +8,6 @@ namespace hf {
 
         public:
 
-            MspParser parser_;
-            bool is_down_;
-            bool was_down_;
-            bool armed_;
-
             NewReceiver(
                     const MspParser & parser,
                     const bool is_down,
@@ -21,7 +16,7 @@ namespace hf {
                 : parser_(parser),
                 is_down_(is_down),
                 was_down_(was_down),
-                armed_(armed) {}
+                is_armed_(armed) {}
 
             NewReceiver() : was_down_(true) {}
 
@@ -40,22 +35,27 @@ namespace hf {
                     MspParser::GetShort(parser, 4) > 0 :
                     rx.is_down_;
 
-                return NewReceiver(parser, is_down, rx.was_down_, rx.armed_);
+                return NewReceiver(parser, is_down, rx.was_down_, rx.is_armed_);
             }
 
             static auto Update(const NewReceiver & rx) -> NewReceiver
             {
-                const auto armed = !rx.is_down_ ? false : rx.is_down_ && !rx.was_down_ ? true : rx.armed_;
+                const auto armed = !rx.is_down_ ? false : rx.is_down_ && !rx.was_down_ ? true : rx.is_armed_;
 
                 return NewReceiver(rx.parser_, rx.is_down_, rx.is_down_, armed);
             }
 
-            void Update()
+            static auto IsArmed(const NewReceiver & rx) -> bool
             {
-                armed_ = !is_down_ ? false : is_down_ && !was_down_ ? true : armed_;
-                was_down_ = is_down_;
-
+                return rx.is_armed_;
             }
+
+        private:
+
+            MspParser parser_;
+            bool is_down_;
+            bool was_down_;
+            bool is_armed_;
     };
 }
 
@@ -78,11 +78,9 @@ void setup()
 
 void loop()
 {
-    //rx_.Update();
-
     rx_ = hf::NewReceiver::Update(rx_);
 
-    printf("armed=%d\n", rx_.armed_);
+    printf("armed=%d\n", hf::NewReceiver::IsArmed(rx_));
 
     delay(1);
 }
