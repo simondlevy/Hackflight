@@ -12,10 +12,17 @@ namespace hf {
             bool was_down_;
             bool armed_;
 
-            NewReceiver(const MspParser & parser, const bool is_down, const bool was_down, const bool armed) 
-                : parser_(parser), is_down_(is_down), was_down_(was_down), armed_(armed) {}
+            NewReceiver(
+                    const MspParser & parser,
+                    const bool is_down,
+                    const bool was_down,
+                    const bool armed) 
+                : parser_(parser),
+                is_down_(is_down),
+                was_down_(was_down),
+                armed_(armed) {}
 
-            NewReceiver() = default;
+            NewReceiver() : was_down_(true) {}
 
             NewReceiver& operator=(const NewReceiver& other) = default;
 
@@ -56,8 +63,8 @@ void setup()
 {
     Serial3.begin(115200);
 
-    rx_.armed_ = false;
-    rx_.was_down_ = true;
+    //rx_.armed_ = false;
+    //rx_.was_down_ = true;
 
     delay(3000);
 }
