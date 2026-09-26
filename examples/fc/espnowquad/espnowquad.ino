@@ -41,7 +41,7 @@ void setup()
     // Start receiver comms
     Serial3.begin(115200);
 
-    // Allow a sec for the receiver to kick in
+    // Wait a sec for the receiver to kick in
     delay(1000);
 
     // Start flight control, no hoverdeck

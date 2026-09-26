@@ -111,6 +111,7 @@ namespace hf {
                 }
             }
 
+            /*
             void Report(const EspNowReceiver & rx)
             {
                 if (helper_.Ready()) {
@@ -127,7 +128,7 @@ namespace hf {
                                 EspNowReceiver::DidRequestAutopilot(rx),
                                 EspNowReceiver::GetTimestampMsec(rx));
                 }
-            }
+            }*/
 
             void Report(const Setpoint & setpoint)
             {
