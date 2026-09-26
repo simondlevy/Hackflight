@@ -18,7 +18,7 @@ namespace hf {
 
             NewReceiver& operator=(const NewReceiver& other) = default;
 
-            static auto Update(
+            static auto ParseByte(
                     const NewReceiver & rx,
                     const uint8_t byte,
                     const uint32_t time_msec
@@ -45,17 +45,7 @@ void serialEvent3()
 {
     while (Serial3.available()) {
 
-        rx_ = hf::NewReceiver::Update(rx_, Serial3.read(), millis());
-
-        /*
-        static hf::MspParser parser_;
-
-        parser_ = hf::MspParser::Parse(parser_, Serial3.read());
-
-        if (hf::MspParser::GetId(parser_) == kMspSetChannels) {
-
-            is_down = hf::MspParser::GetShort(parser_, 4) > 0;
-        }*/
+        rx_ = hf::NewReceiver::ParseByte(rx_, Serial3.read(), millis());
     }
 }
 
@@ -72,19 +62,6 @@ void setup()
 void loop()
 {
     armed = !rx_.is_down_ ? false : rx_.is_down_ && !was_down ? true : armed;
-
-    /*
-    if (!rx_.is_down_) {
-        armed = false;
-    }
-
-    else if (rx_.is_down_ && !was_down) {
-        armed = true;
-    }
-
-    else {
-        armed = armed;
-    }*/
 
     was_down = rx_.is_down_;
 
