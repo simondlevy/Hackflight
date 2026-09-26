@@ -21,14 +21,14 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
-#include <firmware/receivers/espnow.hpp>
+#include <firmware/receivers/new.hpp>
 
-static hf::EspNowReceiver rx_;
+static hf::NewReceiver rx_;
 
 void serialEvent3()
 {
     while (Serial3.available()) {
-        rx_ = hf::EspNowReceiver::Update(rx_, Serial3.read(), millis());
+        rx_ = hf::NewReceiver::ParseByte(rx_, Serial3.read(), millis());
     }
 }
 
@@ -41,6 +41,9 @@ void setup()
     // Start receiver comms
     Serial3.begin(115200);
 
+    // Allow a sec for the receiver to kick in
+    delay(1000);
+
     // Start flight control, no hoverdeck
     fc_.Begin(false);
 
@@ -50,6 +53,12 @@ void setup()
 
 void loop()
 {
+
+    rx_ = hf::NewReceiver::Update(rx_);
+
+    printf("armed=%d\n", hf::NewReceiver::IsArmed(rx_));
+
+    delay(1);
 
     // Run core algorithm to get setpoint from PID controllers
     //const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
