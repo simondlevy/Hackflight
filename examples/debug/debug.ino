@@ -71,13 +71,20 @@ void setup()
 
 void loop()
 {
+    armed = !rx_.is_down_ ? false : rx_.is_down_ && !was_down ? true : armed;
+
+    /*
     if (!rx_.is_down_) {
         armed = false;
     }
 
-    if (rx_.is_down_ && !was_down) {
+    else if (rx_.is_down_ && !was_down) {
         armed = true;
     }
+
+    else {
+        armed = armed;
+    }*/
 
     was_down = rx_.is_down_;
 
