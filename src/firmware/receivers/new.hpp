@@ -69,7 +69,7 @@ namespace hf {
                         rx.is_armed_, timestamp_msec);
             }
 
-            static auto Update(const NewReceiver & rx) -> NewReceiver
+            static auto CheckArming(const NewReceiver & rx) -> NewReceiver
             {
                 const auto armed = !rx.is_down_ ? false :
                     rx.is_down_ && !rx.was_down_ ? true :

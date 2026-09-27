@@ -54,7 +54,7 @@ void setup()
 void loop()
 {
 
-    rx_ = hf::NewReceiver::Update(rx_);
+    rx_ = hf::NewReceiver::CheckArming(rx_);
 
     printf("armed=%d\n", hf::NewReceiver::IsArmed(rx_));
 
