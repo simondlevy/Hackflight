@@ -12,7 +12,7 @@ void loop()
 {
     (void)fc_;
 
-    const auto setpoint = hf::Setpoint(0, 0, 0, 0);
+    const auto setpoint = hf::Setpoint(1, 2, 3, 4);
 
     /*
     static uint8_t k_;
