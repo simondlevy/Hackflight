@@ -19,7 +19,7 @@
 
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
-static const uint32_t kDelayMsec = 1;
+static const uint32_t kSendDelayMsec = 1;
 static const uint32_t kWifiTimeoutMsec = 50;
 
 static const uint32_t kSerialBaudRate = 115'200;
@@ -39,7 +39,7 @@ void serialEvent1()
             Serial.printf("ERROR sending to dongle: %d\n", result);
         }
 
-        delay(1);
+        delay(kSendDelayMsec);
     }
 }
 
