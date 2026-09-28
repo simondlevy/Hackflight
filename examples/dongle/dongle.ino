@@ -22,7 +22,9 @@ static void OnDataRecv(
 {
     (void)mac;
 
-    Serial.printf("%c\n", *data);
+    Serial.write(data, len);
+
+    delay(1);
 }
 
 void setup()
