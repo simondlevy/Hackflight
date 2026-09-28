@@ -95,7 +95,6 @@ namespace hf {
                 mode_ = kModeIdle;
             }
 
-            /*
             auto Update(
                     const EspNowReceiver & rx,
                     const float * motor_vals,
@@ -104,7 +103,7 @@ namespace hf {
                 debugger_.Report(rx);
 
                 Step(
-                        EspNowReceiver::DidSafelyRequestArming(rx),
+                        EspNowReceiver::IsArmed(rx),
                         false, // false = no hover for now
                         EspNowReceiver::GetTimestampMsec(rx),
                         motor_vals,
@@ -120,7 +119,7 @@ namespace hf {
                         is_flying_, GetDt(), state_, setpoint);
 
                 return stabilizer_pid_.setpoint;
-            }*/
+            }
 
              auto Update(
                     const TraditionalReceiver & rx,

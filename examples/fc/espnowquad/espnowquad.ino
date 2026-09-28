@@ -56,12 +56,12 @@ void loop()
 
     rx_ = hf::EspNowReceiver::CheckArming(rx_);
 
-    printf("armed=%d\n", hf::EspNowReceiver::IsArmed(rx_));
+    // Run core algorithm to get setpoint from PID controllers
+    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
+
+    (void)setpoint;
 
     delay(1);
-
-    // Run core algorithm to get setpoint from PID controllers
-    //const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
     //motors_.Run(fc_, setpoint);

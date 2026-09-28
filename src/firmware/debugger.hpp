@@ -111,7 +111,6 @@ namespace hf {
                 }
             }
 
-            /*
             void Report(const EspNowReceiver & rx)
             {
                 if (helper_.Ready()) {
@@ -122,13 +121,11 @@ namespace hf {
                                 EspNowReceiver::GetPitch(rx),
                                 EspNowReceiver::GetYaw(rx)));
 
-                       printf(" | arm=%d hov=%d  aut=%d | time (msec) = %lu\n", 
-                                EspNowReceiver::DidSafelyRequestArming(rx),
-                                EspNowReceiver::DidRequestHover(rx),
-                                EspNowReceiver::DidRequestAutopilot(rx),
+                       printf(" | arm=%d  time (msec) = %lu\n", 
+                                EspNowReceiver::IsArmed(rx),
                                 EspNowReceiver::GetTimestampMsec(rx));
                 }
-            }*/
+            }
 
             void Report(const Setpoint & setpoint)
             {

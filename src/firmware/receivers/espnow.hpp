@@ -109,6 +109,11 @@ namespace hf {
                 return GetAxisValue(rx.parser_, 3);
             }
 
+            static auto GetTimestampMsec(const EspNowReceiver & rx) -> uint32_t
+            {
+                return rx.timestamp_msec_;
+            }
+
         private:
 
             MspParser parser_;
