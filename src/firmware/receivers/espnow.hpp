@@ -1,53 +1,134 @@
+/**
+ * Class for mocking up old-school R/C receiver with ESP-NOW
+ *
+ * Copyright (C) 2026 Simon D. Levy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, in version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #pragma once
 
-#if 0
+#include <hackflight.h>
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/parser.hpp>
 
-            static auto Update(
+namespace hf {
+
+    class EspNowReceiver {
+
+        private:
+
+            static constexpr float kThrottleDownMax = -0.90;
+
+        public:
+
+            EspNowReceiver(
+                    const MspParser & parser,
+                    const bool is_down,
+                    const bool was_down,
+                    const bool armed,
+                    const uint32_t timestamp_msec) 
+                : parser_(parser),
+                is_down_(is_down),
+                was_down_(was_down),
+                is_armed_(armed),
+                timestamp_msec_(timestamp_msec) {}
+
+            EspNowReceiver() : was_down_(true) {}
+
+            EspNowReceiver& operator=(const EspNowReceiver& other) = default;
+
+            static auto ParseByte(
                     const EspNowReceiver & rx,
                     const uint8_t byte,
                     const uint32_t time_msec
                     ) -> EspNowReceiver
             {
-                const bool is_arming_button_up = !GetSwitchStatus(rx.parser_, 4);
+                auto parser = MspParser::Parse(rx.parser_, byte);
 
-                const bool is_armed  =
+                const auto got_new_message =
+                    MspParser::GetId(parser) == kMspSetChannels;
 
-                    // Disarm when arming button is up
-                    is_arming_button_up ? false :
+                const auto is_down =
+                    got_new_message ?
+                    MspParser::GetShort(parser, 4) > 0 :
+                    rx.is_down_;
 
-                    // Arm when arming button goes up to down and throttle is down
-                    (!rx.is_armed_ &&
-                    GetThrottle(rx) < kThrottleDownMax && 
-                    !is_arming_button_up &&
-                    rx.was_arming_button_up_) ? true :
+                const auto timestamp_msec =
+                    got_new_message ? time_msec : rx.timestamp_msec_;
 
-                    // Otherwise leave arming status alone
+                return EspNowReceiver(parser, is_down, rx.was_down_,
+                        rx.is_armed_, timestamp_msec);
+            }
+
+            static auto CheckArming(const EspNowReceiver & rx) -> EspNowReceiver
+            {
+                const auto armed = !rx.is_down_ ? false :
+
+                    rx.is_down_ && !rx.was_down_ &&
+                    GetAxisValue(rx.parser_, 0) < kThrottleDownMax ? true :
+
                     rx.is_armed_;
 
-                printf("%d\n", is_armed);
-
-                return EspNowReceiver(
-                        MspParser::Parse(rx.parser_, byte),
-                        MspParser::GetId(rx.parser_) == kMspSetChannels ?  time_msec :
-                        rx.time_msec_,
-                        is_arming_button_up,
-                        is_armed);
+                return EspNowReceiver(rx.parser_, rx.is_down_, rx.is_down_,
+                        armed, rx.timestamp_msec_);
             }
 
-            static auto DidRequestHover(const EspNowReceiver & rx) -> bool
+            static auto IsArmed(const EspNowReceiver & rx) -> bool
             {
-                return GetSwitchStatus(rx.parser_, 5);
+                return rx.is_armed_;
             }
 
-            static auto DidRequestAutopilot(const EspNowReceiver & rx) -> bool
+            static auto GetThrottle(const EspNowReceiver & rx) -> float
             {
-                return GetSwitchStatus(rx.parser_, 6);
+                return GetAxisValue(rx.parser_, 0);
             }
 
-            static auto GetTimestampMsec(const EspNowReceiver & rx) -> uint32_t
+            static auto GetRoll(const EspNowReceiver & rx) -> float
             {
-                return rx.time_msec_;
+                return GetAxisValue(rx.parser_, 1);
+            }
+
+            static auto GetPitch(const EspNowReceiver & rx) -> float
+            {
+                return GetAxisValue(rx.parser_, 2);
+            }
+
+            static auto GetYaw(const EspNowReceiver & rx) -> float
+            {
+                return GetAxisValue(rx.parser_, 3);
+            }
+
+        private:
+
+            MspParser parser_;
+            bool is_down_;
+            bool was_down_;
+            bool is_armed_;
+            uint32_t timestamp_msec_;
+
+            static auto GetAxisValue(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                const auto val = MspParser::GetShort(parser, index);
+
+                return 2 * (val / 4095.f ) - 1;
+            }
+
+            static auto GetSwitchStatus(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                return MspParser::GetShort(parser, index) > 0;
             }
     };
 }
-#endif

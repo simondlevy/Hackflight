@@ -21,14 +21,14 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/effectors/quad_dshot.hpp>
-#include <firmware/receivers/new.hpp>
+#include <firmware/receivers/espnow.hpp>
 
-static hf::NewReceiver rx_;
+static hf::EspNowReceiver rx_;
 
 void serialEvent3()
 {
     while (Serial3.available()) {
-        rx_ = hf::NewReceiver::ParseByte(rx_, Serial3.read(), millis());
+        rx_ = hf::EspNowReceiver::ParseByte(rx_, Serial3.read(), millis());
     }
 }
 
@@ -54,9 +54,9 @@ void setup()
 void loop()
 {
 
-    rx_ = hf::NewReceiver::CheckArming(rx_);
+    rx_ = hf::EspNowReceiver::CheckArming(rx_);
 
-    printf("armed=%d\n", hf::NewReceiver::IsArmed(rx_));
+    printf("armed=%d\n", hf::EspNowReceiver::IsArmed(rx_));
 
     delay(1);
 
