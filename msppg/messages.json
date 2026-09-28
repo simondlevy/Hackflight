@@ -1,5 +1,5 @@
 {
-  "QUADROTOR_TELEMETRY": 
+  "TELEMETRY": 
   [{"ID": 100},
    {"comment": "mode should be byte, but easier if float"},
    {"mode":   "float"},
@@ -16,11 +16,7 @@
    {"theta":  "float"},
    {"dtheta": "float"},
    {"psi":    "float"},
-   {"dpsi":   "float"},
-   {"motor1": "float"},
-   {"motor2": "float"},
-   {"motor3": "float"},
-   {"motor4": "float"}
+   {"dpsi":   "float"}
   ],
 
   "SET_ARMING": 

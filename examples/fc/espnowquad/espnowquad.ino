@@ -62,5 +62,6 @@ void loop()
     // Run the mixer and motors
     motors_.Run(fc_, setpoint);
 
-    // Here we could send telemetry to base station over Serial3
+    // Send telemetry to base station over Serial3
+    fc_.SendTelemetry(Serial3, setpoint);
 }

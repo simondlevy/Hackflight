@@ -81,8 +81,6 @@ namespace hf {
 
             void Begin(const bool use_hover_deck=true)
             {
-                Serial1.begin(115200);
-
                 imu_.Begin();
 
                 pinMode(kLedPin, OUTPUT); 
@@ -197,10 +195,8 @@ namespace hf {
             }
 
             void SendTelemetry(
-                    const Setpoint & setpoint,
-                    const uint8_t message_id,
-                    const float * motor_values,
-                    const size_t motor_count)
+                    HardwareSerial & serial,
+                    const Setpoint & setpoint)
             {
                 if (telemetry_timer_.Ready()) {
 
@@ -224,15 +220,11 @@ namespace hf {
                     data[13] = state_.psi;
                     data[14] = state_.dpsi;
 
-                    for (uint8_t i=0; i<motor_count; ++i) {
-                        data[15+i] = motor_values[i];
-                    }
-
                     telemetry_serializer_ = MspSerializer::SerializeFloats(
-                            telemetry_serializer_, message_id,
-                            data, 15 + motor_count);
+                            telemetry_serializer_, kMspTelemetry,
+                            data, 15);
 
-                    Serial1.write(
+                    serial.write(
                             MspSerializer::GetPayloadBytes(telemetry_serializer_),
                             MspSerializer::GetPayloadSize(telemetry_serializer_));
                 }
