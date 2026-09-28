@@ -10,23 +10,22 @@ except Exception as e:
     exit(0)
 
 
-'''
 class Telemetry(MspParser):
 
     def __init__(self):
-
         MspParser.__init__(self)
 
 
     def handle_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
                          dx, dy, z, dz, phi, dphi, theta,
                          dtheta, psi, dpsi):
+        print(psi)
 
+    def handle_BOGUS(self, psi):
         print(psi)
 
 
 parser = Telemetry()
-'''
 
 prev = 0
 count = 0
@@ -37,9 +36,7 @@ with serial.Serial('/dev/ttyUSB0', 115200) as ser:
 
         try:
 
-            byte = ord(ser.read(1))
-
-            # print('x%02X' % byte)
+            byte = ser.read(1)
 
             count += 1
 
@@ -48,13 +45,12 @@ with serial.Serial('/dev/ttyUSB0', 115200) as ser:
             if curr - prev > 1:
 
                 if prev > 0:
-                    print(count)
+                    #print(count)
                     count = 0
 
                 prev = curr
 
-            # parser.parse(ser.read(1))
-            # print(ser.read(1).decode())
+            parser.parse(byte)
 
         except KeyboardInterrupt:
 

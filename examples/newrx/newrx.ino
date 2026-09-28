@@ -38,6 +38,8 @@ void serialEvent1()
         if (result != ESP_OK) {
             Serial.printf("ERROR sending to dongle: %d\n", result);
         }
+
+        delay(1);
     }
 }
 
