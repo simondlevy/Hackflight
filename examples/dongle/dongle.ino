@@ -23,8 +23,6 @@ static void OnDataRecv(
     (void)mac;
 
     Serial.write(data, len);
-
-    delay(1);
 }
 
 void setup()
