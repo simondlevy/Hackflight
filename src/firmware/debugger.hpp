@@ -121,7 +121,7 @@ namespace hf {
                                 EspNowReceiver::GetPitch(rx),
                                 EspNowReceiver::GetYaw(rx)));
 
-                       printf(" | arm=%d  time (msec) = %lu\n", 
+                       printf(" | arm=%d | time (msec) = %lu\n", 
                                 EspNowReceiver::IsArmed(rx),
                                 EspNowReceiver::GetTimestampMsec(rx));
                 }

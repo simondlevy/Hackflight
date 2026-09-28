@@ -100,22 +100,19 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                debugger_.Report(rx);
-
                 Step(
                         EspNowReceiver::IsArmed(rx),
                         false, // false = no hover for now
                         EspNowReceiver::GetTimestampMsec(rx),
-                        motor_vals,
-                        motor_count);
+                        motor_vals, motor_count);
 
                 const auto setpoint = Setpoint(
                         (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
                         PositionController::bypass(EspNowReceiver::GetRoll(rx)),
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
-                        PositionController::bypass(EspNowReceiver::GetYaw(rx)));
+                        EspNowReceiver::GetYaw(rx));
 
-                stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
+                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
 
                 return stabilizer_pid_.setpoint;
@@ -127,8 +124,6 @@ namespace hf {
                     const uint8_t motor_count) -> Setpoint
             {
                 const auto rxdata = rx.data;
-
-                debugger_.Report(rxdata);
 
                 Step(rxdata.requested_arming, false, // false = no hover
                         rxdata.timestamp_msec, motor_vals, motor_count);

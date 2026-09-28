@@ -53,18 +53,14 @@ void setup()
 
 void loop()
 {
-
+    // Receiver parses new data via serial event, so check arming here
     rx_ = hf::EspNowReceiver::CheckArming(rx_);
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
-    (void)setpoint;
-
-    delay(1);
-
     // Run the mixer and motors
-    //motors_.Run(fc_, setpoint);
+    motors_.Run(fc_, setpoint);
 
     // Here we could send telemetry to base station over Serial3
 }
