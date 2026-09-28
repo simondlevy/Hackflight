@@ -12,40 +12,20 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <UMS3.h>
-
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 
 #include <firmware/espnow.hpp>
 
-static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
-
 static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
 
+static const uint32_t kDelayMsec = 1;
 static const uint32_t kWifiTimeoutMsec = 50;
 
 static const uint32_t kSerialBaudRate = 115'200;
-static const uint8_t kSerialRxPin = 44;
-static const uint8_t kSerialTxPin = 43;
+static const uint8_t kSerialRxPin = 4;
+static const uint8_t kSerialTxPin = 14;
 
-static const uint32_t kDelayMsec = 10;
-
-static auto blink_timer_ = hf::BlinkTimer();
-
-static UMS3 ums3_;
-
-static uint32_t last_wifi_received_msec_;
-
-static void OnWifiDataReceive(
-        const uint8_t * mac, const uint8_t * data, int len)
-{
-    (void)mac;
-
-    Serial1.write(data, len);
-
-    last_wifi_received_msec_ = millis();
-}
 
 void serialEvent1()
 {
@@ -53,11 +33,14 @@ void serialEvent1()
 
         const uint8_t data = Serial1.read();
 
-        if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
-            // maybe do something here?
+        const auto result = esp_now_send(kDongleAddress, &data, 1);
+
+        if (result != ESP_OK) {
+            Serial.printf("ERROR sending to dongle: %d\n", result);
         }
     }
 }
+
 
 void setup()
 {
@@ -65,27 +48,33 @@ void setup()
 
     Serial1.begin(kSerialBaudRate, SERIAL_8N1, kSerialRxPin, kSerialTxPin);
 
-    ums3_.begin();
-    ums3_.setPixelBrightness(255 / 3);
-    ums3_.setPixelPower(true);
-
     hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kTransmitterAddress);
     hf::EspNow::WifiAddPeer(kDongleAddress);
-
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
 }
 
 void loop()
 {
-    if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
-            ums3_.setPixelColor(0, 255, 0);
-    }
+    /*
+       if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
+       ums3_.setPixelColor(0, 255, 0);
+       }
 
     // not connected
     else {
-        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+    ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+    }*/
+
+    /*
+    static uint8_t k_;
+    const uint8_t data = 'A' + k_;
+    k_ = (k_ + 1) % 26;
+
+    const auto result = esp_now_send(kDongleAddress, &data, 1);
+
+    if (result != ESP_OK) {
+        Serial.printf("ERROR sending to dongle: %d\n", result);
     }
 
-    delay(kDelayMsec);
+    delay(kDelayMsec);*/
 }
+

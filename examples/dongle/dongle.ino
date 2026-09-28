@@ -15,7 +15,14 @@
 #include <hackflight.h>
 #include <firmware/espnow.hpp>
 
-static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
+static const uint8_t kReceiverAddress[6] = {
+    
+    // OMGS3
+    //0x98,0x3D,0xAE,0xEF,0x0E,0xAC
+
+    // TinyPICO
+    0xD4, 0xD4, 0xDA, 0xAA, 0x2E, 0xF0
+};
 
 static void OnDataRecv(
         const uint8_t * mac, const uint8_t * data, int len)
