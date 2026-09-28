@@ -14,6 +14,7 @@ class Telemetry(MspParser):
 
     def __init__(self):
         MspParser.__init__(self)
+        self._count = 0
 
 
     def handle_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
@@ -22,13 +23,11 @@ class Telemetry(MspParser):
         print(psi)
 
     def handle_BOGUS(self, psi):
-        print(psi)
+        print(self._count, psi)
+        self._count += 1
 
 
 parser = Telemetry()
-
-prev = 0
-count = 0
 
 with serial.Serial('/dev/ttyUSB0', 115200) as ser:
 
@@ -36,21 +35,7 @@ with serial.Serial('/dev/ttyUSB0', 115200) as ser:
 
         try:
 
-            byte = ser.read(1)
-
-            count += 1
-
-            curr = time()
-
-            if curr - prev > 1:
-
-                if prev > 0:
-                    #print(count)
-                    count = 0
-
-                prev = curr
-
-            parser.parse(byte)
+            parser.parse(ser.read(1))
 
         except KeyboardInterrupt:
 
