@@ -12,6 +12,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <TinyPICO.h>
+
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 
@@ -21,12 +23,7 @@ static const uint8_t kDongleAddress[6] = {
     
     // M5 Stack Atom
     0xD4,0xD4,0xDA,0x83,0x97,0x90
-
-    // TinyS3
-    //0xB4, 0x3A, 0x45, 0xB1, 0xF2, 0x40
 };
-
-static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
 
 static const uint32_t kSendDelayMsec = 5;
 static const uint32_t kWifiTimeoutMsec = 50;
@@ -37,14 +34,14 @@ static const uint8_t kSerialTxPin = 14;
 
 static uint32_t last_wifi_received_msec_;
 
+static TinyPICO tp_ = TinyPICO();
+
 static void OnWifiDataReceive(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
     //Serial1.write(data, len);
-
-    Serial.printf("received %d\n", len);
 
     last_wifi_received_msec_ = millis();
 }
@@ -71,37 +68,42 @@ void setup()
 {
     Serial.begin(115200);
 
-    Serial1.begin(kSerialBaudRate, SERIAL_8N1, kSerialRxPin, kSerialTxPin);
+    //Serial1.begin(kSerialBaudRate, SERIAL_8N1, kSerialRxPin, kSerialTxPin);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kDongleAddress);
 
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
+
+    //tp_.DotStar_Clear();
 }
 
 void loop()
 {
-    /*
-       if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
-       ums3_.setPixelColor(0, 255, 0);
-       }
+    const auto lag = millis() - last_wifi_received_msec_;
+
+    // connected
+    if (lag < kWifiTimeoutMsec) {
+        tp_.DotStar_SetPixelColor( 0, 255, 0 );
+
+    }
 
     // not connected
     else {
-    ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
-    }*/
-
-    /*
-    static uint8_t k_;
-    const uint8_t data = 'A' + k_;
-    k_ = (k_ + 1) % 26;
-
-    const auto result = esp_now_send(kDongleAddress, &data, 1);
-
-    if (result != ESP_OK) {
-        Serial.printf("ERROR sending to dongle: %d\n", result);
+        tp_.DotStar_SetPixelColor( 255, 0, 0 );
     }
 
-    delay(kDelayMsec);*/
+    /*
+       static uint8_t k_;
+       const uint8_t data = 'A' + k_;
+       k_ = (k_ + 1) % 26;
+
+       const auto result = esp_now_send(kDongleAddress, &data, 1);
+
+       if (result != ESP_OK) {
+       Serial.printf("ERROR sending to dongle: %d\n", result);
+       }
+
+       delay(kDelayMsec);*/
 }
 
