@@ -28,7 +28,8 @@ static const uint8_t kReceiverAddress[6] = {
     //0x98,0x3D,0xAE,0xEF,0x0E,0xAC
 
     // TinyS3
-    0xB4, 0x3A, 0x45, 0xB2, 0x09, 0x2C
+    // 0xB4, 0x3A, 0x45, 0xB2, 0x09, 0x2C
+    0xB4, 0x3A, 0x45, 0xB1, 0xF1, 0xC0
 };
 
 
@@ -95,7 +96,12 @@ static auto ReadAxisShort(
     return map(analogRead(pin), hi, lo, 0, 4095);
 }
 
-static uint16_t low_, high_;
+// Scale to [0, 4095]
+static auto ReadAxis(
+        const uint8_t pin, const uint16_t low, const uint16_t high) -> uint16_t
+{
+    return map(analogRead(pin), low, high, 0, 4095);
+}
 
 void setup()
 {
@@ -105,16 +111,6 @@ void setup()
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kReceiverAddress);
-
-    low_ = 1000;
-    high_ = 0;
-}
-
-// Scale to [0, 4095]
-static auto ReadAxis(
-        const uint8_t pin, const uint16_t low, const uint16_t high) -> uint16_t
-{
-    return map(analogRead(pin), low, high, 0, 4095);
 }
 
 void loop()

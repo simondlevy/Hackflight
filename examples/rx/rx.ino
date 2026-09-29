@@ -21,7 +21,15 @@
 
 //static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
 
-static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
+static const uint8_t kDongleAddress[6] = {
+    
+    // M5 Atom
+    // 0xD4,0xD4,0xDA,0x83,0x97,0x90
+
+    // TinyS3
+    0xB4, 0x3A, 0x45, 0xB1, 0xF1, 0xC0
+};
+
 
 static const uint32_t kWifiTimeoutMsec = 50;
 
@@ -39,6 +47,7 @@ static uint32_t last_wifi_received_msec_;
 
 static int nread_;
 
+// Send Wifi input to Teensy over UART
 static void OnWifiDataReceive(
         const uint8_t * mac, const uint8_t * data, int len)
 {
@@ -49,6 +58,9 @@ static void OnWifiDataReceive(
     last_wifi_received_msec_ = millis();
 }
 
+/*
+
+// Send UART inpt from Teensy to dongle
 void serialEvent1()
 {
     const auto avail = Serial1.available();
@@ -59,14 +71,12 @@ void serialEvent1()
 
     nread_ += avail;
 
-    /*
-    while (Serial1.available()) {
-        const uint8_t data = Serial1.read();
-        //if (esp_now_send(kDongleAddress, &data, 1) != ESP_OK) {
-            // maybe do something here?
-        //}
-    }*/
+    if (esp_now_send(kDongleAddress, buf, avail) != ESP_OK) {
+        Serial.println("failed to send to dongle\n");
+        // maybe do something here?
+    }
 }
+*/
 
 void setup()
 {
@@ -79,7 +89,7 @@ void setup()
     ums3_.setPixelPower(true);
 
     hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kDongleAddress);
+    //hf::EspNow::WifiAddPeer(kDongleAddress);
 
     esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
 }

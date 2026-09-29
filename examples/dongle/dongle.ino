@@ -1,4 +1,4 @@
-/* Hackflight ESP32 transmitter sketch
+/* Hackflight ESP32 receiver sketch
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -12,40 +12,98 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <UMS3.h>
+
 #include <hackflight.h>
+#include <firmware/blink_timer.hpp>
+
 #include <firmware/espnow.hpp>
 
-static const uint8_t kReceiverAddress[6] = {
+//static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
+
+static const uint8_t kDongleAddress[6] = {
     
-    // OMGS3
-    //0x98,0x3D,0xAE,0xEF,0x0E,0xAC
+    // M5 Atom
+    // 0xD4,0xD4,0xDA,0x83,0x97,0x90
 
     // TinyS3
-    //0xB4, 0x3A, 0x45, 0xB2, 0x09, 0x2C
-
-
-    // TinyPICO
-    0xD4, 0xD4, 0xDA, 0xAA, 0x2E, 0xF0
+    0xB4, 0x3A, 0x45, 0xB1, 0xF1, 0xC0
 };
 
-static void OnDataRecv(
+
+static const uint32_t kWifiTimeoutMsec = 50;
+
+static const uint32_t kSerialBaudRate = 115'200;
+static const uint8_t kSerialRxPin = 44;
+static const uint8_t kSerialTxPin = 43;
+
+static const uint32_t kDelayMsec = 10;
+
+static auto blink_timer_ = hf::BlinkTimer();
+
+static UMS3 ums3_;
+
+static uint32_t last_wifi_received_msec_;
+
+static int nread_;
+
+// Send Wifi input to Teensy over UART
+static void OnWifiDataReceive(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
 
-    Serial.write(data, len);
+    Serial1.write(data, len);
+
+    last_wifi_received_msec_ = millis();
 }
+
+/*
+
+// Send UART inpt from Teensy to dongle
+void serialEvent1()
+{
+    const auto avail = Serial1.available();
+
+    uint8_t buf[256] = {};
+
+    Serial1.read(buf, avail);
+
+    nread_ += avail;
+
+    if (esp_now_send(kDongleAddress, buf, avail) != ESP_OK) {
+        Serial.println("failed to send to dongle\n");
+        // maybe do something here?
+    }
+}
+*/
 
 void setup()
 {
     Serial.begin(115200);
 
-    hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kReceiverAddress);
+    Serial1.begin(kSerialBaudRate, SERIAL_8N1, kSerialRxPin, kSerialTxPin);
 
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+    ums3_.begin();
+    ums3_.setPixelBrightness(255 / 3);
+    ums3_.setPixelPower(true);
+
+    hf::EspNow::WifiSetup();
+    //hf::EspNow::WifiAddPeer(kDongleAddress);
+
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
 }
 
 void loop()
 {
+    if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
+        ums3_.setPixelColor(0, 255, 0);
+    }
+
+    // not connected
+    else {
+        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+    }
+
+    Serial.printf("%d\n", nread_);
 }
