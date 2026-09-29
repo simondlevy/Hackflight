@@ -8,10 +8,10 @@
 
 // Hardware-dependent --------------------------------------------------------
 
-static const uint8_t kReceiverAddress[6] = {
+static const uint8_t kDongleAddress[6] = {
     
     // TinyPICO
-    0xD4, 0xD4, 0xDA, 0xAA, 0x2E, 0xF0
+    0x00, 0x4B, 0x12, 0xCD, 0x9B, 0xD0
 };
 
 
@@ -20,7 +20,7 @@ void setup()
     Serial.begin(115200);
 
     hf::EspNow::WifiSetup();
-    hf::EspNow::WifiAddPeer(kReceiverAddress);
+    hf::EspNow::WifiAddPeer(kDongleAddress);
 }
 
 void loop()
@@ -32,12 +32,12 @@ void loop()
     serializer_ = hf::MspSerializer::SerializeShorts(
             serializer_, kMspSetChannels, vals, 7);
 
-    const auto result = esp_now_send(kReceiverAddress,
+    const auto result = esp_now_send(kDongleAddress,
             hf::MspSerializer::GetPayloadBytes(serializer_),
             hf::MspSerializer::GetPayloadSize(serializer_));
 
     if (result != ESP_OK) {
-        Serial.printf("ERROR sending to vehicle: %d\n", result);
+        Serial.printf("ERROR sending to dongle: %d\n", result);
     }
 
     delay(10);
