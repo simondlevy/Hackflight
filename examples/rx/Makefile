@@ -2,8 +2,8 @@ SKETCH = $(shell basename "`pwd`")
 
 ROOT = $(HOME)/Desktop/
 
-FQBN = esp32:esp32:um_tinys3
-#FQBN = esp32:esp32:um_omgs3
+# FQBN = esp32:esp32:um_tinys3
+FQBN = esp32:esp32:um_omgs3
 
 PORT = /dev/ttyACM0
 #PORT = /dev/ttyACM1

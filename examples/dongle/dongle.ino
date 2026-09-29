@@ -12,8 +12,6 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <UMS3.h>
-
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 
@@ -23,9 +21,9 @@ static const uint32_t kWifiTimeoutMsec = 50;
 
 static auto blink_timer_ = hf::BlinkTimer();
 
-static UMS3 ums3_;
-
 static uint32_t last_wifi_received_msec_;
+
+static int count_;
 
 // Send Wifi input to Teensy over UART
 static void OnWifiDataReceive(
@@ -35,6 +33,8 @@ static void OnWifiDataReceive(
 
     // Serial.write(data, len);
 
+    count_ += len;
+
     last_wifi_received_msec_ = millis();
 }
 
@@ -42,10 +42,6 @@ static void OnWifiDataReceive(
 void setup()
 {
     Serial.begin(115200);
-
-    ums3_.begin();
-    ums3_.setPixelBrightness(255 / 3);
-    ums3_.setPixelPower(true);
 
     hf::EspNow::WifiSetup();
 
@@ -55,11 +51,13 @@ void setup()
 void loop()
 {
     if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
-        ums3_.setPixelColor(0, 255, 0);
+        //ums3_.setPixelColor(0, 255, 0);
     }
 
     // not connected
     else {
-        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+        //ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
+
+    Serial.printf("count=%d\n", count_);
 }
