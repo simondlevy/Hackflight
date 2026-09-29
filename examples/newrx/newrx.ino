@@ -26,6 +26,7 @@ static const uint8_t kDongleAddress[6] = {
     //0xB4, 0x3A, 0x45, 0xB1, 0xF2, 0x40
 };
 
+static const uint8_t kTransmitterAddress[6] = {0xB4, 0x3A, 0x45, 0xB2, 0x08, 0x40};
 
 static const uint32_t kSendDelayMsec = 5;
 static const uint32_t kWifiTimeoutMsec = 50;
@@ -33,6 +34,20 @@ static const uint32_t kWifiTimeoutMsec = 50;
 static const uint32_t kSerialBaudRate = 115'200;
 static const uint8_t kSerialRxPin = 4;
 static const uint8_t kSerialTxPin = 14;
+
+static uint32_t last_wifi_received_msec_;
+
+static void OnWifiDataReceive(
+        const uint8_t * mac, const uint8_t * data, int len)
+{
+    (void)mac;
+
+    //Serial1.write(data, len);
+
+    Serial.printf("received %d\n", len);
+
+    last_wifi_received_msec_ = millis();
+}
 
 
 void serialEvent1()
@@ -60,6 +75,8 @@ void setup()
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kDongleAddress);
+
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceive));
 }
 
 void loop()
