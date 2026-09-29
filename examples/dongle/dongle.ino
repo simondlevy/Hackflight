@@ -1,4 +1,4 @@
-/* Hackflight ESP32 receiver sketch
+/* Hackflight ESP32 telemetry dongle sketch
  * 
  * Copyright (C) 2026 Simon D. Levy
  *
@@ -12,6 +12,8 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <TinyPICO.h>
+
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 
@@ -24,6 +26,8 @@ static auto blink_timer_ = hf::BlinkTimer();
 static uint32_t last_wifi_received_msec_;
 
 static int count_;
+
+static TinyPICO tp_ = TinyPICO();
 
 // Send Wifi input to Teensy over UART
 static void OnWifiDataReceive(
@@ -51,12 +55,12 @@ void setup()
 void loop()
 {
     if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
-        //ums3_.setPixelColor(0, 255, 0);
+        tp_.DotStar_SetPixelColor(0, 255, 0);
     }
 
     // not connected
     else {
-        //ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+        tp_.DotStar_SetPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
 
     Serial.printf("count=%d\n", count_);
