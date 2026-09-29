@@ -17,9 +17,17 @@
 
 #include <firmware/espnow.hpp>
 
-static const uint8_t kDongleAddress[6] = {0xD4,0xD4,0xDA,0x83,0x97,0x90};
+static const uint8_t kDongleAddress[6] = {
+    
+    // M5 Stack Atom
+    0xD4,0xD4,0xDA,0x83,0x97,0x90
 
-static const uint32_t kSendDelayMsec = 1;
+    // TinyS3
+    //0xB4, 0x3A, 0x45, 0xB1, 0xF2, 0x40
+};
+
+
+static const uint32_t kSendDelayMsec = 5;
 static const uint32_t kWifiTimeoutMsec = 50;
 
 static const uint32_t kSerialBaudRate = 115'200;

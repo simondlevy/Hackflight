@@ -3,7 +3,6 @@ SKETCH = $(shell basename "`pwd`")
 ROOT = $(HOME)/Desktop/
 
 FQBN = esp32:esp32:m5stack_atom
-
 PORT = /dev/ttyUSB0
 
 LIBS = $(HOME)/Documents/Arduino/libraries

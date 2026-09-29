@@ -22,7 +22,15 @@
 
 // Hardware-dependent --------------------------------------------------------
 
-static const uint8_t kReceiverAddress[6] = {0x98,0x3D,0xAE,0xEF,0x0E,0xAC};
+static const uint8_t kReceiverAddress[6] = {
+    
+    // OMGS3
+    //0x98,0x3D,0xAE,0xEF,0x0E,0xAC
+
+    // TinyPICO
+    0xD4, 0xD4, 0xDA, 0xAA, 0x2E, 0xF0
+};
+
 
 // Analog input ---------------------------------------------------------------
 
@@ -134,9 +142,13 @@ void loop()
     serializer_ = hf::MspSerializer::SerializeShorts(
             serializer_, kMspSetChannels, vals, 7);
 
-    esp_now_send(kReceiverAddress,
+    const auto result = esp_now_send(kReceiverAddress,
             hf::MspSerializer::GetPayloadBytes(serializer_),
             hf::MspSerializer::GetPayloadSize(serializer_));
+
+    if (result != ESP_OK) {
+        Serial.printf("ERROR sending to vehicle: %d\n", result);
+    }
 
     delay(10);
 }

@@ -12,7 +12,7 @@
  * along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <UMS3.h>
+//#include <UMS3.h>
 
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
@@ -33,7 +33,7 @@ static const uint32_t kDelayMsec = 10;
 
 static auto blink_timer_ = hf::BlinkTimer();
 
-static UMS3 ums3_;
+//static UMS3 ums3_;
 
 static uint32_t last_wifi_received_msec_;
 
@@ -43,6 +43,8 @@ static void OnWifiDataReceive(
     (void)mac;
 
     Serial1.write(data, len);
+
+    Serial.printf("received %d\n", len);
 
     last_wifi_received_msec_ = millis();
 }
@@ -65,9 +67,9 @@ void setup()
 
     Serial1.begin(kSerialBaudRate, SERIAL_8N1, kSerialRxPin, kSerialTxPin);
 
-    ums3_.begin();
-    ums3_.setPixelBrightness(255 / 3);
-    ums3_.setPixelPower(true);
+    //ums3_.begin();
+    //ums3_.setPixelBrightness(255 / 3);
+    //ums3_.setPixelPower(true);
 
     hf::EspNow::WifiSetup();
     hf::EspNow::WifiAddPeer(kTransmitterAddress);
@@ -79,12 +81,12 @@ void setup()
 void loop()
 {
     if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
-            ums3_.setPixelColor(0, 255, 0);
+            //ums3_.setPixelColor(0, 255, 0);
     }
 
     // not connected
     else {
-        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+        //ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
 
     delay(kDelayMsec);

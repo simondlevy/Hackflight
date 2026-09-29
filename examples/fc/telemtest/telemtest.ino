@@ -20,5 +20,5 @@ void loop()
        Serial1.write(hf::MspSerializer::GetPayloadBytes(telemetry_serializer_),
        hf::MspSerializer::GetPayloadSize(telemetry_serializer_));
 
-    //delay(1);
+    delay(1);
 }
