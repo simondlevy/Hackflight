@@ -42,7 +42,6 @@ static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
 
-/*
 static void SendTelemetry()
 {
     if (timer_.Ready()) {
@@ -51,7 +50,7 @@ static void SendTelemetry()
 
         Serial3.write((uint8_t *)msg, sizeof(msg));
     }
-}*/
+}
 
 void setup()
 {
@@ -73,7 +72,7 @@ void loop()
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::EspNowReceiver::CheckArming(rx_);
 
-    //SendTelemetry();
+    SendTelemetry();
 
     // Run core algorithm to get setpoint from PID controllers
     const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
