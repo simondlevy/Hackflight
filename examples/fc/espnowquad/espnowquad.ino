@@ -48,7 +48,7 @@ static void SendTelemetry()
 
         const float msg[15] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 39, 41, 43};
 
-        Serial3.write((uint8_t *)msg, sizeof(msg));
+        //Serial3.write((uint8_t *)msg, sizeof(msg));
     }
 }
 
