@@ -29,7 +29,7 @@ class Telemetry(MspParser):
 
 parser = Telemetry()
 
-with serial.Serial('/dev/ttyUSB0', 115200) as ser:
+with serial.Serial('/dev/ttyACM2', 115200) as ser:
 
     while True:
 

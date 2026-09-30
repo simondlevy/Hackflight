@@ -33,9 +33,7 @@ static void OnWifiDataReceive(
 {
     (void)mac;
 
-    // Serial.write(data, len);
-
-    Serial.printf("len=%d\n", len);
+    Serial.write(data, len);
 
     last_wifi_received_msec_ = millis();
 }
