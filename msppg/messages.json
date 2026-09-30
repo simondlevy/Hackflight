@@ -19,12 +19,6 @@
    {"dpsi":   "float"}
   ],
 
-  "BOGUS": 
-  [{"ID": 101},
-   {"psi":    "float"}
-  ],
-
-
   "SET_ARMING": 
   [{"ID": 200},
    {"comment": "Dis/arm"},

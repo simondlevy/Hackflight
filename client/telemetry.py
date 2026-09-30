@@ -54,7 +54,7 @@ class Telemetry(MspParser):
         argparser.add_argument('-r', '--realtime', action='store_true',
                                help='Real-time plot')
 
-        argparser.add_argument('-p', '--port', default='/dev/ttyUSB0',
+        argparser.add_argument('-p', '--port', default='/dev/ttyACM0',
                                help='Serial port for dongle')
 
         args = argparser.parse_args()
@@ -76,8 +76,7 @@ class Telemetry(MspParser):
 
             self.outfile.write(
                     'time,thrust,roll,pitch,yaw,' +
-                    'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi,' +
-                    'm1,m2,m3,m4\n')
+                    'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
 
         except Exception as e:
             print('Unable to open log file %s: %s' %
@@ -125,9 +124,9 @@ class Telemetry(MspParser):
         self.step()
         return self.plotter_data
 
-    def handle_QUADROTOR_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
-                                   dx, dy, z, dz, phi, dphi, theta,
-                                   dtheta, psi, dpsi, m1, m2, m3, m4):
+    def handle_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
+                         dx, dy, z, dz, phi, dphi, theta,
+                         dtheta, psi, dpsi):
 
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
@@ -137,10 +136,10 @@ class Telemetry(MspParser):
               (phi, theta, psi, dx, dy, z, dz))
 
         self.outfile.write(
-                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
+                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
                 % (time.time() - self.start_time, mode, thrust, roll, pitch,
                     yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
-                    dpsi, m1, m2, m3, m4))
+                    dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
