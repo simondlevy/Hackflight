@@ -6,7 +6,7 @@ ROOT = $(HOME)/Desktop/
 #PORT = /dev/ttyUSB0
 #FQBN = esp32:esp32:um_tinys3
 FQBN = esp32:esp32:um_tinypico
-PORT = /dev/ttyACM0
+PORT = /dev/ttyACM2
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 

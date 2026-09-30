@@ -25,8 +25,6 @@ static auto blink_timer_ = hf::BlinkTimer();
 
 static uint32_t last_wifi_received_msec_;
 
-static int count_;
-
 static TinyPICO tp_ = TinyPICO();
 
 // Send Wifi input to Teensy over UART
@@ -37,7 +35,7 @@ static void OnWifiDataReceive(
 
     // Serial.write(data, len);
 
-    count_ += len;
+    Serial.printf("len=%d\n", len);
 
     last_wifi_received_msec_ = millis();
 }
@@ -62,6 +60,4 @@ void loop()
     else {
         tp_.DotStar_SetPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
     }
-
-    Serial.printf("count=%d\n", count_);
 }
