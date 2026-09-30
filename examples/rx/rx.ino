@@ -23,8 +23,11 @@ static const uint8_t kDongleAddress[6] = {
     0x00, 0x4B, 0x12, 0xCD, 0x9B, 0xD0
 };
 
-// Maximum wifi send/receive failure time before giving up
-static const uint32_t kWifiTimeoutMsec = 50;
+// Maximum wifi receive failure time before giving up
+static const uint32_t kWifiReceiveTimeoutMsec = 50;
+
+// Maximum wifi send failure time before giving up
+static const uint32_t kWifiSendTimeoutMsec = 500;
 
 // Serial comms with Teensy
 static const uint32_t kSerialBaudRate = 115'200;
@@ -72,8 +75,7 @@ void serialEvent1()
     }
 
     // Don't keep trying to send to dongle if we haven't succeeded recently
-    if (last_wifi_sent_msec_ > 0 &&
-            (millis()-last_wifi_sent_msec_) > kWifiTimeoutMsec) {
+    if ((millis()-last_wifi_sent_msec_) > kWifiSendTimeoutMsec) {
         should_give_up_ = true;
     }
 }
@@ -108,7 +110,7 @@ void loop()
     static hf::BlinkTimer blink_timer_;
 
     // If we've received transmitter Wifi data recently, make LED solid green
-    if (millis() - last_wifi_received_msec_ < kWifiTimeoutMsec) {
+    if (millis() - last_wifi_received_msec_ < kWifiReceiveTimeoutMsec) {
         ums3_.setPixelColor(0, 255, 0);
     }
 
