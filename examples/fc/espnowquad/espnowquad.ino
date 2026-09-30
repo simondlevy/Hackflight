@@ -42,15 +42,16 @@ static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
 
+/*
 static void SendTelemetry()
 {
     if (timer_.Ready()) {
 
         const float msg[15] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 39, 41, 43};
 
-        //Serial3.write((uint8_t *)msg, sizeof(msg));
+        Serial3.write((uint8_t *)msg, sizeof(msg));
     }
-}
+}*/
 
 void setup()
 {
@@ -61,10 +62,10 @@ void setup()
     delay(1000);
 
     // Start flight control, no hoverdeck
-    //fc_.Begin(false);
+    fc_.Begin(false);
 
     // Start motors
-    //motors_.Begin();
+    motors_.Begin();
 }
 
 void loop()
@@ -72,15 +73,13 @@ void loop()
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::EspNowReceiver::CheckArming(rx_);
 
-    debugger_.Report(rx_);
-
-    SendTelemetry();
+    //SendTelemetry();
 
     // Run core algorithm to get setpoint from PID controllers
-    //const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
-    //motors_.Run(fc_, setpoint);
+    motors_.Run(fc_, setpoint);
 
     // Send telemetry to base station over Serial3
     //fc_.SendTelemetry(Serial3, setpoint);

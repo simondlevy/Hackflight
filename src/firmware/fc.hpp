@@ -98,6 +98,8 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
+                debugger_.Report(rx);
+
                 Step(
                         EspNowReceiver::IsArmed(rx),
                         false, // false = no hover for now
