@@ -4,7 +4,8 @@ ROOT = $(HOME)/Desktop/
 
 FQBN = teensy:avr:teensy40
 
-PORT = /dev/ttyACM0
+# PORT = /dev/ttyACM0
+PORT = /dev/teensy40
 
 LIBS = $(HOME)/Documents/Arduino/libraries
 
