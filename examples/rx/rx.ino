@@ -27,7 +27,7 @@ static const uint8_t kDongleAddress[6] = {
 static const uint32_t kWifiReceiveTimeoutMsec = 50;
 
 // Maximum wifi send failure time before giving up
-static const uint32_t kWifiSendTimeoutMsec = 500;
+static const uint32_t kWifiSendTimeoutMsec = 2500;
 
 // Serial comms with Teensy
 static const uint32_t kSerialBaudRate = 115'200;
@@ -40,7 +40,7 @@ static uint32_t last_wifi_received_msec_;
 static uint32_t last_wifi_sent_msec_;
 
 // Relay transmitter Wifi input to Teensy over UART
-static void OnWifiData(
+static void OnWifiDataReceived(
         const uint8_t * mac, const uint8_t * data, int len)
 {
     (void)mac;
@@ -100,7 +100,7 @@ void setup()
     hf::EspNow::WifiAddPeer(kDongleAddress);
 
     // Register Wifi data received from transmitter
-    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiData));
+    esp_now_register_recv_cb(esp_now_recv_cb_t(OnWifiDataReceived));
 
     esp_now_register_send_cb(esp_now_send_cb_t(OnWifiDataSent));
 }
