@@ -31,8 +31,8 @@ static const uint32_t kWifiSendTimeoutMsec = 500;
 
 // Serial comms with Teensy
 static const uint32_t kSerialBaudRate = 115'200;
-static const uint8_t kSerialRxPin = 44;
-static const uint8_t kSerialTxPin = 43;
+static const uint8_t kSerialRxPin = 14;
+static const uint8_t kSerialTxPin = 13;
 
 static UMS3 ums3_;
 
