@@ -54,7 +54,7 @@ class Telemetry(MspParser):
         argparser.add_argument('-r', '--realtime', action='store_true',
                                help='Real-time plot')
 
-        argparser.add_argument('-p', '--port', default='/dev/ttyACM0',
+        argparser.add_argument('-p', '--port', default='/dev/tinypico',
                                help='Serial port for dongle')
 
         args = argparser.parse_args()
