@@ -57,6 +57,9 @@ class Telemetry(MspParser):
         argparser.add_argument('-p', '--port', default='/dev/tinypico',
                                help='Serial port for dongle')
 
+        argparser.add_argument('-a', '--altitude', type=float, default=0,
+                               help='Avoid logging below specified altitude')
+
         args = argparser.parse_args()
 
         try:
@@ -70,12 +73,14 @@ class Telemetry(MspParser):
 
         self.outfile = None
 
+        self.altitude_min = args.altitude
+
         try:
 
             self.outfile = open(args.outfile, 'w')
 
             self.outfile.write(
-                    'time,thrust,roll,pitch,yaw,' +
+                    'time,mode,thrust,roll,pitch,yaw,' +
                     'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
 
         except Exception as e:
@@ -135,11 +140,12 @@ class Telemetry(MspParser):
                'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') %
               (phi, theta, psi, dx, dy, z, dz))
 
-        self.outfile.write(
-                '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
-                % (time.time() - self.start_time, mode, thrust, roll, pitch,
-                    yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
-                    dpsi))
+        if z > self.altitude_min:
+            self.outfile.write(
+                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
+                    % (time.time() - self.start_time, mode, thrust, roll, pitch,
+                        yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
+                        dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
