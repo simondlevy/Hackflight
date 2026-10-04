@@ -136,9 +136,10 @@ class Telemetry(MspParser):
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
 
-        print(('phi=%+5.1f theta=%+5.1f psi=%+5.1f ' +
+        print(('thr=%3.3f rol=%+3.3f pit=%+3.3f yaw=%+3.3f | ' +
+               'phi=%+5.1f theta=%+5.1f psi=%+5.1f ' +
                'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') %
-              (phi, theta, psi, dx, dy, z, dz))
+              (thrust, roll, pitch, yaw, phi, theta, psi, dx, dy, z, dz))
 
         if z > self.altitude_min:
             self.outfile.write(

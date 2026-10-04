@@ -30,9 +30,6 @@
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/receivers/espnow.hpp>
-#include <firmware/receivers/gamepad.hpp>
-#include <firmware/receivers/springy.hpp>
-#include <firmware/receivers/traditional.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger/filter.hpp>
@@ -79,16 +76,14 @@ namespace hf {
 
         public:
 
-            void Begin(const bool use_hover_deck=true)
+            void Begin()
             {
                 imu_.Begin();
 
                 pinMode(kLedPin, OUTPUT); 
 
-                if (use_hover_deck) {
-                    zranger_.Begin();
-                    flow_sensor_.Begin();
-                }
+                zranger_.Begin();
+                flow_sensor_.Begin();
 
                 mode_ = kModeIdle;
             }
@@ -99,7 +94,14 @@ namespace hf {
                     const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                AcquireHoverData();
+                if (hover_deck_timer_.Ready()) {
+                    zranger_filter_ = ZRangerFilter::Update(
+                            zranger_filter_, zranger_.Read());
+                    optical_flow_filter_ = OpticalFlowFilter::Update(
+                            optical_flow_filter_,
+                            micros(), flow_sensor_.Read());
+                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+                }
 
                 Step(
                         EspNowReceiver::IsArmed(rx),
@@ -117,19 +119,6 @@ namespace hf {
                         is_flying_, GetDt(), state_, setpoint);
 
                 return stabilizer_pid_.setpoint;
-            }
-
-            void AcquireHoverData()
-            {
-                // Slower EKF update with range, optical flow
-                if (hover_deck_timer_.Ready()) {
-                    zranger_filter_ = ZRangerFilter::Update(
-                            zranger_filter_, zranger_.Read());
-                    optical_flow_filter_ = OpticalFlowFilter::Update(
-                            optical_flow_filter_,
-                            micros(), flow_sensor_.Read());
-                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
-                }
             }
 
             auto IsSafeToFly() -> bool
@@ -332,30 +321,6 @@ namespace hf {
                     kVoltageInputPin, kR1Ohms, kR2Ohms);
 
             // Instance methods ---------------------------------------------0
-
-            auto Update(
-                    const Setpoint & setpoint_in,
-                    const bool requested_arming,
-                    const bool requested_hover,
-                    const uint32_t timestamp_msec,
-                    const float * motor_vals,
-                    const uint8_t motor_count,
-                    const bool hold_position) -> Setpoint
-            {
-                RunDelayLoop(micros(), kCoreLoopRate);
-
-                Step(requested_arming, requested_hover,
-                        timestamp_msec, motor_vals, motor_count);
-
-                AcquireHoverData();
-
-                hover_pid_= HoverPidController::Run(hover_pid_,
-                        GetDt(), mode_, state_, setpoint_in, hold_position);
-
-                const auto setpoint_out = hover_pid_.setpoint;
-
-                return setpoint_out;
-             } 
 
             void Step(
                     const bool requested_arming,
