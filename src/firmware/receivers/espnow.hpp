@@ -29,6 +29,7 @@ namespace hf {
         private:
 
             static constexpr float kThrottleDownMax = -0.90;
+            static constexpr float kAxisDeadband = 0.02;
 
         public:
 
@@ -76,7 +77,7 @@ namespace hf {
                 const auto armed = !rx.is_down_ ? false :
 
                     rx.is_down_ && !rx.was_down_ &&
-                    GetAxisValue(rx.parser_, 0) < kThrottleDownMax ? true :
+                    GetThrottle(rx) < kThrottleDownMax ? true :
 
                     rx.is_armed_;
 
@@ -89,9 +90,11 @@ namespace hf {
                 return rx.is_armed_;
             }
 
+            // Special treatment for throttle for now
             static auto GetThrottle(const EspNowReceiver & rx) -> float
             {
-                return GetAxisValue(rx.parser_, 0);
+                const auto val = MspParser::GetShort(rx.parser_, 0);
+                return 2 * (val / 4095.f ) - 1;
             }
 
             static auto GetRoll(const EspNowReceiver & rx) -> float
@@ -125,9 +128,9 @@ namespace hf {
             static auto GetAxisValue(
                     const MspParser & parser, const uint8_t index) -> float
             {
-                const auto val = MspParser::GetShort(parser, index);
+                const float val = MspParser::GetShort(parser, index) / 2048.f;
 
-                return 2 * (val / 4095.f ) - 1;
+                return fabs(val) < kAxisDeadband ? 0 : val;
             }
 
             static auto GetSwitchStatus(

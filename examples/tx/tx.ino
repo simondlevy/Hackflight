@@ -47,12 +47,9 @@ static auto hoveringButton = hf::Pushbutton(A0);
 // Axis extrema determined empirically
 static const uint16_t kThrottleLow = 3931;
 static const uint16_t kThrottleHigh = 252;;
-static const uint16_t kRollLow = 3093;
-static const uint16_t kRollHigh = 766;
-static const uint16_t kPitchLow = 217;
-static const uint16_t kPitchHigh = 4038;
-static const uint16_t kYawLow = 286;
-static const uint16_t kYawHigh = 3736;
+static const uint16_t kRollMid = 2000;
+static const uint16_t kPitchMid = 1950;
+static const uint16_t kYawMid = 1900;
 
 static const uint8_t kLedPin = 21;
 
@@ -75,28 +72,15 @@ static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerR2Ohms,
         12);
 
-static auto ReadAxis(
-        const uint8_t pin, const float lo, const float hi) -> float
+// Scale to [-2048, +2047]
+static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
 {
-    return (-analogRead(pin) + hi) / (-lo + hi) - 0.5;
+    return analogRead(pin) - mid;
 }
 
-static auto ReadAxis(const uint8_t pin) -> float
+static auto DebugAxis(const uint8_t pin, const int16_t mid) -> float
 {
-    return analogRead(pin);
-}
-
-static auto ReadAxisShort(
-        const uint8_t pin, const short lo, const short hi) -> short
-{  
-    return map(analogRead(pin), hi, lo, 0, 4095);
-}
-
-// Scale to [0, 4095]
-static auto ReadAxis(
-        const uint8_t pin, const uint16_t low, const uint16_t high) -> uint16_t
-{
-    return map(analogRead(pin), low, high, 0, 4095);
+    return ReadAxis(pin, mid) / 2048.f;
 }
 
 void setup()
@@ -119,15 +103,21 @@ void loop()
 
     const short vals[7] = {
 
-        ReadAxis(kThrottlePin, kThrottleLow, kThrottleHigh),
-        ReadAxis(kRollPin, kRollLow, kRollHigh),
-        ReadAxis(kPitchPin, kPitchLow, kPitchHigh),
-        ReadAxis(kYawPin, kYawLow, kYawHigh),
+        map(analogRead(kThrottlePin), kThrottleLow, kThrottleHigh, 0, 4095),
+        -ReadAxis(kRollPin, kRollMid),
+        ReadAxis(kPitchPin, kPitchMid),
+        ReadAxis(kYawPin, kYawMid),
 
         armingButton.Read(),
         hoveringButton.Read(),
         autopilotButton.Read()
     };
+
+    /*
+    printf("r=%+3.3f p=%+3.3f y=%+3.3f\n",
+            -DebugAxis(kRollPin, kRollMid),
+            DebugAxis(kPitchPin, kPitchMid),
+            DebugAxis(kYawPin, kYawMid));*/
 
     static hf::MspSerializer serializer_;
 
@@ -139,7 +129,7 @@ void loop()
             hf::MspSerializer::GetPayloadSize(serializer_));
 
     if (result != ESP_OK) {
-        Serial.printf("ERROR sending to vehicle: %d\n", result);
+        //Serial.printf("ERROR sending to vehicle: %d\n", result);
     }
 
     delay(10);
