@@ -46,8 +46,8 @@ void setup()
     // Wait a sec for the receiver to kick in
     delay(1000);
 
-    // Start flight control, no hoverdeck
-    fc_.Begin(false);
+    // Start flight control
+    fc_.Begin();
 
     // Start motors
     motors_.Begin();

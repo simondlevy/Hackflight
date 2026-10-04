@@ -98,9 +98,6 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                // Run sensor fusion on hover-deck
-                AcquireHoverData();
-
                 Step(
                         EspNowReceiver::IsArmed(rx),
                         false, // false = no hover for now
@@ -118,6 +115,61 @@ namespace hf {
 
                 return stabilizer_pid_.setpoint;
             }
+
+             auto Update(
+                    const TraditionalReceiver & rx,
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
+            {
+                const auto rxdata = rx.data;
+
+                Step(rxdata.requested_arming, false, // false = no hover
+                        rxdata.timestamp_msec, motor_vals, motor_count);
+
+                const auto rx_setpoint = rxdata.setpoint;
+
+                const auto setpoint = Setpoint(
+                        (rx_setpoint.thrust+1)/2, // [-1,+1] => [0,1]
+                        PositionController::bypass(rx_setpoint.roll),
+                        PositionController::bypass(rx_setpoint.pitch),
+                        rx_setpoint.yaw);
+
+                stabilizer_pid_ = StabilizerPidController::Run( stabilizer_pid_,
+                        is_flying_, GetDt(), state_, setpoint);
+
+                return stabilizer_pid_.setpoint;
+            } 
+
+            auto Update(
+                    const SpringyReceiver & rx,
+                    const float * motor_vals,
+                    const uint8_t motor_count,
+                    const bool hold_position) -> Setpoint
+            {
+                // Run sensor fusion on hover-deck
+                AcquireHoverData();
+
+                const auto rxdata = rx.data;
+
+                return Update(rxdata.setpoint, rxdata.requested_arming,
+                        rxdata.requested_hover, rxdata.timestamp_msec,
+                        motor_vals, motor_count, hold_position);
+            } 
+
+            auto Update(
+                    const GamepadReceiver & gamepad,
+                    const float * motor_vals,
+                    const uint8_t motor_count) -> Setpoint
+            {
+                // Run sensor fusion on hover-deck
+                AcquireHoverData();
+
+                const auto gpdata = gamepad.data;
+
+                return Update(gpdata.setpoint, gpdata.requested_arming,
+                        gpdata.requested_hover, gpdata.timestamp_msec,
+                        motor_vals, motor_count, true);
+            } 
 
             void AcquireHoverData()
             {
