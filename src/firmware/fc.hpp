@@ -104,11 +104,50 @@ namespace hf {
                     ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
 
-                Step(
-                        EspNowReceiver::IsArmed(rx),
-                        false, // false = no hover for now
-                        EspNowReceiver::GetTimestampMsec(rx),
-                        motor_vals, motor_count);
+                const auto requested_hover = false;
+
+                // Safely update flight mode
+                mode_ = UpdateMode(millis(), state_,
+                        imu_filter_.is_gyro_calibrated,
+                        EspNowReceiver::IsArmed(rx), requested_hover,
+                        EspNowReceiver::GetTimestampMsec(rx), imu_filter_,
+                        mode_);
+
+                // Periodically run flying check to get status for EKF
+                is_flying_ = 
+
+                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
+
+                    flying_check_timer_.Ready() ?
+                    AreMotorsAboveIdle(motor_vals, motor_count) :
+
+                    is_flying_;
+
+                // Sense voltage periodically
+                voltage_ = voltage_sensing_timer_.Ready() ?
+                    voltage_divider_.read() : voltage_;
+
+                // Blink LED to indicate status
+                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
+
+                // Read the raw IMU data
+                const auto imuraw = imu_.Read();
+
+                // Filter the raw IMU data
+                imu_filter_ = ImuFilter::Step(imu_filter_, millis(), imuraw,
+                        imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
+
+                // Periodically run the EKF prediction step
+                if (ekf_prediction_timer_.Ready()) {
+                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
+                }
+
+                // Do EKF fast-update with IMU readings
+                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
+
+                // Get vehicle state from EKF
+                state_ = EKF::getVehicleState(ekf_);
+
 
                 // Convert receiver values into setpoint appropriate for PID
                 // controllers
@@ -313,54 +352,6 @@ namespace hf {
                     kVoltageInputPin, kR1Ohms, kR2Ohms);
 
             // Instance methods ---------------------------------------------0
-
-            void Step(
-                    const bool requested_arming,
-                    bool requested_hover,
-                    const uint32_t timestamp_msec,
-                    const float * motor_vals,
-                    const uint8_t motor_count)
-            {
-                // Safely update flight mode
-                mode_ = UpdateMode(millis(), state_,
-                        imu_filter_.is_gyro_calibrated, requested_arming,
-                        requested_hover, timestamp_msec, imu_filter_, mode_);
-
-                // Periodically run flying check to get status for EKF
-                is_flying_ = 
-
-                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
-
-                    flying_check_timer_.Ready() ?
-                    AreMotorsAboveIdle(motor_vals, motor_count) :
-
-                    is_flying_;
-
-                // Sense voltage periodically
-                voltage_ = voltage_sensing_timer_.Ready() ?
-                    voltage_divider_.read() : voltage_;
-
-                // Blink LED to indicate status
-                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
-
-                // Read the raw IMU data
-                const auto imuraw = imu_.Read();
-
-                // Filter the raw IMU data
-                imu_filter_ = ImuFilter::Step(imu_filter_, millis(), imuraw,
-                        imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
-
-                // Periodically run the EKF prediction step
-                if (ekf_prediction_timer_.Ready()) {
-                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
-                }
-
-                // Do EKF fast-update with IMU readings
-                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
-
-                // Get vehicle state from EKF
-                state_ = EKF::getVehicleState(ekf_);
-            }
 
             auto AreMotorsAboveIdle(
                     const float * motor_vals,
