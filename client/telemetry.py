@@ -57,9 +57,6 @@ class Telemetry(MspParser):
         argparser.add_argument('-p', '--port', default='/dev/tinypico',
                                help='Serial port for dongle')
 
-        argparser.add_argument('-a', '--altitude', type=float, default=0,
-                               help='Avoid logging below specified altitude')
-
         args = argparser.parse_args()
 
         try:
@@ -72,8 +69,6 @@ class Telemetry(MspParser):
         self.start_time = time.time()
 
         self.outfile = None
-
-        self.altitude_min = args.altitude
 
         try:
 
@@ -141,7 +136,8 @@ class Telemetry(MspParser):
                'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') %
               (thrust, roll, pitch, yaw, phi, theta, psi, dx, dy, z, dz))
 
-        if z > self.altitude_min:
+        # Don't log until armed
+        if mode > 0:
             self.outfile.write(
                     '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
                     % (time.time() - self.start_time, mode, thrust, roll, pitch,
