@@ -72,7 +72,7 @@ namespace hf {
             static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
             static constexpr float kMotorIdleMax = 0.1;
 
-        // Public instance methods --------------------------------------------
+            // Public instance methods --------------------------------------------
 
         public:
 
@@ -101,56 +101,29 @@ namespace hf {
                 UpdateMode(rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
-                is_flying_ = 
-
-                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
-
-                    flying_check_timer_.Ready() ?
-                    AreMotorsAboveIdle(motor_vals, motor_count) :
-
-                    is_flying_;
+                UpdateFlyingStatus(motor_vals, motor_count);
 
                 // Sense voltage periodically
-                voltage_ = voltage_sensing_timer_.Ready() ?
-                    voltage_divider_.read() : voltage_;
+                UpdateVoltage();
 
                 // Blink LED to indicate status
                 BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
-                // Read the raw IMU data
-                const auto imuraw = imu_.Read();
+                // Update the IMU filter with raw IMU data
+                UpdateImu();
 
-                // Filter the raw IMU data
-                imu_filter_ = ImuFilter::Step(imu_filter_, millis(), imuraw,
-                        imu_.GetGyroRangeDps(), imu_.GetAccelRangeGs());
-
-                // Periodically run the EKF prediction step
-                if (ekf_prediction_timer_.Ready()) {
-                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
-                }
-
-                // Do EKF fast-update with IMU readings
-                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
-
-                // Get vehicle state from EKF
-                state_ = EKF::getVehicleState(ekf_);
+                // Update state estimation
+                UpdateState();
 
                 // Convert receiver values into setpoint appropriate for PID
                 // controllers
-                const auto setpoint = Setpoint(
-                        (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
-                        PositionController::bypass(EspNowReceiver::GetRoll(rx)),
-                        PositionController::bypass(EspNowReceiver::GetPitch(rx)),
-                        EspNowReceiver::GetYaw(rx));
+                const auto setpoint = MakeSetpoint(rx);
 
                 // Send setpoint and vehicle state to base-station
                 SendTelemetry(serial, setpoint);
 
-                // Run PID controllers
-                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
-                        is_flying_, GetDt(), state_, setpoint);
-
-                return stabilizer_pid_.setpoint;
+                // Run PID controller on sepoint
+                return RunPidController(setpoint);
             }
 
             auto IsSafeToFly() -> bool
@@ -163,103 +136,9 @@ namespace hf {
                 return mode_ != kModeIdle;
             }
 
+            // Static methods ----------------------------------------------
+
         private:
-
-            void UpdateMode(
-                    const EspNowReceiver & rx, const bool requested_hover)
-            {
-                const auto requested_arming = EspNowReceiver::IsArmed(rx);
-
-                const auto is_gyro_calibrated = imu_filter_.is_gyro_calibrated;
-
-                const auto should_arm = 
-
-                    // Disable arming while gyro is calibrating
-                    !is_gyro_calibrated ? false :
-
-                    // Check receiver timeout
-                    CheckFailsafe(millis(),
-                            EspNowReceiver::GetTimestampMsec(rx),
-                            requested_arming);
-
-                // Run a little state-transition machine to update flight mode
-                mode_ = 
-
-                    //  Vehicle flipped over: enter panic mode
-                    IsFlipped(state_) ? kModePanic :
-
-                    // Panic mode: can't recover
-                    mode_ == kModePanic ? kModePanic :
-
-                    // Disallow jumping directly from idle to hover
-                    mode_ == kModeIdle && requested_hover ? kModeIdle :
-
-                    // Want arm and safe to arm: enter armed mode
-                    mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
-                    kModeArmed :
-
-                    // Armed and requested disarm: enter idle mode
-                    mode_ == kModeArmed && !should_arm ? kModeIdle :
-
-                    // Armed and requested hover; enter hover mode
-                    mode_ == kModeArmed && requested_hover ? kModeHovering :
-
-                    // Hovering and requested no-hover; return to armed mode
-                    mode_ == kModeHovering && !requested_hover ? kModeArmed :
-
-                    // Hovering and requested disarm; enter idle mode
-                    mode_ == kModeHovering && !requested_arming ? kModeIdle :
-
-                    //  Default: stay in current mode
-                    mode_;
-             }
-
-            void SendTelemetry(
-                    HardwareSerial & serial,
-                    const Setpoint & setpoint)
-            {
-                if (telemetry_timer_.Ready()) {
-
-                    float data[256] = {};
-
-                    data[0] = (float)mode_;
-
-                    data[1] = setpoint.thrust;
-                    data[2] = setpoint.roll;
-                    data[3] = setpoint.pitch;
-                    data[4] = setpoint.yaw;
-
-                    data[5] = state_.dx;
-                    data[6] = state_.dy;
-                    data[7] = state_.z;
-                    data[8] = state_.dz;
-                    data[9] = state_.phi;
-                    data[10] = state_.dphi;
-                    data[11] = state_.theta;
-                    data[12] = state_.dtheta;
-                    data[13] = state_.psi;
-                    data[14] = state_.dpsi;
-
-                    telemetry_serializer_ = MspSerializer::SerializeFloats(
-                            telemetry_serializer_, kMspTelemetry,
-                            data, 15);
-
-                    serial.write(
-                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
-                            MspSerializer::GetPayloadSize(telemetry_serializer_));
-                }
-            }
-
-            static auto IsFlipped(const VehicleState & state) -> bool
-            {
-                return IsFlippedAngle(state.theta) ||
-                    IsFlippedAngle(state.phi); 
-            }
-
-            static auto IsFlippedAngle(const float angle) -> bool
-            {
-                return fabs(angle) > kTiltAngleFlippedMinDeg;
-            }
 
             static auto CheckFailsafe(
                     const uint32_t msec_curr,
@@ -273,6 +152,26 @@ namespace hf {
 
                 return timed_out ? false : requested_arming;
             } 
+
+            static auto IsFlipped(const VehicleState & state) -> bool
+            {
+                return IsFlippedAngle(state.theta) ||
+                    IsFlippedAngle(state.phi); 
+            }
+
+            static auto IsFlippedAngle(const float angle) -> bool
+            {
+                return fabs(angle) > kTiltAngleFlippedMinDeg;
+            }
+
+            static auto MakeSetpoint(const EspNowReceiver & rx) -> Setpoint
+            {                
+                return Setpoint(
+                    (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
+                    PositionController::bypass(EspNowReceiver::GetRoll(rx)),
+                    PositionController::bypass(EspNowReceiver::GetPitch(rx)),
+                    EspNowReceiver::GetYaw(rx));
+            }
 
             // Instance variables ---------------------------------------------
 
@@ -336,18 +235,6 @@ namespace hf {
 
             // Instance methods ---------------------------------------------0
 
-            void RunHoverDeck()
-            {
-                if (hover_deck_timer_.Ready()) {
-                    zranger_filter_ = ZRangerFilter::Update(
-                            zranger_filter_, zranger_.Read());
-                    optical_flow_filter_ = OpticalFlowFilter::Update(
-                            optical_flow_filter_,
-                            micros(), flow_sensor_.Read());
-                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
-                }
-            }
-
             auto AreMotorsAboveIdle(
                     const float * motor_vals,
                     const uint8_t motor_count) -> bool
@@ -371,15 +258,6 @@ namespace hf {
                     kFlyingHysteresisThresholdMsec;
             }
 
-            auto GetDt() -> float
-            {
-                const auto usec_curr = micros();      
-                const float dt = (usec_curr - usec_prev_)/1000000.0;
-                usec_prev_ = usec_curr;
-
-                return dt;
-            }
-
             void BlinkLed(const bool isimu__calibrated)
             {
                 const auto ready = isimu__calibrated ?
@@ -397,6 +275,160 @@ namespace hf {
                         is_led_pusing_ = false;
                     }
                 }
+            }
+
+            auto GetDt() -> float
+            {
+                const auto usec_curr = micros();      
+                const float dt = (usec_curr - usec_prev_)/1000000.0;
+                usec_prev_ = usec_curr;
+
+                return dt;
+            }
+
+            void RunHoverDeck()
+            {
+                if (hover_deck_timer_.Ready()) {
+                    zranger_filter_ = ZRangerFilter::Update(
+                            zranger_filter_, zranger_.Read());
+                    optical_flow_filter_ = OpticalFlowFilter::Update(
+                            optical_flow_filter_,
+                            micros(), flow_sensor_.Read());
+                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+                }
+            }
+
+            auto RunPidController(const Setpoint & setpoint) -> Setpoint
+            {
+                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
+                        is_flying_, GetDt(), state_, setpoint);
+
+                return stabilizer_pid_.setpoint;
+            }
+
+            void SendTelemetry(
+                    HardwareSerial & serial,
+                    const Setpoint & setpoint)
+            {
+                if (telemetry_timer_.Ready()) {
+
+                    float data[256] = {};
+
+                    data[0] = (float)mode_;
+
+                    data[1] = setpoint.thrust;
+                    data[2] = setpoint.roll;
+                    data[3] = setpoint.pitch;
+                    data[4] = setpoint.yaw;
+
+                    data[5] = state_.dx;
+                    data[6] = state_.dy;
+                    data[7] = state_.z;
+                    data[8] = state_.dz;
+                    data[9] = state_.phi;
+                    data[10] = state_.dphi;
+                    data[11] = state_.theta;
+                    data[12] = state_.dtheta;
+                    data[13] = state_.psi;
+                    data[14] = state_.dpsi;
+
+                    telemetry_serializer_ = MspSerializer::SerializeFloats(
+                            telemetry_serializer_, kMspTelemetry,
+                            data, 15);
+
+                    serial.write(
+                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
+                            MspSerializer::GetPayloadSize(telemetry_serializer_));
+                }
+            }
+
+            void UpdateFlyingStatus(
+                    const float * motor_vals,
+                    const uint8_t motor_count)
+            {
+                is_flying_ = 
+
+                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
+
+                    flying_check_timer_.Ready() ?
+                    AreMotorsAboveIdle(motor_vals, motor_count) :
+
+                    is_flying_;
+            }
+
+            void UpdateImu()
+            {
+                imu_filter_ = ImuFilter::Step(imu_filter_, millis(),
+                        imu_.Read(), imu_.GetGyroRangeDps(),
+                        imu_.GetAccelRangeGs());
+            }
+
+            void UpdateMode(
+                    const EspNowReceiver & rx, const bool requested_hover)
+            {
+                const auto requested_arming = EspNowReceiver::IsArmed(rx);
+
+                const auto is_gyro_calibrated = imu_filter_.is_gyro_calibrated;
+
+                const auto should_arm = 
+
+                    // Disable arming while gyro is calibrating
+                    !is_gyro_calibrated ? false :
+
+                    // Check receiver timeout
+                    CheckFailsafe(millis(),
+                            EspNowReceiver::GetTimestampMsec(rx),
+                            requested_arming);
+
+                // Run a little state-transition machine to update flight mode
+                mode_ = 
+
+                    //  Vehicle flipped over: enter panic mode
+                    IsFlipped(state_) ? kModePanic :
+
+                    // Panic mode: can't recover
+                    mode_ == kModePanic ? kModePanic :
+
+                    // Disallow jumping directly from idle to hover
+                    mode_ == kModeIdle && requested_hover ? kModeIdle :
+
+                    // Want arm and safe to arm: enter armed mode
+                    mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
+                    kModeArmed :
+
+                    // Armed and requested disarm: enter idle mode
+                    mode_ == kModeArmed && !should_arm ? kModeIdle :
+
+                    // Armed and requested hover; enter hover mode
+                    mode_ == kModeArmed && requested_hover ? kModeHovering :
+
+                    // Hovering and requested no-hover; return to armed mode
+                    mode_ == kModeHovering && !requested_hover ? kModeArmed :
+
+                    // Hovering and requested disarm; enter idle mode
+                    mode_ == kModeHovering && !requested_arming ? kModeIdle :
+
+                    //  Default: stay in current mode
+                    mode_;
+            }
+
+            void UpdateState()
+            {
+                // Periodically run the EKF prediction step
+                if (ekf_prediction_timer_.Ready()) {
+                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
+                }
+
+                // Do EKF fast-update with IMU readings
+                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
+
+                state_ = EKF::getVehicleState(ekf_);
+            }
+
+            void UpdateVoltage()
+            {
+                voltage_ = voltage_sensing_timer_.Ready() ?
+                    voltage_divider_.read() : voltage_;
             }
 
     }; // class FlightController
