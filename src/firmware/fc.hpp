@@ -110,14 +110,18 @@ namespace hf {
                         EspNowReceiver::GetTimestampMsec(rx),
                         motor_vals, motor_count);
 
+                // Convert receiver values into setpoint appropriate for PID
+                // controllers
                 const auto setpoint = Setpoint(
                         (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
                         PositionController::bypass(EspNowReceiver::GetRoll(rx)),
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
                         EspNowReceiver::GetYaw(rx));
 
+                // Send setpoint and vehicle state to base-station
                 SendTelemetry(serial, setpoint);
 
+                // Run PID controllers
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
 
@@ -247,21 +251,6 @@ namespace hf {
 
                 return timed_out ? false : requested_arming;
             } 
-
-            /* Adapted from github.com/nickrehm/dRehmFlight/blob/master/
-                 Versions/dRehmFlight_Teensy_BETA_1.3/
-                 dRehmFlight_Teensy_BETA_1.3.ino 
-               */
-            static void RunDelayLoop(const uint32_t usec_curr, 
-                    const uint32_t loop_freq_hz)
-            {
-                float invFreq = 1.0 / loop_freq_hz * 1000000.0;
-                uint32_t checker = micros();
-
-                while (invFreq > (checker - usec_curr)) {
-                    checker = micros();
-                }
-            }
 
             // Instance variables ---------------------------------------------
 
