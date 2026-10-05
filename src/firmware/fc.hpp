@@ -138,6 +138,10 @@ namespace hf {
                 return mode_ != kModeIdle;
             }
 
+        private:
+
+            // Static methods ------------------------------------------------
+
             void SendTelemetry(
                     HardwareSerial & serial,
                     const Setpoint & setpoint)
@@ -173,10 +177,6 @@ namespace hf {
                             MspSerializer::GetPayloadSize(telemetry_serializer_));
                 }
             }
-
-        private:
-
-            // Static methods ------------------------------------------------
 
             static auto UpdateMode(
                     const uint32_t msecCurr,
@@ -339,8 +339,6 @@ namespace hf {
                 // Sense voltage periodically
                 voltage_ = voltage_sensing_timer_.Ready() ?
                     voltage_divider_.read() : voltage_;
-
-                //debugger_.ReportFloat("voltage", voltage_);
 
                 // Blink LED to indicate status
                 BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);

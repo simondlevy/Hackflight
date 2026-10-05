@@ -64,5 +64,5 @@ void loop()
         fc_.Update(rx_, Serial3, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
-    motors_.Run(fc_, setpoint);
+    motors_.Run(setpoint, fc_.IsSafeToFly(), fc_.IsArmed());
 }

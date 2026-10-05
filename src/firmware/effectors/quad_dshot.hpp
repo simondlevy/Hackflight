@@ -25,7 +25,6 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/fc.hpp>
 #include <mixers/quadx.hpp>
 
 namespace hf {
@@ -43,21 +42,23 @@ namespace hf {
                 motors_.begin();
             }
 
-            void Run(FlightController & fc, const Setpoint & setpoint)
+            void Run(
+                    const Setpoint & setpoint,
+                    const bool isSafeToFly,
+                    const bool isArmed)
             {
                 mixer_ = QuadXMixer::Run(setpoint);
 
                 const auto motorvals = GetMotorValues();
 
                 // Run motors if safe
-                if (fc.IsSafeToFly()) {
-                    motors_.run(fc.IsArmed(), motorvals);
+                if (isSafeToFly) {
+                    motors_.run(isArmed, motorvals);
                 }
             }
 
             auto GetMotorValues() -> float *
             {
-
                 motorvals_[0] = mixer_.rr_cw;
                 motorvals_[1] = mixer_.rf_ccw;
                 motorvals_[2] = mixer_.lr_ccw;
