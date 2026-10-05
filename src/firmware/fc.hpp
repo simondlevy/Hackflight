@@ -95,23 +95,10 @@ namespace hf {
                     const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                if (hover_deck_timer_.Ready()) {
-                    zranger_filter_ = ZRangerFilter::Update(
-                            zranger_filter_, zranger_.Read());
-                    optical_flow_filter_ = OpticalFlowFilter::Update(
-                            optical_flow_filter_,
-                            micros(), flow_sensor_.Read());
-                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
-                }
-
-                const auto requested_hover = false;
+                RunHoverDeck();
 
                 // Safely update flight mode
-                mode_ = UpdateMode(millis(), state_,
-                        imu_filter_.is_gyro_calibrated,
-                        EspNowReceiver::IsArmed(rx), requested_hover,
-                        EspNowReceiver::GetTimestampMsec(rx), imu_filter_,
-                        mode_);
+                UpdateMode(rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
                 is_flying_ = 
@@ -148,7 +135,6 @@ namespace hf {
                 // Get vehicle state from EKF
                 state_ = EKF::getVehicleState(ekf_);
 
-
                 // Convert receiver values into setpoint appropriate for PID
                 // controllers
                 const auto setpoint = Setpoint(
@@ -179,7 +165,54 @@ namespace hf {
 
         private:
 
-            // Static methods ------------------------------------------------
+            void UpdateMode(
+                    const EspNowReceiver & rx, const bool requested_hover)
+            {
+                const auto requested_arming = EspNowReceiver::IsArmed(rx);
+
+                const auto is_gyro_calibrated = imu_filter_.is_gyro_calibrated;
+
+                const auto should_arm = 
+
+                    // Disable arming while gyro is calibrating
+                    !is_gyro_calibrated ? false :
+
+                    // Check receiver timeout
+                    CheckFailsafe(millis(),
+                            EspNowReceiver::GetTimestampMsec(rx),
+                            requested_arming);
+
+                // Run a little state-transition machine to update flight mode
+                mode_ = 
+
+                    //  Vehicle flipped over: enter panic mode
+                    IsFlipped(state_) ? kModePanic :
+
+                    // Panic mode: can't recover
+                    mode_ == kModePanic ? kModePanic :
+
+                    // Disallow jumping directly from idle to hover
+                    mode_ == kModeIdle && requested_hover ? kModeIdle :
+
+                    // Want arm and safe to arm: enter armed mode
+                    mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
+                    kModeArmed :
+
+                    // Armed and requested disarm: enter idle mode
+                    mode_ == kModeArmed && !should_arm ? kModeIdle :
+
+                    // Armed and requested hover; enter hover mode
+                    mode_ == kModeArmed && requested_hover ? kModeHovering :
+
+                    // Hovering and requested no-hover; return to armed mode
+                    mode_ == kModeHovering && !requested_hover ? kModeArmed :
+
+                    // Hovering and requested disarm; enter idle mode
+                    mode_ == kModeHovering && !requested_arming ? kModeIdle :
+
+                    //  Default: stay in current mode
+                    mode_;
+             }
 
             void SendTelemetry(
                     HardwareSerial & serial,
@@ -215,56 +248,6 @@ namespace hf {
                             MspSerializer::GetPayloadBytes(telemetry_serializer_),
                             MspSerializer::GetPayloadSize(telemetry_serializer_));
                 }
-            }
-
-            static auto UpdateMode(
-                    const uint32_t msecCurr,
-                    const VehicleState & state,
-                    const bool is_gyro_calibrated,
-                    const bool requestedArming,
-                    const bool requestedHover,
-                    const uint32_t msecPrev,
-                    const ImuFilter & imufilt,
-                    const Mode mode) -> Mode
-            {
-                const auto shouldArm = 
-
-                    // Disable arming while gyro is calibrating
-                    !is_gyro_calibrated ? false :
-
-                    // Check receiver timeout
-                    CheckFailsafe(msecCurr, msecPrev, requestedArming);
-
-                // Run a little state-transition machine to update flight mode
-                return 
-
-                    //  Vehicle flipped over: enter panic mode
-                    IsFlipped(state) ? kModePanic :
-
-                    // Panic mode: can't recover
-                    mode == kModePanic ? kModePanic :
-
-                    // Disallow jumping directly from idle to hover
-                    mode == kModeIdle && requestedHover ? kModeIdle :
-
-                    // Want arm and safe to arm: enter armed mode
-                    mode == kModeIdle && shouldArm && imufilt.is_gyro_calibrated
-                    ? kModeArmed :
-
-                    // Armed and requested disarm: enter idle mode
-                    mode == kModeArmed && !shouldArm ? kModeIdle :
-
-                    // Armed and requested hover; enter hover mode
-                    mode == kModeArmed && requestedHover ? kModeHovering :
-
-                    // Hovering and requested no-hover; return to armed mode
-                    mode == kModeHovering && !requestedHover ? kModeArmed :
-
-                    // Hovering and requested disarm; enter idle mode
-                    mode == kModeHovering && !requestedArming ? kModeIdle :
-
-                    //  Default: stay in current mode
-                    mode;
             }
 
             static auto IsFlipped(const VehicleState & state) -> bool
@@ -352,6 +335,18 @@ namespace hf {
                     kVoltageInputPin, kR1Ohms, kR2Ohms);
 
             // Instance methods ---------------------------------------------0
+
+            void RunHoverDeck()
+            {
+                if (hover_deck_timer_.Ready()) {
+                    zranger_filter_ = ZRangerFilter::Update(
+                            zranger_filter_, zranger_.Read());
+                    optical_flow_filter_ = OpticalFlowFilter::Update(
+                            optical_flow_filter_,
+                            micros(), flow_sensor_.Read());
+                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+                }
+            }
 
             auto AreMotorsAboveIdle(
                     const float * motor_vals,
