@@ -21,16 +21,16 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/motors/quad_dshot.hpp>
-#include <firmware/receivers/espnow.hpp>
+#include <firmware/receiver.hpp>
 
 #include <firmware/timer.hpp>
 
-static hf::EspNowReceiver rx_;
+static hf::Receiver rx_;
 
 void serialEvent3()
 {
     while (Serial3.available()) {
-        rx_ = hf::EspNowReceiver::ParseByte(rx_, Serial3.read(), millis());
+        rx_ = hf::Receiver::ParseByte(rx_, Serial3.read(), millis());
     }
 }
 
@@ -56,7 +56,7 @@ void setup()
 void loop()
 {
     // Receiver parses new data via serial event, so check arming here
-    rx_ = hf::EspNowReceiver::CheckArming(rx_);
+    rx_ = hf::Receiver::CheckArming(rx_);
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry

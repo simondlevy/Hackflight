@@ -21,7 +21,7 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/receivers/espnow.hpp>
+#include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -96,19 +96,19 @@ namespace hf {
                 }
             }
 
-            void Report(const EspNowReceiver & rx)
+            void Report(const Receiver & rx)
             {
                 if (helper_.Ready()) {
 
                     ReportSetpoint(Setpoint(
-                                EspNowReceiver::GetThrottle(rx),
-                                EspNowReceiver::GetRoll(rx),
-                                EspNowReceiver::GetPitch(rx),
-                                EspNowReceiver::GetYaw(rx)));
+                                Receiver::GetThrottle(rx),
+                                Receiver::GetRoll(rx),
+                                Receiver::GetPitch(rx),
+                                Receiver::GetYaw(rx)));
 
                        printf(" | arm=%d | time (msec) = %lu\n", 
-                                EspNowReceiver::IsArmed(rx),
-                                EspNowReceiver::GetTimestampMsec(rx));
+                                Receiver::IsArmed(rx),
+                                Receiver::GetTimestampMsec(rx));
                 }
             }
 

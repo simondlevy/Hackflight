@@ -28,7 +28,7 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/opticalflow/filter.hpp>
 #include <firmware/opticalflow/sensor.hpp>
-#include <firmware/receivers/espnow.hpp>
+#include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger/filter.hpp>
@@ -88,7 +88,7 @@ namespace hf {
             }
 
             auto Update(
-                    const EspNowReceiver & rx,
+                    const Receiver & rx,
                     HardwareSerial & serial,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
@@ -163,13 +163,13 @@ namespace hf {
                 return fabs(angle) > kTiltAngleFlippedMinDeg;
             }
 
-            static auto MakeSetpoint(const EspNowReceiver & rx) -> Setpoint
+            static auto MakeSetpoint(const Receiver & rx) -> Setpoint
             {                
                 return Setpoint(
-                    (EspNowReceiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
-                    PositionController::bypass(EspNowReceiver::GetRoll(rx)),
-                    PositionController::bypass(EspNowReceiver::GetPitch(rx)),
-                    EspNowReceiver::GetYaw(rx));
+                    (Receiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
+                    PositionController::bypass(Receiver::GetRoll(rx)),
+                    PositionController::bypass(Receiver::GetPitch(rx)),
+                    Receiver::GetYaw(rx));
             }
 
             // Instance variables ---------------------------------------------
@@ -363,9 +363,9 @@ namespace hf {
             }
 
             void UpdateMode(
-                    const EspNowReceiver & rx, const bool requested_hover)
+                    const Receiver & rx, const bool requested_hover)
             {
-                const auto requested_arming = EspNowReceiver::IsArmed(rx);
+                const auto requested_arming = Receiver::IsArmed(rx);
 
                 const auto is_gyro_calibrated = imu_filter_.is_gyro_calibrated;
 
@@ -376,7 +376,7 @@ namespace hf {
 
                     // Check receiver timeout
                     CheckFailsafe(millis(),
-                            EspNowReceiver::GetTimestampMsec(rx),
+                            Receiver::GetTimestampMsec(rx),
                             requested_arming);
 
                 // Run a little state-transition machine to update flight mode

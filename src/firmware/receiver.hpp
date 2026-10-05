@@ -24,7 +24,7 @@
 
 namespace hf {
 
-    class EspNowReceiver {
+    class Receiver {
 
         private:
 
@@ -33,7 +33,7 @@ namespace hf {
 
         public:
 
-            EspNowReceiver(
+            Receiver(
                     const MspParser & parser,
                     const bool is_down,
                     const bool was_down,
@@ -45,15 +45,15 @@ namespace hf {
                 is_armed_(armed),
                 timestamp_msec_(timestamp_msec) {}
 
-            EspNowReceiver() : was_down_(true) {}
+            Receiver() : was_down_(true) {}
 
-            EspNowReceiver& operator=(const EspNowReceiver& other) = default;
+            Receiver& operator=(const Receiver& other) = default;
 
             static auto ParseByte(
-                    const EspNowReceiver & rx,
+                    const Receiver & rx,
                     const uint8_t byte,
                     const uint32_t time_msec
-                    ) -> EspNowReceiver
+                    ) -> Receiver
             {
                 auto parser = MspParser::Parse(rx.parser_, byte);
 
@@ -68,11 +68,11 @@ namespace hf {
                 const auto timestamp_msec =
                     got_new_message ? time_msec : rx.timestamp_msec_;
 
-                return EspNowReceiver(parser, is_down, rx.was_down_,
+                return Receiver(parser, is_down, rx.was_down_,
                         rx.is_armed_, timestamp_msec);
             }
 
-            static auto CheckArming(const EspNowReceiver & rx) -> EspNowReceiver
+            static auto CheckArming(const Receiver & rx) -> Receiver
             {
                 const auto armed = !rx.is_down_ ? false :
 
@@ -81,38 +81,38 @@ namespace hf {
 
                     rx.is_armed_;
 
-                return EspNowReceiver(rx.parser_, rx.is_down_, rx.is_down_,
+                return Receiver(rx.parser_, rx.is_down_, rx.is_down_,
                         armed, rx.timestamp_msec_);
             }
 
-            static auto IsArmed(const EspNowReceiver & rx) -> bool
+            static auto IsArmed(const Receiver & rx) -> bool
             {
                 return rx.is_armed_;
             }
 
             // Special treatment for throttle for now
-            static auto GetThrottle(const EspNowReceiver & rx) -> float
+            static auto GetThrottle(const Receiver & rx) -> float
             {
                 const auto val = MspParser::GetShort(rx.parser_, 0);
                 return 2 * (val / 4095.f ) - 1;
             }
 
-            static auto GetRoll(const EspNowReceiver & rx) -> float
+            static auto GetRoll(const Receiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 1);
             }
 
-            static auto GetPitch(const EspNowReceiver & rx) -> float
+            static auto GetPitch(const Receiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 2);
             }
 
-            static auto GetYaw(const EspNowReceiver & rx) -> float
+            static auto GetYaw(const Receiver & rx) -> float
             {
                 return GetAxisValue(rx.parser_, 3);
             }
 
-            static auto GetTimestampMsec(const EspNowReceiver & rx) -> uint32_t
+            static auto GetTimestampMsec(const Receiver & rx) -> uint32_t
             {
                 return rx.timestamp_msec_;
             }
