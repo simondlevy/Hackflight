@@ -90,6 +90,7 @@ namespace hf {
 
             auto Update(
                     const EspNowReceiver & rx,
+                    HardwareSerial & serial,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
@@ -114,6 +115,8 @@ namespace hf {
                         PositionController::bypass(EspNowReceiver::GetRoll(rx)),
                         PositionController::bypass(EspNowReceiver::GetPitch(rx)),
                         EspNowReceiver::GetYaw(rx));
+
+                SendTelemetry(serial, setpoint);
 
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, GetDt(), state_, setpoint);
