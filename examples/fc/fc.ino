@@ -20,7 +20,7 @@
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
-#include <firmware/effectors/quad_dshot.hpp>
+#include <firmware/motors/quad_dshot.hpp>
 #include <firmware/receivers/espnow.hpp>
 
 #include <firmware/timer.hpp>

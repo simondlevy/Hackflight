@@ -19,7 +19,6 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/datatypes.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/filter.hpp>

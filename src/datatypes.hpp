@@ -90,8 +90,6 @@ namespace hf {
 
             Setpoint& operator=(const Setpoint& other) = default;
     };
-
-    typedef float * (*MixerFun)(const Setpoint & setpoint);
 }
 
 
