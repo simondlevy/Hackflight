@@ -56,6 +56,8 @@ void loop()
 
     // not connected
     else {
-        tp_.DotStar_SetPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+        blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
+        tp_.DotStar_SetPixelColor(
+                hf::BlinkTimer::IsOn(blink_timer_) ? 255 : 0, 0, 0);
     }
 }

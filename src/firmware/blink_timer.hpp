@@ -19,18 +19,44 @@ namespace hf {
 
     class BlinkTimer {
 
+        private:
+
+            static constexpr float kFreqHz = 2;
+
         public:
 
-            BlinkTimer(const float freq_hz = 2)
-                : timer_(freq_hz), on_(false) {}
+            BlinkTimer(const Timer & timer, const bool on)
+                : timer_(timer), on_(on) {}
+
+            BlinkTimer() = default;
+
+            BlinkTimer(const BlinkTimer & bt) = default;
 
             bool On() {
 
-                if (timer_.Ready()) {
+                timer_ = Timer::Update(timer_, kFreqHz, millis());
+
+                if (Timer::IsReady(timer_)) {
                     on_ = !on_;
                 }
 
                 return on_;
+            }
+
+            static BlinkTimer Update(
+                    const BlinkTimer & bt,
+                    const uint32_t msec)
+            {
+                const auto timer = Timer::Update(bt.timer_, kFreqHz, msec);
+
+                const auto on = Timer::IsReady(timer) ? !bt.on_ : bt.on_;
+
+                return BlinkTimer(timer, on);
+            }
+
+            static auto IsOn(const BlinkTimer & bt) 
+            {
+                return bt.on_;
             }
 
         private:
