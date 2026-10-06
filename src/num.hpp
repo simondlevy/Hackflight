@@ -37,7 +37,7 @@ class Num {
             return val < -maxabs ? -maxabs : val > maxabs ? maxabs : val;
         }
 
-        static auto ConstrainFloat(float value, const float min_val,
+        static auto ConstrainFloat(const float value, const float min_val,
                 const float max_val) -> float
         {
             return fminf(max_val, fmaxf(min_val,value));
