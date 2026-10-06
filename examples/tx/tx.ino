@@ -87,6 +87,14 @@ static auto DebugAxis(const uint8_t pin, const int16_t mid) -> float
     return ReadAxis(pin, mid) / 2048.f;
 }
 
+static auto DebouncePushbutton(
+        const hf::Pushbutton & pushbutton,
+        const uint8_t pin,
+        const uint32_t msec) -> hf::Pushbutton
+{
+    return hf::Pushbutton::Debounce(pushbutton, analogRead(pin), msec);
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -107,6 +115,15 @@ void loop()
 
     const auto msec = millis();
 
+    arming_button_ = DebouncePushbutton(
+            arming_button_, kArmingButtonPin, msec);
+
+    hovering_button_ = DebouncePushbutton(
+            hovering_button_, kHoveringButtonPin, msec);
+
+    autopilot_button_ = DebouncePushbutton(
+            autopilot_button_, kAutopilotButtonPin, msec);
+
     const short vals[7] = {
 
         map(analogRead(kThrottlePin), kThrottleLow, kThrottleHigh, 0, 4095),
@@ -114,13 +131,14 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        arming_button_.Debounce(analogRead(kArmingButtonPin), msec),
-        hovering_button_.Debounce(analogRead(kHoveringButtonPin), msec),
-        autopilot_button_.Debounce(analogRead(kAutopilotButtonPin), msec)
+        hf::Pushbutton::GetState(arming_button_),
+        hf::Pushbutton::GetState(hovering_button_),
+        hf::Pushbutton::GetState(autopilot_button_)
     };
 
+    /*
     printf("t=%+05d r=%+05d p=%+05d y=%+05d | arm=%d hov=%d aut=%d\n",
-            vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
+            vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);*/
 
     static hf::MspSerializer serializer_;
 

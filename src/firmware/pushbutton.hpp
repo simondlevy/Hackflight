@@ -39,27 +39,7 @@ namespace hf {
 
             Pushbutton(const Pushbutton & other) = default;
 
-            auto Debounce(
-                    const uint16_t analog_value, const uint32_t msec) -> bool
-            {
-                const auto reading = analog_value < kThreshold;
-
-                if (reading != reading_) {
-                    last_debounce_msec_ = msec;
-                }
-
-                if ((msec - last_debounce_msec_) > kDebounceDelayMsec
-                        && reading != state_) {
-
-                    state_ = reading;
-                }
-
-                reading_ = reading;
-
-                return state_;
-            }
-
-            auto NewDebounce(
+            static auto Debounce(
                     const Pushbutton & pushbutton,
                     const uint16_t analog_value,
                     const uint32_t msec) -> Pushbutton
@@ -67,23 +47,20 @@ namespace hf {
                 const auto reading = analog_value < kThreshold;
 
                 const auto last_debounce_msec = 
-                    reading != pushbutton.reading_
-                    ? msec :
-                    pushbutton.last_debounce_msec_;
+                    reading != pushbutton.reading_ ?
+                    msec : pushbutton.last_debounce_msec_;
 
-                /*
-                   if ((msec - last_debounce_msec_) > kDebounceDelayMsec) {
+                const auto state =
+                    ((msec - pushbutton.last_debounce_msec_) >
+                     kDebounceDelayMsec && reading != pushbutton.state_) ?
+                    reading : pushbutton.state_;
 
-                   if (reading != state_) {
-                   state_ = reading;
-                   }
-                   }
+                return Pushbutton(reading, last_debounce_msec, state);
+            }
 
-                   reading_ = reading;
-
-                   return state_;*/
-
-                return Pushbutton(reading, last_debounce_msec, 0);
+            static auto GetState(const Pushbutton & pushbutton)
+            {
+                return pushbutton.state_;
             }
 
         private:
