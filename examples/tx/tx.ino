@@ -119,7 +119,7 @@ void loop()
         autopilot_button_.Debounce(analogRead(kAutopilotButtonPin), msec)
     };
 
-    printf("t=%+04d r=%+04d p=%+04d y=%+04d | arm=%d hov=%d aut=%d\n",
+    printf("t=%+05d r=%+05d p=%+05d y=%+05d | arm=%d hov=%d aut=%d\n",
             vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
 
     static hf::MspSerializer serializer_;

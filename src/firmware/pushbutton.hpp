@@ -27,7 +27,17 @@ namespace hf {
 
         public:
 
+            Pushbutton(
+                    const bool reading,
+                    const uint32_t last_debounce_msec,
+                    const uint8_t state) 
+                : reading_(reading),
+                last_debounce_msec_(last_debounce_msec),
+                state_(state) {}
+
             Pushbutton() = default;
+
+            Pushbutton(const Pushbutton & other) = default;
 
             auto Debounce(
                     const uint16_t analog_value, const uint32_t msec) -> bool
@@ -38,7 +48,7 @@ namespace hf {
                     last_debounce_msec_ = msec;
                 }
 
-                if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
+                if ((msec - last_debounce_msec_) > kDebounceDelayMsec) {
 
                     if (reading != state_) {
                         state_ = reading;
