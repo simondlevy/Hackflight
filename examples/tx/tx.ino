@@ -29,7 +29,7 @@ static const uint8_t kReceiverAddress[6] = {
 };
 
 
-// Analog input ---------------------------------------------------------------
+// Analog input pins ----------------------------------------------------------
 
 static const uint8_t kThrottlePin = A4;
 static const uint8_t kRollPin = A3;
@@ -41,6 +41,8 @@ static const uint8_t kVoltageDividerPin = A6;
 static const uint8_t kArmingButtonPin = A8;
 static const uint8_t kHoveringButtonPin = A0;
 static const uint8_t kAutopilotButtonPin = A7;
+
+// Button debouncing ---------------------------------------------------------
 
 static hf::Pushbutton arming_button_;
 static hf::Pushbutton hovering_button_;
@@ -62,13 +64,11 @@ static const float kVoltageDividerR2Ohms = 2200;
 
 static const float kLowVoltage = 3.0;
 
-static const float kTransmitHz = 100;
-
 static const uint8_t kLedIntensity = 255;
 
-static auto blink_timer_ = hf::BlinkTimer();
+static const float kFreqHz = 100;
 
-static auto transmit_timer_ = hf::Timer(kTransmitHz);
+static auto blink_timer_ = hf::BlinkTimer();
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerPin,
@@ -135,5 +135,5 @@ void loop()
         //Serial.printf("ERROR sending to vehicle: %d\n", result);
     }
 
-    delay(10);
+    delay((int)1000/kFreqHz);
 }
