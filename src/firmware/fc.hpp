@@ -228,7 +228,7 @@ namespace hf {
 
             // Support for LED blinking
             Timer heartbeat_timer_; 
-            Timer fast_blink_timer_ = Timer(kLedFastBlinkRate);
+            Timer fast_blink_timer_;
 
             // Support for voltage sensing
             VoltageDivider voltage_divider_ = VoltageDivider(
@@ -266,10 +266,13 @@ namespace hf {
                 heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
                         kLedHeartbeatRate, msec);
 
+                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
+                        kLedFastBlinkRate, msec);
+
                 const auto ready =
                     is_imu__calibrated ?
                     Timer::IsReady(heartbeat_timer_) :
-                    fast_blink_timer_.Ready();
+                    Timer::IsReady(fast_blink_timer_);
 
                 if (ready) {
                     digitalWrite(kLedPin, true);
