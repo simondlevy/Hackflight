@@ -50,8 +50,8 @@ namespace hf {
 
             // LED indicator
             static const uint8_t kLedPin = 9;
-            static constexpr float kLedHeartbeat_Rate = 0.75;
-            static constexpr float kLedFastBlink_Rate = 3;
+            static constexpr float kLedHeartbeatRate = 0.75;
+            static constexpr float kLedFastBlinkRate = 3;
             static constexpr uint32_t kLedPulseDurationMsec = 50;
 
             // Rate constants for timer tasks
@@ -227,8 +227,8 @@ namespace hf {
             uint32_t led_pulse_start_;
 
             // Support for LED blinking
-            Timer heartbeat_timer_ = Timer(kLedHeartbeat_Rate);
-            Timer fast_blink_timer_ = Timer(kLedFastBlink_Rate);
+            Timer heartbeat_timer_; 
+            Timer fast_blink_timer_ = Timer(kLedFastBlinkRate);
 
             // Support for voltage sensing
             VoltageDivider voltage_divider_ = VoltageDivider(
@@ -259,10 +259,17 @@ namespace hf {
                     kFlyingHysteresisThresholdMsec;
             }
 
-            void BlinkLed(const bool isimu__calibrated)
+            void BlinkLed(const bool is_imu__calibrated)
             {
-                const auto ready = isimu__calibrated ?
-                    heartbeat_timer_.Ready() : fast_blink_timer_.Ready();
+                const auto msec = millis();
+
+                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
+                        kLedHeartbeatRate, msec);
+
+                const auto ready =
+                    is_imu__calibrated ?
+                    Timer::IsReady(heartbeat_timer_) :
+                    fast_blink_timer_.Ready();
 
                 if (ready) {
                     digitalWrite(kLedPin, true);
