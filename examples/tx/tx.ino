@@ -38,9 +38,9 @@ static const uint8_t kYawPin = A1;
 
 static const uint8_t kVoltageDividerPin = A6;
 
-static auto armingButton = hf::Pushbutton(A8);
-static auto autopilotButton = hf::Pushbutton(A7);
-static auto hoveringButton = hf::Pushbutton(A0);
+static auto arming_button_ = hf::Pushbutton(A8);
+static auto autopilot_button_ = hf::Pushbutton(A7);
+static auto hovering_button_ = hf::Pushbutton(A0);
 
 // ----------------------------------------------------------------------------
 
@@ -97,9 +97,9 @@ void loop()
 {
     const auto volts = voltage_divider_.read();
 
-    const auto ledState = volts < kLowVoltage ? blink_timer_.On() : true;
+    const auto led_state = volts < kLowVoltage ? blink_timer_.On() : true;
 
-    analogWrite(kLedPin, ledState ? kLedIntensity : 0);
+    analogWrite(kLedPin, led_state ? kLedIntensity : 0);
 
     const short vals[7] = {
 
@@ -108,9 +108,9 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        armingButton.Read(),
-        hoveringButton.Read(),
-        autopilotButton.Read()
+        arming_button_.Read(),
+        hovering_button_.Read(),
+        autopilot_button_.Read()
     };
 
     /*
