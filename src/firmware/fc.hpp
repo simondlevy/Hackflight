@@ -201,11 +201,11 @@ namespace hf {
             float voltage_;
 
             // Timers
-            Timer ekf_prediction_timer_ = Timer(kEkfPredictionRate);
-            Timer flying_check_timer_ = Timer(kFlyingCheckRate);
-            Timer voltage_sensing_timer_ = Timer(kVoltageSensingRate);
+            Timer ekf_prediction_timer_;
+            Timer flying_check_timer_;
+            Timer voltage_sensing_timer_;
             Timer hover_deck_timer_;
-            Timer telemetry_timer_ = Timer(kTelemetryRate);
+            Timer telemetry_timer_; 
 
             // PID control for stabilize-only
             StabilizerPidController stabilizer_pid_;
@@ -324,7 +324,10 @@ namespace hf {
                     HardwareSerial & serial,
                     const Setpoint & setpoint)
             {
-                if (telemetry_timer_.Ready()) {
+                telemetry_timer_ = Timer::Update(telemetry_timer_, 
+                        kTelemetryRate, millis());
+
+                if (Timer::IsReady(telemetry_timer_)) {
 
                     float data[256] = {};
 
@@ -360,11 +363,14 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count)
             {
+                flying_check_timer_ = Timer::Update(flying_check_timer_,
+                        kFlyingCheckRate, millis());
+
                 is_flying_ = 
 
                     mode_ == kModeIdle || mode_ == kModePanic  ? false :
 
-                    flying_check_timer_.Ready() ?
+                    Timer::IsReady(flying_check_timer_) ?
                     AreMotorsAboveIdle(motor_vals, motor_count) :
 
                     is_flying_;
@@ -428,8 +434,11 @@ namespace hf {
 
             void UpdateState()
             {
+                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
+                        kEkfPredictionRate, millis());
+
                 // Periodically run the EKF prediction step
-                if (ekf_prediction_timer_.Ready()) {
+                if (Timer::IsReady(ekf_prediction_timer_)) {
                     ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
                 }
 
@@ -441,7 +450,10 @@ namespace hf {
 
             void UpdateVoltage()
             {
-                voltage_ = voltage_sensing_timer_.Ready() ?
+                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
+                        kVoltageSensingRate, millis());
+
+                voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
                     voltage_divider_.read() : voltage_;
             }
 
