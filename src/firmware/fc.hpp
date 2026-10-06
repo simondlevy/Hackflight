@@ -93,28 +93,29 @@ namespace hf {
                     const uint8_t motor_count) -> Setpoint
             {
                 // Run sensor fusion on hover-deck
-                RunHoverDeck();
+                RunHoverDeck(micros());
 
                 // Safely update flight mode
-                UpdateMode(rx, false); // no hover request
+                UpdateMode(millis(), rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
-                UpdateFlyingStatus(motor_vals, motor_count);
+                UpdateFlyingStatus(millis(), motor_vals, motor_count);
 
                 // Sense voltage periodically
-                UpdateVoltage();
+                UpdateVoltage(millis());
 
                 // Blink LED to indicate status
-                BlinkLed(imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
+                BlinkLed(millis(),
+                        imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
                 // Update the IMU filter with raw IMU data
-                UpdateImu();
+                UpdateImu(millis());
 
                 // Update state estimation
-                UpdateState();
+                UpdateState(millis());
 
                 // Run PID controller on sepoint made from receiver values
-                return RunPidController(MakeSetpoint(rx));
+                return RunPidController(micros(), MakeSetpoint(rx));
             }
 
             auto IsSafeToFly() -> bool
@@ -250,7 +251,7 @@ namespace hf {
             // Debugging
             Debugger debugger_;
 
-            // Support for GetDt()
+            // Support for microsecond PID control timing
             uint32_t usec_prev_;
 
             // Support for LED blink
@@ -268,6 +269,7 @@ namespace hf {
             // Instance methods ---------------------------------------------0
 
             auto AreMotorsAboveIdle(
+                    const uint32_t msec,
                     const float * motor_vals,
                     const uint8_t motor_count) -> bool
             {
@@ -280,20 +282,16 @@ namespace hf {
                     }
                 }
 
-                const auto msec_curr = millis();
-
-                motor_check_msec_ = is_thrust_hover_idle ? msec_curr :
+                motor_check_msec_ = is_thrust_hover_idle ? msec :
                     motor_check_msec_;
 
                 return  motor_check_msec_ > 0 &&
-                    (msec_curr - motor_check_msec_) <
+                    (msec - motor_check_msec_) <
                     kFlyingHysteresisThresholdMsec;
             }
 
-            void BlinkLed(const bool is_imu__calibrated)
+            void BlinkLed(const uint32_t msec, const bool is_imu__calibrated)
             {
-                const auto msec = millis();
-
                 heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
                         kLedHeartbeatRate, msec);
 
@@ -308,74 +306,72 @@ namespace hf {
                 if (ready) {
                     digitalWrite(kLedPin, true);
                     is_led_pusing_ = true;
-                    led_pulse_start_ = millis();
+                    led_pulse_start_ = msec;
                 }
 
                 else if (is_led_pusing_) {
-                    if (millis() - led_pulse_start_ > kLedPulseDurationMsec) {
+                    if (msec - led_pulse_start_ > kLedPulseDurationMsec) {
                         digitalWrite(kLedPin, false);
                         is_led_pusing_ = false;
                     }
                 }
             }
 
-            auto GetDt() -> float
+            void RunHoverDeck(const uint32_t usec)
             {
-                const auto usec_curr = micros();      
-                const float dt = (usec_curr - usec_prev_)/1000000.0;
-                usec_prev_ = usec_curr;
+                const auto msec = usec / 1000;
 
-                return dt;
-            }
-
-            void RunHoverDeck()
-            {
                 hover_deck_timer_ = Timer::Update(hover_deck_timer_,
-                        kHoverDeckAcquisitionRate, millis());
+                        kHoverDeckAcquisitionRate, msec);
 
                 if (Timer::IsReady(hover_deck_timer_)) {
                     zranger_filter_ = ZRangerFilter::Update(
                             zranger_filter_, zranger_.Read());
                     optical_flow_filter_ = OpticalFlowFilter::Update(
                             optical_flow_filter_,
-                            micros(), flow_sensor_.Read());
+                            usec, flow_sensor_.Read());
                     ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }
 
-            auto RunPidController(const Setpoint & setpoint) -> Setpoint
+            auto RunPidController(const uint32_t usec,
+                    const Setpoint & setpoint) -> Setpoint
             {
+                const float dt = (usec - usec_prev_)/1000000.0;
+                usec_prev_ = usec;
+
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
-                        is_flying_, GetDt(), state_, setpoint);
+                        is_flying_, dt, state_, setpoint);
 
                 return stabilizer_pid_.setpoint;
             }
 
             void UpdateFlyingStatus(
+                    const uint32_t msec,
                     const float * motor_vals,
                     const uint8_t motor_count)
             {
                 flying_check_timer_ = Timer::Update(flying_check_timer_,
-                        kFlyingCheckRate, millis());
+                        kFlyingCheckRate, msec);
 
                 is_flying_ = 
 
                     mode_ == kModeIdle || mode_ == kModePanic  ? false :
 
                     Timer::IsReady(flying_check_timer_) ?
-                    AreMotorsAboveIdle(motor_vals, motor_count) :
+                    AreMotorsAboveIdle(msec, motor_vals, motor_count) :
 
                     is_flying_;
             }
 
-            void UpdateImu()
+            void UpdateImu(const uint32_t msec)
             {
-                imu_filter_ = ImuFilter::Step(imu_filter_, millis(),
+                imu_filter_ = ImuFilter::Step(imu_filter_, msec,
                         imu_.Read(), imu_.GetGyroRangeDps(),
                         imu_.GetAccelRangeGs());
             }
 
-            void UpdateMode(
+            void UpdateMode(const uint32_t msec,
                     const Receiver & rx, const bool requested_hover)
             {
                 const auto requested_arming = Receiver::IsArmed(rx);
@@ -388,7 +384,7 @@ namespace hf {
                     !is_gyro_calibrated ? false :
 
                     // Check receiver timeout
-                    CheckFailsafe(millis(),
+                    CheckFailsafe(msec,
                             Receiver::GetTimestampMsec(rx),
                             requested_arming);
 
@@ -424,26 +420,26 @@ namespace hf {
                     mode_;
             }
 
-            void UpdateState()
+            void UpdateState(const uint32_t msec)
             {
                 ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
-                        kEkfPredictionRate, millis());
+                        kEkfPredictionRate, msec);
 
                 // Periodically run the EKF prediction step
                 if (Timer::IsReady(ekf_prediction_timer_)) {
-                    ekf_ = EKF::Predict(ekf_, millis(), is_flying_); 
+                    ekf_ = EKF::Predict(ekf_, msec, is_flying_); 
                 }
 
                 // Do EKF fast-update with IMU readings
-                ekf_ = EKF::Update(ekf_, imu_filter_.output, millis());
+                ekf_ = EKF::Update(ekf_, imu_filter_.output, msec);
 
                 state_ = EKF::getVehicleState(ekf_);
             }
 
-            void UpdateVoltage()
+            void UpdateVoltage(const uint32_t msec)
             {
                 voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
-                        kVoltageSensingRate, millis());
+                        kVoltageSensingRate, msec);
 
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
                     voltage_divider_.read() : voltage_;
