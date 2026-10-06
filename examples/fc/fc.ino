@@ -67,7 +67,7 @@ void loop()
 
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
-    if (fc_.IsTelemetryReady()) {
+    if (fc_.IsTelemetryReady(millis())) {
         const auto telemetry_bytes = fc_.GetTelemetryBytes(rx_);
         Serial3.write(telemetry_bytes.bytes, telemetry_bytes.count);
     }

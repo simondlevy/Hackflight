@@ -127,10 +127,10 @@ namespace hf {
                 return mode_ != kModeIdle;
             }
 
-            auto IsTelemetryReady() -> bool
+            auto IsTelemetryReady(const uint32_t msec) -> bool
             {
                 telemetry_timer_ = Timer::Update(telemetry_timer_, 
-                        kTelemetryRate, millis());
+                        kTelemetryRate, msec);
 
                 return Timer::IsReady(telemetry_timer_);
             }
