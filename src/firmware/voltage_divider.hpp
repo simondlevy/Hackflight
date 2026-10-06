@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <Arduino.h>
-
 #include <hackflight.h>
 
 namespace hf {
@@ -26,7 +24,6 @@ namespace hf {
 
         private:
 
-            uint8_t input_pin_;
             float r1_ohms_;
             float r2_ohms_;
             uint8_t nbits_;
@@ -35,21 +32,18 @@ namespace hf {
         public:
 
             VoltageDivider(
-                    const uint8_t input_pin,
                     const float r1_ohms,
                     const float r2_ohms,
                     const uint8_t nbits=10,
                     const float signal_volts=3.3)
-                : input_pin_(input_pin),
-                r1_ohms_(r1_ohms),
+                : r1_ohms_(r1_ohms),
                 r2_ohms_(r2_ohms),
                 nbits_(nbits),
                 signal_volts_(signal_volts) {}
 
-            auto read() -> float
+            auto Convert(const uint16_t rawval) -> float
             {
-                return (float)analogRead(input_pin_) /
-                    (1 << nbits_) * signal_volts_ *
+                return (float)rawval / (1 << nbits_) * signal_volts_ *
                     (r1_ohms_ + r2_ohms_) / r2_ohms_;
             }
 

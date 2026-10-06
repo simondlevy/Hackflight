@@ -268,10 +268,10 @@ namespace hf {
             Timer fast_blink_timer_;
 
             // Support for voltage sensing
-            VoltageDivider voltage_divider_ = VoltageDivider(
-                    kVoltageInputPin, kR1Ohms, kR2Ohms);
+            VoltageDivider voltage_divider_ =
+                VoltageDivider( kR1Ohms, kR2Ohms);
 
-            // Instance methods ---------------------------------------------0
+            // Instance methods ----------------------------------------------
 
             auto AreMotorsAboveIdle(
                     const uint32_t msec,
@@ -446,8 +446,10 @@ namespace hf {
                 voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
                         kVoltageSensingRate, msec);
 
+                const auto rawval = analogRead(kVoltageInputPin);
+
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
-                    voltage_divider_.read() : voltage_;
+                    voltage_divider_.Convert(rawval) : voltage_;
             }
 
     }; // class FlightController

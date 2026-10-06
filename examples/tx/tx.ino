@@ -71,7 +71,6 @@ static const float kFreqHz = 100;
 static hf::BlinkTimer blink_timer_; 
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
-        kVoltageDividerPin,
         kVoltageDividerR1Ohms,
         kVoltageDividerR2Ohms,
         12);
@@ -107,7 +106,9 @@ void setup()
 
 void loop()
 {
-    const auto volts = voltage_divider_.read();
+    const auto rawval = analogRead(kVoltageDividerPin);
+
+    const auto volts = voltage_divider_.Convert(rawval);
 
     blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
 
