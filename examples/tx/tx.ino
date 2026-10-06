@@ -38,9 +38,13 @@ static const uint8_t kYawPin = A1;
 
 static const uint8_t kVoltageDividerPin = A6;
 
-static auto arming_button_ = hf::Pushbutton(A8);
-static auto autopilot_button_ = hf::Pushbutton(A7);
-static auto hovering_button_ = hf::Pushbutton(A0);
+static const uint8_t kArmingButtonPin = A8;
+static const uint8_t kHoveringButtonPin = A0;
+static const uint8_t kAutopilotButtonPin = A7;
+
+static hf::Pushbutton arming_button_;
+static hf::Pushbutton hovering_button_;
+static hf::Pushbutton autopilot_button_;
 
 // ----------------------------------------------------------------------------
 
@@ -101,6 +105,8 @@ void loop()
 
     analogWrite(kLedPin, led_state ? kLedIntensity : 0);
 
+    const auto msec = millis();
+
     const short vals[7] = {
 
         map(analogRead(kThrottlePin), kThrottleLow, kThrottleHigh, 0, 4095),
@@ -108,16 +114,13 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        arming_button_.Read(),
-        hovering_button_.Read(),
-        autopilot_button_.Read()
+        arming_button_.Debounce(analogRead(kArmingButtonPin), msec),
+        hovering_button_.Debounce(analogRead(kHoveringButtonPin), msec),
+        autopilot_button_.Debounce(analogRead(kAutopilotButtonPin), msec)
     };
 
-    /*
-    printf("r=%+3.3f p=%+3.3f y=%+3.3f\n",
-            -DebugAxis(kRollPin, kRollMid),
-            DebugAxis(kPitchPin, kPitchMid),
-            DebugAxis(kYawPin, kYawMid));*/
+    printf("t=%+04d r=%+04d p=%+04d y=%+04d | arm=%d hov=%d aut=%d\n",
+            vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);
 
     static hf::MspSerializer serializer_;
 

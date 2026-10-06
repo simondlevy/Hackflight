@@ -29,15 +29,13 @@ namespace hf {
 
             Pushbutton() = default;
 
-            Pushbutton(const uint8_t pin) 
-                : pin_(pin) {}
-
-            auto Read() -> bool
+            auto Debounce(
+                    const uint16_t analog_value, const uint32_t msec) -> bool
             {
-                int reading = analogRead(pin_) < kThreshold;
+                const auto reading = analog_value < kThreshold;
 
                 if (reading != reading_) {
-                    last_debounce_msec_ = millis();
+                    last_debounce_msec_ = msec;
                 }
 
                 if ((millis() - last_debounce_msec_) > kDebounceDelayMsec) {
@@ -54,8 +52,7 @@ namespace hf {
 
         private:
 
-            uint8_t pin_;
-            uint8_t reading_;
+            bool reading_;
             uint32_t last_debounce_msec_;
             uint8_t state_;
     };
