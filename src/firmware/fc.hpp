@@ -88,34 +88,38 @@ namespace hf {
             }
 
             auto Update(
+                    const uint32_t usec,
                     const Receiver & rx,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
+                // Most routines use milliseconds 
+                const auto msec = usec / 1000;
+
                 // Run sensor fusion on hover-deck
-                RunHoverDeck(micros());
+                RunHoverDeck(usec);
 
                 // Safely update flight mode
-                UpdateMode(millis(), rx, false); // no hover request
+                UpdateMode(msec, rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
-                UpdateFlyingStatus(millis(), motor_vals, motor_count);
+                UpdateFlyingStatus(msec, motor_vals, motor_count);
 
                 // Sense voltage periodically
-                UpdateVoltage(millis());
+                UpdateVoltage(msec);
 
                 // Blink LED to indicate status
-                BlinkLed(millis(),
+                BlinkLed(msec,
                         imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
 
                 // Update the IMU filter with raw IMU data
-                UpdateImu(millis());
+                UpdateImu(msec);
 
                 // Update state estimation
-                UpdateState(millis());
+                UpdateState(msec);
 
                 // Run PID controller on sepoint made from receiver values
-                return RunPidController(micros(), MakeSetpoint(rx));
+                return RunPidController(usec, MakeSetpoint(rx));
             }
 
             auto IsSafeToFly() -> bool
