@@ -30,8 +30,8 @@ static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
-static Bmi088Accel _accel = Bmi088Accel(Wire, 0x18);
-static Bmi088Gyro _gyro = Bmi088Gyro(Wire, 0x68);
+static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
+static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
 
 static bool okay(const int status)
 {
@@ -44,23 +44,23 @@ namespace hf {
     {
         return 
 
-            okay(_gyro.begin()) &&
+            okay(gyro_.begin()) &&
 
-            okay(_accel.begin()) &&
+            okay(accel_.begin()) &&
 
-            okay(_gyro.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+            okay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-            okay(_gyro.setRange(KGyroRange)) &&
+            okay(gyro_.setRange(KGyroRange)) &&
 
-            okay(_gyro.pinModeInt3(
+            okay(gyro_.pinModeInt3(
                         Bmi088Gyro::PIN_MODE_PUSH_PULL,
                         Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
 
-            okay(_gyro.mapDrdyInt3(true)) &&
+            okay(gyro_.mapDrdyInt3(true)) &&
 
-            okay(_accel.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+            okay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-            okay(_accel.setRange(kAccelRange));
+            okay(accel_.setRange(kAccelRange));
     }
 
     auto IMU::GetGyroRangeDps() -> int16_t
@@ -80,20 +80,20 @@ namespace hf {
 
     auto IMU::Read() -> IMU::RawData
     {
-        _gyro.readSensor();
+        gyro_.readSensor();
 
-        _accel.readSensor();
+        accel_.readSensor();
 
         return IMU::RawData(
                 IMU::ThreeAxisRaw(
-                    _gyro.getGyroX_raw(),
-                    _gyro.getGyroY_raw(),
-                    _gyro.getGyroZ_raw()
+                    gyro_.getGyroX_raw(),
+                    gyro_.getGyroY_raw(),
+                    gyro_.getGyroZ_raw()
                     ),
                 IMU::ThreeAxisRaw(
-                    _accel.getAccelX_raw(),
-                    _accel.getAccelY_raw(),
-                    _accel.getAccelZ_raw()
+                    accel_.getAccelX_raw(),
+                    accel_.getAccelY_raw(),
+                    accel_.getAccelZ_raw()
                     ));
     }
 

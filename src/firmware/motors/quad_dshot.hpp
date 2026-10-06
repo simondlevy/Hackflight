@@ -44,16 +44,16 @@ namespace hf {
 
             void Run(
                     const Setpoint & setpoint,
-                    const bool isSafeToFly,
-                    const bool isArmed)
+                    const bool is_safe_to_fly,
+                    const bool is_armed)
             {
                 mixer_ = QuadXMixer::Run(setpoint);
 
                 const auto motorvals = GetMotorValues();
 
                 // Run motors if safe
-                if (isSafeToFly) {
-                    motors_.run(isArmed, motorvals);
+                if (is_safe_to_fly) {
+                    motors_.run(is_armed, motorvals);
                 }
             }
 

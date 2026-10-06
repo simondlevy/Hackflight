@@ -26,7 +26,7 @@
 #include <firmware/debugger.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 
-static PMW3901 _pmw3901;
+static PMW3901 pmw3901_;
 
 namespace hf {
 
@@ -34,7 +34,7 @@ namespace hf {
     {
         SPI.begin();
 
-        if (!_pmw3901.begin()) {
+        if (!pmw3901_.begin()) {
             Debugger::ReportForever("Unable to initialize PMW3901");
         }
     }
@@ -45,7 +45,7 @@ namespace hf {
         int16_t dy = 0;
         auto moved = false; // we ignore this
 
-        _pmw3901.readMotion(dx, dy, moved);
+        pmw3901_.readMotion(dx, dy, moved);
 
         return OpticalFlowSensor::RawData(dx, dy);
     }

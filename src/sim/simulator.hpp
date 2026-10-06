@@ -51,8 +51,8 @@ namespace hf {
                 pid_controller(HoverPidController()) {}
 
             Simulator(const Dynamics & dynamics,
-                    const HoverPidController & pidControl)
-                : dynamics(dynamics), pid_controller(pidControl) {}
+                    const HoverPidController & pid_controller)
+                : dynamics(dynamics), pid_controller(pid_controller) {}
 
             static auto Step(
                     const Simulator & sim,
@@ -64,7 +64,7 @@ namespace hf {
             {
                 const auto dt = 1/(float)kPidFastFreq;
 
-                auto pidControl = sim.pid_controller;
+                auto pid_controller = sim.pid_controller;
 
                 auto dynamics = sim.dynamics;
 
@@ -80,12 +80,12 @@ namespace hf {
                     for (uint32_t j=0; j<kPidFastFreq/kPidSlowFreq; ++j) {
 
                         // Run PID control to get new setpoint
-                        pidControl = HoverPidController::Run(
-                                pidControl, dt, mode, state, setpoint);
+                        pid_controller = HoverPidController::Run(
+                                pid_controller, dt, mode, state, setpoint);
 
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces
-                        const auto forces = effector_fun(pidControl.setpoint);
+                        const auto forces = effector_fun(pid_controller.setpoint);
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
@@ -95,7 +95,7 @@ namespace hf {
                     }
                 }
 
-                return Simulator(dynamics, pidControl);
+                return Simulator(dynamics, pid_controller);
             }
 
         private:

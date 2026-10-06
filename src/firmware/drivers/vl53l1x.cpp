@@ -21,7 +21,7 @@
 #include <firmware/debugger.hpp>
 #include <firmware/zranger/sensor.hpp>
 
-static Adafruit_VL53L1X _vl53l1x;
+static Adafruit_VL53L1X vl53l1x_;
 
 namespace hf {
 
@@ -31,16 +31,16 @@ namespace hf {
         Wire1.setClock(400000);
         delay(100);
 
-        if (!_vl53l1x.begin(0x29, &Wire1)) {
+        if (!vl53l1x_.begin(0x29, &Wire1)) {
             Debugger::ReportForever("Unable to initialize VL53L1X");
         }
 
-        if (!_vl53l1x.startRanging()) {
+        if (!vl53l1x_.startRanging()) {
             Debugger::ReportForever("VL53L1X failed to start ranging");
         }
 
         // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms
-        _vl53l1x.setTimingBudget(50);
+        vl53l1x_.setTimingBudget(50);
 
     }
 
@@ -48,12 +48,12 @@ namespace hf {
     {
         static float _distance;
 
-        if (_vl53l1x.dataReady())  {
+        if (vl53l1x_.dataReady())  {
 
-            _distance = _vl53l1x.distance();
+            _distance = vl53l1x_.distance();
 
             // Prepare for another reading
-            _vl53l1x.clearInterrupt();
+            vl53l1x_.clearInterrupt();
         }
 
         return _distance;
