@@ -93,6 +93,7 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
+
                 // Most routines use milliseconds 
                 const auto msec = usec / 1000;
 
