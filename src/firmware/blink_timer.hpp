@@ -32,20 +32,9 @@ namespace hf {
 
             BlinkTimer(const BlinkTimer & bt) = default;
 
-            bool On() {
-
-                timer_ = Timer::Update(timer_, kFreqHz, millis());
-
-                if (Timer::IsReady(timer_)) {
-                    on_ = !on_;
-                }
-
-                return on_;
-            }
-
-            static BlinkTimer Update(
+            static auto Update(
                     const BlinkTimer & bt,
-                    const uint32_t msec)
+                    const uint32_t msec) -> BlinkTimer
             {
                 const auto timer = Timer::Update(bt.timer_, kFreqHz, msec);
 

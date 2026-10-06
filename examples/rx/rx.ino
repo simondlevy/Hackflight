@@ -116,6 +116,8 @@ void loop()
 
     // Otherise, blink LED red
     else {
-        ums3_.setPixelColor(blink_timer_.On() ? 255 : 0, 0, 0);
+        blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
+        ums3_.setPixelColor(hf::BlinkTimer::IsOn(blink_timer_) ?
+                255 : 0, 0, 0);
     }
 }
