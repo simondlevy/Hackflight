@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <Arduino.h>
-
 namespace hf {
 
     class Timer {
