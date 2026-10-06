@@ -89,6 +89,7 @@ namespace hf {
 
             auto Update(
                     const uint32_t usec,
+                    const uint16_t rawvolts,
                     const Receiver & rx,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
@@ -107,7 +108,7 @@ namespace hf {
                 UpdateFlyingStatus(msec, motor_vals, motor_count);
 
                 // Sense voltage periodically
-                UpdateVoltage(msec);
+                UpdateVoltage(msec, rawvolts);
 
                 // Blink LED to indicate status
                 BlinkLed(msec,
@@ -441,12 +442,10 @@ namespace hf {
                 state_ = EKF::getVehicleState(ekf_);
             }
 
-            void UpdateVoltage(const uint32_t msec)
+            void UpdateVoltage(const uint32_t msec, const uint16_t rawval)
             {
                 voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
                         kVoltageSensingRate, msec);
-
-                const auto rawval = analogRead(kVoltageInputPin);
 
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
                     voltage_divider_.Convert(rawval) : voltage_;

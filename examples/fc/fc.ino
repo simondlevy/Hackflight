@@ -25,6 +25,8 @@
 
 #include <firmware/timer.hpp>
 
+static constexpr uint8_t kVoltageInputPin = A9;
+
 static hf::Receiver rx_;
 
 void serialEvent3()
@@ -60,8 +62,8 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint = fc_.Update(
-            micros(), rx_,motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(micros(), analogRead(kVoltageInputPin),
+            rx_,motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
     motors_.Run(setpoint, fc_.IsSafeToFly(), fc_.IsArmed());
