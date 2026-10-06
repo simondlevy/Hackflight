@@ -34,23 +34,26 @@ namespace hf {
 
             class Helper {
 
-                private:
-
-                    Timer timer_ = Timer(kReportingRate);
-
                 public:
 
                     uint32_t count;
 
                     bool Ready()
                     {
-                        if (timer_.Ready()) {
+                        timer_ =
+                            Timer::Update(timer_, kReportingRate, millis());
+
+                        if (Timer::IsReady(timer_)) {
                             count++;
                             return true;
                         }
 
                         return false;
                     }
+
+                private:
+
+                    Timer timer_; 
             };
 
         public:

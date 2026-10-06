@@ -93,6 +93,8 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
+                debugger_.Report(rx);
+
                 // Run sensor fusion on hover-deck
                 RunHoverDeck();
 
