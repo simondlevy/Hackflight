@@ -21,7 +21,7 @@
 
 static const uint32_t kWifiTimeoutMsec = 50;
 
-static auto blink_timer_ = hf::BlinkTimer();
+static hf::BlinkTimer blink_timer_; 
 
 static uint32_t last_wifi_received_msec_;
 

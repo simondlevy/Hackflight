@@ -68,7 +68,7 @@ static const uint8_t kLedIntensity = 255;
 
 static const float kFreqHz = 100;
 
-static auto blink_timer_ = hf::BlinkTimer();
+static hf::BlinkTimer blink_timer_; 
 
 static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
         kVoltageDividerPin,
@@ -109,7 +109,10 @@ void loop()
 {
     const auto volts = voltage_divider_.read();
 
-    const auto led_state = volts < kLowVoltage ? blink_timer_.On() : true;
+    blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
+
+    const auto led_state = volts < kLowVoltage ? 
+        hf::BlinkTimer::IsOn(blink_timer_) : true;
 
     analogWrite(kLedPin, led_state ? kLedIntensity : 0);
 
