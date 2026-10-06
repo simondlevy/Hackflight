@@ -204,7 +204,7 @@ namespace hf {
             Timer ekf_prediction_timer_ = Timer(kEkfPredictionRate);
             Timer flying_check_timer_ = Timer(kFlyingCheckRate);
             Timer voltage_sensing_timer_ = Timer(kVoltageSensingRate);
-            Timer hover_deck_timer_ = Timer(kHoverDeckAcquisitionRate);
+            Timer hover_deck_timer_;
             Timer telemetry_timer_ = Timer(kTelemetryRate);
 
             // PID control for stabilize-only
@@ -299,7 +299,10 @@ namespace hf {
 
             void RunHoverDeck()
             {
-                if (hover_deck_timer_.Ready()) {
+                hover_deck_timer_ = Timer::Update(hover_deck_timer_,
+                        kHoverDeckAcquisitionRate, millis());
+
+                if (Timer::IsReady(hover_deck_timer_)) {
                     zranger_filter_ = ZRangerFilter::Update(
                             zranger_filter_, zranger_.Read());
                     optical_flow_filter_ = OpticalFlowFilter::Update(
