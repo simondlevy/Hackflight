@@ -60,9 +60,15 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint =
-        fc_.Update(rx_, Serial3, motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(rx_, motors_.GetMotorValues(), 4);
 
     // Run the mixer and motors
     motors_.Run(setpoint, fc_.IsSafeToFly(), fc_.IsArmed());
+
+    // Periodically send telemetry (receiver setpoint + vehicle state) to the
+    // dongle
+    if (fc_.IsTelemetryReady()) {
+        const auto telemetry_bytes = fc_.GetTelemetryBytes(rx_);
+        Serial3.write(telemetry_bytes.bytes, telemetry_bytes.count);
+    }
 }

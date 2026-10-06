@@ -90,6 +90,22 @@ namespace hf {
 
             Setpoint& operator=(const Setpoint& other) = default;
     };
+
+    class TelemetryBytes {
+
+        public:
+
+            uint8_t bytes[256];
+            uint8_t count;
+
+            TelemetryBytes(const uint8_t * bytes, const uint8_t count)
+            {
+                memcpy(this->bytes, bytes, count);
+                this->count = count;
+            }
+
+            TelemetryBytes(const TelemetryBytes& other) = default;
+
+            TelemetryBytes() = default;
+    };
 }
-
-

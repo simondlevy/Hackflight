@@ -89,12 +89,9 @@ namespace hf {
 
             auto Update(
                     const Receiver & rx,
-                    HardwareSerial & serial,
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-                debugger_.Report(rx);
-
                 // Run sensor fusion on hover-deck
                 RunHoverDeck();
 
@@ -116,15 +113,8 @@ namespace hf {
                 // Update state estimation
                 UpdateState();
 
-                // Convert receiver values into setpoint appropriate for PID
-                // controllers
-                const auto setpoint = MakeSetpoint(rx);
-
-                // Send setpoint and vehicle state to base-station
-                SendTelemetry(serial, setpoint);
-
-                // Run PID controller on sepoint
-                return RunPidController(setpoint);
+                // Run PID controller on sepoint made from receiver values
+                return RunPidController(MakeSetpoint(rx));
             }
 
             auto IsSafeToFly() -> bool
@@ -135,6 +125,47 @@ namespace hf {
             auto IsArmed() -> bool
             {
                 return mode_ != kModeIdle;
+            }
+
+            auto IsTelemetryReady() -> bool
+            {
+                telemetry_timer_ = Timer::Update(telemetry_timer_, 
+                        kTelemetryRate, millis());
+
+                return Timer::IsReady(telemetry_timer_);
+            }
+
+            auto GetTelemetryBytes(const Receiver & rx) -> TelemetryBytes
+            {
+                const auto setpoint = MakeSetpoint(rx);
+
+                float data[256] = {};
+
+                data[0] = (float)mode_;
+
+                data[1] = setpoint.thrust;
+                data[2] = setpoint.roll;
+                data[3] = setpoint.pitch;
+                data[4] = setpoint.yaw;
+
+                data[5] = state_.dx;
+                data[6] = state_.dy;
+                data[7] = state_.z;
+                data[8] = state_.dz;
+                data[9] = state_.phi;
+                data[10] = state_.dphi;
+                data[11] = state_.theta;
+                data[12] = state_.dtheta;
+                data[13] = state_.psi;
+                data[14] = state_.dpsi;
+
+                telemetry_serializer_ = MspSerializer::SerializeFloats(
+                        telemetry_serializer_, kMspTelemetry,
+                        data, 15);
+
+                return TelemetryBytes(
+                        MspSerializer::GetPayloadBytes(telemetry_serializer_),
+                        MspSerializer::GetPayloadSize(telemetry_serializer_));
             }
 
             // Static methods ----------------------------------------------
@@ -168,10 +199,10 @@ namespace hf {
             static auto MakeSetpoint(const Receiver & rx) -> Setpoint
             {                
                 return Setpoint(
-                    (Receiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
-                    PositionController::bypass(Receiver::GetRoll(rx)),
-                    PositionController::bypass(Receiver::GetPitch(rx)),
-                    Receiver::GetYaw(rx));
+                        (Receiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
+                        PositionController::bypass(Receiver::GetRoll(rx)),
+                        PositionController::bypass(Receiver::GetPitch(rx)),
+                        Receiver::GetYaw(rx));
             }
 
             // Instance variables ---------------------------------------------
@@ -318,45 +349,6 @@ namespace hf {
                         is_flying_, GetDt(), state_, setpoint);
 
                 return stabilizer_pid_.setpoint;
-            }
-
-            void SendTelemetry(
-                    HardwareSerial & serial,
-                    const Setpoint & setpoint)
-            {
-                telemetry_timer_ = Timer::Update(telemetry_timer_, 
-                        kTelemetryRate, millis());
-
-                if (Timer::IsReady(telemetry_timer_)) {
-
-                    float data[256] = {};
-
-                    data[0] = (float)mode_;
-
-                    data[1] = setpoint.thrust;
-                    data[2] = setpoint.roll;
-                    data[3] = setpoint.pitch;
-                    data[4] = setpoint.yaw;
-
-                    data[5] = state_.dx;
-                    data[6] = state_.dy;
-                    data[7] = state_.z;
-                    data[8] = state_.dz;
-                    data[9] = state_.phi;
-                    data[10] = state_.dphi;
-                    data[11] = state_.theta;
-                    data[12] = state_.dtheta;
-                    data[13] = state_.psi;
-                    data[14] = state_.dpsi;
-
-                    telemetry_serializer_ = MspSerializer::SerializeFloats(
-                            telemetry_serializer_, kMspTelemetry,
-                            data, 15);
-
-                    serial.write(
-                            MspSerializer::GetPayloadBytes(telemetry_serializer_),
-                            MspSerializer::GetPayloadSize(telemetry_serializer_));
-                }
             }
 
             void UpdateFlyingStatus(
