@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <hackflight.h>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
