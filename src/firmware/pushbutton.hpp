@@ -48,16 +48,42 @@ namespace hf {
                     last_debounce_msec_ = msec;
                 }
 
-                if ((msec - last_debounce_msec_) > kDebounceDelayMsec) {
+                if ((msec - last_debounce_msec_) > kDebounceDelayMsec
+                        && reading != state_) {
 
-                    if (reading != state_) {
-                        state_ = reading;
-                    }
+                    state_ = reading;
                 }
 
                 reading_ = reading;
 
                 return state_;
+            }
+
+            auto NewDebounce(
+                    const Pushbutton & pushbutton,
+                    const uint16_t analog_value,
+                    const uint32_t msec) -> Pushbutton
+            {
+                const auto reading = analog_value < kThreshold;
+
+                const auto last_debounce_msec = 
+                    reading != pushbutton.reading_
+                    ? msec :
+                    pushbutton.last_debounce_msec_;
+
+                /*
+                   if ((msec - last_debounce_msec_) > kDebounceDelayMsec) {
+
+                   if (reading != state_) {
+                   state_ = reading;
+                   }
+                   }
+
+                   reading_ = reading;
+
+                   return state_;*/
+
+                return Pushbutton(reading, last_debounce_msec, 0);
             }
 
         private:
