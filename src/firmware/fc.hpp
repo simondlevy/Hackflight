@@ -49,7 +49,6 @@ namespace hf {
             static constexpr float kR2Ohms = 1000;
 
             // LED indicator
-            static const uint8_t kLedPin = 9;
             static constexpr float kLedHeartbeatRate = 0.75;
             static constexpr float kLedFastBlinkRate = 3;
             static constexpr uint32_t kLedPulseDurationMsec = 50;
@@ -75,11 +74,17 @@ namespace hf {
 
         public:
 
+            typedef enum {
+
+                kLedUnchanged, 
+                kLedOff, 
+                kLedOn, 
+
+            } LedStatus;
+
             void Begin()
             {
                 imu_.Begin();
-
-                pinMode(kLedPin, OUTPUT); 
 
                 zranger_.Begin();
                 flow_sensor_.Begin();
@@ -111,8 +116,8 @@ namespace hf {
                 UpdateVoltage(msec, rawvolts);
 
                 // Blink LED to indicate status
-                BlinkLed(msec,
-                        imu_filter_.is_gyro_calibrated && mode_ != kModePanic);
+                UpdateLedStatus(msec, imu_filter_.is_gyro_calibrated && mode_ !=
+                        kModePanic);
 
                 // Update the IMU filter with raw IMU data
                 UpdateImu(msec);
@@ -175,6 +180,12 @@ namespace hf {
                         MspSerializer::GetPayloadSize(telemetry_serializer_));
             }
 
+            auto GetLedStatus() -> LedStatus
+            {
+                return led_status_;
+            }
+
+
             // Static methods ----------------------------------------------
 
         private:
@@ -219,6 +230,9 @@ namespace hf {
 
             // Idle, armed, etc.
             Mode mode_;
+
+            // LED status
+            LedStatus led_status_;
 
             // Flying status based on motors
             bool is_flying_;
@@ -296,7 +310,9 @@ namespace hf {
                     kFlyingHysteresisThresholdMsec;
             }
 
-            void BlinkLed(const uint32_t msec, const bool is_imu__calibrated)
+            void UpdateLedStatus(
+                    const uint32_t msec,
+                    const bool is_imu__calibrated)
             {
                 heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
                         kLedHeartbeatRate, msec);
@@ -310,16 +326,20 @@ namespace hf {
                     Timer::IsReady(fast_blink_timer_);
 
                 if (ready) {
-                    digitalWrite(kLedPin, true);
+                    led_status_ = kLedOn;
                     is_led_pusing_ = true;
                     led_pulse_start_ = msec;
                 }
 
                 else if (is_led_pusing_) {
                     if (msec - led_pulse_start_ > kLedPulseDurationMsec) {
-                        digitalWrite(kLedPin, false);
+                        led_status_ = kLedOff;
                         is_led_pusing_ = false;
                     }
+                }
+
+                else {
+                    led_status_ = kLedUnchanged;
                 }
             }
 

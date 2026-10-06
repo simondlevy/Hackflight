@@ -26,6 +26,7 @@
 #include <firmware/timer.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;
+static const uint8_t kLedPin = 9;
 
 static hf::Receiver rx_;
 
@@ -48,6 +49,9 @@ void setup()
     // Wait a sec for the receiver to kick in
     delay(1000);
 
+    // Enable heartbeat LED
+    pinMode(kLedPin, OUTPUT); 
+
     // Start flight control
     fc_.Begin();
 
@@ -64,6 +68,14 @@ void loop()
     // telemetry
     const auto setpoint = fc_.Update(micros(), analogRead(kVoltageInputPin),
             rx_,motors_.GetMotorValues(), 4);
+
+    const auto led_status = fc_.GetLedStatus();
+    if (led_status == hf::FlightController::kLedOff) {
+        digitalWrite(kLedPin, LOW);
+    }
+    else if (led_status == hf::FlightController::kLedOn) {
+        digitalWrite(kLedPin, HIGH);
+    }
 
     // Run the mixer and motors
     motors_.Run(setpoint, fc_.IsSafeToFly(), fc_.IsArmed());
