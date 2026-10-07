@@ -1,4 +1,6 @@
 /*
+   Hackflight hover-deck class
+
    Copyright (C) 2026 Simon D. Levy
 
    This program is free software: you can redistribute it and/or modify
@@ -14,40 +16,28 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#pragma once
 
-// Standard Arduino libraries
-#include <SPI.h>
-
-// Third-party libraries
-#include <pmw3901.hpp>
-
-// Hackflight library
 #include <hackflight.h>
-#include <firmware/opticalflow/sensor.hpp>
-#include <firmware/drivers/error.hpp>
-
-static PMW3901 pmw3901_;
 
 namespace hf {
 
-    void OpticalFlowSensor::Begin()
-    {
-        SPI.begin();
+    class HoverDeck {
 
-        if (!pmw3901_.begin()) {
-            Error::ReportForever("Unable to initialize PMW3901");
-        }
-    }
+        public:
 
-    auto OpticalFlowSensor::Read() -> OpticalFlowSensor::RawData
-    {
-        int16_t dx = 0;
-        int16_t dy = 0;
-        auto moved = false; // we ignore this
+            HoverDeck(const float dx, const float dy, const float z)
+                : dx_(dx), dy_(dy), z_(z) { }
 
-        pmw3901_.readMotion(dx, dy, moved);
+            HoverDeck() = default;
 
-        return OpticalFlowSensor::RawData(dx, dy);
-    }
+            HoverDeck(const HoverDeck & hd) = default;
+
+        private:
+
+            float dx_;
+            float dy_;
+            float z_;
+    };
 
 }

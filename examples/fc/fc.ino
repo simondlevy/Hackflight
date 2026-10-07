@@ -17,15 +17,21 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// Standard Arduino libraries
+#include <SPI.h>
 #include <Wire.h>
 
+// Third-party libraries
+#include <pmw3901.hpp>
 #include <Adafruit_VL53L1X.h>
 
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/drivers/error.hpp>
+#include <firmware/hoverdeck.hpp>
 #include <firmware/motors/quad_dshot.hpp>
+#include <firmware/opticalflow/sensor.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
@@ -43,12 +49,16 @@ void serialEvent3()
 
 static Adafruit_VL53L1X vl53l1x_;
 
+static PMW3901 pmw3901_;
+
 static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
 
-static void ZRangerStart()
+static void HoverDeckStart()
 {
+    (void)pmw3901_;
+
     Wire1.begin();
     Wire1.setClock(400000);
     delay(100);
@@ -65,7 +75,7 @@ static void ZRangerStart()
     vl53l1x_.setTimingBudget(50);
 }
 
-static auto ZRangerRead() -> float
+static auto HoverDeckRead() -> float
 {
     static float distance_;
 
@@ -92,7 +102,10 @@ void setup()
     pinMode(kLedPin, OUTPUT); 
 
     // Start Z-ranger
-    ZRangerStart();
+    HoverDeckStart();
+
+    // Start optical-flow sensor
+    //OpticalFlowStart();
 
     // Start flight control
     fc_.Begin();
@@ -110,7 +123,7 @@ void loop()
     // telemetry
     const auto setpoint = fc_.Update(
             micros(),
-            ZRangerRead(),
+            HoverDeckRead(),
             analogRead(kVoltageInputPin),
             rx_,motors_.GetMotorValues(),
             4);
