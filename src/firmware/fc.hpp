@@ -94,9 +94,7 @@ namespace hf {
                     const Timer & fast_blink_timer,
                     const StabilizerPidController & stabilizer_pid,
                     const uint32_t pid_update_usec_prev,
-                    const Led::Status & led_status,
-                    const bool is_led_pulsing,
-                    const uint32_t led_pulse_start)
+                    const Led & led)
                         :
                             state_(state),
                             mode_(mode),
@@ -117,9 +115,7 @@ namespace hf {
                             fast_blink_timer_(fast_blink_timer),
                             stabilizer_pid_(stabilizer_pid),
                             pid_update_usec_prev_(pid_update_usec_prev),
-                            led_status_(led_status),
-                            is_led_pulsing_(is_led_pulsing),
-                            led_pulse_start_(led_pulse_start) { }
+                            led_(led) {}
 
             static auto Update(
                     const FlightController & fc,
@@ -262,7 +258,7 @@ namespace hf {
             static auto GetLedStatus(
                     const FlightController & fc) -> Led::Status
             {
-                return fc.led_status_;
+                return fc.led_.status_;
             }
 
             static auto IsSafeToFly(const FlightController & fc) -> bool
@@ -364,9 +360,6 @@ namespace hf {
 
             // Support for LED blink
             Led led_;
-            Led::Status led_status_;
-            bool is_led_pulsing_;
-            uint32_t led_pulse_start_;
 
             // ---------------------------------------------------------------
 
@@ -401,20 +394,20 @@ namespace hf {
                     Timer::IsReady(fast_blink_timer_);
 
                 if (ready) {
-                    led_status_ = Led::kStatusOn;
-                    is_led_pulsing_ = true;
-                    led_pulse_start_ = msec;
+                    led_.status_ = Led::kStatusOn;
+                    led_.is_pulsing_ = true;
+                    led_.pulse_start_msec_ = msec;
                 }
 
-                else if (is_led_pulsing_) {
-                    if (msec - led_pulse_start_ > kLedPulseDurationMsec) {
-                        led_status_ = Led::kStatusOff;
-                        is_led_pulsing_ = false;
+                else if (led_.is_pulsing_) {
+                    if (msec - led_.pulse_start_msec_ > kLedPulseDurationMsec) {
+                        led_.status_ = Led::kStatusOff;
+                        led_.is_pulsing_ = false;
                     }
                 }
 
                 else {
-                    led_status_ = Led::kStatusUnchanged;
+                    led_.status_ = Led::kStatusUnchanged;
                 }
             }
 

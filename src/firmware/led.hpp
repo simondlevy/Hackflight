@@ -47,7 +47,7 @@ namespace hf {
 
             Led(const Led & other) = default;
 
-        private:
+        //private:
 
             Status status_;
             bool is_pulsing_;
