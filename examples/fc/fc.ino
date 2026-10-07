@@ -212,7 +212,7 @@ static void MotorsRun(const hf::Setpoint & setpoint)
 
     // Run motors if safe
     if (fc_.IsSafeToFly()) {
-        motors_.run(fc_.IsArmed(), MotorsGetValues().data());
+        motors_.run(fc_.IsArmed(), MotorsGetValues());
     }
 }
 
