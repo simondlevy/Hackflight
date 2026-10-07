@@ -84,7 +84,6 @@ namespace hf {
             FlightController(
                     const VehicleState & state,
                     const Mode & mode,
-                    const LedStatus & led_status,
                     const bool is_flying,
                     const uint32_t motor_check_msec,
                     const ImuFilter & imu_filter,
@@ -102,12 +101,12 @@ namespace hf {
                     const Timer & fast_blink_timer,
                     const StabilizerPidController & stabilizer_pid,
                     const uint32_t pid_update_usec_prev,
+                    const LedStatus & led_status,
                     const bool is_led_pulsing,
                     const uint32_t led_pulse_start)
                         :
                             state_(state),
                             mode_(mode),
-                            led_status_(led_status),
                             is_flying_(is_flying),
                             motor_check_msec_(motor_check_msec),
                             imu_filter_(imu_filter),
@@ -125,6 +124,7 @@ namespace hf {
                             fast_blink_timer_(fast_blink_timer),
                             stabilizer_pid_(stabilizer_pid),
                             pid_update_usec_prev_(pid_update_usec_prev),
+                            led_status_(led_status),
                             is_led_pulsing_(is_led_pulsing),
                             led_pulse_start_(led_pulse_start) { }
 
@@ -337,9 +337,6 @@ namespace hf {
             // Idle, armed, etc.
             Mode mode_;
 
-            // LED status
-            LedStatus led_status_;
-
             // Flying status based on motors
             bool is_flying_;
             uint32_t motor_check_msec_;
@@ -372,6 +369,7 @@ namespace hf {
             uint32_t pid_update_usec_prev_;
 
             // Support for LED blink
+            LedStatus led_status_;
             bool is_led_pulsing_;
             uint32_t led_pulse_start_;
 
