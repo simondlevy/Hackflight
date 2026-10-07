@@ -78,7 +78,7 @@ namespace hf {
             } LedStatus;
 
             auto Update(
-                    const uint32_t msec,
+                    const uint32_t usec,
                     const IMU::RawData imu_data,
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs,
@@ -86,6 +86,9 @@ namespace hf {
                     const Receiver & rx,
                     const std::vector<float> motorvals)
             {
+                // Most updates run on milliseconds
+                const auto msec = usec / 1000;
+
                 // Safely update flight mode
                 UpdateMode(msec, rx, false); // no hover request
 
@@ -104,20 +107,9 @@ namespace hf {
 
                 // Update state estimation
                 UpdateState(msec);
-            }
 
-            auto RunPidController(const uint32_t usec,
-                    const Receiver & rx) -> Setpoint
-            {
-                const auto setpoint = MakeSetpoint(rx);
-
-                const float dt = (usec - usec_prev_)/1000000.0;
-                usec_prev_ = usec;
-
-                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
-                        is_flying_, dt, state_, setpoint);
-
-                return stabilizer_pid_.setpoint;
+                // Run PID controller to get final setpoint
+                UpdatePidController(usec, rx);
             }
 
             auto ShouldSendTelemetry(const uint32_t msec) -> bool
@@ -182,6 +174,11 @@ namespace hf {
                 optical_flow_filter_ = OpticalFlowFilter::Update(
                         optical_flow_filter_, usec, flow);
                 ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+            }
+
+            static auto GetSetpoint(const FlightController & fc) -> Setpoint
+            {
+                return fc.stabilizer_pid_.setpoint;
             }
 
             static auto GetLedStatus(const FlightController & fc) -> LedStatus
@@ -446,6 +443,17 @@ namespace hf {
 
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
                     voltage_divider_.Convert(rawval) : voltage_;
+            }
+
+            void UpdatePidController(const uint32_t usec, const Receiver & rx)
+            {
+                const auto setpoint = MakeSetpoint(rx);
+
+                const float dt = (usec - usec_prev_)/1000000.0;
+                usec_prev_ = usec;
+
+                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
+                        is_flying_, dt, state_, setpoint);
             }
 
     }; // class FlightController

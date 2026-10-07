@@ -262,13 +262,13 @@ void loop()
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
 
-    // Update core algorithm with all inputs
-    fc_.Update(millis(), ImuRead(), ImuGyroRangeDps(),
+    // Update core algorithm with all inputs and run PID controller
+    fc_.Update(micros(), ImuRead(), ImuGyroRangeDps(),
             ImuAccelRangeGs(), analogRead(kVoltageInputPin), rx_,
             MotorsGetValues());
 
-    // Run PID controllers to get final setpoint
-    const auto setpoint = fc_.RunPidController(micros(), rx_);
+    // Get final setpoint from PID controller
+    const auto setpoint = hf::FlightController::GetSetpoint(fc_);
 
     // Run sensor fusion on hover-deck
     if (fc_.ShouldUpdateHover(millis())) {
