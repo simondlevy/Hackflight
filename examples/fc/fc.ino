@@ -28,19 +28,15 @@
 
 #include <hackflight.h>
 #include <firmware/fc.hpp>
-#include <firmware/debugger.hpp>
 #include <firmware/drivers/error.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/motors/quad_dshot.hpp>
 #include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
-#include <firmware/timer.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 
-static constexpr float kHoverDeckUpdateRate = 100;
-static hf::Timer hover_deck_timer_;
 
 // Receiver ------------------------------------------------------------------
 
@@ -238,19 +234,12 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint = fc_.Update(
-            micros(),
-            ImuRead(), 
-            ImuGyroRangeDps(),
-            ImuAccelRangeGs(),
-            analogRead(kVoltageInputPin),
-            rx_,motors_.GetMotorValues(),
-            4);
+    const auto setpoint = fc_.Update( micros(), ImuRead(), ImuGyroRangeDps(),
+            ImuAccelRangeGs(), analogRead(kVoltageInputPin),
+            rx_,motors_.GetMotorValues(), 4);
 
     // Run sensor fusion on hover-deck
-    hover_deck_timer_ = hf::Timer::Update(hover_deck_timer_,
-            kHoverDeckUpdateRate, millis());
-    if (hf::Timer::IsReady(hover_deck_timer_)) {
+    if (fc_.ShouldUpdateHover(millis())) {
         fc_.UpdateHoverDeck(micros(), ZRangerRead(), OpticalFlowRead());
     }
 
@@ -268,7 +257,7 @@ void loop()
 
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
-    if (fc_.IsTelemetryReady(millis())) {
+    if (fc_.ShouldSendTelemetry(millis())) {
         const auto telemetry_bytes = fc_.GetTelemetryBytes(rx_);
         Serial3.write(telemetry_bytes.bytes, telemetry_bytes.count);
     }

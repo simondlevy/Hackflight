@@ -56,6 +56,7 @@ namespace hf {
             static constexpr float kFlyingCheckRate   = 25;
             static constexpr float kVoltageSensingRate = 10;
             static constexpr float kTelemetryRate = 50;
+            static constexpr float kHoverDeckRate = 100;
 
             // Safety constants
             static constexpr float kTiltAngleFlippedMinDeg = 75;
@@ -124,12 +125,20 @@ namespace hf {
                 return mode_ != kModeIdle;
             }
 
-            auto IsTelemetryReady(const uint32_t msec) -> bool
+            auto ShouldSendTelemetry(const uint32_t msec) -> bool
             {
                 telemetry_timer_ = Timer::Update(telemetry_timer_, 
                         kTelemetryRate, msec);
 
                 return Timer::IsReady(telemetry_timer_);
+            }
+
+            auto ShouldUpdateHover(const uint32_t msec) -> bool
+            {
+                hover_timer_ = Timer::Update(hover_timer_,
+                        kHoverDeckRate, msec);
+
+                return Timer::IsReady(hover_timer_);
             }
 
             auto GetTelemetryBytes(const Receiver & rx) -> TelemetryBytes
@@ -255,6 +264,7 @@ namespace hf {
             Timer flying_check_timer_;
             Timer voltage_sensing_timer_;
             Timer telemetry_timer_; 
+            Timer hover_timer_;
 
             // PID control for stabilize-only
             StabilizerPidController stabilizer_pid_;
