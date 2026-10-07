@@ -65,6 +65,18 @@ namespace hf {
                         t + r + p + y,
                         t + r - p - y);
             }
+
+            static auto GetMotorValues(const QuadXMixer & mixer) -> float *
+            {
+                static float vals[4];
+               
+                vals[0] = mixer.rr_cw;
+                vals[1] = mixer.rf_ccw;
+                vals[2] = mixer.lr_ccw;
+                vals[3] = mixer.lf_cw;
+
+                return vals;
+            }
     };
 
 } // namespace hf

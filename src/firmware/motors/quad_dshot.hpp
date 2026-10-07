@@ -59,12 +59,7 @@ namespace hf {
 
             auto GetMotorValues() -> float *
             {
-                motorvals_[0] = mixer_.rr_cw;
-                motorvals_[1] = mixer_.rf_ccw;
-                motorvals_[2] = mixer_.lr_ccw;
-                motorvals_[3] = mixer_.lf_cw;
-
-                return motorvals_;
+                return QuadXMixer::GetMotorValues(mixer_);
             }
 
         private:
