@@ -235,6 +235,8 @@ namespace hf {
                         Receiver::GetYaw(rx));
             }
 
+            // ---------------------------------------------------------------
+
             // Vehicle state
             VehicleState state_;
 
@@ -270,26 +272,16 @@ namespace hf {
             // PID control for stabilize-only
             StabilizerPidController stabilizer_pid_;
 
-            // PID control for hover
-            HoverPidController hover_pid_;
-
-            // Debugging
-            Debugger debugger_;
-
             // Support for microsecond PID control timing
             uint32_t usec_prev_;
 
             // Support for LED blink
             bool is_led_pusing_;
             uint32_t led_pulse_start_;
-
-            // Support for LED blinking
             Timer heartbeat_timer_; 
             Timer fast_blink_timer_;
 
-            // Support for voltage sensing
-            VoltageDivider voltage_divider_ =
-                VoltageDivider( kR1Ohms, kR2Ohms);
+            // ---------------------------------------------------------------
 
             auto AreMotorsAboveIdle(
                     const uint32_t msec,
@@ -452,7 +444,8 @@ namespace hf {
                         kVoltageSensingRate, msec);
 
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
-                    voltage_divider_.Convert(rawval) : voltage_;
+                    VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval) :
+                    voltage_;
             }
 
             void UpdatePidController(const uint32_t usec, const Receiver & rx)

@@ -22,29 +22,17 @@ namespace hf {
 
     class VoltageDivider {
 
-        private:
-
-            float r1_ohms_;
-            float r2_ohms_;
-            uint8_t nbits_;
-            float signal_volts_;
-
         public:
 
-            VoltageDivider(
+            static auto Convert(
                     const float r1_ohms,
                     const float r2_ohms,
+                    const uint16_t rawval,
                     const uint8_t nbits=10,
-                    const float signal_volts=3.3)
-                : r1_ohms_(r1_ohms),
-                r2_ohms_(r2_ohms),
-                nbits_(nbits),
-                signal_volts_(signal_volts) {}
-
-            auto Convert(const uint16_t rawval) -> float
+                    const float signal_volts=3.3) -> float
             {
-                return (float)rawval / (1 << nbits_) * signal_volts_ *
-                    (r1_ohms_ + r2_ohms_) / r2_ohms_;
+                return (float)rawval / (1 << nbits) * signal_volts *
+                    (r1_ohms + r2_ohms) / r2_ohms;
             }
 
     }; // class VoltageDivider
