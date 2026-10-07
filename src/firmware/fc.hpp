@@ -180,7 +180,27 @@ namespace hf {
                 state_ = EKF::getVehicleState(ekf_);
 
                 // Update timers
-                UpdateTimers(msec);
+
+                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
+                        kEkfPredictionRate, msec);
+
+                telemetry_timer_ = Timer::Update(telemetry_timer_, 
+                        kTelemetryRate, msec);
+
+                hover_timer_ = Timer::Update(hover_timer_,
+                        kHoverDeckRate, msec);
+
+                flying_check_timer_ = Timer::Update(flying_check_timer_,
+                        kFlyingCheckRate, msec);
+
+                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
+                        kLedHeartbeatRate, msec);
+
+                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
+                        kLedFastBlinkRate, msec);
+
+                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
+                        kVoltageSensingRate, msec);
 
                 // Run PID controller to get final setpoint
                 stabilizer_pid_ = UpdatePidController(*this, usec, rx);
@@ -417,30 +437,6 @@ namespace hf {
                     AreMotorsAboveIdle(msec, motorvals) :
 
                     is_flying_;
-            }
-
-            void UpdateTimers(const uint32_t msec)
-            {
-                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
-                        kEkfPredictionRate, msec);
-
-                telemetry_timer_ = Timer::Update(telemetry_timer_, 
-                        kTelemetryRate, msec);
-
-                hover_timer_ = Timer::Update(hover_timer_,
-                        kHoverDeckRate, msec);
-
-                flying_check_timer_ = Timer::Update(flying_check_timer_,
-                        kFlyingCheckRate, msec);
-
-                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
-                        kLedHeartbeatRate, msec);
-
-                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
-                        kLedFastBlinkRate, msec);
-
-                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
-                        kVoltageSensingRate, msec);
             }
 
             // ---------------------------------------------------------------
