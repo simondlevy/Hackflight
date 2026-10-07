@@ -17,22 +17,27 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+// C++ STL
+#include <vector>
+
 // Standard Arduino libraries
 #include <SPI.h>
 #include <Wire.h>
 
 // Third-party libraries
-#include <pmw3901.hpp>
 #include <Adafruit_VL53L1X.h>
 #include <BMI088.h>
+#include <dshot-teensy4.hpp>  
+#include <pmw3901.hpp>
 
+// Hackflight library
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <firmware/drivers/error.hpp>
 #include <firmware/imu/sensor.hpp>
-#include <firmware/motors/quad_dshot.hpp>
 #include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
+#include <mixers/quadx.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
@@ -50,8 +55,6 @@ void serialEvent3()
 }
 
 static hf::FlightController fc_;
-
-static hf::QuadDshot motors_;
 
 // ZRanger -------------------------------------------------------------------
 
@@ -186,6 +189,34 @@ static auto ImuAccelRangeGs() -> int16_t
     return aranges[kAccelRange];
 }
 
+// Motors --------------------------------------------------------------------
+
+static hf::QuadXMixer mixer_;
+
+static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
+
+DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
+
+static void MotorsStart()
+{
+    motors_.begin();
+}
+
+static auto MotorsGetValues() -> float *
+{
+    return hf::QuadXMixer::GetMotorValues(mixer_);
+}
+
+static void MotorsRun(const hf::Setpoint & setpoint)
+{
+    mixer_ = hf::QuadXMixer::Run(setpoint);
+
+    // Run motors if safe
+    if (fc_.IsSafeToFly()) {
+        motors_.run(fc_.IsArmed(), MotorsGetValues());
+    }
+}
+
 // Profiling -----------------------------------------------------------------
 
 static void RunProfiler()
@@ -222,12 +253,12 @@ void setup()
     OpticalFlowStart();
 
     // Start motors
-    motors_.Begin();
+    MotorsStart();
 }
 
 void loop()
 {
-    (void)RunProfiler;
+    RunProfiler();
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
@@ -236,7 +267,7 @@ void loop()
     // telemetry
     const auto setpoint = fc_.Update( micros(), ImuRead(), ImuGyroRangeDps(),
             ImuAccelRangeGs(), analogRead(kVoltageInputPin),
-            rx_,motors_.GetMotorValues(), 4);
+            rx_, MotorsGetValues(), 4);
 
     // Run sensor fusion on hover-deck
     if (fc_.ShouldUpdateHover(millis())) {
@@ -253,7 +284,7 @@ void loop()
     }
 
     // Run the mixer and motors
-    motors_.Run(setpoint, fc_.IsSafeToFly(), fc_.IsArmed());
+    MotorsRun(setpoint);
 
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
