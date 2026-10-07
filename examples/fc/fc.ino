@@ -37,6 +37,9 @@
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 
+static constexpr float kHoverDeckUpdateRate = 100;
+static hf::Timer hover_deck_timer_;
+
 static hf::Receiver rx_;
 
 void serialEvent3()
@@ -80,7 +83,6 @@ static auto ZRangerRead() -> float
 
     if (vl53l1x_.dataReady())  {
 
-
         distance_ = vl53l1x_.distance();
 
         // Prepare for another reading
@@ -89,6 +91,42 @@ static auto ZRangerRead() -> float
 
     return distance_;
 }
+
+static void OpticalFlowStart()
+{
+    SPI.begin();
+
+    if (!pmw3901_.begin()) {
+        hf::Error::ReportForever("Unable to initialize PMW3901");
+    }
+}
+
+static auto OpticalFlowRead() -> hf::OpticalFlowSensor::RawData
+{
+    int16_t dx = 0;
+    int16_t dy = 0;
+    auto moved = false; // we ignore this
+
+    pmw3901_.readMotion(dx, dy, moved);
+
+    return hf::OpticalFlowSensor::RawData(dx, dy);
+}
+
+static void RunProfiler()
+{
+    static uint32_t count_;
+    static uint32_t msec_;
+    const auto msec = millis();
+    if (msec - msec_ > 1000) {
+        if (count_ > 0) {
+            printf("%d\n", (int)count_);
+        }
+        count_ = 0;
+        msec_ = msec;
+    }
+    count_++;
+}
+
 
 void setup()
 {
@@ -105,7 +143,7 @@ void setup()
     ZRangerStart();
 
     // Start optical-flow sensor
-    //OpticalFlowStart();
+    OpticalFlowStart();
 
     // Start flight control
     fc_.Begin();
@@ -116,19 +154,24 @@ void setup()
 
 void loop()
 {
+    RunProfiler();
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint = fc_.Update(
-            micros(),
-            ZRangerRead(),
-            analogRead(kVoltageInputPin),
-            rx_,motors_.GetMotorValues(),
-            4);
+    const auto setpoint = fc_.Update( micros(), analogRead(kVoltageInputPin),
+            rx_,motors_.GetMotorValues(), 4);
 
+    // Run sensor fusion on hover-deck
+    hover_deck_timer_ = hf::Timer::Update(hover_deck_timer_,
+            kHoverDeckUpdateRate, millis());
+    if (hf::Timer::IsReady(hover_deck_timer_)) {
+        fc_.UpdateHoverDeck(micros(), ZRangerRead(), OpticalFlowRead());
+    }
+
+    // Blink LED to indicate status
     const auto led_status = fc_.GetLedStatus();
     if (led_status == hf::FlightController::kLedOff) {
         digitalWrite(kLedPin, LOW);

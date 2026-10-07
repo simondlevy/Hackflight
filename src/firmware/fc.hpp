@@ -56,7 +56,6 @@ namespace hf {
             static constexpr float kEkfPredictionRate = 100;
             static constexpr float kFlyingCheckRate   = 25;
             static constexpr float kVoltageSensingRate = 10;
-            static constexpr float kHoverDeckAcquisitionRate = 100;
             static constexpr float kTelemetryRate = 50;
 
             // Safety constants
@@ -83,14 +82,12 @@ namespace hf {
             void Begin()
             {
                 imu_.Begin();
-                flow_sensor_.Begin();
 
                 mode_ = kModeIdle;
             }
 
             auto Update(
                     const uint32_t usec,
-                    const float zdistance,
                     const uint16_t rawvolts,
                     const Receiver & rx,
                     const float * motor_vals,
@@ -99,9 +96,6 @@ namespace hf {
 
                 // Most routines use milliseconds 
                 const auto msec = usec / 1000;
-
-                // Run sensor fusion on hover-deck
-                UpdateHoverDeck(usec, zdistance);
 
                 // Safely update flight mode
                 UpdateMode(msec, rx, false); // no hover request
@@ -182,6 +176,18 @@ namespace hf {
                 return led_status_;
             }
 
+            void UpdateHoverDeck(
+                    const uint32_t usec,
+                    const float zdistance,
+                    const OpticalFlowSensor::RawData flow)
+            {
+                zranger_filter_ = ZRangerFilter::Update(
+                        zranger_filter_, zdistance);
+                optical_flow_filter_ = OpticalFlowFilter::Update(
+                        optical_flow_filter_, usec, flow);
+                ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+            }
+
 
             // Static methods ----------------------------------------------
 
@@ -243,7 +249,6 @@ namespace hf {
 
             // Devices
             IMU imu_;
-            OpticalFlowSensor flow_sensor_;
 
             // Voltage sensing
             float voltage_;
@@ -252,7 +257,6 @@ namespace hf {
             Timer ekf_prediction_timer_;
             Timer flying_check_timer_;
             Timer voltage_sensing_timer_;
-            Timer hover_deck_timer_;
             Timer telemetry_timer_; 
 
             // PID control for stabilize-only
@@ -336,23 +340,6 @@ namespace hf {
 
                 else {
                     led_status_ = kLedUnchanged;
-                }
-            }
-
-            void UpdateHoverDeck(const uint32_t usec, const float zdistance)
-            {
-                const auto msec = usec / 1000;
-
-                hover_deck_timer_ = Timer::Update(hover_deck_timer_,
-                        kHoverDeckAcquisitionRate, msec);
-
-                if (Timer::IsReady(hover_deck_timer_)) {
-                    zranger_filter_ = ZRangerFilter::Update(
-                            zranger_filter_, zdistance);
-                    optical_flow_filter_ = OpticalFlowFilter::Update(
-                            optical_flow_filter_,
-                            usec, flow_sensor_.Read());
-                    ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
                 }
             }
 
