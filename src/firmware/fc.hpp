@@ -138,6 +138,9 @@ namespace hf {
                     const Receiver & rx,
                     const std::vector<float> motorvals) -> FlightController
             {
+                // Most updates run on milliseconds
+                //const auto msec = usec / 1000;
+
                 return fc;
             }
 
@@ -154,7 +157,7 @@ namespace hf {
                 const auto msec = usec / 1000;
 
                 // Safely update flight mode
-                UpdateMode(msec, rx, false); // no hover request
+                mode_ = UpdateMode(*this, msec, rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
                 UpdateFlyingStatus(msec, motorvals);
@@ -437,55 +440,6 @@ namespace hf {
                         gyro_range_dps, accel_range_gs);
             }
 
-            void UpdateMode(const uint32_t msec,
-                    const Receiver & rx, const bool requested_hover)
-            {
-                const auto requested_arming = Receiver::IsArmed(rx);
-
-                const auto is_gyro_calibrated = imu_filter_.is_gyro_calibrated;
-
-                const auto should_arm = 
-
-                    // Disable arming while gyro is calibrating
-                    !is_gyro_calibrated ? false :
-
-                    // Check receiver timeout
-                    CheckFailsafe(msec,
-                            Receiver::GetTimestampMsec(rx),
-                            requested_arming);
-
-                // Run a little state-transition machine to update flight mode
-                mode_ = 
-
-                    //  Vehicle flipped over: enter panic mode
-                    IsFlipped(state_) ? kModePanic :
-
-                    // Panic mode: can't recover
-                    mode_ == kModePanic ? kModePanic :
-
-                    // Disallow jumping directly from idle to hover
-                    mode_ == kModeIdle && requested_hover ? kModeIdle :
-
-                    // Want arm and safe to arm: enter armed mode
-                    mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
-                    kModeArmed :
-
-                    // Armed and requested disarm: enter idle mode
-                    mode_ == kModeArmed && !should_arm ? kModeIdle :
-
-                    // Armed and requested hover; enter hover mode
-                    mode_ == kModeArmed && requested_hover ? kModeHovering :
-
-                    // Hovering and requested no-hover; return to armed mode
-                    mode_ == kModeHovering && !requested_hover ? kModeArmed :
-
-                    // Hovering and requested disarm; enter idle mode
-                    mode_ == kModeHovering && !requested_arming ? kModeIdle :
-
-                    //  Default: stay in current mode
-                    mode_;
-            }
-
             void UpdateState(const uint32_t msec)
             {
                 ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
@@ -521,6 +475,58 @@ namespace hf {
 
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, dt, state_, setpoint);
+            }
+
+            static auto UpdateMode(
+                    const FlightController & fc,
+                    const uint32_t msec,
+                    const Receiver & rx,
+                    const bool requested_hover) -> Mode
+            {
+                const auto requested_arming = Receiver::IsArmed(rx);
+
+                const auto is_gyro_calibrated = fc.imu_filter_.is_gyro_calibrated;
+
+                const auto should_arm = 
+
+                    // Disable arming while gyro is calibrating
+                    !is_gyro_calibrated ? false :
+
+                    // Check receiver timeout
+                    CheckFailsafe(msec,
+                            Receiver::GetTimestampMsec(rx),
+                            requested_arming);
+
+                // Run a little state-transition machine to update flight mode
+                return
+
+                    //  Vehicle flipped over: enter panic mode
+                    IsFlipped(fc.state_) ? kModePanic :
+
+                    // Panic mode: can't recover
+                    fc.mode_ == kModePanic ? kModePanic :
+
+                    // Disallow jumping directly from idle to hover
+                    fc.mode_ == kModeIdle && requested_hover ? kModeIdle :
+
+                    // Want arm and safe to arm: enter armed mode
+                    fc.mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
+                    kModeArmed :
+
+                    // Armed and requested disarm: enter idle mode
+                    fc.mode_ == kModeArmed && !should_arm ? kModeIdle :
+
+                    // Armed and requested hover; enter hover mode
+                    fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
+
+                    // Hovering and requested no-hover; return to armed mode
+                    fc.mode_ == kModeHovering && !requested_hover ? kModeArmed :
+
+                    // Hovering and requested disarm; enter idle mode
+                    fc.mode_ == kModeHovering && !requested_arming ? kModeIdle :
+
+                    //  Default: stay in current mode
+                    fc.mode_;
             }
 
     }; // class FlightController
