@@ -375,12 +375,6 @@ namespace hf {
                     const uint32_t msec,
                     const bool is_imu__calibrated)
             {
-                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
-                        kLedHeartbeatRate, msec);
-
-                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
-                        kLedFastBlinkRate, msec);
-
                 const auto ready =
                     is_imu__calibrated ?
                     Timer::IsReady(heartbeat_timer_) :
@@ -408,9 +402,6 @@ namespace hf {
                     const uint32_t msec,
                     const std::vector<float> motorvals)
             {
-                flying_check_timer_ = Timer::Update(flying_check_timer_,
-                        kFlyingCheckRate, msec);
-
                 is_flying_ = 
 
                     mode_ == kModeIdle || mode_ == kModePanic  ? false :
@@ -423,11 +414,26 @@ namespace hf {
 
             void UpdateTimers(const uint32_t msec)
             {
+                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
+                        kEkfPredictionRate, msec);
+
                 telemetry_timer_ = Timer::Update(telemetry_timer_, 
                         kTelemetryRate, msec);
 
                 hover_timer_ = Timer::Update(hover_timer_,
                         kHoverDeckRate, msec);
+
+                flying_check_timer_ = Timer::Update(flying_check_timer_,
+                        kFlyingCheckRate, msec);
+
+                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
+                        kLedHeartbeatRate, msec);
+
+                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
+                        kLedFastBlinkRate, msec);
+
+                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
+                        kVoltageSensingRate, msec);
             }
 
             void UpdateImu(
@@ -442,9 +448,6 @@ namespace hf {
 
             void UpdateState(const uint32_t msec)
             {
-                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
-                        kEkfPredictionRate, msec);
-
                 // Periodically run the EKF prediction step
                 if (Timer::IsReady(ekf_prediction_timer_)) {
                     ekf_ = EKF::Predict(ekf_, msec, is_flying_); 
@@ -458,9 +461,6 @@ namespace hf {
 
             void UpdateVoltage(const uint32_t msec, const uint16_t rawval)
             {
-                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
-                        kVoltageSensingRate, msec);
-
                 voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
                     VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval) :
                     voltage_;
