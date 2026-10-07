@@ -363,6 +363,7 @@ namespace hf {
             uint32_t pid_update_usec_prev_;
 
             // Support for LED blink
+            Led led_;
             Led::Status led_status_;
             bool is_led_pulsing_;
             uint32_t led_pulse_start_;

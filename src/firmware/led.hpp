@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 namespace hf {
 
     class Led {
@@ -31,6 +33,25 @@ namespace hf {
                 kStatusOn, 
 
             } Status;
+
+            Led(
+                    const Status status,
+                    const bool is_pulsing,
+                    const uint32_t pulse_start_msec) 
+                :
+                    status_(status),
+                    is_pulsing_(is_pulsing),
+                    pulse_start_msec_(pulse_start_msec) {}
+
+            Led() = default;
+
+            Led(const Led & other) = default;
+
+        private:
+
+            Status status_;
+            bool is_pulsing_;
+            uint32_t pulse_start_msec_;
     };
 }
 
