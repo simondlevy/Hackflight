@@ -77,6 +77,57 @@ namespace hf {
 
             } LedStatus;
 
+            FlightController() = default;
+
+            FlightController(const FlightController & other) = default;
+
+            FlightController(
+                    const VehicleState & state,
+                    const Mode & mode,
+                    const LedStatus & led_status,
+                    const bool is_flying,
+                    const uint32_t motor_check_msec,
+                    const ImuFilter & imu_filter,
+                    const EKF & ekf,
+                    const OpticalFlowFilter & optical_flow_filter,
+                    const ZRangerFilter & zranger_filter,
+                    const IMU & imu,
+                    const float voltage,
+                    const Timer & ekf_prediction_timer,
+                    const Timer & flying_check_timer,
+                    const Timer & voltage_sensing_timer,
+                    const Timer & telemetry_timer, 
+                    const Timer & hover_timer,
+                    const Timer & heartbeat_timer, 
+                    const Timer & fast_blink_timer,
+                    const StabilizerPidController & stabilizer_pid,
+                    const uint32_t usec_prev,
+                    const bool is_led_pulsing,
+                    const uint32_t led_pulse_start)
+                        :
+                            state_(state),
+                            mode_(mode),
+                            led_status_(led_status),
+                            is_flying_(is_flying),
+                            motor_check_msec_(motor_check_msec),
+                            imu_filter_(imu_filter),
+                            ekf_(ekf),
+                            optical_flow_filter_(optical_flow_filter),
+                            zranger_filter_(zranger_filter),
+                            imu_(imu),
+                            voltage_(voltage),
+                            ekf_prediction_timer_(ekf_prediction_timer),
+                            flying_check_timer_(flying_check_timer),
+                            voltage_sensing_timer_(voltage_sensing_timer),
+                            telemetry_timer_(telemetry_timer), 
+                            hover_timer_(hover_timer),
+                            heartbeat_timer_(heartbeat_timer), 
+                            fast_blink_timer_(fast_blink_timer),
+                            stabilizer_pid_(stabilizer_pid),
+                            usec_prev_(usec_prev),
+                            is_led_pulsing_(is_led_pulsing),
+                            led_pulse_start_(led_pulse_start) { }
+
             auto Update(
                     const uint32_t usec,
                     const IMU::RawData imu_data,
@@ -268,6 +319,8 @@ namespace hf {
             Timer voltage_sensing_timer_;
             Timer telemetry_timer_; 
             Timer hover_timer_;
+            Timer heartbeat_timer_; 
+            Timer fast_blink_timer_;
 
             // PID control for stabilize-only
             StabilizerPidController stabilizer_pid_;
@@ -276,10 +329,8 @@ namespace hf {
             uint32_t usec_prev_;
 
             // Support for LED blink
-            bool is_led_pusing_;
+            bool is_led_pulsing_;
             uint32_t led_pulse_start_;
-            Timer heartbeat_timer_; 
-            Timer fast_blink_timer_;
 
             // ---------------------------------------------------------------
 
@@ -321,14 +372,14 @@ namespace hf {
 
                 if (ready) {
                     led_status_ = kLedOn;
-                    is_led_pusing_ = true;
+                    is_led_pulsing_ = true;
                     led_pulse_start_ = msec;
                 }
 
-                else if (is_led_pusing_) {
+                else if (is_led_pulsing_) {
                     if (msec - led_pulse_start_ > kLedPulseDurationMsec) {
                         led_status_ = kLedOff;
-                        is_led_pusing_ = false;
+                        is_led_pulsing_ = false;
                     }
                 }
 
