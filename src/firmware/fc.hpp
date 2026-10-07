@@ -21,7 +21,6 @@
 #include <hackflight.h>
 #include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
-#include <firmware/hoverdeck.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/msp/__messages__.h>
@@ -80,14 +79,6 @@ namespace hf {
                 kLedOn, 
 
             } LedStatus;
-
-            typedef struct {
-
-                float dx;
-                float dy;
-                float z;
-
-            } HoverDeckData;
 
             void Begin()
             {

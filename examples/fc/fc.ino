@@ -29,7 +29,6 @@
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/drivers/error.hpp>
-#include <firmware/hoverdeck.hpp>
 #include <firmware/motors/quad_dshot.hpp>
 #include <firmware/opticalflow/sensor.hpp>
 #include <firmware/receiver.hpp>
@@ -55,7 +54,7 @@ static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
 
-static void HoverDeckStart()
+static void ZRangerStart()
 {
     (void)pmw3901_;
 
@@ -75,11 +74,12 @@ static void HoverDeckStart()
     vl53l1x_.setTimingBudget(50);
 }
 
-static auto HoverDeckRead() -> float
+static auto ZRangerRead() -> float
 {
     static float distance_;
 
     if (vl53l1x_.dataReady())  {
+
 
         distance_ = vl53l1x_.distance();
 
@@ -102,7 +102,7 @@ void setup()
     pinMode(kLedPin, OUTPUT); 
 
     // Start Z-ranger
-    HoverDeckStart();
+    ZRangerStart();
 
     // Start optical-flow sensor
     //OpticalFlowStart();
@@ -116,6 +116,7 @@ void setup()
 
 void loop()
 {
+
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
 
@@ -123,7 +124,7 @@ void loop()
     // telemetry
     const auto setpoint = fc_.Update(
             micros(),
-            HoverDeckRead(),
+            ZRangerRead(),
             analogRead(kVoltageInputPin),
             rx_,motors_.GetMotorValues(),
             4);
