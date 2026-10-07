@@ -108,54 +108,11 @@ namespace hf {
                 // Update state estimation
                 UpdateState(msec);
 
-                UpdateTelemetryTimer(msec);
+                // Update timers
+                UpdateTimers(msec);
 
                 // Run PID controller to get final setpoint
                 UpdatePidController(usec, rx);
-            }
-
-            auto ShouldUpdateHover(const uint32_t msec) -> bool
-            {
-                hover_timer_ = Timer::Update(hover_timer_,
-                        kHoverDeckRate, msec);
-
-                return Timer::IsReady(hover_timer_);
-            }
-
-            auto GetTelemetryBytes(const Receiver & rx) -> TelemetryBytes
-            {
-                const auto setpoint = MakeSetpoint(rx);
-
-                float data[16] = {
-
-                    (float)mode_,
-
-                    voltage_,
-
-                    setpoint.thrust,
-                    setpoint.roll,
-                    setpoint.pitch,
-                    setpoint.yaw,
-
-                    state_.dx,
-                    state_.dy,
-                    state_.z,
-                    state_.dz,
-                    state_.phi,
-                    state_.dphi,
-                    state_.theta,
-                    state_.dtheta,
-                    state_.psi,
-                    state_.dpsi
-                };
-
-                telemetry_serializer_ = MspSerializer::SerializeFloats(
-                        telemetry_serializer_, kMspTelemetry,
-                        data, 16);
-
-                return TelemetryBytes(
-                        MspSerializer::GetPayloadBytes(telemetry_serializer_),
-                        MspSerializer::GetPayloadSize(telemetry_serializer_));
             }
 
             void UpdateHoverDeck(
@@ -168,6 +125,46 @@ namespace hf {
                 optical_flow_filter_ = OpticalFlowFilter::Update(
                         optical_flow_filter_, usec, flow);
                 ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+            }
+
+            static auto GetTelemetryBytes(
+                    const FlightController &fc,
+                    const Receiver & rx) -> TelemetryBytes
+            {
+                const auto setpoint = MakeSetpoint(rx);
+
+                float data[16] = {
+
+                    (float)fc.mode_,
+
+                    fc.voltage_,
+
+                    setpoint.thrust,
+                    setpoint.roll,
+                    setpoint.pitch,
+                    setpoint.yaw,
+
+                    fc.state_.dx,
+                    fc.state_.dy,
+                    fc.state_.z,
+                    fc.state_.dz,
+                    fc.state_.phi,
+                    fc.state_.dphi,
+                    fc.state_.theta,
+                    fc.state_.dtheta,
+                    fc.state_.psi,
+                    fc.state_.dpsi
+                };
+
+                MspSerializer telemetry_serializer;
+
+                telemetry_serializer = MspSerializer::SerializeFloats(
+                        telemetry_serializer, kMspTelemetry,
+                        data, 16);
+
+                return TelemetryBytes(
+                        MspSerializer::GetPayloadBytes(telemetry_serializer),
+                        MspSerializer::GetPayloadSize(telemetry_serializer));
             }
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
@@ -195,6 +192,13 @@ namespace hf {
             {
                 return Timer::IsReady(fc.telemetry_timer_);
             }
+
+            static auto ShouldUpdateHover(
+                    const FlightController & fc) -> bool
+            {
+                return Timer::IsReady(fc.hover_timer_);
+            }
+
 
         private:
 
@@ -268,9 +272,6 @@ namespace hf {
 
             // PID control for hover
             HoverPidController hover_pid_;
-
-            // Telemetry serializer
-            MspSerializer telemetry_serializer_;
 
             // Debugging
             Debugger debugger_;
@@ -361,10 +362,13 @@ namespace hf {
                     is_flying_;
             }
 
-            void UpdateTelemetryTimer(const uint32_t msec)
+            void UpdateTimers(const uint32_t msec)
             {
                 telemetry_timer_ = Timer::Update(telemetry_timer_, 
                         kTelemetryRate, msec);
+
+                hover_timer_ = Timer::Update(hover_timer_,
+                        kHoverDeckRate, msec);
             }
 
             void UpdateImu(

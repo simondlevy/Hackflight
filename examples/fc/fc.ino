@@ -271,7 +271,7 @@ void loop()
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
 
     // Run sensor fusion on hover-deck
-    if (fc_.ShouldUpdateHover(millis())) {
+    if (hf::FlightController::ShouldUpdateHover(fc_)) {
         fc_.UpdateHoverDeck(micros(), ZRangerRead(), OpticalFlowRead());
     }
 
@@ -290,7 +290,8 @@ void loop()
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
-        const auto telemetry_bytes = fc_.GetTelemetryBytes(rx_);
+        const auto telemetry_bytes =
+            hf::FlightController::GetTelemetryBytes(fc_, rx_);
         Serial3.write(telemetry_bytes.bytes, telemetry_bytes.count);
     }
 }
