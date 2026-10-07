@@ -75,7 +75,7 @@ class Telemetry(MspParser):
             self.outfile = open(args.outfile, 'w')
 
             self.outfile.write(
-                    'time,mode,thrust,roll,pitch,yaw,' +
+                    'time,mode,volts,thrust,roll,pitch,yaw,' +
                     'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
 
         except Exception as e:
@@ -124,25 +124,25 @@ class Telemetry(MspParser):
         self.step()
         return self.plotter_data
 
-    def handle_TELEMETRY(self, mode, thrust, roll, pitch, yaw,
-                         dx, dy, z, dz, phi, dphi, theta,
-                         dtheta, psi, dpsi):
+    def handle_TELEMETRY(self, mode, volts, thrust, roll, pitch, yaw, dx, dy,
+                         z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
 
-        print(('thr=%3.3f rol=%+3.3f pit=%+3.3f yaw=%+3.3f | ' +
+        print(('volts=%3.1f thr=%3.3f rol=%+3.3f pit=%+3.3f yaw=%+3.3f | ' +
                'phi=%+5.1f theta=%+5.1f psi=%+5.1f ' +
                'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') %
-              (thrust, roll, pitch, yaw, phi, theta, psi, dx, dy, z, dz))
+              (volts, thrust, roll, pitch, yaw,
+               phi, theta, psi, dx, dy, z, dz))
 
         # Don't log until armed
         if mode > 0:
             self.outfile.write(
-                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
-                    % (time.time() - self.start_time, mode, thrust, roll, pitch,
-                        yaw, dx, dy, z, dz, phi, dphi, theta, dtheta, psi,
-                        dpsi))
+                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
+                    % (time.time() - self.start_time, mode, volts, thrust,
+                       roll, pitch, yaw, dx, dy, z, dz, phi, dphi, theta,
+                       dtheta, psi, dpsi))
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 

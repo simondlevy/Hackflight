@@ -231,7 +231,7 @@ void setup()
 
 void loop()
 {
-    RunProfiler();
+    (void)RunProfiler;
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);

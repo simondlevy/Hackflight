@@ -88,7 +88,6 @@ namespace hf {
                     const float * motor_vals,
                     const uint8_t motor_count) -> Setpoint
             {
-
                 // Most routines use milliseconds 
                 const auto msec = usec / 1000;
 
@@ -137,29 +136,32 @@ namespace hf {
             {
                 const auto setpoint = MakeSetpoint(rx);
 
-                float data[256] = {};
+                float data[16] = {
 
-                data[0] = (float)mode_;
+                    (float)mode_,
 
-                data[1] = setpoint.thrust;
-                data[2] = setpoint.roll;
-                data[3] = setpoint.pitch;
-                data[4] = setpoint.yaw;
+                    voltage_,
 
-                data[5] = state_.dx;
-                data[6] = state_.dy;
-                data[7] = state_.z;
-                data[8] = state_.dz;
-                data[9] = state_.phi;
-                data[10] = state_.dphi;
-                data[11] = state_.theta;
-                data[12] = state_.dtheta;
-                data[13] = state_.psi;
-                data[14] = state_.dpsi;
+                    setpoint.thrust,
+                    setpoint.roll,
+                    setpoint.pitch,
+                    setpoint.yaw,
+
+                    state_.dx,
+                    state_.dy,
+                    state_.z,
+                    state_.dz,
+                    state_.phi,
+                    state_.dphi,
+                    state_.theta,
+                    state_.dtheta,
+                    state_.psi,
+                    state_.dpsi
+                };
 
                 telemetry_serializer_ = MspSerializer::SerializeFloats(
                         telemetry_serializer_, kMspTelemetry,
-                        data, 15);
+                        data, 16);
 
                 return TelemetryBytes(
                         MspSerializer::GetPayloadBytes(telemetry_serializer_),
