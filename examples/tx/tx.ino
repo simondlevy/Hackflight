@@ -70,11 +70,6 @@ static const float kFreqHz = 100;
 
 static hf::BlinkTimer blink_timer_; 
 
-static hf::VoltageDivider voltage_divider_ = hf::VoltageDivider(
-        kVoltageDividerR1Ohms,
-        kVoltageDividerR2Ohms,
-        12);
-
 // Scale to [-2048, +2047]
 static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
 {
@@ -108,7 +103,9 @@ void loop()
 {
     const auto rawval = analogRead(kVoltageDividerPin);
 
-    const auto volts = voltage_divider_.Convert(rawval);
+    // 12-bit voltage reading
+    const auto volts = hf::VoltageDivider::Convert(
+            kVoltageDividerR1Ohms, kVoltageDividerR2Ohms, rawval, 12);
 
     blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
 
@@ -141,8 +138,10 @@ void loop()
     };
 
     /*
-    printf("t=%+05d r=%+05d p=%+05d y=%+05d | arm=%d hov=%d aut=%d\n",
-            vals[0], vals[1], vals[2], vals[3], vals[4], vals[5], vals[6]);*/
+    printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
+            "arm=%d hov=%d aut=%d\n",
+            volts, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5],
+            vals[6]);*/
 
     static hf::MspSerializer serializer_;
 
