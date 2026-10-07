@@ -128,6 +128,19 @@ namespace hf {
                             is_led_pulsing_(is_led_pulsing),
                             led_pulse_start_(led_pulse_start) { }
 
+            static auto Update(
+                    const FlightController & fc,
+                    const uint32_t usec,
+                    const IMU::RawData imu_data,
+                    const int16_t gyro_range_dps,
+                    const int16_t accel_range_gs,
+                    const uint16_t rawvolts,
+                    const Receiver & rx,
+                    const std::vector<float> motorvals) -> FlightController
+            {
+                return fc;
+            }
+
             auto Update(
                     const uint32_t usec,
                     const IMU::RawData imu_data,
