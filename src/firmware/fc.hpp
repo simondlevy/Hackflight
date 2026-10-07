@@ -101,7 +101,7 @@ namespace hf {
                     const Timer & heartbeat_timer, 
                     const Timer & fast_blink_timer,
                     const StabilizerPidController & stabilizer_pid,
-                    const uint32_t usec_prev,
+                    const uint32_t pid_update_usec_prev,
                     const bool is_led_pulsing,
                     const uint32_t led_pulse_start)
                         :
@@ -124,7 +124,7 @@ namespace hf {
                             heartbeat_timer_(heartbeat_timer), 
                             fast_blink_timer_(fast_blink_timer),
                             stabilizer_pid_(stabilizer_pid),
-                            usec_prev_(usec_prev),
+                            pid_update_usec_prev_(pid_update_usec_prev),
                             is_led_pulsing_(is_led_pulsing),
                             led_pulse_start_(led_pulse_start) { }
 
@@ -342,7 +342,7 @@ namespace hf {
             StabilizerPidController stabilizer_pid_;
 
             // Support for microsecond PID control timing
-            uint32_t usec_prev_;
+            uint32_t pid_update_usec_prev_;
 
             // Support for LED blink
             bool is_led_pulsing_;
@@ -470,8 +470,8 @@ namespace hf {
             {
                 const auto setpoint = MakeSetpoint(rx);
 
-                const float dt = (usec - usec_prev_)/1000000.0;
-                usec_prev_ = usec;
+                const float dt = (usec - pid_update_usec_prev_)/1000000.0;
+                pid_update_usec_prev_ = usec;
 
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, dt, state_, setpoint);
