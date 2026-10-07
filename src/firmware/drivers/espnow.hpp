@@ -16,7 +16,8 @@
 #include <WiFi.h>
 
 #include <hackflight.h>
-#include <firmware/debugger.hpp>
+
+#include "error.hpp"
 
 namespace hf {
 
@@ -29,7 +30,7 @@ namespace hf {
                 WiFi.mode(WIFI_STA);
 
                 if (esp_now_init() != ESP_OK) {
-                    hf::Debugger::ReportForever("Error initializing ESP-NOW");
+                    Error::ReportForever("Error initializing ESP-NOW");
                 }
             }
 
@@ -41,7 +42,7 @@ namespace hf {
                 peerInfo.encrypt = false;
             
                 if (esp_now_add_peer(&peerInfo) != ESP_OK){
-                    hf::Debugger::ReportForever("Failed to add peer");
+                    Error::ReportForever("Failed to add peer");
                 }
             }
 

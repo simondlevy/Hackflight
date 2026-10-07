@@ -23,8 +23,9 @@
 
 // Hackflight library
 #include <hackflight.h>
-#include <firmware/debugger.hpp>
 #include <firmware/opticalflow/sensor.hpp>
+
+#include "error.hpp"
 
 static PMW3901 pmw3901_;
 
@@ -35,7 +36,7 @@ namespace hf {
         SPI.begin();
 
         if (!pmw3901_.begin()) {
-            Debugger::ReportForever("Unable to initialize PMW3901");
+            Error::ReportForever("Unable to initialize PMW3901");
         }
     }
 

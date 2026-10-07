@@ -21,6 +21,8 @@
 #include <firmware/debugger.hpp>
 #include <firmware/zranger/sensor.hpp>
 
+#include "error.hpp"
+
 static Adafruit_VL53L1X vl53l1x_;
 
 namespace hf {
@@ -32,11 +34,11 @@ namespace hf {
         delay(100);
 
         if (!vl53l1x_.begin(0x29, &Wire1)) {
-            Debugger::ReportForever("Unable to initialize VL53L1X");
+            Error::ReportForever("Unable to initialize VL53L1X");
         }
 
         if (!vl53l1x_.startRanging()) {
-            Debugger::ReportForever("VL53L1X failed to start ranging");
+            Error::ReportForever("VL53L1X failed to start ranging");
         }
 
         // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms

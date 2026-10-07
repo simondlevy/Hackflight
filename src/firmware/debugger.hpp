@@ -68,14 +68,6 @@ namespace hf {
                 (char *)"PANIC"
             };
 
-            static void ReportForever(const char * errmsg)
-            {
-                while (true) {
-                    printf("%s\n", errmsg);
-                    delay(500);
-                }
-            }
-
             void Report(const uint32_t msec, const Mode mode)
             {
                 if (helper_.Ready(msec)) {

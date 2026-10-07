@@ -17,7 +17,7 @@
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
 
-#include <firmware/espnow.hpp>
+#include <firmware/drivers/espnow.hpp>
 
 static const uint32_t kWifiTimeoutMsec = 50;
 

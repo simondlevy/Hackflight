@@ -13,8 +13,8 @@
  */
 
 #include <hackflight.h>
-#include <firmware/espnow.hpp>
 #include <firmware/blink_timer.hpp>
+#include <firmware/drivers/espnow.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/pushbutton.hpp>
