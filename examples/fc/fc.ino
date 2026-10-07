@@ -201,9 +201,9 @@ static void MotorsStart()
     motors_.begin();
 }
 
-static auto MotorsGetValues() -> float *
+static auto MotorsGetValues() -> std::vector<float>
 {
-    return hf::QuadXMixer::GetMotorValues(mixer_);
+    return hf::QuadXMixer::NewGetMotorValues(mixer_);
 }
 
 static void MotorsRun(const hf::Setpoint & setpoint)
@@ -212,7 +212,7 @@ static void MotorsRun(const hf::Setpoint & setpoint)
 
     // Run motors if safe
     if (fc_.IsSafeToFly()) {
-        motors_.run(fc_.IsArmed(), MotorsGetValues());
+        motors_.run(fc_.IsArmed(), MotorsGetValues().data());
     }
 }
 
@@ -265,8 +265,8 @@ void loop()
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
     const auto setpoint = fc_.Update( micros(), ImuRead(), ImuGyroRangeDps(),
-            ImuAccelRangeGs(), analogRead(kVoltageInputPin),
-            rx_, MotorsGetValues(), 4);
+            ImuAccelRangeGs(), analogRead(kVoltageInputPin), rx_,
+            MotorsGetValues());
 
     // Run sensor fusion on hover-deck
     if (fc_.ShouldUpdateHover(millis())) {

@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <datatypes.hpp>
 
 namespace hf {
@@ -74,6 +76,19 @@ namespace hf {
                 vals[1] = mixer.rf_ccw;
                 vals[2] = mixer.lr_ccw;
                 vals[3] = mixer.lf_cw;
+
+                return vals;
+            }
+
+            static auto NewGetMotorValues(
+                    const QuadXMixer & mixer) -> std::vector<float>
+            {
+                std::vector<float> vals = {
+                    mixer.rr_cw,
+                    mixer.rf_ccw,
+                    mixer.lr_ccw,
+                    mixer.lf_cw
+                };
 
                 return vals;
             }

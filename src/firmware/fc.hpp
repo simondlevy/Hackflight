@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <hackflight.h>
 #include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
@@ -86,8 +88,7 @@ namespace hf {
                     const int16_t accel_range_gs,
                     const uint16_t rawvolts,
                     const Receiver & rx,
-                    const float * motor_vals,
-                    const uint8_t motor_count) -> Setpoint
+                    const std::vector<float> motorvals) -> Setpoint
             {
                 // Most routines use milliseconds 
                 const auto msec = usec / 1000;
@@ -96,7 +97,7 @@ namespace hf {
                 UpdateMode(msec, rx, false); // no hover request
 
                 // Periodically run flying check to get status for EKF
-                UpdateFlyingStatus(msec, motor_vals, motor_count);
+                UpdateFlyingStatus(msec, motorvals);
 
                 // Sense voltage periodically
                 UpdateVoltage(msec, rawvolts);
@@ -297,13 +298,12 @@ namespace hf {
 
             auto AreMotorsAboveIdle(
                     const uint32_t msec,
-                    const float * motor_vals,
-                    const uint8_t motor_count) -> bool
+                    const std::vector<float> motorvals) -> bool
             {
                 auto is_thrust_hover_idle = false;
 
-                for (int i = 0; i < motor_count; ++i) {
-                    if (motor_vals[i] > kMotorIdleMax) {
+                for (auto motorval : motorvals) {
+                    if (motorval > kMotorIdleMax) {
                         is_thrust_hover_idle = true;
                         break;
                     }
@@ -364,8 +364,7 @@ namespace hf {
 
             void UpdateFlyingStatus(
                     const uint32_t msec,
-                    const float * motor_vals,
-                    const uint8_t motor_count)
+                    const std::vector<float> motorvals)
             {
                 flying_check_timer_ = Timer::Update(flying_check_timer_,
                         kFlyingCheckRate, msec);
@@ -375,7 +374,7 @@ namespace hf {
                     mode_ == kModeIdle || mode_ == kModePanic  ? false :
 
                     Timer::IsReady(flying_check_timer_) ?
-                    AreMotorsAboveIdle(msec, motor_vals, motor_count) :
+                    AreMotorsAboveIdle(msec, motorvals) :
 
                     is_flying_;
             }
