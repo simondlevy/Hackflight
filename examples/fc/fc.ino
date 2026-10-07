@@ -17,12 +17,16 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
+#include <Wire.h>
+
+#include <Adafruit_VL53L1X.h>
+
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
+#include <firmware/drivers/error.hpp>
 #include <firmware/motors/quad_dshot.hpp>
 #include <firmware/receiver.hpp>
-
 #include <firmware/timer.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;
@@ -37,9 +41,44 @@ void serialEvent3()
     }
 }
 
+static Adafruit_VL53L1X vl53l1x_;
+
 static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
+
+static void ZRangerStart()
+{
+    Wire1.begin();
+    Wire1.setClock(400000);
+    delay(100);
+
+    if (!vl53l1x_.begin(0x29, &Wire1)) {
+        hf::Error::ReportForever("Unable to initialize VL53L1X");
+    }
+
+    if (!vl53l1x_.startRanging()) {
+        hf::Error::ReportForever("VL53L1X failed to start ranging");
+    }
+
+    // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms
+    vl53l1x_.setTimingBudget(50);
+}
+
+static auto ZRangerRead() -> float
+{
+    static float distance_;
+
+    if (vl53l1x_.dataReady())  {
+
+        distance_ = vl53l1x_.distance();
+
+        // Prepare for another reading
+        vl53l1x_.clearInterrupt();
+    }
+
+    return distance_;
+}
 
 void setup()
 {
@@ -51,6 +90,9 @@ void setup()
 
     // Enable heartbeat LED
     pinMode(kLedPin, OUTPUT); 
+
+    // Start Z-ranger
+    ZRangerStart();
 
     // Start flight control
     fc_.Begin();
@@ -66,8 +108,12 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint = fc_.Update(micros(), analogRead(kVoltageInputPin),
-            rx_,motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(
+            micros(),
+            ZRangerRead(),
+            analogRead(kVoltageInputPin),
+            rx_,motors_.GetMotorValues(),
+            4);
 
     const auto led_status = fc_.GetLedStatus();
     if (led_status == hf::FlightController::kLedOff) {

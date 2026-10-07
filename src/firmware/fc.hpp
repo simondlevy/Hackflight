@@ -32,7 +32,6 @@
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger/filter.hpp>
-#include <firmware/zranger/sensor.hpp>
 #include <pidcontrol/hover.hpp>
 
 namespace hf {
@@ -84,7 +83,6 @@ namespace hf {
             void Begin()
             {
                 imu_.Begin();
-                zranger_.Begin();
                 flow_sensor_.Begin();
 
                 mode_ = kModeIdle;
@@ -92,6 +90,7 @@ namespace hf {
 
             auto Update(
                     const uint32_t usec,
+                    const float zdistance,
                     const uint16_t rawvolts,
                     const Receiver & rx,
                     const float * motor_vals,
@@ -102,7 +101,7 @@ namespace hf {
                 const auto msec = usec / 1000;
 
                 // Run sensor fusion on hover-deck
-                RunHoverDeck(usec);
+                UpdateHoverDeck(usec, zdistance);
 
                 // Safely update flight mode
                 UpdateMode(msec, rx, false); // no hover request
@@ -244,7 +243,6 @@ namespace hf {
 
             // Devices
             IMU imu_;
-            ZRanger zranger_;
             OpticalFlowSensor flow_sensor_;
 
             // Voltage sensing
@@ -341,7 +339,7 @@ namespace hf {
                 }
             }
 
-            void RunHoverDeck(const uint32_t usec)
+            void UpdateHoverDeck(const uint32_t usec, const float zdistance)
             {
                 const auto msec = usec / 1000;
 
@@ -350,7 +348,7 @@ namespace hf {
 
                 if (Timer::IsReady(hover_deck_timer_)) {
                     zranger_filter_ = ZRangerFilter::Update(
-                            zranger_filter_, zranger_.Read());
+                            zranger_filter_, zdistance);
                     optical_flow_filter_ = OpticalFlowFilter::Update(
                             optical_flow_filter_,
                             usec, flow_sensor_.Read());
