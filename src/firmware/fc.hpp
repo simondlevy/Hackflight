@@ -39,8 +39,6 @@ namespace hf {
 
     class FlightController {
 
-        // Constants ---------------------------------------------------------
-
         private:
 
             // Voltage divider sensing
@@ -68,8 +66,6 @@ namespace hf {
             // over the idle thrust.
             static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
             static constexpr float kMotorIdleMax = 0.1;
-
-            // Public instance methods --------------------------------------------
 
         public:
 
@@ -124,16 +120,6 @@ namespace hf {
                 return stabilizer_pid_.setpoint;
             }
 
-            auto IsSafeToFly() -> bool
-            {
-                return mode_ != kModePanic;
-            }
-
-            auto IsArmed() -> bool
-            {
-                return mode_ != kModeIdle;
-            }
-
             auto ShouldSendTelemetry(const uint32_t msec) -> bool
             {
                 telemetry_timer_ = Timer::Update(telemetry_timer_, 
@@ -186,11 +172,6 @@ namespace hf {
                         MspSerializer::GetPayloadSize(telemetry_serializer_));
             }
 
-            auto GetLedStatus() -> LedStatus
-            {
-                return led_status_;
-            }
-
             void UpdateHoverDeck(
                     const uint32_t usec,
                     const float zdistance,
@@ -203,8 +184,20 @@ namespace hf {
                 ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
             }
 
+            static auto GetLedStatus(const FlightController & fc) -> LedStatus
+            {
+                return fc.led_status_;
+            }
 
-            // Static methods ----------------------------------------------
+            static auto IsSafeToFly(const FlightController & fc) -> bool
+            {
+                return fc.mode_ != kModePanic;
+            }
+
+            static auto IsArmed(const FlightController & fc) -> bool
+            {
+                return fc.mode_ != kModeIdle;
+            }
 
         private:
 
@@ -240,8 +233,6 @@ namespace hf {
                         PositionController::bypass(Receiver::GetPitch(rx)),
                         Receiver::GetYaw(rx));
             }
-
-            // Instance variables ---------------------------------------------
 
             // Vehicle state
             VehicleState state_;
@@ -301,8 +292,6 @@ namespace hf {
             // Support for voltage sensing
             VoltageDivider voltage_divider_ =
                 VoltageDivider( kR1Ohms, kR2Ohms);
-
-            // Instance methods ----------------------------------------------
 
             auto AreMotorsAboveIdle(
                     const uint32_t msec,

@@ -211,8 +211,8 @@ static void MotorsRun(const hf::Setpoint & setpoint)
     mixer_ = hf::QuadXMixer::Run(setpoint);
 
     // Run motors if safe
-    if (fc_.IsSafeToFly()) {
-        motors_.run(fc_.IsArmed(), MotorsGetValues());
+    if (hf::FlightController::IsSafeToFly(fc_)) {
+        motors_.run(hf::FlightController::IsArmed(fc_), MotorsGetValues());
     }
 }
 
@@ -276,7 +276,7 @@ void loop()
     }
 
     // Blink LED to indicate status
-    const auto led_status = fc_.GetLedStatus();
+    const auto led_status = hf::FlightController::GetLedStatus(fc_);
     if (led_status == hf::FlightController::kLedOff) {
         digitalWrite(kLedPin, LOW);
     }
