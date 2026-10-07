@@ -21,7 +21,7 @@
 #include <firmware/debugger.hpp>
 #include <firmware/zranger/sensor.hpp>
 
-#include "error.hpp"
+#include <firmware/drivers/error.hpp>
 
 static Adafruit_VL53L1X vl53l1x_;
 

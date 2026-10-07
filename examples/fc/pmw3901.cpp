@@ -25,7 +25,7 @@
 #include <hackflight.h>
 #include <firmware/opticalflow/sensor.hpp>
 
-#include "error.hpp"
+#include <firmware/drivers/error.hpp>
 
 static PMW3901 pmw3901_;
 

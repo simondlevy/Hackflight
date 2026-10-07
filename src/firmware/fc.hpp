@@ -84,7 +84,6 @@ namespace hf {
             void Begin()
             {
                 imu_.Begin();
-
                 zranger_.Begin();
                 flow_sensor_.Begin();
 
