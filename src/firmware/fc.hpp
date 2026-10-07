@@ -172,8 +172,11 @@ namespace hf {
                 // Update the IMU filter with raw IMU data
                 UpdateImu(msec, imu_data, gyro_range_dps, accel_range_gs);
 
-                // Update state estimation
-                UpdateState(msec);
+                // Update state estimator
+                ekf_ = UpdateStateEstimator(*this, msec);
+
+                // Get state from estimator
+                state_ = EKF::getVehicleState(ekf_);
 
                 // Update timers
                 UpdateTimers(msec);
@@ -181,6 +184,7 @@ namespace hf {
                 // Run PID controller to get final setpoint
                 stabilizer_pid_ = UpdatePidController(*this, usec, rx);
 
+                // Track updates
                 pid_update_usec_prev_ = usec;
             }
 
@@ -448,20 +452,21 @@ namespace hf {
                         gyro_range_dps, accel_range_gs);
             }
 
-            void UpdateState(const uint32_t msec)
+            // ---------------------------------------------------------------
+
+            static auto UpdateStateEstimator(const FlightController & fc,
+                    const uint32_t msec) -> EKF
             {
+                auto ekf = fc.ekf_;
+
                 // Periodically run the EKF prediction step
-                if (Timer::IsReady(ekf_prediction_timer_)) {
-                    ekf_ = EKF::Predict(ekf_, msec, is_flying_); 
+                if (Timer::IsReady(fc.ekf_prediction_timer_)) {
+                    ekf= EKF::Predict(ekf, msec, fc.is_flying_); 
                 }
 
                 // Do EKF fast-update with IMU readings
-                ekf_ = EKF::Update(ekf_, imu_filter_.output, msec);
-
-                state_ = EKF::getVehicleState(ekf_);
+                return EKF::Update(ekf, fc.imu_filter_.output, msec);
             }
-
-            // ---------------------------------------------------------------
 
             static auto UpdatePidController(
                     const FlightController & fc,
