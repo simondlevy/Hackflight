@@ -155,7 +155,8 @@ namespace hf {
                 UpdateFlyingStatus(msec, motorvals);
 
                 // Blink LED to indicate status
-                UpdateLedStatus(msec, imu_filter_.is_gyro_calibrated && mode_ !=
+                led_ = UpdateLed(*this,
+                        msec, imu_filter_.is_gyro_calibrated && mode_ !=
                         kModePanic);
 
                 // Update the IMU filter with raw IMU data
@@ -258,7 +259,7 @@ namespace hf {
             static auto GetLedStatus(
                     const FlightController & fc) -> Led::Status
             {
-                return fc.led_.status_;
+                return Led::GetStatus(fc.led_);
             }
 
             static auto IsSafeToFly(const FlightController & fc) -> bool
@@ -384,18 +385,6 @@ namespace hf {
                     kFlyingHysteresisThresholdMsec;
             }
 
-            void UpdateLedStatus(
-                    const uint32_t msec,
-                    const bool is_imu__calibrated)
-            {
-                const auto is_ready =
-                    is_imu__calibrated ?
-                    Timer::IsReady(heartbeat_timer_) :
-                    Timer::IsReady(fast_blink_timer_);
-
-                led_ = Led::Update(led_, msec, is_ready);
-            }
-
             void UpdateFlyingStatus(
                     const uint32_t msec,
                     const std::vector<float> motorvals)
@@ -411,6 +400,17 @@ namespace hf {
             }
 
             // ---------------------------------------------------------------
+
+            static auto UpdateLed(
+                    const FlightController & fc,
+                    const uint32_t msec,
+                    const bool is_imu__calibrated) -> Led
+            {
+                return Led::Update(fc.led_, msec, 
+                        is_imu__calibrated ?
+                        Timer::IsReady(fc.heartbeat_timer_) :
+                        Timer::IsReady(fc.fast_blink_timer_));
+            }
 
             static auto UpdateImuFilter(
                     const FlightController & fc,

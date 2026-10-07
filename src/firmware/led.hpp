@@ -80,7 +80,12 @@ namespace hf {
                 return Led(status, is_pulsing, pulse_start_msec);
             }
 
-        //private:
+            static auto GetStatus(const Led & led) -> Status
+            {
+                return led.status_;
+            }
+
+        private:
 
             Status status_;
             bool is_pulsing_;
