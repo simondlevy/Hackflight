@@ -22,8 +22,8 @@
 #include <firmware/estimator/rotation.hpp>
 #include <firmware/estimator/three_axis_subsampler.hpp>
 #include <firmware/imu/filter.hpp>
-#include <firmware/opticalflow/filter.hpp>
-#include <firmware/zranger/filter.hpp>
+#include <firmware/optical_flow.hpp>
+#include <firmware/zranger.hpp>
 #include <num.hpp>
 
 namespace hf {

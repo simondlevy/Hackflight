@@ -17,9 +17,22 @@
 #pragma once
 
 #include <hackflight.h>
-#include <firmware/opticalflow/sensor.hpp>
 
 namespace hf {
+
+    class OpticalFlowData {
+
+        public:
+
+            int16_t x;
+            int16_t y;
+
+            OpticalFlowData() = default;
+
+            OpticalFlowData(const int16_t x, const int16_t y) : x(x), y(y) {}
+
+            OpticalFlowData& operator=(const OpticalFlowData& other) = default;
+    };
 
     class OpticalFlowFilter {
 
@@ -60,7 +73,7 @@ namespace hf {
             static auto Update(
                     const OpticalFlowFilter & filter,
                     const uint32_t usec_curr,
-                    const OpticalFlowSensor::RawData & rawdata
+                    const OpticalFlowData & rawdata
                     ) -> OpticalFlowFilter
             {
                 // Provide motion information to comply with sensor mounting

@@ -26,12 +26,11 @@
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
-#include <firmware/opticalflow/filter.hpp>
-#include <firmware/opticalflow/sensor.hpp>
+#include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
-#include <firmware/zranger/filter.hpp>
+#include <firmware/zranger.hpp>
 #include <pidcontrol/hover.hpp>
 
 namespace hf {
@@ -179,7 +178,7 @@ namespace hf {
             void UpdateHoverDeck(
                     const uint32_t usec,
                     const float zdistance,
-                    const OpticalFlowSensor::RawData flow)
+                    const OpticalFlowData flow)
             {
                 zranger_filter_ = ZRangerFilter::Update(
                         zranger_filter_, zdistance);

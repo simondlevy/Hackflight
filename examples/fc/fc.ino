@@ -30,7 +30,7 @@
 #include <firmware/debugger.hpp>
 #include <firmware/drivers/error.hpp>
 #include <firmware/motors/quad_dshot.hpp>
-#include <firmware/opticalflow/sensor.hpp>
+#include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
@@ -101,7 +101,7 @@ static void OpticalFlowStart()
     }
 }
 
-static auto OpticalFlowRead() -> hf::OpticalFlowSensor::RawData
+static auto OpticalFlowRead() -> hf::OpticalFlowData
 {
     int16_t dx = 0;
     int16_t dy = 0;
@@ -109,7 +109,7 @@ static auto OpticalFlowRead() -> hf::OpticalFlowSensor::RawData
 
     pmw3901_.readMotion(dx, dy, moved);
 
-    return hf::OpticalFlowSensor::RawData(dx, dy);
+    return hf::OpticalFlowData(dx, dy);
 }
 
 static void RunProfiler()

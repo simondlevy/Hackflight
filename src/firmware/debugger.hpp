@@ -22,7 +22,7 @@
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
-#include <firmware/opticalflow/sensor.hpp>
+#include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
