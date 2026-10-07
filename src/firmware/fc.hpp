@@ -388,27 +388,12 @@ namespace hf {
                     const uint32_t msec,
                     const bool is_imu__calibrated)
             {
-                const auto ready =
+                const auto is_ready =
                     is_imu__calibrated ?
                     Timer::IsReady(heartbeat_timer_) :
                     Timer::IsReady(fast_blink_timer_);
 
-                if (ready) {
-                    led_.status_ = Led::kStatusOn;
-                    led_.is_pulsing_ = true;
-                    led_.pulse_start_msec_ = msec;
-                }
-
-                else if (led_.is_pulsing_) {
-                    if (msec - led_.pulse_start_msec_ > kLedPulseDurationMsec) {
-                        led_.status_ = Led::kStatusOff;
-                        led_.is_pulsing_ = false;
-                    }
-                }
-
-                else {
-                    led_.status_ = Led::kStatusUnchanged;
-                }
+                led_ = Led::Update(led_, msec, is_ready);
             }
 
             void UpdateFlyingStatus(
