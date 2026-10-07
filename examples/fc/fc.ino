@@ -262,11 +262,13 @@ void loop()
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
 
-    // Run core algorithm to get setpoint from PID controllers and send
-    // telemetry
-    const auto setpoint = fc_.Update( micros(), ImuRead(), ImuGyroRangeDps(),
+    // Update core algorithm with all inputs
+    fc_.Update(millis(), ImuRead(), ImuGyroRangeDps(),
             ImuAccelRangeGs(), analogRead(kVoltageInputPin), rx_,
             MotorsGetValues());
+
+    // Run PID controllers to get final setpoint
+    const auto setpoint = fc_.RunPidController(micros(), rx_);
 
     // Run sensor fusion on hover-deck
     if (fc_.ShouldUpdateHover(millis())) {

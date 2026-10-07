@@ -82,17 +82,14 @@ namespace hf {
             } LedStatus;
 
             auto Update(
-                    const uint32_t usec,
+                    const uint32_t msec,
                     const IMU::RawData imu_data,
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs,
                     const uint16_t rawvolts,
                     const Receiver & rx,
-                    const std::vector<float> motorvals) -> Setpoint
+                    const std::vector<float> motorvals)
             {
-                // Most routines use milliseconds 
-                const auto msec = usec / 1000;
-
                 // Safely update flight mode
                 UpdateMode(msec, rx, false); // no hover request
 
@@ -111,9 +108,20 @@ namespace hf {
 
                 // Update state estimation
                 UpdateState(msec);
+            }
 
-                // Run PID controller on sepoint made from receiver values
-                return RunPidController(usec, MakeSetpoint(rx));
+            auto RunPidController(const uint32_t usec,
+                    const Receiver & rx) -> Setpoint
+            {
+                const auto setpoint = MakeSetpoint(rx);
+
+                const float dt = (usec - usec_prev_)/1000000.0;
+                usec_prev_ = usec;
+
+                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
+                        is_flying_, dt, state_, setpoint);
+
+                return stabilizer_pid_.setpoint;
             }
 
             auto IsSafeToFly() -> bool
@@ -348,18 +356,6 @@ namespace hf {
                 else {
                     led_status_ = kLedUnchanged;
                 }
-            }
-
-            auto RunPidController(const uint32_t usec,
-                    const Setpoint & setpoint) -> Setpoint
-            {
-                const float dt = (usec - usec_prev_)/1000000.0;
-                usec_prev_ = usec;
-
-                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
-                        is_flying_, dt, state_, setpoint);
-
-                return stabilizer_pid_.setpoint;
             }
 
             void UpdateFlyingStatus(
