@@ -42,14 +42,7 @@ static const uint8_t kLedPin = 9;
 static constexpr float kHoverDeckUpdateRate = 100;
 static hf::Timer hover_deck_timer_;
 
-static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
-
-static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
-
-// The SDO pin should either be pulled low for the 0x18/0x68
-// addresses, high for 0x19/0x69
-static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
-static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
+// Receiver ------------------------------------------------------------------
 
 static hf::Receiver rx_;
 
@@ -60,18 +53,16 @@ void serialEvent3()
     }
 }
 
-static Adafruit_VL53L1X vl53l1x_;
-
-static PMW3901 pmw3901_;
-
 static hf::FlightController fc_;
 
 static hf::QuadDshot motors_;
 
+// ZRanger -------------------------------------------------------------------
+
+static Adafruit_VL53L1X vl53l1x_;
+
 static void ZRangerStart()
 {
-    (void)pmw3901_;
-
     Wire1.begin();
     Wire1.setClock(400000);
     delay(100);
@@ -103,6 +94,10 @@ static auto ZRangerRead() -> float
     return distance_;
 }
 
+// Optical flow --------------------------------------------------------------
+
+static PMW3901 pmw3901_;
+
 static void OpticalFlowStart()
 {
     SPI.begin();
@@ -123,11 +118,20 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
     return hf::OpticalFlowData(dx, dy);
 }
 
+// IMU -----------------------------------------------------------------------
+
+static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
+static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
+
+// The SDO pin should either be pulled low for the 0x18/0x68
+// addresses, high for 0x19/0x69
+static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
+static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
+
 static auto ImuOkay(const int status) -> bool
 {
     return status >= 0;
 }
-
 
 static void ImuStart()
 {
@@ -186,6 +190,7 @@ static auto ImuAccelRangeGs() -> int16_t
     return aranges[kAccelRange];
 }
 
+// Profiling -----------------------------------------------------------------
 
 static void RunProfiler()
 {
@@ -202,6 +207,7 @@ static void RunProfiler()
     count_++;
 }
 
+// Main ----------------------------------------------------------------------
 
 void setup()
 {

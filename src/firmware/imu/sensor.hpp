@@ -56,13 +56,5 @@ namespace hf {
 
                     RawData& operator=(const RawData& other) = default;
             };
-
-            auto Begin() -> bool;
-
-            auto GetGyroRangeDps() -> int16_t;
-
-            auto GetAccelRangeGs() -> int16_t;
-
-            auto Read() -> RawData;
     };
 }
