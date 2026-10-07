@@ -42,6 +42,7 @@
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 
+static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
 
@@ -53,8 +54,6 @@ void serialEvent3()
         rx_ = hf::Receiver::ParseByte(rx_, Serial3.read(), millis());
     }
 }
-
-static hf::FlightController fc_;
 
 // ZRanger -------------------------------------------------------------------
 
@@ -219,7 +218,7 @@ static void MotorsRun(const hf::Setpoint & setpoint)
 
 // Profiling -----------------------------------------------------------------
 
-static void RunProfiler()
+static void ProfilerRun()
 {
     static uint32_t count_;
     static uint32_t msec_;
@@ -258,7 +257,7 @@ void setup()
 
 void loop()
 {
-    RunProfiler();
+    (void)ProfilerRun;
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
