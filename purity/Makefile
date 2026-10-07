@@ -1,8 +1,11 @@
-test: test.o
-	g++ -o test test.o
+test: main.o
+	g++ -o test main.o
 
-test.o: test.cpp
-	g++ -Wall -I../src -c test.cpp
+main.o: main.cpp
+	g++ -Wall -I../src -c main.cpp
+
+edit:
+	vim main.cpp
 
 clean:
-	rm -rf test test.o
+	rm -rf test main.o
