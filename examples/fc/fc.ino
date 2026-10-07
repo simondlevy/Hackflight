@@ -24,11 +24,13 @@
 // Third-party libraries
 #include <pmw3901.hpp>
 #include <Adafruit_VL53L1X.h>
+#include <BMI088.h>
 
 #include <hackflight.h>
 #include <firmware/fc.hpp>
 #include <firmware/debugger.hpp>
 #include <firmware/drivers/error.hpp>
+#include <firmware/imu/sensor.hpp>
 #include <firmware/motors/quad_dshot.hpp>
 #include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
@@ -39,6 +41,15 @@ static const uint8_t kLedPin = 9;
 
 static constexpr float kHoverDeckUpdateRate = 100;
 static hf::Timer hover_deck_timer_;
+
+static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
+
+static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
+
+// The SDO pin should either be pulled low for the 0x18/0x68
+// addresses, high for 0x19/0x69
+static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
+static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
 
 static hf::Receiver rx_;
 
@@ -112,6 +123,70 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
     return hf::OpticalFlowData(dx, dy);
 }
 
+static auto ImuOkay(const int status) -> bool
+{
+    return status >= 0;
+}
+
+
+static void ImuStart()
+{
+    if (!(ImuOkay(gyro_.begin()) &&
+
+        ImuOkay(accel_.begin()) &&
+
+        ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+
+        ImuOkay(gyro_.setRange(kGyroRange)) &&
+
+        ImuOkay(gyro_.pinModeInt3(
+                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+
+        ImuOkay(gyro_.mapDrdyInt3(true)) &&
+
+        ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+
+        ImuOkay(accel_.setRange(kAccelRange)))) {
+
+        hf::Error::ReportForever("Unable to start IMU");
+    }
+}
+
+static auto ImuRead() -> hf::IMU::RawData
+{
+    gyro_.readSensor();
+
+    accel_.readSensor();
+
+    return hf::IMU::RawData(
+            hf::IMU::ThreeAxisRaw(
+                gyro_.getGyroX_raw(),
+                gyro_.getGyroY_raw(),
+                gyro_.getGyroZ_raw()
+                ),
+            hf::IMU::ThreeAxisRaw(
+                accel_.getAccelX_raw(),
+                accel_.getAccelY_raw(),
+                accel_.getAccelZ_raw()
+                ));
+}
+
+static auto ImuGyroRangeDps() -> int16_t
+{
+    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
+
+    return granges[kGyroRange];
+}
+
+static auto ImuAccelRangeGs() -> int16_t
+{
+    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+
+    return aranges[kAccelRange];
+}
+
+
 static void RunProfiler()
 {
     static uint32_t count_;
@@ -139,14 +214,10 @@ void setup()
     // Enable heartbeat LED
     pinMode(kLedPin, OUTPUT); 
 
-    // Start Z-ranger
+    // Start the sensors
+    ImuStart();
     ZRangerStart();
-
-    // Start optical-flow sensor
     OpticalFlowStart();
-
-    // Start flight control
-    fc_.Begin();
 
     // Start motors
     motors_.Begin();
@@ -161,8 +232,14 @@ void loop()
 
     // Run core algorithm to get setpoint from PID controllers and send
     // telemetry
-    const auto setpoint = fc_.Update( micros(), analogRead(kVoltageInputPin),
-            rx_,motors_.GetMotorValues(), 4);
+    const auto setpoint = fc_.Update(
+            micros(),
+            ImuRead(), 
+            ImuGyroRangeDps(),
+            ImuAccelRangeGs(),
+            analogRead(kVoltageInputPin),
+            rx_,motors_.GetMotorValues(),
+            4);
 
     // Run sensor fusion on hover-deck
     hover_deck_timer_ = hf::Timer::Update(hover_deck_timer_,

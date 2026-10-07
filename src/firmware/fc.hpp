@@ -78,15 +78,11 @@ namespace hf {
 
             } LedStatus;
 
-            void Begin()
-            {
-                imu_.Begin();
-
-                mode_ = kModeIdle;
-            }
-
             auto Update(
                     const uint32_t usec,
+                    const IMU::RawData imu_data,
+                    const int16_t gyro_range_dps,
+                    const int16_t accel_range_gs,
                     const uint16_t rawvolts,
                     const Receiver & rx,
                     const float * motor_vals,
@@ -110,7 +106,7 @@ namespace hf {
                         kModePanic);
 
                 // Update the IMU filter with raw IMU data
-                UpdateImu(msec);
+                UpdateImu(msec, imu_data, gyro_range_dps, accel_range_gs);
 
                 // Update state estimation
                 UpdateState(msec);
@@ -372,11 +368,14 @@ namespace hf {
                     is_flying_;
             }
 
-            void UpdateImu(const uint32_t msec)
+            void UpdateImu(
+                    const uint32_t msec, 
+                    const IMU::RawData data,
+                    const int16_t gyro_range_dps,
+                    const int16_t accel_range_gs)
             {
-                imu_filter_ = ImuFilter::Step(imu_filter_, msec,
-                        imu_.Read(), imu_.GetGyroRangeDps(),
-                        imu_.GetAccelRangeGs());
+                imu_filter_ = ImuFilter::Step(imu_filter_, msec, data,
+                        gyro_range_dps, accel_range_gs);
             }
 
             void UpdateMode(const uint32_t msec,
