@@ -159,11 +159,11 @@ namespace hf {
                 // Safely update flight mode
                 mode_ = UpdateMode(*this, msec, rx, false); // no hover request
 
+                // Sense voltage periodically
+                voltage_ = UpdateVoltage(*this, msec, rawvolts);
+
                 // Periodically run flying check to get status for EKF
                 UpdateFlyingStatus(msec, motorvals);
-
-                // Sense voltage periodically
-                UpdateVoltage(msec, rawvolts);
 
                 // Blink LED to indicate status
                 UpdateLedStatus(msec, imu_filter_.is_gyro_calibrated && mode_ !=
@@ -459,13 +459,6 @@ namespace hf {
                 state_ = EKF::getVehicleState(ekf_);
             }
 
-            void UpdateVoltage(const uint32_t msec, const uint16_t rawval)
-            {
-                voltage_ = Timer::IsReady(voltage_sensing_timer_) ?
-                    VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval) :
-                    voltage_;
-            }
-
             void UpdatePidController(const uint32_t usec, const Receiver & rx)
             {
                 const auto setpoint = MakeSetpoint(rx);
@@ -475,6 +468,15 @@ namespace hf {
 
                 stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
                         is_flying_, dt, state_, setpoint);
+            }
+
+            static auto UpdateVoltage(
+                    const FlightController &fc,
+                    const uint32_t msec, const uint16_t rawval) -> float
+            {
+                return Timer::IsReady(fc.voltage_sensing_timer_) ?
+                    VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval) :
+                    fc.voltage_;
             }
 
             static auto UpdateMode(
