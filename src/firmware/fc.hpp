@@ -108,16 +108,10 @@ namespace hf {
                 // Update state estimation
                 UpdateState(msec);
 
+                UpdateTelemetryTimer(msec);
+
                 // Run PID controller to get final setpoint
                 UpdatePidController(usec, rx);
-            }
-
-            auto ShouldSendTelemetry(const uint32_t msec) -> bool
-            {
-                telemetry_timer_ = Timer::Update(telemetry_timer_, 
-                        kTelemetryRate, msec);
-
-                return Timer::IsReady(telemetry_timer_);
             }
 
             auto ShouldUpdateHover(const uint32_t msec) -> bool
@@ -194,6 +188,12 @@ namespace hf {
             static auto IsArmed(const FlightController & fc) -> bool
             {
                 return fc.mode_ != kModeIdle;
+            }
+
+            static auto ShouldSendTelemetry(
+                    const FlightController & fc) -> bool
+            {
+                return Timer::IsReady(fc.telemetry_timer_);
             }
 
         private:
@@ -359,6 +359,12 @@ namespace hf {
                     AreMotorsAboveIdle(msec, motorvals) :
 
                     is_flying_;
+            }
+
+            void UpdateTelemetryTimer(const uint32_t msec)
+            {
+                telemetry_timer_ = Timer::Update(telemetry_timer_, 
+                        kTelemetryRate, msec);
             }
 
             void UpdateImu(
