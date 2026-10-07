@@ -170,7 +170,8 @@ namespace hf {
                         kModePanic);
 
                 // Update the IMU filter with raw IMU data
-                UpdateImu(msec, imu_data, gyro_range_dps, accel_range_gs);
+                imu_filter_ = UpdateImuFilter(*this, msec, imu_data,
+                        gyro_range_dps, accel_range_gs);
 
                 // Update state estimator
                 ekf_ = UpdateStateEstimator(*this, msec);
@@ -442,17 +443,18 @@ namespace hf {
                         kVoltageSensingRate, msec);
             }
 
-            void UpdateImu(
+            // ---------------------------------------------------------------
+
+            static auto UpdateImuFilter(
+                    const FlightController & fc,
                     const uint32_t msec, 
                     const IMU::RawData data,
                     const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs)
+                    const int16_t accel_range_gs) -> ImuFilter
             {
-                imu_filter_ = ImuFilter::Step(imu_filter_, msec, data,
+                return ImuFilter::Step(fc.imu_filter_, msec, data,
                         gyro_range_dps, accel_range_gs);
             }
-
-            // ---------------------------------------------------------------
 
             static auto UpdateStateEstimator(const FlightController & fc,
                     const uint32_t msec) -> EKF
