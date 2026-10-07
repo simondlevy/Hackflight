@@ -179,7 +179,9 @@ namespace hf {
                 UpdateTimers(msec);
 
                 // Run PID controller to get final setpoint
-                UpdatePidController(usec, rx);
+                stabilizer_pid_ = UpdatePidController(*this, usec, rx);
+
+                pid_update_usec_prev_ = usec;
             }
 
             void UpdateHoverDeck(
@@ -459,15 +461,17 @@ namespace hf {
                 state_ = EKF::getVehicleState(ekf_);
             }
 
-            void UpdatePidController(const uint32_t usec, const Receiver & rx)
+            // ---------------------------------------------------------------
+
+            static auto UpdatePidController(
+                    const FlightController & fc,
+                    const uint32_t usec,
+                    const Receiver & rx) -> StabilizerPidController
             {
-                const auto setpoint = MakeSetpoint(rx);
+                const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
-                const float dt = (usec - pid_update_usec_prev_)/1000000.0;
-                pid_update_usec_prev_ = usec;
-
-                stabilizer_pid_ = StabilizerPidController::Run(stabilizer_pid_,
-                        is_flying_, dt, state_, setpoint);
+                return StabilizerPidController::Run(fc.stabilizer_pid_,
+                        fc.is_flying_, dt, fc.state_, MakeSetpoint(rx));
             }
 
             static auto UpdateVoltage(
