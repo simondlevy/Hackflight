@@ -25,6 +25,7 @@
 #include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
+#include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
@@ -69,14 +70,6 @@ namespace hf {
 
         public:
 
-            typedef enum {
-
-                kLedUnchanged, 
-                kLedOff, 
-                kLedOn, 
-
-            } LedStatus;
-
             FlightController() = default;
 
             FlightController(const FlightController & other) = default;
@@ -101,7 +94,7 @@ namespace hf {
                     const Timer & fast_blink_timer,
                     const StabilizerPidController & stabilizer_pid,
                     const uint32_t pid_update_usec_prev,
-                    const LedStatus & led_status,
+                    const Led::Status & led_status,
                     const bool is_led_pulsing,
                     const uint32_t led_pulse_start)
                         :
@@ -266,7 +259,8 @@ namespace hf {
                 return fc.stabilizer_pid_.setpoint;
             }
 
-            static auto GetLedStatus(const FlightController & fc) -> LedStatus
+            static auto GetLedStatus(
+                    const FlightController & fc) -> Led::Status
             {
                 return fc.led_status_;
             }
@@ -369,7 +363,7 @@ namespace hf {
             uint32_t pid_update_usec_prev_;
 
             // Support for LED blink
-            LedStatus led_status_;
+            Led::Status led_status_;
             bool is_led_pulsing_;
             uint32_t led_pulse_start_;
 
@@ -406,20 +400,20 @@ namespace hf {
                     Timer::IsReady(fast_blink_timer_);
 
                 if (ready) {
-                    led_status_ = kLedOn;
+                    led_status_ = Led::kStatusOn;
                     is_led_pulsing_ = true;
                     led_pulse_start_ = msec;
                 }
 
                 else if (is_led_pulsing_) {
                     if (msec - led_pulse_start_ > kLedPulseDurationMsec) {
-                        led_status_ = kLedOff;
+                        led_status_ = Led::kStatusOff;
                         is_led_pulsing_ = false;
                     }
                 }
 
                 else {
-                    led_status_ = kLedUnchanged;
+                    led_status_ = Led::kStatusUnchanged;
                 }
             }
 

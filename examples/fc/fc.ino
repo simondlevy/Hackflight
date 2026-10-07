@@ -35,6 +35,7 @@
 #include <firmware/fc.hpp>
 #include <firmware/drivers/error.hpp>
 #include <firmware/imu/sensor.hpp>
+#include <firmware/led.hpp>
 #include <firmware/optical_flow.hpp>
 #include <firmware/receiver.hpp>
 #include <mixers/quadx.hpp>
@@ -277,10 +278,10 @@ void loop()
 
     // Blink LED to indicate status
     const auto led_status = hf::FlightController::GetLedStatus(fc_);
-    if (led_status == hf::FlightController::kLedOff) {
+    if (led_status == hf::Led::kStatusOff) {
         digitalWrite(kLedPin, LOW);
     }
-    else if (led_status == hf::FlightController::kLedOn) {
+    else if (led_status == hf::Led::kStatusOn) {
         digitalWrite(kLedPin, HIGH);
     }
 
