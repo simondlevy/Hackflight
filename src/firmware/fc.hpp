@@ -44,7 +44,6 @@ namespace hf {
         private:
 
             // Voltage divider sensing
-            static constexpr uint8_t kVoltageInputPin = A9;
             static constexpr float kR1Ohms = 3300;
             static constexpr float kR2Ohms = 1000;
 

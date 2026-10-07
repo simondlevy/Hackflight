@@ -38,7 +38,7 @@ namespace hf {
 
                 public:
 
-                    uint32_t count;
+                    int count;
 
                     bool Ready(const uint32_t msec)
                     {
@@ -72,7 +72,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | mode=%s\n", helper_.count, kModeNames[mode]);
+                    printf("%5d | mode=%s\n", helper_.count, kModeNames[mode]);
                 }
             }
 
@@ -81,7 +81,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | %s=%f\n", helper_.count, label, value);
+                    printf("%5d | %s=%f\n", helper_.count, label, value);
                 }
             }
 
@@ -90,7 +90,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | %s=%s\n",
+                    printf("%5d | %s=%s\n",
                             helper_.count, label, flag ? "true" : "false");
                 }
             }
@@ -105,9 +105,9 @@ namespace hf {
                                 Receiver::GetPitch(rx),
                                 Receiver::GetYaw(rx)));
 
-                       printf(" | arm=%d | time (msec) = %lu\n", 
+                       printf(" | arm=%d | time (msec) = %d\n", 
                                 Receiver::IsArmed(rx),
-                                Receiver::GetTimestampMsec(rx));
+                                (int)Receiver::GetTimestampMsec(rx));
                 }
             }
 
@@ -124,7 +124,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
+                    printf("%5d | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
                             helper_.count, state.dx, state.dy, state.z,
                             state.dz);
                 }
@@ -136,7 +136,7 @@ namespace hf {
                 if (helper_.Ready(msec)) {
 
                     if (full) {
-                        printf("%5lu | "
+                        printf("%5d | "
                                 "dx=%+03.3f dy=%+03.3f z=%6.3f dz=%+5.3f "
                                 "phi=%+03.0f dphi=%+04.0f theta=%+03.0f "
                                 " dtheta=%+04.0f psi=%+04.0f dpsi=%+04.0f\n",
@@ -145,7 +145,7 @@ namespace hf {
                                 state.dtheta, state.psi, state.dpsi);
                     }
                     else {
-                        printf("%5lu | "
+                        printf("%5d | "
                                 "phi=%+03.0f dphi=%+04.0f theta=%+03.0f "
                                 "dtheta=%+04.0f psi=%+04.0f dpsi=%+04.0f\n",
                                 helper_.count, state.phi, state.dphi,
@@ -159,7 +159,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | x=%+05d y=%+05d z=%+05d\n",
+                    printf("%5d | x=%+05d y=%+05d z=%+05d\n",
                             helper_.count, raw.x, raw.y, raw.z);
                 }
             }
@@ -168,7 +168,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | x=%+04.0f y=%+04.0f z=%+04.0f\n",
+                    printf("%5d | x=%+04.0f y=%+04.0f z=%+04.0f\n",
                             helper_.count, vec.x, vec.y, vec.z);
                 }
             }
@@ -180,7 +180,7 @@ namespace hf {
                     const auto g = imufilt.gyro_dps;
                     const auto a = imufilt.accel_gs;
 
-                    printf("%5lu | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
+                    printf("%5d | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
                             "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n",
                             helper_.count, g.x, g.y, g.z, a.x, a.y, a.z);
                 }
@@ -193,7 +193,7 @@ namespace hf {
                     const auto gyro = imuraw.gyro;
                     const auto accel = imuraw.accel;
 
-                    printf("%5lu | gx=%+05d gy=%+05d gz=%+05d | "
+                    printf("%5d | gx=%+05d gy=%+05d gz=%+05d | "
                             "ax=%+05d ay=%+05d az=%+05d\n",
                             helper_.count, gyro.x, gyro.y, gyro.z,
                             accel.x, accel.y, accel.z);
@@ -207,7 +207,7 @@ namespace hf {
             {
                 if (helper_.Ready(msec)) {
 
-                    printf("%5lu | ", helper_.count);
+                    printf("%5d | ", helper_.count);
 
                     for (uint8_t k=0; k<count; ++k) {
                         printf("m%d=", k+1);
@@ -225,7 +225,7 @@ namespace hf {
 
             const void ReportSetpoint(const Setpoint & setpoint)
             {
-                printf("%5lu | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
+                printf("%5d | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
                         "yaw=%+3.3f",
                         helper_.count, setpoint.thrust, setpoint.roll,
                         setpoint.pitch, setpoint.yaw);

@@ -42,4 +42,9 @@ class Num {
         {
             return fminf(max_val, fmaxf(min_val,value));
         }
+
+        static auto Max(const float a, const float b) -> float
+        {
+            return a > b ? a : b;
+        }
 };

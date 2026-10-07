@@ -539,7 +539,7 @@ namespace hf {
                     const float rzz) -> Core
             {
 
-                const auto angle = max(0, fabsf(acosf(rzz)) -
+                const auto angle = Num::Max(0, fabsf(acosf(rzz)) -
                         Num::kDeg2Rad * (15.0f / 2));
                 const auto predicted_distance = core.x[kStateZ] / cosf(angle);
                 const auto measured_distance = zrfilter.distance_m;
@@ -573,7 +573,7 @@ namespace hf {
 
                 // Saturate elevation in prediction and correction to avoid
                 // singularities
-                const auto z_g  = max(core.x[kStateZ], 0.1);
+                const auto z_g  = Num::Max(core.x[kStateZ], 0.1);
 
                 const auto dg = core.x[state_index];
 
@@ -646,7 +646,8 @@ namespace hf {
 
                         // add measurement noise
                         p[i*kStateDim+j] = p[j*kStateDim+i] =
-                            GetPval(i, j, 0.5*p[i*kStateDim+j] + 0.5*p[j*kStateDim+i] + v,
+                            GetPval(i, j, 0.5*p[i*kStateDim+j] +
+                                    0.5*p[j*kStateDim+i] + v,
                                     MinCovariance, MaxCovariance); 
                     }
                 }
