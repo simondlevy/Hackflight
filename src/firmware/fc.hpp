@@ -135,7 +135,25 @@ namespace hf {
                     pid_update_usec_prev_(pid_update_usec_prev),
                     led_(led) {}
 
-            auto Update(
+            static auto Update(
+                    const FlightController & fc,
+                    const uint32_t usec,
+                    const IMU::RawData imu_data,
+                    const int16_t gyro_range_dps,
+                    const int16_t accel_range_gs,
+                    const uint16_t rawvolts,
+                    const Receiver & rx,
+                    const std::vector<float> motorvals) -> FlightController
+            {
+                // Most updates run on milliseconds
+                const auto msec = usec / 1000;
+
+                (void)msec;
+
+                return fc;
+            }
+
+             void Update(
                     const uint32_t usec,
                     const IMU::RawData imu_data,
                     const int16_t gyro_range_dps,
