@@ -71,13 +71,13 @@ namespace hf {
             FlightController(const FlightController & other) = default;
 
             FlightController(
-                    const VehicleState & state,
-                    const Mode & mode,
-                    const FlyingStatus & flying_status,
-                    const ImuFilter & imu_filter,
                     const EKF & ekf,
                     const OpticalFlowFilter & optical_flow_filter,
                     const ZRangerFilter & zranger_filter,
+                    const ImuFilter & imu_filter,
+                    const VehicleState & state,
+                    const Mode & mode,
+                    const FlyingStatus & flying_status,
                     const IMU & imu,
                     const float voltage,
                     const Timer & ekf_prediction_timer,
@@ -91,13 +91,14 @@ namespace hf {
                     const uint32_t pid_update_usec_prev,
                     const Led & led)
                         :
-                            state_(state),
-                            mode_(mode),
-                            flying_status_(flying_status),
-                            imu_filter_(imu_filter),
                             ekf_(ekf),
                             optical_flow_filter_(optical_flow_filter),
                             zranger_filter_(zranger_filter),
+                            imu_filter_(imu_filter),
+
+                            state_(state),
+                            mode_(mode),
+                            flying_status_(flying_status),
                             imu_(imu),
                             voltage_(voltage),
                             ekf_prediction_timer_(ekf_prediction_timer),
@@ -184,8 +185,10 @@ namespace hf {
             {
                 zranger_filter_ = ZRangerFilter::Update(
                         zranger_filter_, zdistance);
+
                 optical_flow_filter_ = OpticalFlowFilter::Update(
                         optical_flow_filter_, usec, flow);
+
                 ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
             }
 
@@ -427,6 +430,14 @@ namespace hf {
                 return FlyingStatus::IsFlying(fc.flying_status_);
             }
 
+            // ---------------------------------------------------------------
+
+            // Sensor fusion
+            EKF ekf_;
+            OpticalFlowFilter optical_flow_filter_;
+            ZRangerFilter zranger_filter_;
+            ImuFilter imu_filter_;
+
             // Vehicle state
             VehicleState state_;
 
@@ -435,12 +446,6 @@ namespace hf {
 
             // Flying status based on motors
             FlyingStatus flying_status_;
-
-            // Sensor fusion
-            ImuFilter imu_filter_;
-            EKF ekf_;
-            OpticalFlowFilter optical_flow_filter_;
-            ZRangerFilter zranger_filter_;
 
             // Devices
             IMU imu_;
@@ -465,6 +470,8 @@ namespace hf {
 
             // Support for LED blink
             Led led_;
+
+            // ---------------------------------------------------------------
 
     }; // class FlightController
 
