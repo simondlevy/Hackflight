@@ -23,6 +23,7 @@
 #include <hackflight.h>
 #include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
+#include <firmware/flying_status.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
@@ -63,11 +64,6 @@ namespace hf {
             static constexpr float kTiltAngleFlippedMinDeg = 75;
             static constexpr uint32_t kFailsafeMsec = 500;
 
-            // We say we are flying if one or more motors are running
-            // over the idle thrust.
-            static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
-            static constexpr float kMotorIdleMax = 0.1;
-
         public:
 
             FlightController() = default;
@@ -77,8 +73,7 @@ namespace hf {
             FlightController(
                     const VehicleState & state,
                     const Mode & mode,
-                    const bool is_flying,
-                    const uint32_t motor_check_msec,
+                    const FlyingStatus & flying_status,
                     const ImuFilter & imu_filter,
                     const EKF & ekf,
                     const OpticalFlowFilter & optical_flow_filter,
@@ -98,8 +93,7 @@ namespace hf {
                         :
                             state_(state),
                             mode_(mode),
-                            is_flying_(is_flying),
-                            motor_check_msec_(motor_check_msec),
+                            flying_status_(flying_status),
                             imu_filter_(imu_filter),
                             ekf_(ekf),
                             optical_flow_filter_(optical_flow_filter),
@@ -116,22 +110,6 @@ namespace hf {
                             stabilizer_pid_(stabilizer_pid),
                             pid_update_usec_prev_(pid_update_usec_prev),
                             led_(led) {}
-
-            static auto Update(
-                    const FlightController & fc,
-                    const uint32_t usec,
-                    const IMU::RawData imu_data,
-                    const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs,
-                    const uint16_t rawvolts,
-                    const Receiver & rx,
-                    const std::vector<float> motorvals) -> FlightController
-            {
-                // Most updates run on milliseconds
-                //const auto msec = usec / 1000;
-
-                return fc;
-            }
 
             auto Update(
                     const uint32_t usec,
@@ -152,7 +130,7 @@ namespace hf {
                 voltage_ = UpdateVoltage(*this, msec, rawvolts);
 
                 // Periodically run flying check to get status for EKF
-                UpdateFlyingStatus(msec, motorvals);
+                flying_status_ = UpdateFlyingStatus(*this, msec, motorvals);
 
                 // Blink LED to indicate status
                 led_ = UpdateLed(*this,
@@ -320,86 +298,21 @@ namespace hf {
                         Receiver::GetYaw(rx));
             }
 
-            // ---------------------------------------------------------------
-
-            // Vehicle state
-            VehicleState state_;
-
-            // Idle, armed, etc.
-            Mode mode_;
-
-            // Flying status based on motors
-            bool is_flying_;
-            uint32_t motor_check_msec_;
-
-            // Sensor fusion
-            ImuFilter imu_filter_;
-            EKF ekf_;
-            OpticalFlowFilter optical_flow_filter_;
-            ZRangerFilter zranger_filter_;
-
-            // Devices
-            IMU imu_;
-
-            // Voltage sensing
-            float voltage_;
-
-            // Timers
-            Timer ekf_prediction_timer_;
-            Timer flying_check_timer_;
-            Timer voltage_sensing_timer_;
-            Timer telemetry_timer_; 
-            Timer hover_timer_;
-            Timer heartbeat_timer_; 
-            Timer fast_blink_timer_;
-
-            // PID control for stabilize-only
-            StabilizerPidController stabilizer_pid_;
-
-            // Support for microsecond PID control timing
-            uint32_t pid_update_usec_prev_;
-
-            // Support for LED blink
-            Led led_;
-
-            // ---------------------------------------------------------------
-
-            auto AreMotorsAboveIdle(
+            static auto UpdateFlyingStatus(
+                    const FlightController & fc,
                     const uint32_t msec,
-                    const std::vector<float> motorvals) -> bool
+                    const std::vector<float> motorvals) -> FlyingStatus
             {
-                auto is_thrust_hover_idle = false;
+                return 
 
-                for (auto motorval : motorvals) {
-                    if (motorval > kMotorIdleMax) {
-                        is_thrust_hover_idle = true;
-                        break;
-                    }
-                }
+                    fc.mode_ == kModeIdle || fc.mode_ == kModePanic ? 
+                    FlyingStatus(false, 0) :
 
-                motor_check_msec_ = is_thrust_hover_idle ? msec :
-                    motor_check_msec_;
+                    Timer::IsReady(fc.flying_check_timer_) ?
+                    FlyingStatus::Update(fc.flying_status_, msec, motorvals) :
 
-                return  motor_check_msec_ > 0 &&
-                    (msec - motor_check_msec_) <
-                    kFlyingHysteresisThresholdMsec;
+                    fc.flying_status_;
             }
-
-            void UpdateFlyingStatus(
-                    const uint32_t msec,
-                    const std::vector<float> motorvals)
-            {
-                is_flying_ = 
-
-                    mode_ == kModeIdle || mode_ == kModePanic  ? false :
-
-                    Timer::IsReady(flying_check_timer_) ?
-                    AreMotorsAboveIdle(msec, motorvals) :
-
-                    is_flying_;
-            }
-
-            // ---------------------------------------------------------------
 
             static auto UpdateLed(
                     const FlightController & fc,
@@ -430,7 +343,7 @@ namespace hf {
 
                 // Periodically run the EKF prediction step
                 if (Timer::IsReady(fc.ekf_prediction_timer_)) {
-                    ekf= EKF::Predict(ekf, msec, fc.is_flying_); 
+                    ekf = EKF::Predict(ekf, msec, IsFlying(fc));
                 }
 
                 // Do EKF fast-update with IMU readings
@@ -445,7 +358,7 @@ namespace hf {
                 const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
                 return StabilizerPidController::Run(fc.stabilizer_pid_,
-                        fc.is_flying_, dt, fc.state_, MakeSetpoint(rx));
+                        IsFlying(fc), dt, fc.state_, MakeSetpoint(rx));
             }
 
             static auto UpdateVoltage(
@@ -508,6 +421,50 @@ namespace hf {
                     //  Default: stay in current mode
                     fc.mode_;
             }
+
+            static auto IsFlying(const FlightController & fc) -> bool
+            {
+                return FlyingStatus::IsFlying(fc.flying_status_);
+            }
+
+            // Vehicle state
+            VehicleState state_;
+
+            // Idle, armed, etc.
+            Mode mode_;
+
+            // Flying status based on motors
+            FlyingStatus flying_status_;
+
+            // Sensor fusion
+            ImuFilter imu_filter_;
+            EKF ekf_;
+            OpticalFlowFilter optical_flow_filter_;
+            ZRangerFilter zranger_filter_;
+
+            // Devices
+            IMU imu_;
+
+            // Voltage sensing
+            float voltage_;
+
+            // Timers
+            Timer ekf_prediction_timer_;
+            Timer flying_check_timer_;
+            Timer voltage_sensing_timer_;
+            Timer telemetry_timer_; 
+            Timer hover_timer_;
+            Timer heartbeat_timer_; 
+            Timer fast_blink_timer_;
+
+            // PID control for stabilize-only
+            StabilizerPidController stabilizer_pid_;
+
+            // Support for microsecond PID control timing
+            uint32_t pid_update_usec_prev_;
+
+            // Support for LED blink
+            Led led_;
 
     }; // class FlightController
 
