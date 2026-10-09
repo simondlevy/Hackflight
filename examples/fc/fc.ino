@@ -258,7 +258,7 @@ void setup()
 
 void loop()
 {
-    (void)ProfilerRun;
+    ProfilerRun();
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
@@ -271,10 +271,11 @@ void loop()
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
 
-    // Run sensor fusion on hover-deck
-    if (hf::FlightController::ShouldUpdateHover(fc_)) {
-        fc_.UpdateHoverDeck(micros(), ZRangerRead(), OpticalFlowRead());
-    }
+    // Run sensor fusion on hover-deck as indicated
+    fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
+        hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
+                OpticalFlowRead()) :
+        fc_;
 
     // Blink LED to indicate status
     const auto led_status = hf::FlightController::GetLedStatus(fc_);

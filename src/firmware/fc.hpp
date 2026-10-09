@@ -70,6 +70,30 @@ namespace hf {
 
             FlightController(const FlightController & other) = default;
 
+            FlightController(const FlightController & fc,
+                    const EKF & ekf,
+                    const OpticalFlowFilter & optical_flow_filter,
+                    const ZRangerFilter & zranger_filter)
+                :
+                    ekf_(ekf),
+                    optical_flow_filter_(optical_flow_filter),
+                    zranger_filter_(zranger_filter),
+                    state_(fc.state_),
+                    mode_(fc.mode_),
+                    flying_status_(fc.flying_status_),
+                    imu_(fc.imu_),
+                    voltage_(fc.voltage_),
+                    ekf_prediction_timer_(fc.ekf_prediction_timer_),
+                    flying_check_timer_(fc.flying_check_timer_),
+                    voltage_sensing_timer_(fc.voltage_sensing_timer_),
+                    telemetry_timer_(fc.telemetry_timer_), 
+                    hover_timer_(fc.hover_timer_),
+                    heartbeat_timer_(fc.heartbeat_timer_), 
+                    fast_blink_timer_(fc.fast_blink_timer_),
+                    stabilizer_pid_(fc.stabilizer_pid_),
+                    pid_update_usec_prev_(fc.pid_update_usec_prev_),
+                    led_(fc.led_) {}
+
             FlightController(
                     const EKF & ekf,
                     const OpticalFlowFilter & optical_flow_filter,
@@ -90,27 +114,26 @@ namespace hf {
                     const StabilizerPidController & stabilizer_pid,
                     const uint32_t pid_update_usec_prev,
                     const Led & led)
-                        :
-                            ekf_(ekf),
-                            optical_flow_filter_(optical_flow_filter),
-                            zranger_filter_(zranger_filter),
-                            imu_filter_(imu_filter),
-
-                            state_(state),
-                            mode_(mode),
-                            flying_status_(flying_status),
-                            imu_(imu),
-                            voltage_(voltage),
-                            ekf_prediction_timer_(ekf_prediction_timer),
-                            flying_check_timer_(flying_check_timer),
-                            voltage_sensing_timer_(voltage_sensing_timer),
-                            telemetry_timer_(telemetry_timer), 
-                            hover_timer_(hover_timer),
-                            heartbeat_timer_(heartbeat_timer), 
-                            fast_blink_timer_(fast_blink_timer),
-                            stabilizer_pid_(stabilizer_pid),
-                            pid_update_usec_prev_(pid_update_usec_prev),
-                            led_(led) {}
+                :
+                    ekf_(ekf),
+                    optical_flow_filter_(optical_flow_filter),
+                    zranger_filter_(zranger_filter),
+                    imu_filter_(imu_filter),
+                    state_(state),
+                    mode_(mode),
+                    flying_status_(flying_status),
+                    imu_(imu),
+                    voltage_(voltage),
+                    ekf_prediction_timer_(ekf_prediction_timer),
+                    flying_check_timer_(flying_check_timer),
+                    voltage_sensing_timer_(voltage_sensing_timer),
+                    telemetry_timer_(telemetry_timer), 
+                    hover_timer_(hover_timer),
+                    heartbeat_timer_(heartbeat_timer), 
+                    fast_blink_timer_(fast_blink_timer),
+                    stabilizer_pid_(stabilizer_pid),
+                    pid_update_usec_prev_(pid_update_usec_prev),
+                    led_(led) {}
 
             auto Update(
                     const uint32_t usec,
@@ -178,18 +201,23 @@ namespace hf {
                 pid_update_usec_prev_ = usec;
             }
 
-            void UpdateHoverDeck(
+            static auto UpdateHover(
+                    const FlightController & fc,
                     const uint32_t usec,
                     const float zdistance,
-                    const OpticalFlowData flow)
+                    const OpticalFlowData flow) -> FlightController
             {
-                zranger_filter_ = ZRangerFilter::Update(
-                        zranger_filter_, zdistance);
+                const auto zranger_filter = ZRangerFilter::Update(
+                        fc.zranger_filter_, zdistance);
 
-                optical_flow_filter_ = OpticalFlowFilter::Update(
-                        optical_flow_filter_, usec, flow);
+                const auto optical_flow_filter = OpticalFlowFilter::Update(
+                        fc.optical_flow_filter_, usec, flow);
 
-                ekf_ = EKF::Update(ekf_, zranger_filter_, optical_flow_filter_);
+                const auto ekf = EKF::Update(
+                        fc.ekf_, zranger_filter, optical_flow_filter);
+
+                return FlightController(fc, ekf, optical_flow_filter,
+                        zranger_filter);
             }
 
             static auto GetTelemetryBytes(
