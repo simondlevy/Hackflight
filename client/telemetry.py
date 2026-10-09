@@ -57,6 +57,10 @@ class Telemetry(MspParser):
         argparser.add_argument('-p', '--port', default='/dev/tinypico',
                                help='Serial port for dongle')
 
+        argparser.add_argument('-c', '--continuous_logging',
+                               action='store_true',
+                               help='Continuous logging')
+
         args = argparser.parse_args()
 
         try:
@@ -69,6 +73,8 @@ class Telemetry(MspParser):
         self.start_time = time.time()
 
         self.outfile = None
+
+        self.continuous_logging = args.continuous_logging
 
         try:
 
@@ -137,7 +143,7 @@ class Telemetry(MspParser):
                phi, theta, psi, dx, dy, z, dz))
 
         # Don't log until armed
-        if mode > 0:
+        if self.continuous_logging or mode > 0:
             self.outfile.write(
                     '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
                     % (time.time() - self.start_time, mode, volts, thrust,
