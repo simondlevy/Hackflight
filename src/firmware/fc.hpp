@@ -81,7 +81,6 @@ namespace hf {
                     state_(fc.state_),
                     mode_(fc.mode_),
                     flying_status_(fc.flying_status_),
-                    imu_(fc.imu_),
                     voltage_(fc.voltage_),
                     ekf_prediction_timer_(fc.ekf_prediction_timer_),
                     flying_check_timer_(fc.flying_check_timer_),
@@ -102,7 +101,6 @@ namespace hf {
                     const VehicleState & state,
                     const Mode & mode,
                     const FlyingStatus & flying_status,
-                    const IMU & imu,
                     const float voltage,
                     const Timer & ekf_prediction_timer,
                     const Timer & flying_check_timer,
@@ -122,7 +120,6 @@ namespace hf {
                     state_(state),
                     mode_(mode),
                     flying_status_(flying_status),
-                    imu_(imu),
                     voltage_(voltage),
                     ekf_prediction_timer_(ekf_prediction_timer),
                     flying_check_timer_(flying_check_timer),
@@ -161,91 +158,42 @@ namespace hf {
                         UpdateImuFilter(fc, msec, imu_data, gyro_range_dps,
                             accel_range_gs),
 
-                        fc.state_,
+                        EKF::getVehicleState(fc.ekf_),
 
                         UpdateMode(fc, msec, rx, false), // no hover yet
 
                         UpdateFlyingStatus(fc, msec, motorvals),
 
-                        fc.imu_,
-                        fc.voltage_,
-                        fc.ekf_prediction_timer_,
-                        fc.flying_check_timer_,
-                        fc.voltage_sensing_timer_,
-                        fc.telemetry_timer_,
-                        fc.hover_timer_,
-                        fc.heartbeat_timer_,
-                        fc.fast_blink_timer_,
-                        fc.stabilizer_pid_,
-                        fc.pid_update_usec_prev_,
-                        fc.led_
-                );
-            }
+                        UpdateVoltage(fc, msec, rawvolts),
 
-            void Update(
-                    const uint32_t usec,
-                    const IMU::RawData imu_data,
-                    const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs,
-                    const uint16_t rawvolts,
-                    const Receiver & rx,
-                    const std::vector<float> motorvals)
-            {
-                // Most updates run on milliseconds
-                const auto msec = usec / 1000;
+                        Timer::Update(fc.ekf_prediction_timer_,
+                                kEkfPredictionRate, msec),
 
-                // Safely update flight mode
-                mode_ = UpdateMode(*this, msec, rx, false); // no hover request
+                        Timer::Update(fc.flying_check_timer_,
+                                kFlyingCheckRate, msec),
 
-                // Sense voltage periodically
-                voltage_ = UpdateVoltage(*this, msec, rawvolts);
+                        Timer::Update(fc.voltage_sensing_timer_,
+                                kVoltageSensingRate, msec),
 
-                // Periodically run flying check to get status for EKF
-                flying_status_ = UpdateFlyingStatus(*this, msec, motorvals);
+                        Timer::Update(fc.telemetry_timer_, 
+                                kTelemetryRate, msec),
 
-                // Blink LED to indicate status
-                led_ = UpdateLed(*this,
-                        msec, imu_filter_.is_gyro_calibrated && mode_ !=
-                        kModePanic);
+                        Timer::Update(fc.hover_timer_,
+                                kHoverDeckRate, msec),
 
-                // Update the IMU filter with raw IMU data
-                imu_filter_ = UpdateImuFilter(*this, msec, imu_data,
-                        gyro_range_dps, accel_range_gs);
+                        Timer::Update(fc.heartbeat_timer_, 
+                                kLedHeartbeatRate, msec),
 
-                // Update state estimator
-                ekf_ = UpdateStateEstimator(*this, msec);
+                        Timer::Update(fc.fast_blink_timer_, 
+                                kLedFastBlinkRate, msec),
 
-                // Get state from estimator
-                state_ = EKF::getVehicleState(ekf_);
+                        UpdatePidController(fc, usec, rx),
 
-                // Update timers
+                        usec,
 
-                ekf_prediction_timer_ = Timer::Update(ekf_prediction_timer_,
-                        kEkfPredictionRate, msec);
-
-                telemetry_timer_ = Timer::Update(telemetry_timer_, 
-                        kTelemetryRate, msec);
-
-                hover_timer_ = Timer::Update(hover_timer_,
-                        kHoverDeckRate, msec);
-
-                flying_check_timer_ = Timer::Update(flying_check_timer_,
-                        kFlyingCheckRate, msec);
-
-                heartbeat_timer_ = Timer::Update(heartbeat_timer_, 
-                        kLedHeartbeatRate, msec);
-
-                fast_blink_timer_ = Timer::Update(fast_blink_timer_, 
-                        kLedFastBlinkRate, msec);
-
-                voltage_sensing_timer_ = Timer::Update(voltage_sensing_timer_,
-                        kVoltageSensingRate, msec);
-
-                // Run PID controller to get final setpoint
-                stabilizer_pid_ = UpdatePidController(*this, usec, rx);
-
-                // Track updates
-                pid_update_usec_prev_ = usec;
+                        UpdateLed(fc, msec,fc.imu_filter_.is_gyro_calibrated
+                                && fc.mode_ != kModePanic)
+                            );
             }
 
             static auto UpdateHover(
@@ -521,9 +469,6 @@ namespace hf {
 
             // Flying status based on motors
             FlyingStatus flying_status_;
-
-            // Devices
-            IMU imu_;
 
             // Voltage sensing
             float voltage_;

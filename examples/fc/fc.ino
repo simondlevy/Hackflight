@@ -258,15 +258,15 @@ void setup()
 
 void loop()
 {
-    ProfilerRun();
+    (void)ProfilerRun;
 
     // Receiver parses new data via serial event, so check arming here
     rx_ = hf::Receiver::CheckArming(rx_);
 
     // Update core algorithm with all inputs and run PID controller
-    fc_.Update(micros(), ImuRead(), ImuGyroRangeDps(),
-            ImuAccelRangeGs(), analogRead(kVoltageInputPin), rx_,
-            MotorsGetValues());
+    fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
+            ImuGyroRangeDps(), ImuAccelRangeGs(), analogRead(kVoltageInputPin),
+            rx_, MotorsGetValues());
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
