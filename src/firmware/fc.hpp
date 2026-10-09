@@ -150,10 +150,39 @@ namespace hf {
 
                 (void)msec;
 
-                return fc;
+                return FlightController(
+
+                        UpdateStateEstimator(fc, msec),
+
+                        fc.optical_flow_filter_,
+
+                        fc.zranger_filter_,
+
+                        UpdateImuFilter(fc, msec, imu_data, gyro_range_dps,
+                            accel_range_gs),
+
+                        fc.state_,
+
+                        UpdateMode(fc, msec, rx, false), // no hover yet
+
+                        UpdateFlyingStatus(fc, msec, motorvals),
+
+                        fc.imu_,
+                        fc.voltage_,
+                        fc.ekf_prediction_timer_,
+                        fc.flying_check_timer_,
+                        fc.voltage_sensing_timer_,
+                        fc.telemetry_timer_,
+                        fc.hover_timer_,
+                        fc.heartbeat_timer_,
+                        fc.fast_blink_timer_,
+                        fc.stabilizer_pid_,
+                        fc.pid_update_usec_prev_,
+                        fc.led_
+                );
             }
 
-             void Update(
+            void Update(
                     const uint32_t usec,
                     const IMU::RawData imu_data,
                     const int16_t gyro_range_dps,
