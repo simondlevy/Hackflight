@@ -24,7 +24,7 @@
 
 #include <datatypes.hpp>
 #include <num.hpp>
-#include <pidcontrol/hover.hpp>
+#include <pidcontrol/new.hpp>
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
 
@@ -42,16 +42,16 @@ namespace hf {
 
             Dynamics dynamics;
 
-            HoverPidController pid_controller;
+            PidController pid_controller;
 
             Simulator() = default;
 
             Simulator(const Pose & pose)
                 : dynamics(Dynamics(pose)),
-                pid_controller(HoverPidController()) {}
+                pid_controller(PidController()) {}
 
             Simulator(const Dynamics & dynamics,
-                    const HoverPidController & pid_controller)
+                    const PidController & pid_controller)
                 : dynamics(dynamics), pid_controller(pid_controller) {}
 
             static auto Step(
@@ -80,8 +80,14 @@ namespace hf {
                     for (uint32_t j=0; j<kPidFastFreq/kPidSlowFreq; ++j) {
 
                         // Run PID control to get new setpoint
-                        pid_controller = HoverPidController::Run(
-                                pid_controller, dt, mode, state, setpoint);
+                        pid_controller = PidController::Run(
+                                pid_controller,
+                                true,
+                                dt,
+                                mode,
+                                state,
+                                setpoint,
+                                PidController::kControlHover);
 
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces
