@@ -36,7 +36,7 @@
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger.hpp>
 #include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/stabilize.hpp>
+#include <pidcontrol/new.hpp>
 
 namespace hf {
 
@@ -90,7 +90,7 @@ namespace hf {
                     hover_timer_(fc.hover_timer_),
                     heartbeat_timer_(fc.heartbeat_timer_), 
                     fast_blink_timer_(fc.fast_blink_timer_),
-                    stabilizer_pid_(fc.stabilizer_pid_),
+                    pid_controller_(fc.pid_controller_),
                     pid_update_usec_prev_(fc.pid_update_usec_prev_),
                     led_(fc.led_) {}
 
@@ -110,7 +110,7 @@ namespace hf {
                     const Timer & hover_timer,
                     const Timer & heartbeat_timer, 
                     const Timer & fast_blink_timer,
-                    const StabilizerPidController & stabilizer_pid,
+                    const PidController & pid_controller,
                     const uint32_t pid_update_usec_prev,
                     const Led & led)
                 :
@@ -129,7 +129,7 @@ namespace hf {
                     hover_timer_(hover_timer),
                     heartbeat_timer_(heartbeat_timer), 
                     fast_blink_timer_(fast_blink_timer),
-                    stabilizer_pid_(stabilizer_pid),
+                    pid_controller_(pid_controller),
                     pid_update_usec_prev_(pid_update_usec_prev),
                     led_(led) {}
 
@@ -258,7 +258,7 @@ namespace hf {
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
             {
-                return fc.stabilizer_pid_.setpoint;
+                return fc.pid_controller_.setpoint;
             }
 
             static auto GetLedStatus(
@@ -380,11 +380,11 @@ namespace hf {
             static auto UpdatePidController(
                     const FlightController & fc,
                     const uint32_t usec,
-                    const Receiver & rx) -> StabilizerPidController
+                    const Receiver & rx) -> PidController
             {
                 const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
-                return StabilizerPidController::Run(fc.stabilizer_pid_,
+                return PidController::Run(fc.pid_controller_,
                         IsFlying(fc), dt, fc.state_, MakeSetpoint(rx));
             }
 
@@ -484,7 +484,7 @@ namespace hf {
             Timer fast_blink_timer_;
 
             // PID control for stabilize-only
-            StabilizerPidController stabilizer_pid_;
+            PidController pid_controller_;
 
             // Support for microsecond PID control timing
             uint32_t pid_update_usec_prev_;
