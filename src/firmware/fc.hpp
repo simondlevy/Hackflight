@@ -35,7 +35,8 @@
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger.hpp>
-#include <pidcontrol/hover.hpp>
+#include <pidcontrol/pids/position.hpp>
+#include <pidcontrol/stabilize.hpp>
 
 namespace hf {
 
