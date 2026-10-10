@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <array>
+#include <vector>
 
 namespace hf {
 
@@ -85,6 +86,19 @@ namespace hf {
                 payload[5 + 2 * count] = checksum;
 
                 return MspSerializer(payload, 6 + 2 * count);
+            }
+
+
+            static auto GetPayload(
+                    const MspSerializer & serializer) -> std::vector<uint8_t>
+            {
+                std::vector<uint8_t> payload;
+
+                for (uint8_t k=0; k<serializer.payload_size_; ++k) {
+                    payload.push_back(serializer.payload_[k]);
+                }
+
+                return payload;
             }
 
             static auto GetPayloadBytes(
