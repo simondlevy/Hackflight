@@ -294,6 +294,6 @@ void loop()
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
         const auto telemetry_bytes =
             hf::FlightController::GetTelemetryBytes(fc_, rx_);
-        Serial3.write(telemetry_bytes.bytes, telemetry_bytes.count);
+        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
 }

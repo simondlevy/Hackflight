@@ -217,7 +217,7 @@ namespace hf {
 
             static auto GetTelemetryBytes(
                     const FlightController &fc,
-                    const Receiver & rx) -> TelemetryBytes
+                    const Receiver & rx) -> std::vector<uint8_t>
             {
                 const auto setpoint = MakeSetpoint(rx);
 
@@ -250,9 +250,7 @@ namespace hf {
                         telemetry_serializer, kMspTelemetry,
                         data, 16);
 
-                return TelemetryBytes(
-                        MspSerializer::GetPayloadBytes(telemetry_serializer),
-                        MspSerializer::GetPayloadSize(telemetry_serializer));
+                return MspSerializer::GetPayload(telemetry_serializer);
             }
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
