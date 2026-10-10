@@ -70,7 +70,7 @@ namespace hf {
                 return PositionController(output, integral);
             }
 
-            static auto bypass(const float in) -> float
+            static auto Bypass(const float in) -> float
             {
                 return in * kMaxDemandDegrees;
             }

@@ -35,7 +35,6 @@
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger.hpp>
-#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/new.hpp>
 
 namespace hf {
@@ -320,8 +319,8 @@ namespace hf {
             {                
                 return Setpoint(
                         (Receiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
-                        PositionController::bypass(Receiver::GetRoll(rx)),
-                        PositionController::bypass(Receiver::GetPitch(rx)),
+                        Receiver::GetRoll(rx),
+                        Receiver::GetPitch(rx),
                         Receiver::GetYaw(rx));
             }
 

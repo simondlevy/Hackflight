@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <pidcontrol/pids/position.hpp>
 #include <pidcontrol/pids/rollpitch.hpp>
 #include <pidcontrol/pids/yaw.hpp>
 
@@ -53,11 +54,17 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> PidController
             {
+                const auto roll =
+                    PositionController::Bypass(setpoint_in.roll);
+
+                const auto pitch =
+                    PositionController::Bypass(setpoint_in.pitch);
+
                 const auto roll_pid = RollPitchPid::Run(s.roll_pid_,
-                        dt, airborne, setpoint_in.roll, state.phi, state.dphi);
+                        dt, airborne, roll, state.phi, state.dphi);
 
                 const auto pitch_pid = RollPitchPid::Run(s.pitch_pid_,
-                        dt, airborne, setpoint_in.pitch, state.theta, state.dtheta);
+                        dt, airborne, pitch, state.theta, state.dtheta);
 
                 const auto yaw_pid = YawPid::Run(s.yaw_pid_,
                         dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
