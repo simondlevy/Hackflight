@@ -134,22 +134,13 @@ namespace hf {
                 const auto pitch_demand = hold_position ? position_x_pid.output :
                     PositionController::Bypass(setpoint_in.pitch);
 
-                (void)roll_demand;
-                (void)pitch_demand;
-
                 // Stabilize  ------------------------------------------------
 
-                const auto roll =
-                    PositionController::Bypass(setpoint_in.roll);
-
-                const auto pitch =
-                    PositionController::Bypass(setpoint_in.pitch);
-
                 const auto roll_pid = RollPitchPid::Run(pc.roll_pid_,
-                        dt, airborne, roll, state.phi, state.dphi);
+                        dt, airborne, roll_demand, state.phi, state.dphi);
 
                 const auto pitch_pid = RollPitchPid::Run(pc.pitch_pid_,
-                        dt, airborne, pitch, state.theta, state.dtheta);
+                        dt, airborne, pitch_demand, state.theta, state.dtheta);
 
                 const auto yaw_pid = YawPid::Run(pc.yaw_pid_,
                         dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
