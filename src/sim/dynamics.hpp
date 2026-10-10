@@ -52,22 +52,19 @@ namespace hf {
 
             static constexpr float kRollPitchYawScale = 500;
 
-            // Vehicle state (Equation 11)
-            SimState state;
-
             Dynamics() = default;
 
             Dynamics& operator=(const Dynamics& other) = default;
 
             Dynamics(const Pose & pose)
-                : state(pose), airborne_(false) {}
+                : state_(pose), airborne_(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
-                : state(state), dstate_(dstate), airborne_(airborne) {}
+                : state_(state), dstate_(dstate), airborne_(airborne) {}
 
             static auto Update(
-                    const Dynamics & dyn,
+                    const Dynamics & dynamics,
                     const VehicleParams & vparams,
                     const float dt,
                     const Setpoint & forces,
@@ -82,28 +79,28 @@ namespace hf {
 
                 // -----------------------------------------------------------
 
-                const auto cphi = cos(dyn.state.phi);
-                const auto cnphi = cos(-dyn.state.phi);
-                const auto snphi = sin(-dyn.state.phi);
-                const auto ctheta = cos(dyn.state.theta);
-                const auto stheta = sin(dyn.state.theta);
-                const auto cpsi = cos(dyn.state.psi);
-                const auto spsi = sin(dyn.state.psi);
+                const auto cphi = cos(dynamics.state_.phi);
+                const auto cnphi = cos(-dynamics.state_.phi);
+                const auto snphi = sin(-dynamics.state_.phi);
+                const auto ctheta = cos(dynamics.state_.theta);
+                const auto stheta = sin(dynamics.state_.theta);
+                const auto cpsi = cos(dynamics.state_.psi);
+                const auto spsi = sin(dynamics.state_.psi);
 
                 const auto I = vparams.I;
                 const auto l = vparams.l;
                 const auto m = vparams.m;
 
-                const auto s = dyn.state;
-                const auto ds = dyn.dstate_;
+                const auto s = dynamics.state_;
+                const auto ds = dynamics.dstate_;
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
 
                 // Equation 12 line 6 for dz/dt in inertial (earth) frame
                 const auto airborne =
                     ddz > 0 ? true :
-                    dyn.airborne_ && s.dz < 0 && s.z <= 0 ? false :
-                    dyn.airborne_;
+                    dynamics.airborne_ && s.dz < 0 && s.z <= 0 ? false :
+                    dynamics.airborne_;
 
                 // Compute state as first temporal integral of first temporal
                 // derivative
@@ -138,7 +135,7 @@ namespace hf {
                             s.dpsi,
                             -l / I * u4);
 
-                return dyn.airborne_ && !airborne ? // just landed ?
+                return dynamics.airborne_ && !airborne ? // just landed ?
 
                     // yes: reset dynamics, keeping current pose
                     Dynamics(Pose(s.x, s.y, s.z, s.phi, s.theta, s.psi)) :
@@ -161,7 +158,15 @@ namespace hf {
                 return omega * omega;
             }
 
+            static auto GetSimState(const Dynamics & dynamics) -> SimState
+            {
+                return dynamics.state_;
+            }
+
         private:
+
+            // Vehicle state (Equation 11)
+            SimState state_;
 
             // Vehicle state first derivative (Equation 12)
             SimState dstate_;
