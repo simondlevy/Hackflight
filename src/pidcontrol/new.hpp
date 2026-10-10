@@ -76,7 +76,8 @@ namespace hf {
                     const Mode mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in,
-                    const ControlLevel=kControlHover) -> PidController
+                    const ControlLevel
+                    control_level=kControlHover) -> PidController
             {
                 // Altitude hold ---------------------------------------------
 
@@ -120,7 +121,11 @@ namespace hf {
                         dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
 
                 const auto setpoint_out = Setpoint(
+
+                        control_level > kControlStabilize ?
+                        climbrate_pid.output :
                         setpoint_in.thrust,
+
                         roll_pid.output,
                         pitch_pid.output,
                         yaw_pid.output);
