@@ -119,7 +119,7 @@ class PluginHelper {
 
         auto GetSetpoint() -> hf::Setpoint
         {
-            return simulator_.pid_controller.setpoint;
+            return hf::PidController::GetSetpoint(simulator_.pid_controller);
         }
 
         void SetDbodyFromState(const hf::VehicleParams vparams, const hf::SimState & state)

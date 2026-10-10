@@ -255,7 +255,7 @@ namespace hf {
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
             {
-                return fc.pid_controller_.setpoint;
+                return PidController::GetSetpoint(fc.pid_controller_);
             }
 
             static auto GetLedStatus(

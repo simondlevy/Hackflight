@@ -45,8 +45,6 @@ namespace hf {
 
             } ControlLevel;
 
-            Setpoint setpoint;
-
             PidController() = default;
 
             PidController& operator=(
@@ -63,7 +61,7 @@ namespace hf {
                     const YawPid & yaw_pid,
                     const Setpoint & setpoint)
                 :
-                    setpoint(setpoint),
+                    setpoint_(setpoint),
                     altitude_target_(altitude_target),
                     altitude_pid_(altitude_pid),
                     climbrate_pid_(climbrate_pid),
@@ -167,7 +165,14 @@ namespace hf {
                         setpoint_out);
             }
 
+            static auto GetSetpoint(const PidController & pc) -> Setpoint
+            {
+                return pc.setpoint_;
+            }
+
         private:
+
+            Setpoint setpoint_;
 
             float altitude_target_;
             AltitudeController altitude_pid_;

@@ -92,7 +92,8 @@ namespace hf {
 
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces
-                        const auto forces = effector_fun(pid_controller.setpoint);
+                        const auto forces = effector_fun(
+                                PidController::GetSetpoint(pid_controller));
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
