@@ -383,8 +383,14 @@ namespace hf {
             {
                 const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
-                return PidController::Run(fc.pid_controller_,
-                        IsFlying(fc), dt, fc.state_, MakeSetpoint(rx));
+                return PidController::Run(
+                        fc.pid_controller_,
+                        IsFlying(fc),
+                        dt,
+                        fc.mode_,
+                        fc.state_,
+                        MakeSetpoint(rx),
+                        PidController::kControlStabilize);
             }
 
             static auto UpdateVoltage(
