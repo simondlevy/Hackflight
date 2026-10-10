@@ -56,6 +56,8 @@ namespace hf {
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
+                    const PositionController & position_x_pid,
+                    const PositionController & position_y_pid,
                     const RollPitchPid & pitch_pid,
                     const RollPitchPid & roll_pid,
                     const YawPid & yaw_pid,
@@ -65,6 +67,8 @@ namespace hf {
                     altitude_target_(altitude_target),
                     altitude_pid_(altitude_pid),
                     climbrate_pid_(climbrate_pid),
+                    position_x_pid_(position_x_pid),
+                    position_y_pid_(position_y_pid),
                     pitch_pid_(pitch_pid),
                     roll_pid_(roll_pid),
                     yaw_pid_(yaw_pid) {}
@@ -103,6 +107,36 @@ namespace hf {
                             dt,
                             altitude_pid.output, state.dz);
 
+                // Position hold ---------------------------------------------
+
+                // Rotate world-coordinate velocities into body coordinates
+                const auto dxw = state.dx;
+                const auto dyw = state.dy;
+                const auto psi = Num::kDeg2Rad * state.psi;
+                const auto cospsi = cos(psi);
+                const auto sinpsi = sin(psi);
+                const auto dxb =  dxw * cospsi + dyw * sinpsi;
+                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
+
+                const auto position_y_pid =
+                    PositionController::Run(pc.position_y_pid_, airborne, dt,
+                            setpoint_in.roll, dyb);
+
+                const auto position_x_pid =
+                    PositionController::Run(pc.position_x_pid_, airborne, dt,
+                            setpoint_in.pitch, dxb);
+
+                const auto hold_position = control_level == kControlHover;
+
+                const auto roll_demand = hold_position ? position_y_pid.output :
+                    PositionController::Bypass(setpoint_in.roll);
+
+                const auto pitch_demand = hold_position ? position_x_pid.output :
+                    PositionController::Bypass(setpoint_in.pitch);
+
+                (void)roll_demand;
+                (void)pitch_demand;
+
                 // Stabilize  ------------------------------------------------
 
                 const auto roll =
@@ -134,6 +168,8 @@ namespace hf {
                         new_altitude_target,
                         altitude_pid,
                         climbrate_pid,
+                        pc.position_x_pid_,
+                        pc.position_y_pid_,
                         roll_pid,
                         pitch_pid,
                         yaw_pid,
@@ -145,6 +181,9 @@ namespace hf {
             float altitude_target_;
             AltitudeController altitude_pid_;
             ClimbRateController climbrate_pid_;
+
+            PositionController position_x_pid_;
+            PositionController position_y_pid_;
 
             RollPitchPid pitch_pid_;
             RollPitchPid roll_pid_;
