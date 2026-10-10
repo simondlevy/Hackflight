@@ -204,7 +204,7 @@ static void MotorsStart()
 
 static auto MotorsGetValues() -> std::vector<float>
 {
-    return hf::QuadXMixer::NewGetMotorValues(mixer_);
+    return hf::QuadXMixer::GetMotorValues(mixer_);
 }
 
 static void MotorsRun(const hf::Setpoint & setpoint)
