@@ -52,19 +52,16 @@ namespace hf {
 
             static constexpr float kRollPitchYawScale = 500;
 
-            // Vehicle state (Equation 11)
-            SimState state;
-
             Dynamics() = default;
 
             Dynamics& operator=(const Dynamics& other) = default;
 
             Dynamics(const Pose & pose)
-                : state(pose), airborne_(false) {}
+                : state_(pose), airborne_(false) {}
 
             Dynamics(const SimState & state, const SimState & dstate,
                     const bool airborne)
-                : state(state), dstate_(dstate), airborne_(airborne) {}
+                : state_(state), dstate_(dstate), airborne_(airborne) {}
 
             static auto Update(
                     const Dynamics & dyn,
@@ -82,19 +79,19 @@ namespace hf {
 
                 // -----------------------------------------------------------
 
-                const auto cphi = cos(dyn.state.phi);
-                const auto cnphi = cos(-dyn.state.phi);
-                const auto snphi = sin(-dyn.state.phi);
-                const auto ctheta = cos(dyn.state.theta);
-                const auto stheta = sin(dyn.state.theta);
-                const auto cpsi = cos(dyn.state.psi);
-                const auto spsi = sin(dyn.state.psi);
+                const auto cphi = cos(dyn.state_.phi);
+                const auto cnphi = cos(-dyn.state_.phi);
+                const auto snphi = sin(-dyn.state_.phi);
+                const auto ctheta = cos(dyn.state_.theta);
+                const auto stheta = sin(dyn.state_.theta);
+                const auto cpsi = cos(dyn.state_.psi);
+                const auto spsi = sin(dyn.state_.psi);
 
                 const auto I = vparams.I;
                 const auto l = vparams.l;
                 const auto m = vparams.m;
 
-                const auto s = dyn.state;
+                const auto s = dyn.state_;
                 const auto ds = dyn.dstate_;
 
                 const auto ddz = -wparams.g + (cphi * ctheta) / m * u1;
@@ -161,7 +158,15 @@ namespace hf {
                 return omega * omega;
             }
 
+            static SimState GetSimState(const Dynamics & d)
+            {
+                return d.state_;
+            }
+
         private:
+
+            // Vehicle state (Equation 11)
+            SimState state_;
 
             // Vehicle state first derivative (Equation 12)
             SimState dstate_;

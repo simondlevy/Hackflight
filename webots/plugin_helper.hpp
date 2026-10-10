@@ -112,7 +112,7 @@ class PluginHelper {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
                     effector_fun, vehicle_params);
 
-            const auto state = simulator_.dynamics.state;
+            const auto state = hf::Dynamics::GetSimState(simulator_.dynamics);
 
             return state;
         }

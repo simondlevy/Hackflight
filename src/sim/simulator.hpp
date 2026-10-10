@@ -74,7 +74,8 @@ namespace hf {
                     // Get vehicle state from dynamics and convert state values
                     // from doubles/radians to floats/degrees for PID
                     // controllers
-                    const auto state = SimStateToVehicleState(dynamics.state);
+                    const auto state = SimStateToVehicleState(
+                            Dynamics::GetSimState(dynamics));
 
                     // Run fast PID control and mixer in middle loop ----------
                     for (uint32_t j=0; j<kPidFastFreq/kPidSlowFreq; ++j) {
