@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <pidcontrol/pids/altitude.hpp>
-#include <pidcontrol/pids/climbrate.hpp>
-#include <pidcontrol/pids/position.hpp>
-#include <pidcontrol/pids/rollpitch.hpp>
-#include <pidcontrol/pids/yaw.hpp>
+#include <pids/altitude.hpp>
+#include <pids/climbrate.hpp>
+#include <pids/position.hpp>
+#include <pids/rollpitch.hpp>
+#include <pids/yaw.hpp>
 
 namespace hf {
 

@@ -35,7 +35,7 @@
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger.hpp>
-#include <pidcontrol/new.hpp>
+#include <pidcontrol.hpp>
 
 namespace hf {
 

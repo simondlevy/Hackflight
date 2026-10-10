@@ -24,7 +24,7 @@
 
 #include <datatypes.hpp>
 #include <num.hpp>
-#include <pidcontrol/new.hpp>
+#include <pidcontrol.hpp>
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
 
