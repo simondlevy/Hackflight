@@ -39,9 +39,6 @@ class PluginHelper {
 
         static constexpr char kWorldVariableName[] = "WORLD";
 
-        // Platform-independent simulator simulator loop
-        hf::Simulator simulator_;
-
     public:
 
         typedef struct {
@@ -156,4 +153,7 @@ class PluginHelper {
     private:
 
         FILE * logfile_;
+
+        // Platform-independent simulator simulator loop
+        hf::Simulator simulator_;
 };
