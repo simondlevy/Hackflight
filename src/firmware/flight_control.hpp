@@ -91,7 +91,9 @@ namespace hf {
                     pid_controller_(fc.pid_controller_),
                     pid_update_usec_prev_(fc.pid_update_usec_prev_),
                     led_(fc.led_),
-                    was_arming_button_up_(fc.was_arming_button_up_) {}
+                    was_arming_button_up_(fc.was_arming_button_up_),
+                    receiver_parser_(fc.receiver_parser_),
+                    receiver_message_msec_(fc.receiver_message_msec_) {}
 
             FlightController(
                     const EKF & ekf,
@@ -112,7 +114,9 @@ namespace hf {
                     const PidController & pid_controller,
                     const uint32_t pid_update_usec_prev,
                     const Led & led,
-                    const bool was_arming_button_up)
+                    const bool was_arming_button_up,
+                    const MspParser & receiver_parser,
+                    const uint32_t receiver_message_msec)
                 :
                     ekf_(ekf),
                     optical_flow_filter_(optical_flow_filter),
@@ -132,9 +136,48 @@ namespace hf {
                     pid_controller_(pid_controller),
                     pid_update_usec_prev_(pid_update_usec_prev),
                     led_(led),
-                    was_arming_button_up_(was_arming_button_up) {}
+                    was_arming_button_up_(was_arming_button_up),
+                    receiver_parser_(receiver_parser),
+                    receiver_message_msec_(receiver_message_msec) {}
 
-             static auto Update(
+            static auto ParseReceiverByte(const FlightController & fc,
+                    const uint8_t byte,
+                    const uint32_t msec)
+            {
+                auto parser = MspParser::Parse(fc.receiver_parser_, byte);
+
+                const auto got_new_message =
+                    MspParser::GetId(parser) == kMspSetChannels;
+
+                const auto timestamp_msec =
+                    got_new_message ? msec : fc.receiver_message_msec_;
+
+                return FlightController(
+                        fc.ekf_,
+                        fc.optical_flow_filter_,
+                        fc.zranger_filter_,
+                        fc.imu_filter_,
+                        fc.state_,
+                        fc.mode_,
+                        fc.flying_status_,
+                        fc.voltage_,
+                        fc.ekf_prediction_timer_,
+                        fc.flying_check_timer_,
+                        fc.voltage_sensing_timer_,
+                        fc.telemetry_timer_, 
+                        fc.hover_timer_,
+                        fc.heartbeat_timer_, 
+                        fc.fast_blink_timer_,
+                        fc.pid_controller_,
+                        fc.pid_update_usec_prev_,
+                        fc.led_,
+                        fc.was_arming_button_up_,
+                        parser,
+                        timestamp_msec);
+
+            }
+
+            static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,
                     const IMU::RawData imu_data,
@@ -169,7 +212,7 @@ namespace hf {
                         UpdateVoltage(fc, msec, rawvolts),
 
                         Timer::Update(fc.ekf_prediction_timer_,
-                                kEkfPredictionRate, msec),
+                            kEkfPredictionRate, msec),
 
                         Timer::Update(fc.flying_check_timer_,
                                 kFlyingCheckRate, msec),
@@ -196,7 +239,12 @@ namespace hf {
                         UpdateLed(fc, msec,fc.imu_filter_.is_gyro_calibrated
                                 && fc.mode_ != kModePanic),
 
-                        !Receiver::IsArmingButtonDown(rx));
+                        !Receiver::IsArmingButtonDown(rx),
+
+                        fc.receiver_parser_,
+
+                        fc.receiver_message_msec_);
+
             }
 
             static auto UpdateHover(
@@ -511,6 +559,10 @@ namespace hf {
 
             // Safety
             bool was_arming_button_up_;
+
+            // MSP receiver
+            MspParser receiver_parser_;
+            uint32_t receiver_message_msec_;
 
             // ---------------------------------------------------------------
 

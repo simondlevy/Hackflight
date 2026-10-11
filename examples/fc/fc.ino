@@ -52,7 +52,10 @@ static hf::Receiver rx_;
 void serialEvent3()
 {
     while (Serial3.available()) {
-        rx_ = hf::Receiver::ParseByte(rx_, Serial3.read(), millis());
+        const auto byt = Serial3.read();
+        const auto msec = millis();
+        //rx_ = hf::Receiver::ParseByte(rx_, byt, msec);
+        fc_ = hf::FlightController::ParseReceiverByte(fc_, byt, msec);
     }
 }
 
@@ -271,7 +274,7 @@ void setup()
 
 void loop()
 {
-    ProfilerRun(false);
+    ProfilerRun();
 
     //static hf::Debugger debugger_;
     //debugger_.Report(millis(), rx_);
