@@ -147,7 +147,7 @@ namespace hf {
 
                         control_level > kControlStabilize ?
                         climbrate_pid.output :
-                        setpoint_in.thrust,
+                        (setpoint_in.thrust + 1) / 2, // [-1,+1] => [0,1]
 
                         roll_pid.output,
                         pitch_pid.output,

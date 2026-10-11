@@ -313,7 +313,7 @@ namespace hf {
             static auto MakeSetpoint(const Receiver & rx) -> Setpoint
             {                
                 return Setpoint(
-                        (Receiver::GetThrottle(rx)+1)/2, // [-1,+1] => [0,1]
+                        Receiver::GetThrottle(rx),
                         Receiver::GetRoll(rx),
                         Receiver::GetPitch(rx),
                         Receiver::GetYaw(rx));
