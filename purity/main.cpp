@@ -16,7 +16,7 @@
    along with this program. If not, see <http:--www.gnu.org/licenses/>.
  */
 
-#include <firmware/fc.hpp>
+#include <firmware/flight_control.hpp>
 
 int main()
 {

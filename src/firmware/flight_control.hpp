@@ -21,7 +21,6 @@
 #include <vector>
 
 #include <hackflight.h>
-#include <firmware/debugger.hpp>
 #include <firmware/estimator/ekf.hpp>
 #include <firmware/flying_status.hpp>
 #include <firmware/imu/filter.hpp>
