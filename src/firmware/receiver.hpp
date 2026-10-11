@@ -120,6 +120,16 @@ namespace hf {
                 return GetSwitchStatus(rx.parser_, 4);
             }
 
+            static auto IsHoverButtonDown(const Receiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 5);
+            }
+
+            static auto IsAutopilotButtonDown(const Receiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 6);
+            }
+
         private:
 
             MspParser parser_;

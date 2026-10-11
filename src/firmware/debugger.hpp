@@ -113,8 +113,10 @@ namespace hf {
                                 Receiver::GetPitch(rx),
                                 Receiver::GetYaw(rx)));
 
-                       printf(" | arm=%d | time (msec) = %d\n", 
-                                Receiver::IsArmed(rx),
+                       printf(" | arm=%d hov=%d aut=%d | time (msec) = %d\n", 
+                                Receiver::IsArmingButtonDown(rx),
+                                Receiver::IsHoverButtonDown(rx),
+                                Receiver::IsAutopilotButtonDown(rx),
                                 (int)Receiver::GetTimestampMsec(rx));
                 }
             }
