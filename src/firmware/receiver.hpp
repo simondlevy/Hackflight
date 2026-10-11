@@ -35,17 +35,17 @@ namespace hf {
 
             Receiver(
                     const MspParser & parser,
-                    const bool is_down,
-                    const bool was_down,
+                    const bool is_throttle_down,
+                    const bool was_throttle_down,
                     const bool armed,
                     const uint32_t timestamp_msec) 
                 : parser_(parser),
-                is_down_(is_down),
-                was_down_(was_down),
+                is_throttle_down_(is_throttle_down),
+                was_throttle_down_(was_throttle_down),
                 is_armed_(armed),
                 timestamp_msec_(timestamp_msec) {}
 
-            Receiver() : was_down_(true) {}
+            Receiver() : was_throttle_down_(true) {}
 
             static auto ParseByte(
                     const Receiver & rx,
@@ -58,28 +58,28 @@ namespace hf {
                 const auto got_new_message =
                     MspParser::GetId(parser) == kMspSetChannels;
 
-                const auto is_down =
+                const auto is_throttle_down =
                     got_new_message ?
                     MspParser::GetShort(parser, 4) > 0 :
-                    rx.is_down_;
+                    rx.is_throttle_down_;
 
                 const auto timestamp_msec =
                     got_new_message ? time_msec : rx.timestamp_msec_;
 
-                return Receiver(parser, is_down, rx.was_down_,
+                return Receiver(parser, is_throttle_down, rx.was_throttle_down_,
                         rx.is_armed_, timestamp_msec);
             }
 
             static auto CheckArming(const Receiver & rx) -> Receiver
             {
-                const auto armed = !rx.is_down_ ? false :
+                const auto armed = !rx.is_throttle_down_ ? false :
 
-                    rx.is_down_ && !rx.was_down_ &&
+                    rx.is_throttle_down_ && !rx.was_throttle_down_ &&
                     GetThrottle(rx) < kThrottleDownMax ? true :
 
                     rx.is_armed_;
 
-                return Receiver(rx.parser_, rx.is_down_, rx.is_down_,
+                return Receiver(rx.parser_, rx.is_throttle_down_, rx.is_throttle_down_,
                         armed, rx.timestamp_msec_);
             }
 
@@ -118,8 +118,8 @@ namespace hf {
         private:
 
             MspParser parser_;
-            bool is_down_;
-            bool was_down_;
+            bool is_throttle_down_;
+            bool was_throttle_down_;
             bool is_armed_;
             uint32_t timestamp_msec_;
 
