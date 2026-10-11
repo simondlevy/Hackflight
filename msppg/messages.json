@@ -20,24 +20,6 @@
    {"dpsi":   "float"}
   ],
 
-  "SET_ARMING": 
-  [{"ID": 200},
-   {"comment": "Dis/arm"},
-   {"arm":    "byte"}
-  ],
-
-  "SET_IDLE": 
-  [{"ID": 201}
-  ],
-
-  "SET_HOVER": 
-  [{"ID": 202},
-   {"thrust" : "float"},
-   {"vx":      "float"},
-   {"vy":      "float"},
-   {"yaw":     "float"}
-  ],
-
   "SET_CHANNELS": 
   [{"ID": 203},
    {"throttle":  "short"},
