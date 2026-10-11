@@ -37,7 +37,6 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/optical_flow.hpp>
-#include <firmware/receiver.hpp>
 #include <mixers/quadx.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;
@@ -47,15 +46,11 @@ static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
 
-static hf::Receiver rx_;
-
 void serialEvent3()
 {
     while (Serial3.available()) {
-        const auto byt = Serial3.read();
-        const auto msec = millis();
-        rx_ = hf::Receiver::ParseByte(rx_, byt, msec);
-        fc_ = hf::FlightController::ParseReceiverByte(fc_, byt, msec);
+        fc_ = hf::FlightController::ParseReceiverByte(
+                fc_, Serial3.read(), millis());
     }
 }
 
@@ -274,15 +269,13 @@ void setup()
 
 void loop()
 {
-    ProfilerRun();
-
-    //static hf::Debugger debugger_;
-    //debugger_.Report(millis(), rx_);
+    // We should reach aprrox. 1600 Hz in this loop
+    ProfilerRun(false);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
             ImuGyroRangeDps(), ImuAccelRangeGs(), analogRead(kVoltageInputPin),
-            rx_, MotorsGetValues(), hf::PidController::kControlAltHold);
+            MotorsGetValues(), hf::PidController::kControlStabilize);
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
@@ -309,7 +302,7 @@ void loop()
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
         const auto telemetry_bytes =
-            hf::FlightController::GetTelemetryBytes(fc_, rx_);
+            hf::FlightController::GetTelemetryBytes(fc_);
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
 }

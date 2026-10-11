@@ -23,7 +23,6 @@
 #include <firmware/imu/sensor.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/optical_flow.hpp>
-#include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {
@@ -100,24 +99,6 @@ namespace hf {
 
                     printf("%5d | %s=%s\n",
                             helper_.count, label, flag ? "true" : "false");
-                }
-            }
-
-            void Report(const uint32_t msec, const Receiver & rx)
-            {
-                if (helper_.Ready(msec)) {
-
-                    ReportSetpoint(Setpoint(
-                                Receiver::GetThrottle(rx),
-                                Receiver::GetRoll(rx),
-                                Receiver::GetPitch(rx),
-                                Receiver::GetYaw(rx)));
-
-                       printf(" | arm=%d hov=%d aut=%d | time (msec) = %d\n", 
-                                Receiver::IsArmingButtonDown(rx),
-                                Receiver::IsHoverButtonDown(rx),
-                                Receiver::IsAutopilotButtonDown(rx),
-                                (int)Receiver::GetTimestampMsec(rx));
                 }
             }
 

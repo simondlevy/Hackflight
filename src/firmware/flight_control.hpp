@@ -30,7 +30,6 @@
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
 #include <firmware/optical_flow.hpp>
-#include <firmware/receiver.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
 #include <firmware/zranger.hpp>
@@ -178,7 +177,6 @@ namespace hf {
                         fc.was_arming_button_up_,
                         parser,
                         timestamp_msec);
-
             }
 
             static auto Update(
@@ -188,7 +186,6 @@ namespace hf {
                     const int16_t gyro_range_dps,
                     const int16_t accel_range_gs,
                     const uint16_t rawvolts,
-                    const Receiver & rx,
                     const std::vector<float> motorvals, 
                     const PidController::ControlLevel
                     control_level) -> FlightController
@@ -209,7 +206,7 @@ namespace hf {
 
                         EKF::getVehicleState(fc.ekf_),
 
-                        UpdateMode(fc, msec, rx, control_level),
+                        UpdateMode(fc, msec, control_level),
 
                         UpdateFlyingStatus(fc, msec, motorvals),
 
@@ -236,14 +233,14 @@ namespace hf {
                         Timer::Update(fc.fast_blink_timer_, 
                                 kLedFastBlinkRate, msec),
 
-                        UpdatePidController(fc, usec, rx, control_level),
+                        UpdatePidController(fc, usec, control_level),
 
                         usec,
 
                         UpdateLed(fc, msec,fc.imu_filter_.is_gyro_calibrated
                                 && fc.mode_ != kModePanic),
 
-                        !Receiver::IsArmingButtonDown(rx),
+                        !IsArmingButtonDown(fc),
 
                         fc.receiver_parser_,
 
@@ -271,10 +268,9 @@ namespace hf {
             }
 
             static auto GetTelemetryBytes(
-                    const FlightController &fc,
-                    const Receiver & rx) -> std::vector<uint8_t>
+                    const FlightController &fc) -> std::vector<uint8_t>
             {
-                const auto setpoint = MakeSetpoint(rx);
+                const auto setpoint = MakeSetpoint(fc);
 
                 float data[16] = {
 
@@ -368,13 +364,13 @@ namespace hf {
                 return fabs(angle) > kTiltAngleFlippedMinDeg;
             }
 
-            static auto MakeSetpoint(const Receiver & rx) -> Setpoint
+            static auto MakeSetpoint(const FlightController & fc) -> Setpoint
             {                
                 return Setpoint(
-                        Receiver::GetThrottle(rx),
-                        Receiver::GetRoll(rx),
-                        Receiver::GetPitch(rx),
-                        Receiver::GetYaw(rx));
+                        GetThrottle(fc),
+                        GetRoll(fc),
+                        GetPitch(fc),
+                        GetYaw(fc));
             }
 
             static auto UpdateFlyingStatus(
@@ -432,7 +428,6 @@ namespace hf {
             static auto UpdatePidController(
                     const FlightController & fc,
                     const uint32_t usec,
-                    const Receiver & rx,
                     const PidController::ControlLevel
                     control_level) -> PidController
             {
@@ -444,7 +439,7 @@ namespace hf {
                         dt,
                         fc.mode_,
                         fc.state_,
-                        MakeSetpoint(rx),
+                        MakeSetpoint(fc),
                         control_level);
             }
 
@@ -460,10 +455,9 @@ namespace hf {
             static auto UpdateMode(
                     const FlightController & fc,
                     const uint32_t msec,
-                    const Receiver & rx,
                     const PidController::ControlLevel control_level) -> Mode
             {
-                const auto is_arming_button_down = Receiver::IsArmingButtonDown(rx);
+                const auto is_arming_button_down = IsArmingButtonDown(fc);
 
                 const auto is_gyro_calibrated = fc.imu_filter_.is_gyro_calibrated;
 
@@ -474,12 +468,12 @@ namespace hf {
 
                     // Check receiver timeout
                     !CheckFailsafe(msec,
-                            Receiver::GetTimestampMsec(rx),
+                            fc.receiver_message_msec_,
                             is_arming_button_down) ? false :
 
                     // Throttle must be down for arming in stabilization-only
                     control_level == PidController::kControlStabilize ? 
-                    Receiver::GetThrottle(rx) < kThrottleDownMax :
+                    GetThrottle(fc) < kThrottleDownMax :
 
                     true;
 
