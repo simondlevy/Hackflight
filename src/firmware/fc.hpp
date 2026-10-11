@@ -139,7 +139,9 @@ namespace hf {
                     const int16_t accel_range_gs,
                     const uint16_t rawvolts,
                     const Receiver & rx,
-                    const std::vector<float> motorvals) -> FlightController
+                    const std::vector<float> motorvals, 
+                    const PidController::ControlLevel
+                    control_level) -> FlightController
             {
                 // Most updates run on milliseconds
                 const auto msec = usec / 1000;
@@ -184,7 +186,7 @@ namespace hf {
                         Timer::Update(fc.fast_blink_timer_, 
                                 kLedFastBlinkRate, msec),
 
-                        UpdatePidController(fc, usec, rx),
+                        UpdatePidController(fc, usec, rx, control_level),
 
                         usec,
 
@@ -374,7 +376,9 @@ namespace hf {
             static auto UpdatePidController(
                     const FlightController & fc,
                     const uint32_t usec,
-                    const Receiver & rx) -> PidController
+                    const Receiver & rx,
+                    const PidController::ControlLevel
+                    control_level) -> PidController
             {
                 const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
@@ -385,7 +389,7 @@ namespace hf {
                         fc.mode_,
                         fc.state_,
                         MakeSetpoint(rx),
-                        PidController::kControlStabilize);
+                        control_level);
             }
 
             static auto UpdateVoltage(

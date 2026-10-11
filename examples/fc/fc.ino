@@ -279,7 +279,7 @@ void loop()
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
             ImuGyroRangeDps(), ImuAccelRangeGs(), analogRead(kVoltageInputPin),
-            rx_, MotorsGetValues());
+            rx_, MotorsGetValues(), hf::PidController::kControlStabilize);
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
