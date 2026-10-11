@@ -115,6 +115,11 @@ namespace hf {
                 return rx.timestamp_msec_;
             }
 
+            static auto IsArmingButtonDown(const Receiver & rx) -> bool
+            {
+                return GetSwitchStatus(rx.parser_, 4);
+            }
+
         private:
 
             MspParser parser_;
