@@ -410,7 +410,7 @@ namespace hf {
 
                 const auto is_gyro_calibrated = fc.imu_filter_.is_gyro_calibrated;
 
-                const auto should_arm = 
+                const auto is_safe_to_arm = 
 
                     // Disable arming while gyro is calibrating
                     !is_gyro_calibrated ? false :
@@ -433,11 +433,11 @@ namespace hf {
                     fc.mode_ == kModeIdle && requested_hover ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
-                    fc.mode_ == kModeIdle && should_arm && is_gyro_calibrated ?
+                    fc.mode_ == kModeIdle && is_safe_to_arm && is_gyro_calibrated ?
                     kModeArmed :
 
                     // Armed and requested disarm: enter idle mode
-                    fc.mode_ == kModeArmed && !should_arm ? kModeIdle :
+                    fc.mode_ == kModeArmed && !is_safe_to_arm ? kModeIdle :
 
                     // Armed and requested hover; enter hover mode
                     fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
