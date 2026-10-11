@@ -45,7 +45,8 @@ static const uint8_t kAutopilotButtonPin = A7;
 
 // Button debouncing ---------------------------------------------------------
 
-static hf::Pushbutton arming_button_;
+static const uint16_t kArmingPinMin = 4000;
+
 static hf::Pushbutton hovering_button_;
 static hf::Pushbutton autopilot_button_;
 
@@ -117,8 +118,8 @@ void loop()
 
     const auto msec = millis();
 
-    arming_button_ = DebouncePushbutton(
-            arming_button_, kArmingButtonPin, msec);
+
+    const auto is_armed = analogRead(kArmingButtonPin) > kArmingPinMin;
 
     hovering_button_ = DebouncePushbutton(
             hovering_button_, kHoveringButtonPin, msec);
@@ -133,16 +134,16 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        hf::Pushbutton::GetState(arming_button_),
+        is_armed,
         hf::Pushbutton::GetState(hovering_button_),
         hf::Pushbutton::GetState(autopilot_button_)
     };
 
     /*
-    printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
+    Serial.printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
             "arm=%d hov=%d aut=%d\n",
-            volts, vals[0], vals[1], vals[2], vals[3], vals[4], vals[5],
-            vals[6]);*/
+            volts, vals[0], vals[1], vals[2], vals[3],
+            vals[4], vals[5], vals[6]);*/
 
     static hf::MspSerializer serializer_;
 

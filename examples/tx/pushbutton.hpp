@@ -58,7 +58,7 @@ namespace hf {
                 return Pushbutton(reading, last_debounce_msec, state);
             }
 
-            static auto GetState(const Pushbutton & pushbutton)
+            static auto GetState(const Pushbutton & pushbutton) -> uint8_t
             {
                 return pushbutton.state_;
             }
