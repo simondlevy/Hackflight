@@ -62,6 +62,9 @@ namespace hf {
             static constexpr float kThrottleDownMax = -0.90;
             static constexpr float kTiltAngleFlippedMinDeg = 75;
             static constexpr uint32_t kFailsafeMsec = 500;
+            
+            // Stick deadband
+            static constexpr float kAxisDeadband = 0.02;
 
         public:
 
@@ -140,7 +143,8 @@ namespace hf {
                     receiver_parser_(receiver_parser),
                     receiver_message_msec_(receiver_message_msec) {}
 
-            static auto ParseReceiverByte(const FlightController & fc,
+            static auto ParseReceiverByte(
+                    const FlightController & fc,
                     const uint8_t byte,
                     const uint32_t msec)
             {
@@ -519,6 +523,63 @@ namespace hf {
                 return FlyingStatus::IsFlying(fc.flying_status_);
             }
 
+            // Special treatment for throttle for now
+            static auto GetThrottle(const FlightController & fc) -> float
+            {
+                const auto val = MspParser::GetShort(fc.receiver_parser_, 0);
+                return 2 * (val / 4095.f ) - 1;
+            }
+
+            static auto GetRoll(const FlightController & fc) -> float
+            {
+                return GetAxisValue(fc.receiver_parser_, 1);
+            }
+
+            static auto GetPitch(const FlightController & fc) -> float
+            {
+                return GetAxisValue(fc.receiver_parser_, 2);
+            }
+
+            static auto GetYaw(const FlightController & fc) -> float
+            {
+                return GetAxisValue(fc.receiver_parser_, 3);
+            }
+
+            static auto GetReceiverMessageTimestampMsec(
+                    const FlightController & fc) -> uint32_t
+            {
+                return fc.receiver_message_msec_;
+            }
+
+            static auto IsArmingButtonDown(const FlightController & fc) -> bool
+            {
+                return GetSwitchStatus(fc.receiver_parser_, 4);
+            }
+
+            static auto IsHoverButtonDown(const FlightController & fc) -> bool
+            {
+                return GetSwitchStatus(fc.receiver_parser_, 5);
+            }
+
+            static auto IsAutopilotButtonDown(const FlightController & fc) -> bool
+            {
+                return GetSwitchStatus(fc.receiver_parser_, 6);
+            }
+
+            static auto GetAxisValue(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                const float val = MspParser::GetShort(parser, index) / 2048.f;
+
+                return fabs(val) < kAxisDeadband ? 0 : val;
+            }
+
+            static auto GetSwitchStatus(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                return MspParser::GetShort(parser, index) > 0;
+            }
+ 
             // ---------------------------------------------------------------
 
             // Sensor fusion

@@ -54,7 +54,7 @@ void serialEvent3()
     while (Serial3.available()) {
         const auto byt = Serial3.read();
         const auto msec = millis();
-        //rx_ = hf::Receiver::ParseByte(rx_, byt, msec);
+        rx_ = hf::Receiver::ParseByte(rx_, byt, msec);
         fc_ = hf::FlightController::ParseReceiverByte(fc_, byt, msec);
     }
 }
