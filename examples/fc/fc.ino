@@ -45,8 +45,6 @@ static const uint8_t kLedPin = 9;
 
 static hf::FlightController fc_;
 
-static constexpr float kCoreLoopRate = 1000;
-
 // Receiver ------------------------------------------------------------------
 
 static hf::Receiver rx_;
@@ -249,16 +247,6 @@ static void ProfilerRun(const bool should_run=true)
     }
 }
 
-static void RunDelayLoop(const uint32_t usec_curr)
-{
-    float invFreq = 1.0 / kCoreLoopRate * 1000000.0;
-    uint32_t checker = micros();
-
-    while (invFreq > (checker - usec_curr)) {
-        checker = micros();
-    }
-}
-
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -283,13 +271,10 @@ void setup()
 
 void loop()
 {
-    ProfilerRun();
-
-    //RunDelayLoop(micros());
-
-    rx_ = hf::Receiver::CheckArming(rx_);
+    ProfilerRun(false);
 
     // Receiver parses new data via serial event, so check arming here
+    rx_ = hf::Receiver::CheckArming(rx_);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
@@ -317,7 +302,6 @@ void loop()
     // Run the mixer and motors
     MotorsRun(setpoint);
 
-#if 0
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
@@ -325,5 +309,4 @@ void loop()
             hf::FlightController::GetTelemetryBytes(fc_, rx_);
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
-#endif
 }
