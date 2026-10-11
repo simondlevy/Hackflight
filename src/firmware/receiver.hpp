@@ -47,8 +47,6 @@ namespace hf {
 
             Receiver() : was_down_(true) {}
 
-            Receiver& operator=(const Receiver& other) = default;
-
             static auto ParseByte(
                     const Receiver & rx,
                     const uint8_t byte,

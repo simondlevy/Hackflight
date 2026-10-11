@@ -53,7 +53,6 @@ namespace hf {
             static constexpr uint32_t kLedPulseDurationMsec = 50;
 
             // Rate constants for timer tasks
-            static constexpr float kCoreLoopRate = 1000;
             static constexpr float kEkfPredictionRate = 100;
             static constexpr float kFlyingCheckRate   = 25;
             static constexpr float kVoltageSensingRate = 10;
@@ -132,7 +131,7 @@ namespace hf {
                     pid_update_usec_prev_(pid_update_usec_prev),
                     led_(led) {}
 
-            static auto Update(
+             static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,
                     const IMU::RawData imu_data,
@@ -144,8 +143,6 @@ namespace hf {
             {
                 // Most updates run on milliseconds
                 const auto msec = usec / 1000;
-
-                (void)msec;
 
                 return FlightController(
 

@@ -45,6 +45,8 @@ static const uint8_t kLedPin = 9;
 
 static hf::FlightController fc_;
 
+static constexpr float kCoreLoopRate = 1000;
+
 // Receiver ------------------------------------------------------------------
 
 static hf::Receiver rx_;
@@ -158,21 +160,31 @@ static void ImuStart()
 
 static auto ImuRead() -> hf::IMU::RawData
 {
-    gyro_.readSensor();
 
-    accel_.readSensor();
+    static int16_t gx_;
+    static int16_t gy_;
+    static int16_t gz_;
+
+    static int16_t ax_;
+    static int16_t ay_;
+    static int16_t az_;
+
+    if (gyro_.getDrdyStatus()) {
+
+        gyro_.readSensor();
+        gx_ = gyro_.getGyroX_raw();
+        gy_ = gyro_.getGyroY_raw();
+        gz_ = gyro_.getGyroZ_raw();
+
+        accel_.readSensor();
+        ax_ = accel_.getAccelX_raw();
+        ay_ = accel_.getAccelY_raw();
+        az_ = accel_.getAccelZ_raw();
+    }
 
     return hf::IMU::RawData(
-            hf::IMU::ThreeAxisRaw(
-                gyro_.getGyroX_raw(),
-                gyro_.getGyroY_raw(),
-                gyro_.getGyroZ_raw()
-                ),
-            hf::IMU::ThreeAxisRaw(
-                accel_.getAccelX_raw(),
-                accel_.getAccelY_raw(),
-                accel_.getAccelZ_raw()
-                ));
+            hf::IMU::ThreeAxisRaw(gx_, gy_, gz_),
+            hf::IMU::ThreeAxisRaw(ax_, ay_, az_));
 }
 
 static auto ImuGyroRangeDps() -> int16_t
@@ -213,25 +225,38 @@ static void MotorsRun(const hf::Setpoint & setpoint)
 
     // Run motors if safe
     if (hf::FlightController::IsSafeToFly(fc_)) {
+        MotorsGetValues();
         motors_.run(hf::FlightController::IsArmed(fc_), MotorsGetValues());
     }
 }
 
 // Profiling -----------------------------------------------------------------
 
-static void ProfilerRun()
+static void ProfilerRun(const bool should_run=true)
 {
-    static uint32_t count_;
-    static uint32_t msec_;
-    const auto msec = millis();
-    if (msec - msec_ > 1000) {
-        if (count_ > 0) {
-            printf("%d\n", (int)count_);
+    if (should_run) {
+        static uint32_t count_;
+        static uint32_t msec_;
+        const auto msec = millis();
+        if (msec - msec_ > 1000) {
+            if (count_ > 0) {
+                printf("%d\n", (int)count_);
+            }
+            count_ = 0;
+            msec_ = msec;
         }
-        count_ = 0;
-        msec_ = msec;
+        count_++;
     }
-    count_++;
+}
+
+static void RunDelayLoop(const uint32_t usec_curr)
+{
+    float invFreq = 1.0 / kCoreLoopRate * 1000000.0;
+    uint32_t checker = micros();
+
+    while (invFreq > (checker - usec_curr)) {
+        checker = micros();
+    }
 }
 
 // Main ----------------------------------------------------------------------
@@ -258,10 +283,13 @@ void setup()
 
 void loop()
 {
-    (void)ProfilerRun;
+    ProfilerRun();
+
+    //RunDelayLoop(micros());
+
+    rx_ = hf::Receiver::CheckArming(rx_);
 
     // Receiver parses new data via serial event, so check arming here
-    rx_ = hf::Receiver::CheckArming(rx_);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
@@ -289,6 +317,7 @@ void loop()
     // Run the mixer and motors
     MotorsRun(setpoint);
 
+#if 0
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
@@ -296,4 +325,5 @@ void loop()
             hf::FlightController::GetTelemetryBytes(fc_, rx_);
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
+#endif
 }
