@@ -32,8 +32,8 @@
 
 // Hackflight library
 #include <hackflight.h>
+#include <firmware/debugger.hpp>
 #include <firmware/fc.hpp>
-#include <firmware/drivers/error.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
 #include <firmware/optical_flow.hpp>
@@ -67,11 +67,11 @@ static void ZRangerStart()
     delay(100);
 
     if (!vl53l1x_.begin(0x29, &Wire1)) {
-        hf::Error::ReportForever("Unable to initialize VL53L1X");
+        hf::Debugger::ReportForever("Unable to initialize VL53L1X");
     }
 
     if (!vl53l1x_.startRanging()) {
-        hf::Error::ReportForever("VL53L1X failed to start ranging");
+        hf::Debugger::ReportForever("VL53L1X failed to start ranging");
     }
 
     // Valid timing budgets: 15, 20, 33, 50, 100, 200 and 500ms
@@ -102,7 +102,7 @@ static void OpticalFlowStart()
     SPI.begin();
 
     if (!pmw3901_.begin()) {
-        hf::Error::ReportForever("Unable to initialize PMW3901");
+        hf::Debugger::ReportForever("Unable to initialize PMW3901");
     }
 }
 
@@ -152,7 +152,7 @@ static void ImuStart()
 
         ImuOkay(accel_.setRange(kAccelRange)))) {
 
-        hf::Error::ReportForever("Unable to start IMU");
+        hf::Debugger::ReportForever("Unable to start IMU");
     }
 }
 

@@ -16,7 +16,7 @@
 
 #include <hackflight.h>
 #include <firmware/blink_timer.hpp>
-#include <firmware/drivers/espnow.hpp>
+#include <firmware/espnow.hpp>
 
 static const uint8_t kDongleAddress[6] = {
     0x00, 0x4B, 0x12, 0xCD, 0x9B, 0xD0
