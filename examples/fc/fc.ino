@@ -273,11 +273,8 @@ void loop()
 {
     ProfilerRun(false);
 
-    // Receiver parses new data via serial event, so check arming here
-    rx_ = hf::Receiver::CheckArming(rx_);
-
-    static hf::Debugger debugger_;
-    debugger_.Report(millis(), rx_);
+    //static hf::Debugger debugger_;
+    //debugger_.Report(millis(), rx_);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),

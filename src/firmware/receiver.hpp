@@ -28,24 +28,14 @@ namespace hf {
 
         private:
 
-            static constexpr float kThrottleDownMax = -0.90;
             static constexpr float kAxisDeadband = 0.02;
 
         public:
 
-            Receiver(
-                    const MspParser & parser,
-                    const bool is_arming_button_down,
-                    const bool was_arming_button_down,
-                    const bool armed,
-                    const uint32_t timestamp_msec) 
-                : parser_(parser),
-                is_arming_button_down_(is_arming_button_down),
-                was_arming_button_down_(was_arming_button_down),
-                is_armed_(armed),
-                timestamp_msec_(timestamp_msec) {}
+            Receiver( const MspParser & parser, const uint32_t timestamp_msec)
+                : parser_(parser), timestamp_msec_(timestamp_msec) {}
 
-            Receiver() : was_arming_button_down_(true) {}
+            Receiver() = default;
 
             static auto ParseByte(
                     const Receiver & rx,
@@ -58,34 +48,10 @@ namespace hf {
                 const auto got_new_message =
                     MspParser::GetId(parser) == kMspSetChannels;
 
-                const auto is_arming_button_down =
-                    got_new_message ?
-                    MspParser::GetShort(parser, 4) > 0 :
-                    rx.is_arming_button_down_;
-
                 const auto timestamp_msec =
                     got_new_message ? time_msec : rx.timestamp_msec_;
 
-                return Receiver(parser, is_arming_button_down, rx.was_arming_button_down_,
-                        rx.is_armed_, timestamp_msec);
-            }
-
-            static auto CheckArming(const Receiver & rx) -> Receiver
-            {
-                const auto armed = !rx.is_arming_button_down_ ? false :
-
-                    rx.is_arming_button_down_ && !rx.was_arming_button_down_ &&
-                    GetThrottle(rx) < kThrottleDownMax ? true :
-
-                    rx.is_armed_;
-
-                return Receiver(rx.parser_, rx.is_arming_button_down_,
-                        rx.is_arming_button_down_, armed, rx.timestamp_msec_);
-            }
-
-            static auto IsArmed(const Receiver & rx) -> bool
-            {
-                return rx.is_armed_;
+                return Receiver(parser, timestamp_msec);
             }
 
             // Special treatment for throttle for now
@@ -133,9 +99,6 @@ namespace hf {
         private:
 
             MspParser parser_;
-            bool is_arming_button_down_;
-            bool was_arming_button_down_;
-            bool is_armed_;
             uint32_t timestamp_msec_;
 
             static auto GetAxisValue(

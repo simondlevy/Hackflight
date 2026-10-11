@@ -59,6 +59,7 @@ namespace hf {
             static constexpr float kHoverDeckRate = 100;
 
             // Safety constants
+            static constexpr float kThrottleDownMax = -0.90;
             static constexpr float kTiltAngleFlippedMinDeg = 75;
             static constexpr uint32_t kFailsafeMsec = 500;
 
@@ -89,7 +90,8 @@ namespace hf {
                     fast_blink_timer_(fc.fast_blink_timer_),
                     pid_controller_(fc.pid_controller_),
                     pid_update_usec_prev_(fc.pid_update_usec_prev_),
-                    led_(fc.led_) {}
+                    led_(fc.led_),
+                    was_arming_button_up_(fc.was_arming_button_up_) {}
 
             FlightController(
                     const EKF & ekf,
@@ -109,7 +111,8 @@ namespace hf {
                     const Timer & fast_blink_timer,
                     const PidController & pid_controller,
                     const uint32_t pid_update_usec_prev,
-                    const Led & led)
+                    const Led & led,
+                    const bool was_arming_button_up)
                 :
                     ekf_(ekf),
                     optical_flow_filter_(optical_flow_filter),
@@ -128,7 +131,8 @@ namespace hf {
                     fast_blink_timer_(fast_blink_timer),
                     pid_controller_(pid_controller),
                     pid_update_usec_prev_(pid_update_usec_prev),
-                    led_(led) {}
+                    led_(led),
+                    was_arming_button_up_(was_arming_button_up) {}
 
              static auto Update(
                     const FlightController & fc,
@@ -158,7 +162,7 @@ namespace hf {
 
                         EKF::getVehicleState(fc.ekf_),
 
-                        UpdateMode(fc, msec, rx, false), // no hover yet
+                        UpdateMode(fc, msec, rx, control_level),
 
                         UpdateFlyingStatus(fc, msec, motorvals),
 
@@ -190,8 +194,9 @@ namespace hf {
                         usec,
 
                         UpdateLed(fc, msec,fc.imu_filter_.is_gyro_calibrated
-                                && fc.mode_ != kModePanic)
-                            );
+                                && fc.mode_ != kModePanic),
+
+                        !Receiver::IsArmingButtonDown(rx));
             }
 
             static auto UpdateHover(
@@ -290,14 +295,14 @@ namespace hf {
             static auto CheckFailsafe(
                     const uint32_t msec_curr,
                     const uint32_t msec_prev,
-                    const bool requested_arming) -> bool
+                    const bool is_arming_button_down) -> bool
             {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
                     msec_curr - msec_prev > kFailsafeMsec;
 
-                return timed_out ? false : requested_arming;
+                return timed_out ? false : is_arming_button_down;
             } 
 
             static auto IsFlipped(const VehicleState & state) -> bool
@@ -404,9 +409,9 @@ namespace hf {
                     const FlightController & fc,
                     const uint32_t msec,
                     const Receiver & rx,
-                    const bool requested_hover) -> Mode
+                    const PidController::ControlLevel control_level) -> Mode
             {
-                const auto requested_arming = Receiver::IsArmed(rx);
+                const auto is_arming_button_down = Receiver::IsArmingButtonDown(rx);
 
                 const auto is_gyro_calibrated = fc.imu_filter_.is_gyro_calibrated;
 
@@ -416,9 +421,15 @@ namespace hf {
                     !is_gyro_calibrated ? false :
 
                     // Check receiver timeout
-                    CheckFailsafe(msec,
+                    !CheckFailsafe(msec,
                             Receiver::GetTimestampMsec(rx),
-                            requested_arming);
+                            is_arming_button_down) ? false :
+
+                    // Throttle must be down for arming in stabilization-only
+                    control_level == PidController::kControlStabilize ? 
+                    Receiver::GetThrottle(rx) < kThrottleDownMax :
+
+                    true;
 
                 // Run a little state-transition machine to update flight mode
                 return
@@ -430,23 +441,26 @@ namespace hf {
                     fc.mode_ == kModePanic ? kModePanic :
 
                     // Disallow jumping directly from idle to hover
-                    fc.mode_ == kModeIdle && requested_hover ? kModeIdle :
+                    //fc.mode_ == kModeIdle && requested_hover ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
-                    fc.mode_ == kModeIdle && is_safe_to_arm && is_gyro_calibrated ?
+                    fc.mode_ == kModeIdle &&
+                    is_arming_button_down &&
+                    fc.was_arming_button_up_ &&
+                    is_safe_to_arm ?
                     kModeArmed :
 
                     // Armed and requested disarm: enter idle mode
-                    fc.mode_ == kModeArmed && !is_safe_to_arm ? kModeIdle :
+                    fc.mode_ == kModeArmed && !is_arming_button_down ? kModeIdle :
 
                     // Armed and requested hover; enter hover mode
-                    fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
+                    //fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
 
                     // Hovering and requested no-hover; return to armed mode
-                    fc.mode_ == kModeHovering && !requested_hover ? kModeArmed :
+                    //fc.mode_ == kModeHovering && !requested_hover ? kModeArmed :
 
                     // Hovering and requested disarm; enter idle mode
-                    fc.mode_ == kModeHovering && !requested_arming ? kModeIdle :
+                    fc.mode_ == kModeHovering && !is_arming_button_down ? kModeIdle :
 
                     //  Default: stay in current mode
                     fc.mode_;
@@ -494,6 +508,9 @@ namespace hf {
 
             // Support for LED blink
             Led led_;
+
+            // Safety
+            bool was_arming_button_up_;
 
             // ---------------------------------------------------------------
 
