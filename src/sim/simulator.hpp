@@ -40,19 +40,15 @@ namespace hf {
 
         public:
 
-            Dynamics dynamics;
-
-            PidController pid_controller;
-
             Simulator() = default;
 
             Simulator(const Pose & pose)
-                : dynamics(Dynamics(pose)),
-                pid_controller(PidController()) {}
+                : dynamics_(Dynamics(pose)),
+                pid_controller_(PidController()) {}
 
             Simulator(const Dynamics & dynamics,
                     const PidController & pid_controller)
-                : dynamics(dynamics), pid_controller(pid_controller) {}
+                : dynamics_(dynamics), pid_controller_(pid_controller) {}
 
             static auto Step(
                     const Simulator & sim,
@@ -64,9 +60,9 @@ namespace hf {
             {
                 const auto dt = 1/(float)kPidFastFreq;
 
-                auto pid_controller = sim.pid_controller;
+                auto pid_controller = sim.pid_controller_;
 
-                auto dynamics = sim.dynamics;
+                auto dynamics = sim.dynamics_;
 
                 // Run slow PID control in outer loop -------------------------
                 for (uint32_t i=0; i<kPidSlowFreq/framerate; ++i) {
@@ -106,7 +102,21 @@ namespace hf {
                 return Simulator(dynamics, pid_controller);
             }
 
+            static auto GetSimState(const Simulator & sim)
+            {
+                return Dynamics::GetSimState(sim.dynamics_);
+            }
+
+            static auto GetSetpoint(const Simulator & sim)
+            {
+                return PidController::GetSetpoint(sim.pid_controller_);
+            }
+
         private:
+
+            Dynamics dynamics_;
+
+            PidController pid_controller_;
 
             static auto SimStateToVehicleState(
                     const SimState state) -> VehicleState 

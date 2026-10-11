@@ -112,14 +112,14 @@ class PluginHelper {
             simulator_ = hf::Simulator::Step(simulator_, mode, setpoint,
                     effector_fun, vehicle_params);
 
-            const auto state = hf::Dynamics::GetSimState(simulator_.dynamics);
+            const auto state = hf::Simulator::GetSimState(simulator_);
 
             return state;
         }
 
         auto GetSetpoint() -> hf::Setpoint
         {
-            return hf::PidController::GetSetpoint(simulator_.pid_controller);
+            return hf::Simulator::GetSetpoint(simulator_);
         }
 
         void SetDbodyFromState(const hf::VehicleParams vparams, const hf::SimState & state)
