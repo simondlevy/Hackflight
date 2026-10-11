@@ -45,11 +45,16 @@ under 3,000 lines of code.
 
 # Hardware
 
-* [Teensy4.0](https://www.pjrc.com/store/teensy40.html)
+* MCU: [Teensy4.0](https://www.pjrc.com/store/teensy40.html)
 
-* [XIAO ESP32-C6](https://www.seeedstudio.com/Seeed-Studio-XIAO-ESP32C6-p-5884.html)
+* IMU: [BMI088 I^2C breakout board](https://www.tindie.com/products/bobbiebots/bmi088-i2c-breakout)
 
-* [BMI088 Shuttle Board](https://www.digikey.com/en/products/detail/bosch-sensortec/SHUTTLE-BOARD-3-0-BMI088/14617528)
+* Receiver: [OMGS3 ESP32](https://unexpectedmaker.com/shop.html#!/OMGS3/p/687192227)
+
+* Transmitter: Radiomaster T8L modified with [custom circuit board](kicad/tx) using
+[TinyS3 ESP32](https://www.adafruit.com/product/5398)
+
+* Telemetry dongle: [TinyPICO ESP32](https://www.adafruit.com/product/5028)
 
 # Simulator
 
