@@ -53,9 +53,8 @@ static hf::Pushbutton autopilot_button_;
 // ----------------------------------------------------------------------------
 
 // Axis extrema determined empirically
-static const uint16_t kThrottleLow = 3931;
-static const uint16_t kThrottleHigh = 252;;
-static const uint16_t kRollMid = 2000;
+static const uint16_t kThrottleMid = 1903;
+static const uint16_t kRollMid = 1951;
 static const uint16_t kPitchMid = 1950;
 static const uint16_t kYawMid = 1900;
 
@@ -129,7 +128,7 @@ void loop()
 
     const short vals[7] = {
 
-        map(analogRead(kThrottlePin), kThrottleLow, kThrottleHigh, 0, 4095),
+        -ReadAxis(kThrottlePin, kThrottleMid),
         -ReadAxis(kRollPin, kRollMid),
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),

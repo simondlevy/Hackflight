@@ -558,8 +558,9 @@ namespace hf {
             // Special treatment for throttle for now
             static auto GetThrottle(const FlightController & fc) -> float
             {
-                const auto val = MspParser::GetShort(fc.receiver_parser_, 0);
-                return 2 * (val / 4095.f ) - 1;
+                return GetAxisValue(fc.receiver_parser_, 0);
+                //const auto val = MspParser::GetShort(fc.receiver_parser_, 0);
+                //return 2 * (val / 4095.f ) - 1;
             }
 
             static auto GetRoll(const FlightController & fc) -> float
