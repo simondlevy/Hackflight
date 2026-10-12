@@ -74,9 +74,9 @@ namespace hf {
 
                     FlyingStatus(
                             const bool is_flying,
-                            const bool last_flying_check_msec)
+                            const bool started_flying_msec)
                         : is_flying_(is_flying),
-                        last_flying_check_msec_(last_flying_check_msec) {}
+                        started_flying_msec_(started_flying_msec) {}
 
                     FlyingStatus() = default;
 
@@ -87,20 +87,20 @@ namespace hf {
                             const uint32_t msec,
                             const std::vector<float> motorvals) -> FlyingStatus
                     {
-                        const auto last_flying_check_msec =
+                        const auto started_flying_msec =
                             IsThrustOverIdle(motorvals) ?
                             msec :
-                            fs.last_flying_check_msec_;
+                            fs.started_flying_msec_;
 
-                        const auto is_flying = last_flying_check_msec > 0 &&
-                            (msec - last_flying_check_msec) <
+                        const auto is_flying = started_flying_msec > 0 &&
+                            (msec - started_flying_msec) <
                             kFlyingHysteresisThresholdMsec;
 
-                        return FlyingStatus(last_flying_check_msec, is_flying);
+                        return FlyingStatus(started_flying_msec, is_flying);
                     }
 
                     bool is_flying_;
-                    uint32_t last_flying_check_msec_;
+                    uint32_t started_flying_msec_;
             };
 
         public:
@@ -605,6 +605,26 @@ namespace hf {
                 return MspParser::GetShort(parser, index) > 0;
             }
 
+            static auto UpdateStartedFlyingTime(
+                    const FlightController & fc,
+                    const uint32_t msec,
+                    const std::vector<float> motorvals) -> uint32_t
+            {
+                return IsThrustOverIdle(motorvals) ?
+                    msec :
+                    fc.started_flying_msec_;
+
+            }
+
+            static auto UpdateFlyingStatus(
+                    const FlightController & fc,
+                    const uint32_t msec) -> bool
+            {
+                return fc.started_flying_msec_ > 0 &&
+                    (msec - fc.started_flying_msec_) <
+                    kFlyingHysteresisThresholdMsec;
+            }
+
             static auto IsThrustOverIdle(
                     const std::vector<float> motorvals) -> bool
             {
@@ -664,7 +684,7 @@ namespace hf {
 
             // Flying status
             bool is_flying_;
-            uint32_t last_flying_check_msec_;
+            uint32_t started_flying_msec_;
 
             // ---------------------------------------------------------------
 
