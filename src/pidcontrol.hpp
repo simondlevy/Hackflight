@@ -41,7 +41,7 @@ namespace hf {
 
                 kControlStabilize,
                 kControlAltHold,
-                kControlHover
+                kControlPosHold
 
             } ControlLevel;
 
@@ -79,7 +79,7 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in,
                     const ControlLevel
-                    control_level=kControlHover) -> PidController
+                    control_level=kControlPosHold) -> PidController
             {
                 // Altitude hold ---------------------------------------------
 
@@ -124,7 +124,7 @@ namespace hf {
                     PositionController::Run(pc.position_x_pid_, airborne, dt,
                             setpoint_in.pitch, dxb);
 
-                const auto hold_position = control_level == kControlHover;
+                const auto hold_position = control_level == kControlPosHold;
 
                 const auto roll_demand = hold_position ? position_y_pid.output :
                     PositionController::Bypass(setpoint_in.roll);
