@@ -228,7 +228,7 @@ namespace hf {
             static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,
-                    const IMU::RawData imu_data,
+                    const Imu::RawData imu_data,
                     const uint16_t rawvolts,
                     const std::vector<float> motorvals, 
                     const PidController::ControlLevel
@@ -444,7 +444,7 @@ namespace hf {
             static auto UpdateImuFilter(
                     const FlightController & fc,
                     const uint32_t msec, 
-                    const IMU::RawData data)-> ImuFilter
+                    const Imu::RawData data)-> ImuFilter
             {
                 return ImuFilter::Step(fc.imu_filter_, msec, data);
             }
@@ -459,7 +459,7 @@ namespace hf {
                     ekf = EKF::Predict(ekf, msec, IsFlying(fc));
                 }
 
-                // Do EKF fast-update with IMU readings
+                // Do EKF fast-update with Imu readings
                 return EKF::Update(ekf, fc.imu_filter_.output, msec);
             }
 

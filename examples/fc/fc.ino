@@ -115,7 +115,7 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
     return hf::OpticalFlowData(dx, dy);
 }
 
-// IMU -----------------------------------------------------------------------
+// Imu -----------------------------------------------------------------------
 
 static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
 static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
@@ -150,11 +150,11 @@ static void ImuStart()
 
         ImuOkay(accel_.setRange(kAccelRange)))) {
 
-        hf::Debugger::ReportForever("Unable to start IMU");
+        hf::Debugger::ReportForever("Unable to start Imu");
     }
 }
 
-static auto ImuRead() -> hf::IMU::RawData
+static auto ImuRead() -> hf::Imu::RawData
 {
 
     static int16_t gx_;
@@ -180,9 +180,9 @@ static auto ImuRead() -> hf::IMU::RawData
         az_ = accel_.getAccelZ_raw();
     }
 
-    return hf::IMU::RawData(
-            hf::IMU::ThreeAxisRaw(gx_, gy_, gz_, granges[kGyroRange]),
-            hf::IMU::ThreeAxisRaw(ax_, ay_, az_, aranges[kAccelRange]));
+    return hf::Imu::RawData(
+            hf::Imu::ThreeAxisRaw(gx_, gy_, gz_, granges[kGyroRange]),
+            hf::Imu::ThreeAxisRaw(ax_, ay_, az_, aranges[kAccelRange]));
 }
 
 // Motors --------------------------------------------------------------------

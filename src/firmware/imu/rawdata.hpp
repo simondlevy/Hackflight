@@ -22,7 +22,7 @@
 
 namespace hf {
 
-    class IMU {
+    class Imu {
 
         public:
 

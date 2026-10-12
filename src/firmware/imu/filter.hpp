@@ -94,7 +94,7 @@ namespace hf {
             static auto Step(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
-                    const IMU::RawData & imuraw) -> ImuFilter
+                    const Imu::RawData & imuraw) -> ImuFilter
             {
                 const auto gyro_raw = imuraw.gyro;
 

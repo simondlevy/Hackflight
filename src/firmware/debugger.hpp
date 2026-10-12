@@ -146,7 +146,7 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec, const IMU::ThreeAxisRaw & raw)
+            void Report(const uint32_t msec, const Imu::ThreeAxisRaw & raw)
             {
                 if (helper_.Ready(msec)) {
 
@@ -177,7 +177,7 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec, const IMU::RawData & imuraw)
+            void Report(const uint32_t msec, const Imu::RawData & imuraw)
             {
                 if (helper_.Ready(msec)) {
 
