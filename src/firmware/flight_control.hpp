@@ -22,7 +22,6 @@
 
 #include <hackflight.h>
 #include <firmware/estimator/ekf.hpp>
-#include <firmware/flying_status.hpp>
 #include <firmware/imu/filter.hpp>
 #include <firmware/imu/sensor.hpp>
 #include <firmware/led.hpp>
@@ -64,6 +63,47 @@ namespace hf {
             
             // Stick deadband
             static constexpr float kAxisDeadband = 0.02;
+
+            // Flying status based on motors spins
+            static constexpr float kMotorIdleMax = 0.1;
+            static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
+
+            class FlyingStatus {
+
+                public:
+
+                    FlyingStatus(
+                            const bool is_flying,
+                            const bool last_flying_check_msec)
+                        : is_flying_(is_flying),
+                        last_flying_check_msec_(last_flying_check_msec) {}
+
+                    FlyingStatus() = default;
+
+                    FlyingStatus(const FlyingStatus &other) = default;
+
+                    static auto Update(
+                            const FlyingStatus & fs,
+                            const uint32_t msec,
+                            const std::vector<float> motorvals) -> FlyingStatus
+                    {
+                        const auto is_thrust_hover_idle = 
+                            std::any_of(motorvals.begin(), motorvals.end(),
+                                    [](float x) { return x > kMotorIdleMax; });
+
+                        const auto last_flying_check_msec = is_thrust_hover_idle ? msec :
+                            fs.last_flying_check_msec_;
+
+                        const auto is_flying = last_flying_check_msec > 0 &&
+                            (msec - last_flying_check_msec) <
+                            kFlyingHysteresisThresholdMsec;
+
+                        return FlyingStatus(last_flying_check_msec, is_flying);
+                    }
+
+                    bool is_flying_;
+                    uint32_t last_flying_check_msec_;
+            };
 
         public:
 
@@ -514,7 +554,7 @@ namespace hf {
 
             static auto IsFlying(const FlightController & fc) -> bool
             {
-                return FlyingStatus::IsFlying(fc.flying_status_);
+                return fc.flying_status_.is_flying_;
             }
 
             // Special treatment for throttle for now
@@ -573,7 +613,7 @@ namespace hf {
             {
                 return MspParser::GetShort(parser, index) > 0;
             }
- 
+
             // ---------------------------------------------------------------
 
             // Sensor fusion
