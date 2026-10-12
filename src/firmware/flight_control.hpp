@@ -82,7 +82,7 @@ namespace hf {
 
                     FlyingStatus(const FlyingStatus &other) = default;
 
-                    static auto Update(
+                    static auto Check(
                             const FlyingStatus & fs,
                             const uint32_t msec,
                             const std::vector<float> motorvals) -> FlyingStatus
@@ -425,7 +425,7 @@ namespace hf {
                     FlyingStatus(false, 0) :
 
                     Timer::IsReady(fc.flying_check_timer_) ?
-                    FlyingStatus::Update(fc.flying_status_, msec, motorvals) :
+                    FlyingStatus::Check(fc.flying_status_, msec, motorvals) :
 
                     fc.flying_status_;
             }
