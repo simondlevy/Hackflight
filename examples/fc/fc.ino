@@ -160,10 +160,12 @@ static auto ImuRead() -> hf::IMU::RawData
     static int16_t gx_;
     static int16_t gy_;
     static int16_t gz_;
+    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
 
     static int16_t ax_;
     static int16_t ay_;
     static int16_t az_;
+    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
     if (gyro_.getDrdyStatus()) {
 
@@ -179,22 +181,8 @@ static auto ImuRead() -> hf::IMU::RawData
     }
 
     return hf::IMU::RawData(
-            hf::IMU::ThreeAxisRaw(gx_, gy_, gz_),
-            hf::IMU::ThreeAxisRaw(ax_, ay_, az_));
-}
-
-static auto ImuGyroRangeDps() -> int16_t
-{
-    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
-
-    return granges[kGyroRange];
-}
-
-static auto ImuAccelRangeGs() -> int16_t
-{
-    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
-
-    return aranges[kAccelRange];
+            hf::IMU::ThreeAxisRaw(gx_, gy_, gz_, granges[kGyroRange]),
+            hf::IMU::ThreeAxisRaw(ax_, ay_, az_, aranges[kAccelRange]));
 }
 
 // Motors --------------------------------------------------------------------
@@ -274,8 +262,8 @@ void loop()
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
-            ImuGyroRangeDps(), ImuAccelRangeGs(), analogRead(kVoltageInputPin),
-            MotorsGetValues(), hf::PidController::kControlStabilize);
+            analogRead(kVoltageInputPin), MotorsGetValues(),
+            hf::PidController::kControlStabilize);
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);

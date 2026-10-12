@@ -96,7 +96,8 @@ namespace hf {
                             }
                         }
 
-                        const auto last_flying_check_msec = is_thrust_hover_idle ? msec :
+                        const auto last_flying_check_msec =
+                            is_thrust_hover_idle ? msec :
                             fs.last_flying_check_msec_;
 
                         const auto is_flying = last_flying_check_msec > 0 &&
@@ -228,8 +229,6 @@ namespace hf {
                     const FlightController & fc,
                     const uint32_t usec,
                     const IMU::RawData imu_data,
-                    const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs,
                     const uint16_t rawvolts,
                     const std::vector<float> motorvals, 
                     const PidController::ControlLevel
@@ -246,8 +245,7 @@ namespace hf {
 
                         fc.zranger_filter_,
 
-                        UpdateImuFilter(fc, msec, imu_data, gyro_range_dps,
-                            accel_range_gs),
+                        UpdateImuFilter(fc, msec, imu_data),
 
                         EKF::getVehicleState(fc.ekf_),
 
@@ -446,12 +444,9 @@ namespace hf {
             static auto UpdateImuFilter(
                     const FlightController & fc,
                     const uint32_t msec, 
-                    const IMU::RawData data,
-                    const int16_t gyro_range_dps,
-                    const int16_t accel_range_gs) -> ImuFilter
+                    const IMU::RawData data)-> ImuFilter
             {
-                return ImuFilter::Step(fc.imu_filter_, msec, data,
-                        gyro_range_dps, accel_range_gs);
+                return ImuFilter::Step(fc.imu_filter_, msec, data);
             }
 
             static auto UpdateStateEstimator(const FlightController & fc,

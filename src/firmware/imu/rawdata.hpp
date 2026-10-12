@@ -34,10 +34,16 @@ namespace hf {
                     int16_t y;
                     int16_t z;
 
+                    int16_t scale;
+
                     ThreeAxisRaw() = default;
 
-                    ThreeAxisRaw(const int16_t x, const int16_t y, const int16_t z) 
-                        : x(x), y(y), z(z) {}
+                    ThreeAxisRaw(
+                            const int16_t x,
+                            const int16_t y,
+                            const int16_t z,
+                            const int scale) 
+                        : x(x), y(y), z(z), scale(scale) {}
 
                     ThreeAxisRaw& operator=(const ThreeAxisRaw& other) = default;
             };
