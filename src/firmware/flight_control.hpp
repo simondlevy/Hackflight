@@ -87,9 +87,14 @@ namespace hf {
                             const uint32_t msec,
                             const std::vector<float> motorvals) -> FlyingStatus
                     {
-                        const auto is_thrust_hover_idle = 
-                            std::any_of(motorvals.begin(), motorvals.end(),
-                                    [](float x) { return x > kMotorIdleMax; });
+                        auto is_thrust_hover_idle = false;
+
+                        for (auto motorval : motorvals) {
+                            if (motorval > kMotorIdleMax) {
+                                is_thrust_hover_idle = true;
+                                break;
+                            }
+                        }
 
                         const auto last_flying_check_msec = is_thrust_hover_idle ? msec :
                             fs.last_flying_check_msec_;
@@ -159,18 +164,18 @@ namespace hf {
                     const bool was_arming_button_up,
                     const MspParser & receiver_parser,
                     const uint32_t receiver_message_msec)
-                :
-                    ekf_(ekf),
-                    optical_flow_filter_(optical_flow_filter),
-                    zranger_filter_(zranger_filter),
-                    imu_filter_(imu_filter),
-                    state_(state),
-                    mode_(mode),
-                    flying_status_(flying_status),
-                    voltage_(voltage),
-                    ekf_prediction_timer_(ekf_prediction_timer),
-                    flying_check_timer_(flying_check_timer),
-                    voltage_sensing_timer_(voltage_sensing_timer),
+                        :
+                            ekf_(ekf),
+                            optical_flow_filter_(optical_flow_filter),
+                            zranger_filter_(zranger_filter),
+                            imu_filter_(imu_filter),
+                            state_(state),
+                            mode_(mode),
+                            flying_status_(flying_status),
+                            voltage_(voltage),
+                            ekf_prediction_timer_(ekf_prediction_timer),
+                            flying_check_timer_(flying_check_timer),
+                            voltage_sensing_timer_(voltage_sensing_timer),
                     telemetry_timer_(telemetry_timer), 
                     hover_timer_(hover_timer),
                     heartbeat_timer_(heartbeat_timer), 
