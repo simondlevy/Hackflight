@@ -68,41 +68,6 @@ namespace hf {
             static constexpr float kMotorIdleMax = 0.1;
             static const uint32_t kFlyingHysteresisThresholdMsec = 2000;
 
-            class FlyingStatus {
-
-                public:
-
-                    FlyingStatus(
-                            const bool is_flying,
-                            const bool started_flying_msec)
-                        : is_flying_(is_flying),
-                        started_flying_msec_(started_flying_msec) {}
-
-                    FlyingStatus() = default;
-
-                    FlyingStatus(const FlyingStatus &other) = default;
-
-                    static auto Check(
-                            const FlyingStatus & fs,
-                            const uint32_t msec,
-                            const std::vector<float> motorvals) -> FlyingStatus
-                    {
-                        const auto started_flying_msec =
-                            IsThrustOverIdle(motorvals) ?
-                            msec :
-                            fs.started_flying_msec_;
-
-                        const auto is_flying = started_flying_msec > 0 &&
-                            (msec - started_flying_msec) <
-                            kFlyingHysteresisThresholdMsec;
-
-                        return FlyingStatus(started_flying_msec, is_flying);
-                    }
-
-                    bool is_flying_;
-                    uint32_t started_flying_msec_;
-            };
-
         public:
 
             FlightController() = default;
@@ -119,7 +84,8 @@ namespace hf {
                     zranger_filter_(zranger_filter),
                     state_(fc.state_),
                     mode_(fc.mode_),
-                    flying_status_(fc.flying_status_),
+                    is_flying_(fc.is_flying_),
+                    started_flying_msec_(fc.started_flying_msec_),
                     voltage_(fc.voltage_),
                     ekf_prediction_timer_(fc.ekf_prediction_timer_),
                     flying_check_timer_(fc.flying_check_timer_),
@@ -142,7 +108,8 @@ namespace hf {
                     const ImuFilter & imu_filter,
                     const VehicleState & state,
                     const Mode & mode,
-                    const FlyingStatus & flying_status,
+                    const bool is_flying,
+                    const uint32_t started_flying_msec,
                     const float voltage,
                     const Timer & ekf_prediction_timer,
                     const Timer & flying_check_timer,
@@ -164,21 +131,22 @@ namespace hf {
                             imu_filter_(imu_filter),
                             state_(state),
                             mode_(mode),
-                            flying_status_(flying_status),
+                            is_flying_(is_flying),
+                            started_flying_msec_(started_flying_msec),
                             voltage_(voltage),
                             ekf_prediction_timer_(ekf_prediction_timer),
                             flying_check_timer_(flying_check_timer),
                             voltage_sensing_timer_(voltage_sensing_timer),
-                    telemetry_timer_(telemetry_timer), 
-                    hover_timer_(hover_timer),
-                    heartbeat_timer_(heartbeat_timer), 
-                    fast_blink_timer_(fast_blink_timer),
-                    pid_controller_(pid_controller),
-                    pid_update_usec_prev_(pid_update_usec_prev),
-                    led_(led),
-                    was_arming_button_up_(was_arming_button_up),
-                    receiver_parser_(receiver_parser),
-                    receiver_message_msec_(receiver_message_msec) {}
+                            telemetry_timer_(telemetry_timer), 
+                            hover_timer_(hover_timer),
+                            heartbeat_timer_(heartbeat_timer), 
+                            fast_blink_timer_(fast_blink_timer),
+                            pid_controller_(pid_controller),
+                            pid_update_usec_prev_(pid_update_usec_prev),
+                            led_(led),
+                            was_arming_button_up_(was_arming_button_up),
+                            receiver_parser_(receiver_parser),
+                            receiver_message_msec_(receiver_message_msec) {}
 
             static auto ParseReceiverByte(
                     const FlightController & fc,
@@ -200,7 +168,8 @@ namespace hf {
                         fc.imu_filter_,
                         fc.state_,
                         fc.mode_,
-                        fc.flying_status_,
+                        fc.is_flying_,
+                        fc.started_flying_msec_,
                         fc.voltage_,
                         fc.ekf_prediction_timer_,
                         fc.flying_check_timer_,
@@ -243,7 +212,9 @@ namespace hf {
 
                         UpdateMode(fc, msec, control_level),
 
-                        UpdateFlyingStatus(fc, msec, motorvals),
+                        UpdateFlyingStatus(fc, msec),
+
+                        UpdateStartedFlyingTime(fc, msec, motorvals),
 
                         UpdateVoltage(fc, msec, rawvolts),
 
@@ -406,22 +377,6 @@ namespace hf {
                         GetYaw(fc));
             }
 
-            static auto UpdateFlyingStatus(
-                    const FlightController & fc,
-                    const uint32_t msec,
-                    const std::vector<float> motorvals) -> FlyingStatus
-            {
-                return 
-
-                    fc.mode_ == kModeIdle || fc.mode_ == kModePanic ? 
-                    FlyingStatus(false, 0) :
-
-                    Timer::IsReady(fc.flying_check_timer_) ?
-                    FlyingStatus::Check(fc.flying_status_, msec, motorvals) :
-
-                    fc.flying_status_;
-            }
-
             static auto UpdateLed(
                     const FlightController & fc,
                     const uint32_t msec,
@@ -448,7 +403,7 @@ namespace hf {
 
                 // Periodically run the EKF prediction step
                 if (Timer::IsReady(fc.ekf_prediction_timer_)) {
-                    ekf = EKF::Predict(ekf, msec, IsFlying(fc));
+                    ekf = EKF::Predict(ekf, msec, fc.is_flying_);
                 }
 
                 // Do EKF fast-update with Imu readings
@@ -465,7 +420,7 @@ namespace hf {
 
                 return PidController::Run(
                         fc.pid_controller_,
-                        IsFlying(fc),
+                        fc.is_flying_,
                         dt,
                         fc.mode_,
                         fc.state_,
@@ -542,11 +497,6 @@ namespace hf {
                     fc.mode_;
             }
 
-            static auto IsFlying(const FlightController & fc) -> bool
-            {
-                return fc.flying_status_.is_flying_;
-            }
-
             // Special treatment for throttle for now
             static auto GetThrottle(const FlightController & fc) -> float
             {
@@ -605,6 +555,15 @@ namespace hf {
                 return MspParser::GetShort(parser, index) > 0;
             }
 
+            static auto UpdateFlyingStatus(
+                    const FlightController & fc,
+                    const uint32_t msec) -> bool
+            {
+                return fc.started_flying_msec_ > 0 &&
+                    (msec - fc.started_flying_msec_) <
+                    kFlyingHysteresisThresholdMsec;
+            }
+
             static auto UpdateStartedFlyingTime(
                     const FlightController & fc,
                     const uint32_t msec,
@@ -614,15 +573,6 @@ namespace hf {
                     msec :
                     fc.started_flying_msec_;
 
-            }
-
-            static auto UpdateFlyingStatus(
-                    const FlightController & fc,
-                    const uint32_t msec) -> bool
-            {
-                return fc.started_flying_msec_ > 0 &&
-                    (msec - fc.started_flying_msec_) <
-                    kFlyingHysteresisThresholdMsec;
             }
 
             static auto IsThrustOverIdle(
@@ -652,7 +602,8 @@ namespace hf {
             Mode mode_;
 
             // Flying status based on motors
-            FlyingStatus flying_status_;
+            bool is_flying_;
+            uint32_t started_flying_msec_;
 
             // Voltage sensing
             float voltage_;
@@ -681,10 +632,6 @@ namespace hf {
             // MSP receiver
             MspParser receiver_parser_;
             uint32_t receiver_message_msec_;
-
-            // Flying status
-            bool is_flying_;
-            uint32_t started_flying_msec_;
 
             // ---------------------------------------------------------------
 
