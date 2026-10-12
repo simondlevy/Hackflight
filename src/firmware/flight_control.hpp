@@ -23,7 +23,7 @@
 #include <hackflight.h>
 #include <firmware/estimator/ekf.hpp>
 #include <firmware/imu/filter.hpp>
-#include <firmware/imu/sensor.hpp>
+#include <firmware/imu/rawdata.hpp>
 #include <firmware/led.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
@@ -290,7 +290,6 @@ namespace hf {
                         fc.receiver_parser_,
 
                         fc.receiver_message_msec_);
-
             }
 
             static auto UpdateHover(
@@ -381,7 +380,6 @@ namespace hf {
             {
                 return Timer::IsReady(fc.hover_timer_);
             }
-
 
         private:
 

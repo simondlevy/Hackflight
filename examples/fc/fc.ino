@@ -34,7 +34,7 @@
 #include <hackflight.h>
 #include <firmware/debugger.hpp>
 #include <firmware/flight_control.hpp>
-#include <firmware/imu/sensor.hpp>
+#include <firmware/imu/rawdata.hpp>
 #include <firmware/led.hpp>
 #include <firmware/optical_flow.hpp>
 #include <mixers/quadx.hpp>

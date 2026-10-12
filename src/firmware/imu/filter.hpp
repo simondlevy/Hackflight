@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <firmware/imu/sensor.hpp>
+#include <firmware/imu/rawdata.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/imu/three_axis_lpf.hpp>
 

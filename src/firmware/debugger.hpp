@@ -20,7 +20,7 @@
 
 #include <hackflight.h>
 #include <firmware/imu/filter.hpp>
-#include <firmware/imu/sensor.hpp>
+#include <firmware/imu/rawdata.hpp>
 #include <firmware/imu/three_axis.hpp>
 #include <firmware/optical_flow.hpp>
 #include <firmware/timer.hpp>
