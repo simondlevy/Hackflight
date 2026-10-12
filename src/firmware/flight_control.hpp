@@ -87,17 +87,9 @@ namespace hf {
                             const uint32_t msec,
                             const std::vector<float> motorvals) -> FlyingStatus
                     {
-                        auto is_thrust_hover_idle = false;
-
-                        for (auto motorval : motorvals) {
-                            if (motorval > kMotorIdleMax) {
-                                is_thrust_hover_idle = true;
-                                break;
-                            }
-                        }
-
                         const auto last_flying_check_msec =
-                            is_thrust_hover_idle ? msec :
+                            IsThrustOverIdle(motorvals) ?
+                            msec :
                             fs.last_flying_check_msec_;
 
                         const auto is_flying = last_flying_check_msec > 0 &&
@@ -613,6 +605,18 @@ namespace hf {
                 return MspParser::GetShort(parser, index) > 0;
             }
 
+            static auto IsThrustOverIdle(
+                    const std::vector<float> motorvals) -> bool
+            {
+                for (auto motorval : motorvals) {
+                    if (motorval > kMotorIdleMax) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             // ---------------------------------------------------------------
 
             // Sensor fusion
@@ -657,6 +661,10 @@ namespace hf {
             // MSP receiver
             MspParser receiver_parser_;
             uint32_t receiver_message_msec_;
+
+            // Flying status
+            bool is_flying_;
+            uint32_t last_flying_check_msec_;
 
             // ---------------------------------------------------------------
 
