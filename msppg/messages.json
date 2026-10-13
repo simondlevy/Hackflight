@@ -26,8 +26,6 @@
    {"roll":      "short"},
    {"pitch":     "short"},
    {"yaw":       "short"},
-   {"arm":       "short"},
-   {"hover":     "short"},
-   {"autopilot": "short"}
+   {"mode":      "short"}
   ]
 }

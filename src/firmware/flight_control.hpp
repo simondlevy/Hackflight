@@ -97,7 +97,7 @@ namespace hf {
                     pid_controller_(fc.pid_controller_),
                     pid_update_usec_prev_(fc.pid_update_usec_prev_),
                     led_(fc.led_),
-                    was_arming_button_up_(fc.was_arming_button_up_),
+                    was_ever_idle_(fc.was_ever_idle_),
                     receiver_parser_(fc.receiver_parser_),
                     receiver_message_msec_(fc.receiver_message_msec_) {}
 
@@ -121,7 +121,7 @@ namespace hf {
                     const PidController & pid_controller,
                     const uint32_t pid_update_usec_prev,
                     const Led & led,
-                    const bool was_arming_button_up,
+                    const bool was_ever_idle,
                     const MspParser & receiver_parser,
                     const uint32_t receiver_message_msec)
                         :
@@ -144,7 +144,7 @@ namespace hf {
                             pid_controller_(pid_controller),
                             pid_update_usec_prev_(pid_update_usec_prev),
                             led_(led),
-                            was_arming_button_up_(was_arming_button_up),
+                            was_ever_idle_(was_ever_idle),
                             receiver_parser_(receiver_parser),
                             receiver_message_msec_(receiver_message_msec) {}
 
@@ -181,7 +181,7 @@ namespace hf {
                         fc.pid_controller_,
                         fc.pid_update_usec_prev_,
                         fc.led_,
-                        fc.was_arming_button_up_,
+                        fc.was_ever_idle_,
                         parser,
                         timestamp_msec);
             }
@@ -246,7 +246,8 @@ namespace hf {
                         UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
 
-                        !IsArmingSwitchOn(fc),
+                        GetReceiverMode(fc) == kModeIdle ? true :
+                            fc.was_ever_idle_,
 
                         fc.receiver_parser_,
 
@@ -346,15 +347,14 @@ namespace hf {
 
             static auto CheckFailsafe(
                     const uint32_t msec_curr,
-                    const uint32_t msec_prev,
-                    const bool is_arming_button_down) -> bool
+                    const uint32_t msec_prev) -> bool
             {
                 const auto timed_out = 
                     msec_prev > 0 &&
                     msec_curr > msec_prev &&
                     msec_curr - msec_prev > kFailsafeMsec;
 
-                return timed_out ? false : is_arming_button_down;
+                return timed_out ? false : true;
             } 
 
             static auto IsFlipped(const VehicleState & state) -> bool
@@ -371,10 +371,10 @@ namespace hf {
             static auto MakeSetpoint(const FlightController & fc) -> Setpoint
             {                
                 return Setpoint(
-                        GetThrottle(fc),
-                        GetRoll(fc),
-                        GetPitch(fc),
-                        GetYaw(fc));
+                        GetReceiverThrottle(fc),
+                        GetReceiverRoll(fc),
+                        GetReceiverPitch(fc),
+                        GetReceiverYaw(fc));
             }
 
             static auto UpdateLed(
@@ -444,7 +444,7 @@ namespace hf {
                     const PidController::ControlLevel control_level) -> Mode
             {
                 // Run a little state-transition machine to update flight mode
-                return
+                return 
 
                     //  Vehicle flipped over: enter panic mode
                     IsFlipped(fc.state_) ? kModePanic :
@@ -452,27 +452,34 @@ namespace hf {
                     // Panic mode: can't recover
                     fc.mode_ == kModePanic ? kModePanic :
 
-                    // Disallow jumping directly from idle to hover
-                    //fc.mode_ == kModeIdle && requested_hover ? kModeIdle :
+                    // Disallow starting in armed mode
+                    !fc.was_ever_idle_ ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
                     fc.mode_ == kModeIdle &&
-                    IsArmingSwitchOn(fc) &&
-                    fc.was_arming_button_up_ &&
+                    GetReceiverMode(fc) == kModeArmed &&
                     IsSafeToArm(fc, msec, control_level) ?
                     kModeArmed :
 
-                    // Armed and requested disarm: enter idle mode
-                    fc.mode_ == kModeArmed && !IsArmingSwitchOn(fc) ? kModeIdle :
+                    fc.mode_ == kModeArmed &&
+                    GetReceiverMode(fc) == kModeIdle ?
+                    kModeIdle :
+
+#if 0
+                    // Disallow jumping directly from idle to hover
+                    fc.mode_ == kModeIdle && IsHoverSwitchOn(fc) ? kModeIdle :
+
+                    fc.mode_ == kModeIdle && !IsHoverSwitchOn(fc) ?  kModeIdle :
 
                     // Armed and requested hover; enter hover mode
-                    //fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
+                    fc.mode_ == kModeArmed && IsHoverSwitchOn(fc) ?  kModeHovering :
 
                     // Hovering and requested no-hover; return to armed mode
-                    //fc.mode_ == kModeHovering && !requested_hover ? kModeArmed :
+                    fc.mode_ == kModeHovering && !IsHoverSwitchOn(fc) ?  kModeArmed :
 
                     // Hovering and requested disarm; enter idle mode
-                    fc.mode_ == kModeHovering && !IsArmingSwitchOn(fc) ? kModeIdle :
+                    fc.mode_ == kModeHovering && !IsArmingSwitchOn(fc) ?  kModeIdle :
+#endif
 
                     //  Default: stay in current mode
                     fc.mode_;
@@ -489,38 +496,51 @@ namespace hf {
                     !IsGyroCalibrated(fc) ? false :
 
                     // Check receiver timeout
-                    !CheckFailsafe(msec,
-                            fc.receiver_message_msec_,
-                            IsArmingSwitchOn(fc)) ? false :
-
-                    // Throttle must be down for arming in stabilization-only
-                    control_level == PidController::kControlStabilize ? 
-                    GetThrottle(fc) < kThrottleDownMax :
+                    !CheckFailsafe(msec, fc.receiver_message_msec_) ? false :
 
                     true;
             }
 
             // Special treatment for throttle for now
-            static auto GetThrottle(const FlightController & fc) -> float
+            static auto GetReceiverThrottle(const FlightController & fc) -> float
             {
                 return GetAxisValue(fc.receiver_parser_, 0);
-                //const auto val = MspParser::GetShort(fc.receiver_parser_, 0);
-                //return 2 * (val / 4095.f ) - 1;
             }
 
-            static auto GetRoll(const FlightController & fc) -> float
+            static auto GetReceiverRoll(const FlightController & fc) -> float
             {
                 return GetAxisValue(fc.receiver_parser_, 1);
             }
 
-            static auto GetPitch(const FlightController & fc) -> float
+            static auto GetReceiverPitch(const FlightController & fc) -> float
             {
                 return GetAxisValue(fc.receiver_parser_, 2);
             }
 
-            static auto GetYaw(const FlightController & fc) -> float
+            static auto GetReceiverYaw(const FlightController & fc) -> float
             {
                 return GetAxisValue(fc.receiver_parser_, 3);
+            }
+
+            static auto GetReceiverMode(const FlightController & fc) -> Mode
+            {
+                const Mode modes[5] = {
+                    kModeIdle,
+                    kModeArmed,
+                    kModeHovering,
+                    kModeAutonomous,
+                    kModePanic
+                };
+
+                return modes[MspParser::GetShort(fc.receiver_parser_, 4)];
+            }
+
+            static auto GetAxisValue(
+                    const MspParser & parser, const uint8_t index) -> float
+            {
+                const float val = MspParser::GetShort(parser, index) / 2048.f;
+
+                return fabs(val) < kAxisDeadband ? 0 : val;
             }
 
             static auto GetReceiverMessageTimestampMsec(
@@ -532,35 +552,6 @@ namespace hf {
             static auto IsGyroCalibrated(const FlightController & fc) -> bool
             {
                 return ImuFilter::IsGyroCalibrated(fc.imu_filter_);
-            }
-
-            static auto IsArmingSwitchOn(const FlightController & fc) -> bool
-            {
-                return GetSwitchStatus(fc, 4);
-            }
-
-            static auto IsHoverSwitchOn(const FlightController & fc) -> bool
-            {
-                return GetSwitchStatus(fc, 5);
-            }
-
-            static auto IsAutopilotSwitchOn(const FlightController & fc) -> bool
-            {
-                return GetSwitchStatus(fc, 6);
-            }
-
-            static auto GetAxisValue(
-                    const MspParser & parser, const uint8_t index) -> float
-            {
-                const float val = MspParser::GetShort(parser, index) / 2048.f;
-
-                return fabs(val) < kAxisDeadband ? 0 : val;
-            }
-
-            static auto GetSwitchStatus(
-                    const FlightController & fc, const uint8_t index) -> float
-            {
-                return MspParser::GetShort(fc.receiver_parser_, index) > 0;
             }
 
             static auto UpdateFlyingStatus(
@@ -635,7 +626,7 @@ namespace hf {
             Led led_;
 
             // Safety
-            bool was_arming_button_up_;
+            bool was_ever_idle_;
 
             // MSP receiver
             MspParser receiver_parser_;

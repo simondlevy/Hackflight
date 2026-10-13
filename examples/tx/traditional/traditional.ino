@@ -41,17 +41,15 @@ static const uint8_t kArmingButtonPin = A8;
 static const uint8_t kHoveringButtonPin = A0;
 static const uint8_t kAutopilotButtonPin = A7;
 
-// Button debouncing ---------------------------------------------------------
-
-static const uint16_t kButtonAnalogMin = 4000;
-
-// ----------------------------------------------------------------------------
+static const uint16_t kButtonAnalogMax = 50;
 
 // Axis extrema determined empirically
 static const uint16_t kThrottleMid = 1903;
 static const uint16_t kRollMid = 1951;
 static const uint16_t kPitchMid = 1950;
 static const uint16_t kYawMid = 1900;
+
+static const int16_t kThrottleArmingMin = -1900;
 
 static const uint8_t kLedPin = 21;
 
@@ -103,19 +101,9 @@ static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
     return analogRead(pin) - mid;
 }
 
-static auto DebugAxis(const uint8_t pin, const int16_t mid) -> float
-{
-    return ReadAxis(pin, mid) / 2048.f;
-}
-
 static auto ReadButton(const uint8_t pin) -> bool
 {
-    return analogRead(pin) > kButtonAnalogMin;
-}
-
-static auto ReadButtonInverted(const uint8_t pin) -> bool
-{
-    return analogRead(pin) < (4095 - kButtonAnalogMin);
+    return analogRead(pin) < kButtonAnalogMax;
 }
 
 void setup()
@@ -128,11 +116,9 @@ void setup()
     hf::EspNow::WifiAddPeer(kReceiverAddress);
 }
 
+
 void loop()
 {
-    static Pushbutton hover_button_;
-    static Pushbutton autopilot_button_;
-
     const auto rawval = analogRead(kVoltageDividerPin);
 
     // 12-bit voltage reading
@@ -148,36 +134,44 @@ void loop()
 
     const auto msec = millis();
 
-    const auto is_armed = ReadButton(kArmingButtonPin);
+    const auto throttle = -ReadAxis(kThrottlePin, kThrottleMid);
+    const auto roll = -ReadAxis(kRollPin, kRollMid);
+    const auto pitch =  ReadAxis(kPitchPin, kPitchMid);
+    const auto yaw = ReadAxis(kYawPin, kYawMid);
 
-    hover_button_ = Pushbutton::Update(hover_button_,
-            ReadButtonInverted(kHoveringButtonPin));
+    const auto is_throttle_down = throttle < kThrottleArmingMin;
 
-    autopilot_button_ = Pushbutton::Update(autopilot_button_,
-            ReadButtonInverted(kAutopilotButtonPin));
+    const auto is_arming_button_pressed = ReadButton(kArmingButtonPin);
 
-    const short vals[7] = {
+    // Implement a little state/transition machine for mode
+    static hf::Mode mode_;
+    mode_ = 
 
-        -ReadAxis(kThrottlePin, kThrottleMid),
-        -ReadAxis(kRollPin, kRollMid),
-        ReadAxis(kPitchPin, kPitchMid),
-        ReadAxis(kYawPin, kYawMid),
+        mode_ == hf::kModeIdle &&
+        is_throttle_down &&
+        is_arming_button_pressed ?
+        hf::kModeArmed :
 
-        is_armed,
-        Pushbutton::GetState(hover_button_),
-        Pushbutton::GetState(autopilot_button_)
-    };
+        mode_ == hf::kModeArmed &&
+        !is_arming_button_pressed ?
+        hf::kModeIdle :
 
-    /*
-       Serial.printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
-       "arm=%d hov=%d aut=%d\n",
-       volts, vals[0], vals[1], vals[2], vals[3],
-       vals[4], vals[5], vals[6]);*/
+        mode_;
 
     static hf::MspSerializer serializer_;
 
+    static const char * kModeNames[4] = {
+        "idle", "armed", "hover", "autopilot"
+    };
+
+    Serial.printf("volts=%2.1f mode=%-10s " 
+            "t=%+05d r=%+05d p=%+05d y=%+05d\n",
+            volts, kModeNames[mode_], throttle, roll, pitch, yaw);
+
+    const short vals[5] = {throttle, roll, pitch, yaw, mode_};
+
     serializer_ = hf::MspSerializer::SerializeShorts(
-            serializer_, kMspSetChannels, vals, 7);
+            serializer_, kMspSetChannels, vals, 5);
 
     const auto result = esp_now_send(kReceiverAddress,
             hf::MspSerializer::GetPayloadBytes(serializer_),

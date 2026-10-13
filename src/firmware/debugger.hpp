@@ -60,11 +60,11 @@ namespace hf {
         public:
 
             static constexpr char * kModeNames[6] = {
-                (char *)"IDLE",
-                (char *)"ARMED",
-                (char *)"HOVERING",
-                (char *)"AUTONOMOUS",
-                (char *)"PANIC"
+                (char *)"idle",
+                (char *)"armed",
+                (char *)"hovering",
+                (char *)"autonomous",
+                (char *)"panic"
             };
 
             static void ReportForever(const char * errmsg)
