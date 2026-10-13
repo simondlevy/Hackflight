@@ -39,10 +39,10 @@ namespace hf {
 
                     int count;
 
-                    bool Ready(const uint32_t msec)
+                    bool Ready()
                     {
                         timer_ =
-                            Timer::Update(timer_, kReportingRate, msec);
+                            Timer::Update(timer_, kReportingRate, millis());
 
                         if (Timer::IsReady(timer_)) {
                             count++;
@@ -75,45 +75,43 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec, const Mode mode)
+            void Report(const Mode mode)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | mode=%s\n", helper_.count, kModeNames[mode]);
                 }
             }
 
-            void ReportFloat(const uint32_t msec,
-                    const char * label, const float value)
+            void ReportFloat(const char * label, const float value)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | %s=%f\n", helper_.count, label, value);
                 }
             }
 
-            void ReportBool(const uint32_t msec,
-                    const char * label, const bool value)
+            void ReportBool(const char * label, const bool value)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | %s=%s\n",
                             helper_.count, label, value ? "true" : "false");
                 }
             }
 
-            void Report(const uint32_t msec, const Setpoint & setpoint)
+            void Report(const Setpoint & setpoint)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     ReportSetpoint(setpoint);
                     printf("\n");
                 }
             }
 
-            void ReportHover(const uint32_t msec, const VehicleState & state)
+            void ReportHover(const VehicleState & state)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
                             helper_.count, state.dx, state.dy, state.z,
@@ -121,10 +119,9 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec,
-                    const VehicleState & state, const bool full=false)
+            void Report(const VehicleState & state, const bool full=false)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     if (full) {
                         printf("%5d | "
@@ -146,27 +143,27 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec, const Imu::ThreeAxisRaw & raw)
+            void Report(const Imu::ThreeAxisRaw & raw)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | x=%+05d y=%+05d z=%+05d\n",
                             helper_.count, raw.x, raw.y, raw.z);
                 }
             }
 
-            void Report(const uint32_t msec, const ThreeAxis & vec)
+            void Report(const ThreeAxis & vec)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | x=%+04.0f y=%+04.0f z=%+04.0f\n",
                             helper_.count, vec.x, vec.y, vec.z);
                 }
             }
 
-            void Report(const uint32_t msec, const ImuFilter::Data & imufilt)
+            void Report(const ImuFilter::Data & imufilt)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     const auto g = imufilt.gyro_dps;
                     const auto a = imufilt.accel_gs;
@@ -177,9 +174,9 @@ namespace hf {
                 }
             }
 
-            void Report(const uint32_t msec, const Imu::RawData & imuraw)
+            void Report(const Imu::RawData & imuraw)
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     const auto gyro = imuraw.gyro;
                     const auto accel = imuraw.accel;
@@ -191,12 +188,11 @@ namespace hf {
                 }
             }
 
-            void ReportMotors(const uint32_t msec,
-                    const float * vals,
+            void ReportMotors(const float * vals,
                     const uint8_t count,
                     const char * fmt="%f")
             {
-                if (helper_.Ready(msec)) {
+                if (helper_.Ready()) {
 
                     printf("%5d | ", helper_.count);
 

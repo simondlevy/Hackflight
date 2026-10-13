@@ -19,6 +19,9 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/voltage_divider.hpp>
 
+// For traditional (slack throttle) TX emulation -----------------------------
+static const bool kIsTraditional = true;
+
 // Hardware-dependent --------------------------------------------------------
 
 static const uint8_t kReceiverAddress[6] = {
@@ -39,7 +42,7 @@ static const uint8_t kHoverButtonPin = A0;
 static const uint8_t kAutonomousButtonPin = A7;
 static const uint8_t kLedPin = 21;
 
-// Weak-ass button debouncing ------------------------------------------------
+// Helps with button debouncing
 static const uint16_t kButtonAnalogMax = 50;
 
 // Axis extrema determined empirically --------------------------------------
@@ -48,8 +51,7 @@ static const uint16_t kRollMid = 1951;
 static const uint16_t kPitchMid = 1950;
 static const uint16_t kYawMid = 1900;
 
-// For traditional (slack throttle) TX emulation -----------------------------
-static const bool kIsTraditional = false;
+// For traditional (slack throttle) TX emulation flagged by kIsTraditional ---
 static const int16_t kThrottleArmingMin = -1900;
 
 // Votage divider constants to scale down for 3.3V analog-read ---------------

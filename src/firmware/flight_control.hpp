@@ -461,25 +461,10 @@ namespace hf {
                     IsSafeToArm(fc, msec, control_level) ?
                     kModeArmed :
 
-                    fc.mode_ == kModeArmed &&
+                    // Want disarm: enter idle mode
+                    fc.mode_ >= kModeArmed &&
                     GetReceiverMode(fc) == kModeIdle ?
                     kModeIdle :
-
-#if 0
-                    // Disallow jumping directly from idle to hover
-                    fc.mode_ == kModeIdle && IsHoverSwitchOn(fc) ? kModeIdle :
-
-                    fc.mode_ == kModeIdle && !IsHoverSwitchOn(fc) ?  kModeIdle :
-
-                    // Armed and requested hover; enter hover mode
-                    fc.mode_ == kModeArmed && IsHoverSwitchOn(fc) ?  kModeHovering :
-
-                    // Hovering and requested no-hover; return to armed mode
-                    fc.mode_ == kModeHovering && !IsHoverSwitchOn(fc) ?  kModeArmed :
-
-                    // Hovering and requested disarm; enter idle mode
-                    fc.mode_ == kModeHovering && !IsArmingSwitchOn(fc) ?  kModeIdle :
-#endif
 
                     //  Default: stay in current mode
                     fc.mode_;

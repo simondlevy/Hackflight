@@ -258,7 +258,7 @@ void setup()
 void loop()
 {
     // We should reach aprrox. 1600 Hz in this loop
-    ProfilerRun();
+    ProfilerRun(false);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
@@ -267,6 +267,8 @@ void loop()
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
+
+    //static hf::Debugger debugger_; debugger_.Report(setpoint);
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
