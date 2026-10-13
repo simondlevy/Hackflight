@@ -93,12 +93,12 @@ namespace hf {
             }
 
             void ReportBool(const uint32_t msec,
-                    const char * label, const bool flag)
+                    const char * label, const bool value)
             {
                 if (helper_.Ready(msec)) {
 
                     printf("%5d | %s=%s\n",
-                            helper_.count, label, flag ? "true" : "false");
+                            helper_.count, label, value ? "true" : "false");
                 }
             }
 

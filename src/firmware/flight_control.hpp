@@ -246,7 +246,7 @@ namespace hf {
                         UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
 
-                        !IsArmingButtonDown(fc),
+                        !IsArmingSwitchOn(fc),
 
                         fc.receiver_parser_,
 
@@ -443,24 +443,6 @@ namespace hf {
                     const uint32_t msec,
                     const PidController::ControlLevel control_level) -> Mode
             {
-                const auto is_arming_button_down = IsArmingButtonDown(fc);
-
-                const auto is_safe_to_arm = 
-
-                    // Disable arming while gyro is calibrating
-                    !IsGyroCalibrated(fc) ? false :
-
-                    // Check receiver timeout
-                    !CheckFailsafe(msec,
-                            fc.receiver_message_msec_,
-                            is_arming_button_down) ? false :
-
-                    // Throttle must be down for arming in stabilization-only
-                    control_level == PidController::kControlStabilize ? 
-                    GetThrottle(fc) < kThrottleDownMax :
-
-                    true;
-
                 // Run a little state-transition machine to update flight mode
                 return
 
@@ -475,13 +457,13 @@ namespace hf {
 
                     // Want arm and safe to arm: enter armed mode
                     fc.mode_ == kModeIdle &&
-                    is_arming_button_down &&
+                    IsArmingSwitchOn(fc) &&
                     fc.was_arming_button_up_ &&
-                    is_safe_to_arm ?
+                    IsSafeToArm(fc, msec, control_level) ?
                     kModeArmed :
 
                     // Armed and requested disarm: enter idle mode
-                    fc.mode_ == kModeArmed && !is_arming_button_down ? kModeIdle :
+                    fc.mode_ == kModeArmed && !IsArmingSwitchOn(fc) ? kModeIdle :
 
                     // Armed and requested hover; enter hover mode
                     //fc.mode_ == kModeArmed && requested_hover ? kModeHovering :
@@ -490,10 +472,32 @@ namespace hf {
                     //fc.mode_ == kModeHovering && !requested_hover ? kModeArmed :
 
                     // Hovering and requested disarm; enter idle mode
-                    fc.mode_ == kModeHovering && !is_arming_button_down ? kModeIdle :
+                    fc.mode_ == kModeHovering && !IsArmingSwitchOn(fc) ? kModeIdle :
 
                     //  Default: stay in current mode
                     fc.mode_;
+            }
+
+            static auto IsSafeToArm(
+                    const FlightController & fc,
+                    const uint32_t msec,
+                    const PidController::ControlLevel control_level) -> bool
+            {
+                return
+
+                    // Disable arming while gyro is calibrating
+                    !IsGyroCalibrated(fc) ? false :
+
+                    // Check receiver timeout
+                    !CheckFailsafe(msec,
+                            fc.receiver_message_msec_,
+                            IsArmingSwitchOn(fc)) ? false :
+
+                    // Throttle must be down for arming in stabilization-only
+                    control_level == PidController::kControlStabilize ? 
+                    GetThrottle(fc) < kThrottleDownMax :
+
+                    true;
             }
 
             // Special treatment for throttle for now
@@ -530,7 +534,7 @@ namespace hf {
                 return ImuFilter::IsGyroCalibrated(fc.imu_filter_);
             }
 
-            static auto IsArmingButtonDown(const FlightController & fc) -> bool
+            static auto IsArmingSwitchOn(const FlightController & fc) -> bool
             {
                 return GetSwitchStatus(fc, 4);
             }
