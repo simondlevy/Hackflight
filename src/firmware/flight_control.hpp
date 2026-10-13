@@ -243,7 +243,7 @@ namespace hf {
 
                         usec,
 
-                        UpdateLed(fc, msec,fc.imu_filter_.is_gyro_calibrated
+                        UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
 
                         !IsArmingButtonDown(fc),
@@ -407,7 +407,8 @@ namespace hf {
                 }
 
                 // Do EKF fast-update with Imu readings
-                return EKF::Update(ekf, fc.imu_filter_.output, msec);
+                return EKF::Update(
+                        ekf, ImuFilter::GetOutput(fc.imu_filter_), msec);
             }
 
             static auto UpdatePidController(
@@ -444,12 +445,10 @@ namespace hf {
             {
                 const auto is_arming_button_down = IsArmingButtonDown(fc);
 
-                const auto is_gyro_calibrated = fc.imu_filter_.is_gyro_calibrated;
-
                 const auto is_safe_to_arm = 
 
                     // Disable arming while gyro is calibrating
-                    !is_gyro_calibrated ? false :
+                    !IsGyroCalibrated(fc) ? false :
 
                     // Check receiver timeout
                     !CheckFailsafe(msec,
@@ -526,19 +525,24 @@ namespace hf {
                 return fc.receiver_message_msec_;
             }
 
+            static auto IsGyroCalibrated(const FlightController & fc) -> bool
+            {
+                return ImuFilter::IsGyroCalibrated(fc.imu_filter_);
+            }
+
             static auto IsArmingButtonDown(const FlightController & fc) -> bool
             {
-                return GetSwitchStatus(fc.receiver_parser_, 4);
+                return GetSwitchStatus(fc, 4);
             }
 
             static auto IsHoverButtonDown(const FlightController & fc) -> bool
             {
-                return GetSwitchStatus(fc.receiver_parser_, 5);
+                return GetSwitchStatus(fc, 5);
             }
 
             static auto IsAutopilotButtonDown(const FlightController & fc) -> bool
             {
-                return GetSwitchStatus(fc.receiver_parser_, 6);
+                return GetSwitchStatus(fc, 6);
             }
 
             static auto GetAxisValue(
@@ -550,9 +554,9 @@ namespace hf {
             }
 
             static auto GetSwitchStatus(
-                    const MspParser & parser, const uint8_t index) -> float
+                    const FlightController & fc, const uint8_t index) -> float
             {
-                return MspParser::GetShort(parser, index) > 0;
+                return MspParser::GetShort(fc.receiver_parser_, index) > 0;
             }
 
             static auto UpdateFlyingStatus(

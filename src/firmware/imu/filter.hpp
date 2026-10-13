@@ -53,10 +53,6 @@ namespace hf {
                     Data& operator=(const Data& other) = default;
             };
 
-            Data output;
-
-            bool is_gyro_calibrated;
-
             ImuFilter& operator=(const ImuFilter& other) = default;
 
             ImuFilter() = default;
@@ -72,8 +68,8 @@ namespace hf {
                     const ThreeAxisLpf & accel_lpf,
                     const ThreeAxisLpf & gyro_lpf) 
                 : 
-                    output(output),
-                    is_gyro_calibrated(is_gyro_calibrated),
+                    output_(output),
+                    is_gyro_calibrated_(is_gyro_calibrated),
                     gyro_sum_(gyro_sum),
                     gyro_sum_of_squares_(gyro_sum_of_squares),
                     gyro_sample_count_(gyro_sample_count),
@@ -106,10 +102,10 @@ namespace hf {
 
                 const auto gyro_val = ThreeAxis(gyro_raw.x, gyro_raw.y, gyro_raw.z);
 
-                const auto gyro_sum = filter.is_gyro_calibrated ?
+                const auto gyro_sum = filter.is_gyro_calibrated_ ?
                     filter.gyro_sum_ : filter.gyro_sum_ + gyro_val;
 
-                const auto gyro_sum_of_squares = filter.is_gyro_calibrated ?
+                const auto gyro_sum_of_squares = filter.is_gyro_calibrated_ ?
                     filter.gyro_sum_of_squares_ :
                     filter.gyro_sum_of_squares_ + Square(gyro_val);
 
@@ -123,7 +119,7 @@ namespace hf {
                 const auto is_buffer_filled =
                     new_buffer_index == kGyroNumberOfSamples;
 
-                const auto want_update =!filter.is_gyro_calibrated &&
+                const auto want_update =!filter.is_gyro_calibrated_ &&
                     is_buffer_filled;
 
                 const bool is_gyro_variance_low =
@@ -144,7 +140,7 @@ namespace hf {
                     filter.gyro_variance_sample_time_msec_;
 
                 const auto is_gyro_calibrated = should_update ? true :
-                    filter.is_gyro_calibrated;
+                    filter.is_gyro_calibrated_;
 
                 const auto gyro_sample_count = is_buffer_filled ? 0 :
                     new_buffer_index;
@@ -169,7 +165,20 @@ namespace hf {
                         gyro_variance_sample_time_msec, accel_lpf, gyro_lpf);
             }
 
+            static auto IsGyroCalibrated(const ImuFilter & filter) -> bool
+            {
+                return filter.is_gyro_calibrated_;
+            }
+
+            static auto GetOutput(const ImuFilter & filter) -> Data
+            {
+                return filter.output_;
+            }
+
         private:
+
+            Data output_;
+            bool is_gyro_calibrated_;
 
             ThreeAxis gyro_sum_;
             ThreeAxis gyro_sum_of_squares_;
@@ -188,5 +197,6 @@ namespace hf {
             {
                 return vec * 2 * (float)s / 65536;
             }
+
     };
 }
