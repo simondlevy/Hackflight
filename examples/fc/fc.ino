@@ -276,14 +276,14 @@ void setup()
 
 void loop()
 {
-    RunDelayLoop(micros());
+    //RunDelayLoop(micros());
 
     // We should reach aprrox. 1600 Hz in this loop
     ProfilerRun();
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
-            analogRead(kVoltageInputPin), MotorsGetValues(),
+            /*analogRead(kVoltageInputPin)*/40000, MotorsGetValues(),
             kControlLevel);
 
     // Get final setpoint from PID controller
