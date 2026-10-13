@@ -75,6 +75,53 @@ namespace hf {
 
             FlightController(const FlightController & other) = default;
 
+            FlightController(
+                    const EKF & ekf,
+                    const OpticalFlowFilter & optical_flow_filter,
+                    const ZRangerFilter & zranger_filter,
+                    const ImuFilter & imu_filter,
+                    const VehicleState & state,
+                    const Mode & mode,
+                    const bool is_flying,
+                    const uint32_t started_flying_msec,
+                    const float voltage,
+                    const Timer & ekf_prediction_timer,
+                    const Timer & flying_check_timer,
+                    const Timer & voltage_sensing_timer,
+                    const Timer & telemetry_timer, 
+                    const Timer & hover_timer,
+                    const Timer & heartbeat_timer, 
+                    const Timer & fast_blink_timer,
+                    const PidController & pid_controller,
+                    const uint32_t pid_update_usec_prev,
+                    const Led & led,
+                    const bool was_ever_idle,
+                    const MspParser & receiver_parser,
+                    const uint32_t receiver_message_msec)
+                        :
+                            ekf_(ekf),
+                            optical_flow_filter_(optical_flow_filter),
+                            zranger_filter_(zranger_filter),
+                            imu_filter_(imu_filter),
+                            state_(state),
+                            mode_(mode),
+                            is_flying_(is_flying),
+                            started_flying_msec_(started_flying_msec),
+                            voltage_(voltage),
+                            ekf_prediction_timer_(ekf_prediction_timer),
+                            flying_check_timer_(flying_check_timer),
+                            voltage_sensing_timer_(voltage_sensing_timer),
+                            telemetry_timer_(telemetry_timer), 
+                            hover_timer_(hover_timer),
+                            heartbeat_timer_(heartbeat_timer), 
+                            fast_blink_timer_(fast_blink_timer),
+                            pid_controller_(pid_controller),
+                            pid_update_usec_prev_(pid_update_usec_prev),
+                            led_(led),
+                            was_ever_idle_(was_ever_idle),
+                            receiver_parser_(receiver_parser),
+                            receiver_message_msec_(receiver_message_msec) {}
+
             FlightController(const FlightController & fc,
                     const float voltage)
                 :
@@ -127,53 +174,6 @@ namespace hf {
                     was_ever_idle_(fc.was_ever_idle_),
                     receiver_parser_(fc.receiver_parser_),
                     receiver_message_msec_(fc.receiver_message_msec_) {}
-
-            FlightController(
-                    const EKF & ekf,
-                    const OpticalFlowFilter & optical_flow_filter,
-                    const ZRangerFilter & zranger_filter,
-                    const ImuFilter & imu_filter,
-                    const VehicleState & state,
-                    const Mode & mode,
-                    const bool is_flying,
-                    const uint32_t started_flying_msec,
-                    const float voltage,
-                    const Timer & ekf_prediction_timer,
-                    const Timer & flying_check_timer,
-                    const Timer & voltage_sensing_timer,
-                    const Timer & telemetry_timer, 
-                    const Timer & hover_timer,
-                    const Timer & heartbeat_timer, 
-                    const Timer & fast_blink_timer,
-                    const PidController & pid_controller,
-                    const uint32_t pid_update_usec_prev,
-                    const Led & led,
-                    const bool was_ever_idle,
-                    const MspParser & receiver_parser,
-                    const uint32_t receiver_message_msec)
-                        :
-                            ekf_(ekf),
-                            optical_flow_filter_(optical_flow_filter),
-                            zranger_filter_(zranger_filter),
-                            imu_filter_(imu_filter),
-                            state_(state),
-                            mode_(mode),
-                            is_flying_(is_flying),
-                            started_flying_msec_(started_flying_msec),
-                            voltage_(voltage),
-                            ekf_prediction_timer_(ekf_prediction_timer),
-                            flying_check_timer_(flying_check_timer),
-                            voltage_sensing_timer_(voltage_sensing_timer),
-                            telemetry_timer_(telemetry_timer), 
-                            hover_timer_(hover_timer),
-                            heartbeat_timer_(heartbeat_timer), 
-                            fast_blink_timer_(fast_blink_timer),
-                            pid_controller_(pid_controller),
-                            pid_update_usec_prev_(pid_update_usec_prev),
-                            led_(led),
-                            was_ever_idle_(was_ever_idle),
-                            receiver_parser_(receiver_parser),
-                            receiver_message_msec_(receiver_message_msec) {}
 
             static auto ParseReceiverByte(
                     const FlightController & fc,
@@ -228,56 +228,35 @@ namespace hf {
                 return FlightController(
 
                         UpdateStateEstimator(fc, msec),
-
                         fc.optical_flow_filter_,
-
                         fc.zranger_filter_,
-
                         UpdateImuFilter(fc, msec, imu_data),
-
                         EKF::getVehicleState(fc.ekf_),
-
                         UpdateMode(fc, msec, control_level),
-
                         UpdateFlyingStatus(fc, msec),
-
                         UpdateStartedFlyingTime(fc, msec, motorvals),
-
                         fc.voltage_,
-
                         Timer::Update(fc.ekf_prediction_timer_,
                             kEkfPredictionRate, msec),
-
                         Timer::Update(fc.flying_check_timer_,
                                 kFlyingCheckRate, msec),
-
                         Timer::Update(fc.voltage_sensing_timer_,
                                 kVoltageSensingRate, msec),
-
                         Timer::Update(fc.telemetry_timer_, 
                                 kTelemetryRate, msec),
-
                         Timer::Update(fc.hover_timer_,
                                 kHoverDeckRate, msec),
-
                         Timer::Update(fc.heartbeat_timer_, 
                                 kLedHeartbeatRate, msec),
-
                         Timer::Update(fc.fast_blink_timer_, 
                                 kLedFastBlinkRate, msec),
-
                         UpdatePidController(fc, usec, control_level),
-
                         usec,
-
                         UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
-
                         GetReceiverMode(fc) == kModeIdle ? true :
                             fc.was_ever_idle_,
-
                         fc.receiver_parser_,
-
                         fc.receiver_message_msec_);
             }
 
