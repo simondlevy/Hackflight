@@ -18,12 +18,12 @@
 
 #include <array>
 
-#include <firmware/estimator/quaternion.hpp>
-#include <firmware/estimator/rotation.hpp>
-#include <firmware/estimator/three_axis_subsampler.hpp>
-#include <firmware/imu/filter.hpp>
-#include <firmware/optical_flow.hpp>
-#include <firmware/zranger.hpp>
+#include <firmware/fc/estimator/quaternion.hpp>
+#include <firmware/fc/estimator/rotation.hpp>
+#include <firmware/fc/estimator/three_axis_subsampler.hpp>
+#include <firmware/fc/imu/filter.hpp>
+#include <firmware/fc/optical_flow.hpp>
+#include <firmware/fc/zranger.hpp>
 #include <num.hpp>
 
 namespace hf {

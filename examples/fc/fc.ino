@@ -33,10 +33,10 @@
 // Hackflight library
 #include <hackflight.h>
 #include <firmware/debugger.hpp>
-#include <firmware/flight_control.hpp>
-#include <firmware/imu/rawdata.hpp>
-#include <firmware/led.hpp>
-#include <firmware/optical_flow.hpp>
+#include <firmware/fc/flight_control.hpp>
+#include <firmware/fc/imu/rawdata.hpp>
+#include <firmware/fc/led.hpp>
+#include <firmware/fc/optical_flow.hpp>
 #include <mixers/quadx.hpp>
 
 static constexpr uint8_t kVoltageInputPin = A9;

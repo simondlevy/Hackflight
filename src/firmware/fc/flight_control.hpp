@@ -21,17 +21,18 @@
 #include <vector>
 
 #include <hackflight.h>
-#include <firmware/estimator/ekf.hpp>
-#include <firmware/imu/filter.hpp>
-#include <firmware/imu/rawdata.hpp>
-#include <firmware/led.hpp>
+
+#include <firmware/fc/estimator/ekf.hpp>
+#include <firmware/fc/imu/filter.hpp>
+#include <firmware/fc/imu/rawdata.hpp>
+#include <firmware/fc/led.hpp>
+#include <firmware/fc/optical_flow.hpp>
+#include <firmware/fc/zranger.hpp>
 #include <firmware/msp/__messages__.h>
 #include <firmware/msp/parser.hpp>
 #include <firmware/msp/serializer.hpp>
-#include <firmware/optical_flow.hpp>
 #include <firmware/timer.hpp>
 #include <firmware/voltage_divider.hpp>
-#include <firmware/zranger.hpp>
 #include <pidcontrol.hpp>
 
 namespace hf {

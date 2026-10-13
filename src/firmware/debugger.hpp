@@ -19,10 +19,10 @@
 #include <stdio.h>
 
 #include <hackflight.h>
-#include <firmware/imu/filter.hpp>
-#include <firmware/imu/rawdata.hpp>
-#include <firmware/imu/three_axis.hpp>
-#include <firmware/optical_flow.hpp>
+#include <firmware/fc/imu/filter.hpp>
+#include <firmware/fc/imu/rawdata.hpp>
+#include <firmware/fc/imu/three_axis.hpp>
+#include <firmware/fc/optical_flow.hpp>
 #include <firmware/timer.hpp>
 
 namespace hf {

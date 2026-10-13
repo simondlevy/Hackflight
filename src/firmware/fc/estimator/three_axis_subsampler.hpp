@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <firmware/imu/three_axis.hpp>
+#include <firmware/fc/imu/three_axis.hpp>
 
 namespace hf {
 
