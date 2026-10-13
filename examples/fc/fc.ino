@@ -277,14 +277,14 @@ void setup()
 void loop()
 {
     //RunDelayLoop(micros());
+    (void)RunDelayLoop;
 
-    // We should reach aprrox. 1600 Hz in this loop
+    // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
-            /*analogRead(kVoltageInputPin)*/40000, MotorsGetValues(),
-            kControlLevel);
+            MotorsGetValues(), kControlLevel);
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
@@ -293,6 +293,12 @@ void loop()
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
         hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
                 OpticalFlowRead()) :
+        fc_;
+
+    // Run sensor fusion on hover-deck as indicated
+    fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
+        hf::FlightController::UpdateVoltage(fc_,
+                analogRead(kVoltageInputPin)) :
         fc_;
 
     // Blink LED to indicate status

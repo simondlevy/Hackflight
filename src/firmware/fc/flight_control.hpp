@@ -53,7 +53,7 @@ namespace hf {
             // Rate constants for timer tasks
             static constexpr float kEkfPredictionRate = 100;
             static constexpr float kFlyingCheckRate   = 25;
-            static constexpr float kVoltageSensingRate = 10;
+            static constexpr float kVoltageSensingRate = 1;
             static constexpr float kTelemetryRate = 50;
             static constexpr float kHoverDeckRate = 100;
 
@@ -74,6 +74,32 @@ namespace hf {
             FlightController() = default;
 
             FlightController(const FlightController & other) = default;
+
+            FlightController(const FlightController & fc,
+                    const float voltage)
+                :
+                    ekf_(fc.ekf_),
+                    optical_flow_filter_(fc.optical_flow_filter_),
+                    zranger_filter_(fc.zranger_filter_),
+                    state_(fc.state_),
+                    mode_(fc.mode_),
+                    is_flying_(fc.is_flying_),
+                    started_flying_msec_(fc.started_flying_msec_),
+                    voltage_(voltage),
+                    ekf_prediction_timer_(fc.ekf_prediction_timer_),
+                    flying_check_timer_(fc.flying_check_timer_),
+                    voltage_sensing_timer_(fc.voltage_sensing_timer_),
+                    telemetry_timer_(fc.telemetry_timer_), 
+                    hover_timer_(fc.hover_timer_),
+                    heartbeat_timer_(fc.heartbeat_timer_), 
+                    fast_blink_timer_(fc.fast_blink_timer_),
+                    pid_controller_(fc.pid_controller_),
+                    pid_update_usec_prev_(fc.pid_update_usec_prev_),
+                    led_(fc.led_),
+                    was_ever_idle_(fc.was_ever_idle_),
+                    receiver_parser_(fc.receiver_parser_),
+                    receiver_message_msec_(fc.receiver_message_msec_) {}
+
 
             FlightController(const FlightController & fc,
                     const EKF & ekf,
@@ -187,15 +213,11 @@ namespace hf {
                         timestamp_msec);
             }
 
-            void Update(const uint32_t msec)
-            {
-            }
 
             static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,
                     const Imu::RawData imu_data,
-                    const uint16_t rawvolts,
                     const std::vector<float> motorvals, 
                     const PidController::ControlLevel
                     control_level) -> FlightController
@@ -221,7 +243,7 @@ namespace hf {
 
                         UpdateStartedFlyingTime(fc, msec, motorvals),
 
-                        UpdateVoltage(fc, msec, rawvolts),
+                        fc.voltage_,
 
                         Timer::Update(fc.ekf_prediction_timer_,
                             kEkfPredictionRate, msec),
@@ -276,6 +298,14 @@ namespace hf {
 
                 return FlightController(fc, ekf, optical_flow_filter,
                         zranger_filter);
+            }
+
+            static auto UpdateVoltage(
+                    const FlightController & fc,
+                    const uint16_t rawval) -> FlightController
+            {
+                return FlightController(fc,
+                        VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval));
             }
 
             static auto GetTelemetryBytes(
@@ -346,6 +376,12 @@ namespace hf {
                     const FlightController & fc) -> bool
             {
                 return Timer::IsReady(fc.hover_timer_);
+            }
+
+            static auto ShouldUpdateVoltage(
+                    const FlightController & fc) -> bool
+            {
+                return Timer::IsReady(fc.voltage_sensing_timer_);
             }
 
         private:
