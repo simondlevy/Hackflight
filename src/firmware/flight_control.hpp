@@ -443,9 +443,6 @@ namespace hf {
                     const uint32_t msec,
                     const PidController::ControlLevel control_level) -> Mode
             {
-                static Debugger debugger_;
-                debugger_.ReportBool(msec, "hover", IsHoverButtonDown(fc));
-
                 // Run a little state-transition machine to update flight mode
                 return
 
@@ -542,12 +539,12 @@ namespace hf {
                 return GetSwitchStatus(fc, 4);
             }
 
-            static auto IsHoverButtonDown(const FlightController & fc) -> bool
+            static auto IsHoverSwitchOn(const FlightController & fc) -> bool
             {
                 return GetSwitchStatus(fc, 5);
             }
 
-            static auto IsAutopilotButtonDown(const FlightController & fc) -> bool
+            static auto IsAutopilotSwitchOn(const FlightController & fc) -> bool
             {
                 return GetSwitchStatus(fc, 6);
             }

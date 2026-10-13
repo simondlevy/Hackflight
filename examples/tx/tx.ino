@@ -66,6 +66,37 @@ static const float kFreqHz = 100;
 
 static hf::BlinkTimer blink_timer_; 
 
+// Intermittent pushbutton as on/off toggle
+class Pushbutton {
+
+    public:
+
+        Pushbutton(const bool state, const bool was_down)
+            : state_(state), was_down_(was_down) {}
+
+        Pushbutton() = default;
+
+        Pushbutton(const Pushbutton & other) = default;
+
+        static auto Update(
+                const Pushbutton & pb, const bool is_down) -> Pushbutton
+        {
+            return Pushbutton(
+                    is_down && !pb.was_down_ ? !pb.state_ : pb.state_,
+                    is_down);
+        }
+
+        static auto GetState(const Pushbutton & pb) -> bool
+        {
+            return pb.state_;
+        }
+
+    private:
+
+        bool state_;
+        bool was_down_;
+};
+
 // Scale to [-2048, +2047]
 static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
 {
@@ -99,6 +130,9 @@ void setup()
 
 void loop()
 {
+    static Pushbutton hover_button_;
+    static Pushbutton autopilot_button_;
+
     const auto rawval = analogRead(kVoltageDividerPin);
 
     // 12-bit voltage reading
@@ -116,11 +150,11 @@ void loop()
 
     const auto is_armed = ReadButton(kArmingButtonPin);
 
-    const auto is_hovering = ReadButtonInverted(kHoveringButtonPin);
+    hover_button_ = Pushbutton::Update(hover_button_,
+            ReadButtonInverted(kHoveringButtonPin));
 
-    const auto is_autopiloted = ReadButtonInverted(kAutopilotButtonPin);
-
-    Serial.println(is_autopiloted);
+    autopilot_button_ = Pushbutton::Update(autopilot_button_,
+            ReadButtonInverted(kAutopilotButtonPin));
 
     const short vals[7] = {
 
@@ -129,16 +163,16 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        is_armed, is_hovering, is_autopiloted
-        //hf::Pushbutton::GetState(hovering_button_),
-        //hf::Pushbutton::GetState(autopilot_button_)
+        is_armed,
+        Pushbutton::GetState(hover_button_),
+        Pushbutton::GetState(autopilot_button_)
     };
 
     /*
-    Serial.printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
-            "arm=%d hov=%d aut=%d\n",
-            volts, vals[0], vals[1], vals[2], vals[3],
-            vals[4], vals[5], vals[6]);*/
+       Serial.printf("volts=%2.1f t=%+05d r=%+05d p=%+05d y=%+05d | "
+       "arm=%d hov=%d aut=%d\n",
+       volts, vals[0], vals[1], vals[2], vals[3],
+       vals[4], vals[5], vals[6]);*/
 
     static hf::MspSerializer serializer_;
 
