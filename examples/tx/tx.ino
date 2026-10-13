@@ -19,8 +19,6 @@
 #include <firmware/msp/serializer.hpp>
 #include <firmware/voltage_divider.hpp>
 
-#include "pushbutton.hpp"
-
 // Hardware-dependent --------------------------------------------------------
 
 static const uint8_t kReceiverAddress[6] = {
@@ -45,10 +43,7 @@ static const uint8_t kAutopilotButtonPin = A7;
 
 // Button debouncing ---------------------------------------------------------
 
-static const uint16_t kArmingPinMin = 4000;
-
-static hf::Pushbutton hovering_button_;
-static hf::Pushbutton autopilot_button_;
+static const uint16_t kButtonAnalogMin = 4000;
 
 // ----------------------------------------------------------------------------
 
@@ -82,12 +77,14 @@ static auto DebugAxis(const uint8_t pin, const int16_t mid) -> float
     return ReadAxis(pin, mid) / 2048.f;
 }
 
-static auto DebouncePushbutton(
-        const hf::Pushbutton & pushbutton,
-        const uint8_t pin,
-        const uint32_t msec) -> hf::Pushbutton
+static auto ReadButton(const uint8_t pin) -> bool
 {
-    return hf::Pushbutton::Debounce(pushbutton, analogRead(pin), msec);
+    return analogRead(pin) > kButtonAnalogMin;
+}
+
+static auto ReadButtonInverted(const uint8_t pin) -> bool
+{
+    return analogRead(pin) < (4095 - kButtonAnalogMin);
 }
 
 void setup()
@@ -117,14 +114,13 @@ void loop()
 
     const auto msec = millis();
 
+    const auto is_armed = ReadButton(kArmingButtonPin);
 
-    const auto is_armed = analogRead(kArmingButtonPin) > kArmingPinMin;
+    const auto is_hovering = ReadButtonInverted(kHoveringButtonPin);
 
-    hovering_button_ = DebouncePushbutton(
-            hovering_button_, kHoveringButtonPin, msec);
+    const auto is_autopiloted = ReadButtonInverted(kAutopilotButtonPin);
 
-    autopilot_button_ = DebouncePushbutton(
-            autopilot_button_, kAutopilotButtonPin, msec);
+    Serial.println(is_autopiloted);
 
     const short vals[7] = {
 
@@ -133,9 +129,9 @@ void loop()
         ReadAxis(kPitchPin, kPitchMid),
         ReadAxis(kYawPin, kYawMid),
 
-        is_armed,
-        hf::Pushbutton::GetState(hovering_button_),
-        hf::Pushbutton::GetState(autopilot_button_)
+        is_armed, is_hovering, is_autopiloted
+        //hf::Pushbutton::GetState(hovering_button_),
+        //hf::Pushbutton::GetState(autopilot_button_)
     };
 
     /*

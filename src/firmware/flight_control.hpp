@@ -443,6 +443,9 @@ namespace hf {
                     const uint32_t msec,
                     const PidController::ControlLevel control_level) -> Mode
             {
+                static Debugger debugger_;
+                debugger_.ReportBool(msec, "hover", IsHoverButtonDown(fc));
+
                 // Run a little state-transition machine to update flight mode
                 return
 
