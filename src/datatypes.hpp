@@ -68,7 +68,7 @@ namespace hf {
 
         kModeIdle,
         kModeArmed,
-        kModeHovering,
+        kModeHover,
         kModeAutonomous,
         kModePanic
 

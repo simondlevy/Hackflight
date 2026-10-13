@@ -20,7 +20,7 @@
 #include <firmware/voltage_divider.hpp>
 
 // For traditional (slack throttle) TX emulation -----------------------------
-static const bool kIsTraditional = true;
+static const bool kIsTraditional = false;
 
 // Hardware-dependent --------------------------------------------------------
 
@@ -230,19 +230,19 @@ void loop()
         mode_ == hf::kModeArmed &&
         !kIsTraditional && 
         MomentaryButton::GetState(hover_button_) ? 
-        hf::kModeHovering :
+        hf::kModeHover :
 
-        mode_ == hf::kModeHovering &&
+        mode_ == hf::kModeHover &&
         !MomentaryButton::GetState(hover_button_) ? 
         hf::kModeArmed :
 
-        mode_ == hf::kModeHovering &&
+        mode_ == hf::kModeHover &&
         MomentaryButton::GetState(autonomous_button_) ? 
         hf::kModeAutonomous :
 
         mode_ == hf::kModeAutonomous &&
         !MomentaryButton::GetState(autonomous_button_) ? 
-        hf::kModeHovering :
+        hf::kModeHover :
 
         mode_;
 

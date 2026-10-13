@@ -93,7 +93,7 @@ namespace hf {
                         kAltitudeMinM, kAltitudemaxM);
 
                 const auto hovering =
-                    mode == kModeHovering || mode == kModeAutonomous;
+                    mode == kModeHover || mode == kModeAutonomous;
 
                 const auto altitude_pid =
                     AltitudeController::Run(pc.altitude_pid_, hovering, dt,

@@ -444,6 +444,9 @@ namespace hf {
                     const uint32_t msec,
                     const PidController::ControlLevel control_level) -> Mode
             {
+                static hf::Debugger debugger_;
+                debugger_.Report(fc.mode_);
+
                 // Run a little state-transition machine to update flight mode
                 return 
 
@@ -457,15 +460,16 @@ namespace hf {
                     !fc.was_ever_idle_ ? kModeIdle :
 
                     // Want arm and safe to arm: enter armed mode
-                    fc.mode_ == kModeIdle &&
                     GetReceiverMode(fc) == kModeArmed &&
                     IsSafeToArm(fc, msec, control_level) ?
                     kModeArmed :
 
                     // Want disarm: enter idle mode
-                    fc.mode_ >= kModeArmed &&
-                    GetReceiverMode(fc) == kModeIdle ?
-                    kModeIdle :
+                    GetReceiverMode(fc) == kModeIdle  ?  kModeIdle :
+
+                    // Want hover: TX will send this only in armed mode,
+                    // so it's safe for us to jump to hover mode
+                    GetReceiverMode(fc) == kModeHover ?  kModeHover :
 
                     //  Default: stay in current mode
                     fc.mode_;
@@ -513,7 +517,7 @@ namespace hf {
                 const Mode modes[5] = {
                     kModeIdle,
                     kModeArmed,
-                    kModeHovering,
+                    kModeHover,
                     kModeAutonomous,
                     kModePanic
                 };
