@@ -444,9 +444,6 @@ namespace hf {
                     const uint32_t msec,
                     const PidController::ControlLevel control_level) -> Mode
             {
-                static hf::Debugger debugger_;
-                debugger_.Report(fc.mode_);
-
                 // Run a little state-transition machine to update flight mode
                 return 
 

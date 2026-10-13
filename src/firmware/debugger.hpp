@@ -75,8 +75,10 @@ namespace hf {
                 }
             }
 
-            void Report(const Mode mode)
+            static void Report(const Mode mode)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | mode=%s\n", helper_.count, kModeNames[mode]);
@@ -85,6 +87,8 @@ namespace hf {
 
             void ReportFloat(const char * label, const float value)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | %s=%f\n", helper_.count, label, value);
@@ -93,6 +97,8 @@ namespace hf {
 
             void ReportBool(const char * label, const bool value)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | %s=%s\n",
@@ -100,17 +106,23 @@ namespace hf {
                 }
             }
 
-            void Report(const Setpoint & setpoint)
+            static void Report(const Setpoint & setpoint)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
-                    ReportSetpoint(setpoint);
-                    printf("\n");
+                printf("%5d | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
+                        "yaw=%+3.3f\n",
+                        helper_.count, setpoint.thrust, setpoint.roll,
+                        setpoint.pitch, setpoint.yaw);
                 }
             }
 
             void ReportHover(const VehicleState & state)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | dx=%+3.3f dy=%+3.3f z=%6.3f dz=%+5.3f\n",
@@ -119,8 +131,10 @@ namespace hf {
                 }
             }
 
-            void Report(const VehicleState & state, const bool full=false)
+            static void Report(const VehicleState & state, const bool full=false)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     if (full) {
@@ -143,8 +157,10 @@ namespace hf {
                 }
             }
 
-            void Report(const Imu::ThreeAxisRaw & raw)
+            static void Report(const Imu::ThreeAxisRaw & raw)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | x=%+05d y=%+05d z=%+05d\n",
@@ -152,8 +168,10 @@ namespace hf {
                 }
             }
 
-            void Report(const ThreeAxis & vec)
+            static void Report(const ThreeAxis & vec)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | x=%+04.0f y=%+04.0f z=%+04.0f\n",
@@ -161,8 +179,10 @@ namespace hf {
                 }
             }
 
-            void Report(const ImuFilter::Data & imufilt)
+            static void Report(const ImuFilter::Data & imufilt)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     const auto g = imufilt.gyro_dps;
@@ -174,8 +194,10 @@ namespace hf {
                 }
             }
 
-            void Report(const Imu::RawData & imuraw)
+            static void Report(const Imu::RawData & imuraw)
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     const auto gyro = imuraw.gyro;
@@ -192,6 +214,8 @@ namespace hf {
                     const uint8_t count,
                     const char * fmt="%f")
             {
+                static Helper helper_;
+
                 if (helper_.Ready()) {
 
                     printf("%5d | ", helper_.count);
@@ -204,23 +228,6 @@ namespace hf {
 
                     printf("\n");
                 }
-            }
-
-        private:
-
-            Helper helper_;
-
-            const void ReportSetpoint(const Setpoint & setpoint)
-            {
-                printf("%5d | thrust=%+3.3f roll=%+3.3f pitch=%+3.3f "
-                        "yaw=%+3.3f",
-                        helper_.count, setpoint.thrust, setpoint.roll,
-                        setpoint.pitch, setpoint.yaw);
-            }
-
-            static auto Bool2Str(const bool value) -> const char *
-            {
-                return value ? "true" : "false";
             }
 
     };
