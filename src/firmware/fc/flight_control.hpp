@@ -187,6 +187,10 @@ namespace hf {
                         timestamp_msec);
             }
 
+            void Update(const uint32_t msec)
+            {
+            }
+
             static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,

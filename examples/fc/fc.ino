@@ -41,6 +41,8 @@
 
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
+static const auto kControlLevel = hf::PidController::kControlStabilize;
+static uint32_t kLoopFreq = 2000;
 
 static hf::FlightController fc_;
 
@@ -233,6 +235,23 @@ static void ProfilerRun(const bool should_run=true)
     }
 }
 
+// Loop stability ------------------------------------------------------------
+
+/* Adapted from github.com/nickrehm/dRehmFlight/blob/master/
+   Versions/dRehmFlight_Teensy_BETA_1.3/ dRehmFlight_Teensy_BETA_1.3.ino
+ */
+static void RunDelayLoop(const uint32_t usec)
+{
+    const float inv_feq = 1.0 / kLoopFreq * 1000000.0;
+
+    uint32_t checker = micros();
+
+    while (inv_feq > (checker - usec)) {
+        checker = micros();
+    }
+}
+
+
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -257,18 +276,18 @@ void setup()
 
 void loop()
 {
+    RunDelayLoop(micros());
+
     // We should reach aprrox. 1600 Hz in this loop
-    ProfilerRun(false);
+    ProfilerRun();
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
             analogRead(kVoltageInputPin), MotorsGetValues(),
-            hf::PidController::kControlAltHold);
+            kControlLevel);
 
     // Get final setpoint from PID controller
     const auto setpoint = hf::FlightController::GetSetpoint(fc_);
-
-    //static hf::Debugger debugger_; debugger_.Report(setpoint);
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
@@ -291,8 +310,10 @@ void loop()
     // Periodically send telemetry (receiver setpoint + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
+
         const auto telemetry_bytes =
             hf::FlightController::GetTelemetryBytes(fc_);
+
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
 }

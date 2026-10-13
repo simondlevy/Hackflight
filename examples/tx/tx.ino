@@ -20,7 +20,7 @@
 #include <firmware/voltage_divider.hpp>
 
 // For traditional (slack throttle) TX emulation -----------------------------
-static const bool kIsTraditional = false;
+static const bool kIsTraditional = true;
 
 // Hardware-dependent --------------------------------------------------------
 

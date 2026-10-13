@@ -88,7 +88,6 @@ namespace hf {
                 return MspSerializer(payload, 6 + 2 * count);
             }
 
-
             static auto GetPayload(
                     const MspSerializer & serializer) -> std::vector<uint8_t>
             {
