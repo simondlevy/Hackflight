@@ -38,7 +38,7 @@ static const uint8_t kYawPin = A1;
 static const uint8_t kVoltageDividerPin = A6;
 
 static const uint8_t kArmingButtonPin = A8;
-static const uint8_t kHoveringButtonPin = A0;
+static const uint8_t kHoverButtonPin = A0;
 static const uint8_t kAutopilotButtonPin = A7;
 
 static const uint16_t kButtonAnalogMax = 50;
@@ -119,11 +119,15 @@ void setup()
 
 void loop()
 {
-    const auto rawval = analogRead(kVoltageDividerPin);
+    static Pushbutton hover_button_;
+
+    hover_button_ = Pushbutton::Update(
+            hover_button_, ReadButton(kHoverButtonPin));
 
     // 12-bit voltage reading
     const auto volts = hf::VoltageDivider::Convert(
-            kVoltageDividerR1Ohms, kVoltageDividerR2Ohms, rawval, 12);
+            kVoltageDividerR1Ohms, kVoltageDividerR2Ohms, 
+            analogRead(kVoltageDividerPin), 12);
 
     blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
 
@@ -131,8 +135,6 @@ void loop()
         hf::BlinkTimer::IsOn(blink_timer_) : true;
 
     analogWrite(kLedPin, led_state ? kLedIntensity : 0);
-
-    const auto msec = millis();
 
     const auto throttle = -ReadAxis(kThrottlePin, kThrottleMid);
     const auto roll = -ReadAxis(kRollPin, kRollMid);
@@ -152,6 +154,14 @@ void loop()
         mode_ == hf::kModeArmed &&
         !is_arming_button_pressed ?
         hf::kModeIdle :
+
+        mode_ == hf::kModeArmed &&
+        Pushbutton::GetState(hover_button_) ? 
+        hf::kModeHovering :
+
+        mode_ == hf::kModeHovering &&
+        !Pushbutton::GetState(hover_button_) ? 
+        hf::kModeArmed :
 
         mode_;
 
