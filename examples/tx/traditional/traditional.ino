@@ -64,37 +64,6 @@ static const float kFreqHz = 100;
 
 static hf::BlinkTimer blink_timer_; 
 
-// Intermittent pushbutton as on/off toggle
-class Pushbutton {
-
-    public:
-
-        Pushbutton(const bool state, const bool was_down)
-            : state_(state), was_down_(was_down) {}
-
-        Pushbutton() = default;
-
-        Pushbutton(const Pushbutton & other) = default;
-
-        static auto Update(
-                const Pushbutton & pb, const bool is_down) -> Pushbutton
-        {
-            return Pushbutton(
-                    is_down && !pb.was_down_ ? !pb.state_ : pb.state_,
-                    is_down);
-        }
-
-        static auto GetState(const Pushbutton & pb) -> bool
-        {
-            return pb.state_;
-        }
-
-    private:
-
-        bool state_;
-        bool was_down_;
-};
-
 // Scale to [-2048, +2047]
 static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
 {
