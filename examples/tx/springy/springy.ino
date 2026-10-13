@@ -39,7 +39,7 @@ static const uint8_t kVoltageDividerPin = A6;
 
 static const uint8_t kArmingButtonPin = A8;
 static const uint8_t kHoverButtonPin = A0;
-static const uint8_t kAutopilotButtonPin = A7;
+static const uint8_t kAutonomousButtonPin = A7;
 
 static const uint16_t kButtonAnalogMax = 50;
 
@@ -76,11 +76,11 @@ class Pushbutton {
 
         Pushbutton(const Pushbutton & other) = default;
 
-        static auto Update(
-                const Pushbutton & pb, const bool is_down) -> Pushbutton
+        static auto Update( const Pushbutton & pb, const bool is_down,
+                const bool should_reset) -> Pushbutton
         {
             return Pushbutton(
-                    is_down && !pb.was_down_ ? !pb.state_ : pb.state_,
+                    should_reset ? false : is_down && !pb.was_down_ ? !pb.state_ : pb.state_,
                     is_down);
         }
 
@@ -119,10 +119,17 @@ void setup()
 
 void loop()
 {
-    static Pushbutton hover_button_;
+    static hf::Mode mode_;
 
+    const auto is_idle = mode_ == hf::kModeIdle;
+
+    static Pushbutton hover_button_;
     hover_button_ = Pushbutton::Update(
-            hover_button_, ReadButton(kHoverButtonPin));
+            hover_button_, ReadButton(kHoverButtonPin), is_idle);
+
+    static Pushbutton autonomous_button_;
+    autonomous_button_ = Pushbutton::Update(
+            autonomous_button_, ReadButton(kAutonomousButtonPin), is_idle);
 
     // 12-bit voltage reading
     const auto volts = hf::VoltageDivider::Convert(
@@ -144,8 +151,10 @@ void loop()
     const auto is_arming_button_pressed = ReadButton(kArmingButtonPin);
 
     // Implement a little state/transition machine for mode
-    static hf::Mode mode_;
     mode_ = 
+
+        !is_arming_button_pressed ?
+        hf::kModeIdle :
 
         mode_ == hf::kModeIdle &&
         is_arming_button_pressed ?
@@ -163,12 +172,20 @@ void loop()
         !Pushbutton::GetState(hover_button_) ? 
         hf::kModeArmed :
 
+        mode_ == hf::kModeHovering &&
+        Pushbutton::GetState(autonomous_button_) ? 
+        hf::kModeAutonomous :
+
+        mode_ == hf::kModeAutonomous &&
+        !Pushbutton::GetState(autonomous_button_) ? 
+        hf::kModeHovering :
+
         mode_;
 
     static hf::MspSerializer serializer_;
 
     static const char * kModeNames[4] = {
-        "idle", "armed", "hover", "autopilot"
+        "idle", "armed", "hover", "autonomous"
     };
 
     Serial.printf("volts=%2.1f mode=%-10s " 
