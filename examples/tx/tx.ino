@@ -42,8 +42,6 @@ static const uint8_t kHoverButtonPin = A0;
 static const uint8_t kAutonomousButtonPin = A7;
 static const uint8_t kLedPin = 21;
 
-// Helps with button debouncing
-static const uint16_t kButtonAnalogMax = 50;
 
 // Axis extrema determined empirically --------------------------------------
 static const uint16_t kThrottleMid = 1903;
@@ -62,9 +60,14 @@ static const float kVoltageDividerR2Ohms = 2200;
 static const float kLowVoltage = 3.0;
 static const uint8_t kLedIntensity = 255;
 static const float kFreqHz = 100;
+static const uint32_t kLatchingButtonDebounceMsec = 250;
 
 // Momentary pushbutton as on/off toggle
 class MomentaryButton {
+
+    private:
+
+        static constexpr uint16_t kAnalogMax = 50;
 
     public:
 
@@ -79,7 +82,7 @@ class MomentaryButton {
                 const uint16_t analog_value,
                 const bool should_reset) -> MomentaryButton
         {
-            const auto is_down = analog_value < kButtonAnalogMax;
+            const auto is_down = analog_value < kAnalogMax;
 
             return MomentaryButton(
 
@@ -101,57 +104,59 @@ class MomentaryButton {
         bool was_down_;
 };
 
-// Debouncer for latching pushbutton
-class DebouncedButton {
+// Latching button with debouncing
+class LatchingButton {
 
     private:
 
-        static constexpr uint32_t kDebounceDelayMsec = 250;
+        static constexpr uint16_t kAnalogMax = 4095;
+        static constexpr uint32_t kDebounceMsec = 250;
 
     public:
 
-        DebouncedButton(
-                const bool analog_value,
-                const uint32_t last_debounce_msec,
-                const uint8_t state) 
-            : analog_value_(analog_value),
-            last_debounce_msec_(last_debounce_msec),
-            state_(state) {}
+        LatchingButton(
+                const bool state,
+                const bool was_up,
+                const uint32_t transition_start_msec)
+            :
+                state_(state),
+                was_up_(was_up),
+                transition_start_msec_(transition_start_msec) {}
 
-        DebouncedButton() = default;
+        LatchingButton() = default;
 
-        DebouncedButton(const DebouncedButton & other) = default;
+        LatchingButton(const LatchingButton & other) = default;
 
         static auto Update(
-                const DebouncedButton & button,
-                const uint16_t analog_value,
-                const uint32_t msec) -> DebouncedButton
+                const LatchingButton & button,
+                const uint32_t msec,
+                const uint16_t analog_value) -> LatchingButton
         {
-            const auto is_down = analog_value < kButtonAnalogMax;
+            const auto is_up = analog_value == kAnalogMax;
 
-            const auto last_debounce_msec = 
-                analog_value != button.analog_value_ ?
-                msec : button.last_debounce_msec_;
+            const auto transition_start_msec = 
+                is_up != button.was_up_ ? msec :
+                button.transition_start_msec_;
 
-            const auto state =
-                ((msec - button.last_debounce_msec_) >
-                 kDebounceDelayMsec && analog_value != button.state_) ?
-                analog_value : button.state_;
+            const auto state = (msec - button.transition_start_msec_) >
+                kDebounceMsec ? !is_up : button.state_;
 
-            return DebouncedButton(analog_value, last_debounce_msec, state);
+            return LatchingButton(state, is_up, transition_start_msec);
         }
 
-        static auto GetState(const DebouncedButton & button) -> uint8_t
+        static auto GetState(const LatchingButton & button) -> bool
         {
             return button.state_;
         }
 
+
     private:
 
-        bool analog_value_;
-        uint32_t last_debounce_msec_;
-        uint8_t state_;
+        bool state_;
+        bool was_up_;
+        uint32_t transition_start_msec_;
 };
+
 
 // Scale to [-2048, +2047]
 static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
@@ -176,9 +181,11 @@ void loop()
 
     const auto is_idle = mode_ == hf::kModeIdle;
 
-    static DebouncedButton arming_button_;
-    arming_button_ = DebouncedButton::Update(
-            arming_button_, analogRead(kArmingButtonPin), millis());
+    const auto msec = millis();
+
+    static LatchingButton arming_button_;
+    arming_button_ = LatchingButton::Update(
+            arming_button_, msec, analogRead(kArmingButtonPin));
 
     static MomentaryButton hover_button_;
     hover_button_ = MomentaryButton::Update(
@@ -195,7 +202,7 @@ void loop()
 
     static hf::BlinkTimer blink_timer_; 
 
-    blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
+    blink_timer_ = hf::BlinkTimer::Update(blink_timer_, msec);
 
     const auto led_state = volts < kLowVoltage ? 
         hf::BlinkTimer::IsOn(blink_timer_) : true;
@@ -208,7 +215,7 @@ void loop()
     const auto yaw = ReadAxis(kYawPin, kYawMid);
 
     const auto is_arming_button_pressed =
-        DebouncedButton::GetState(arming_button_);
+        LatchingButton::GetState(arming_button_);
 
     const auto is_throttle_down = throttle < kThrottleArmingMin;
 
