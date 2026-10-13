@@ -139,8 +139,6 @@ void loop()
     const auto pitch =  ReadAxis(kPitchPin, kPitchMid);
     const auto yaw = ReadAxis(kYawPin, kYawMid);
 
-    const auto is_throttle_down = throttle < kThrottleArmingMin;
-
     const auto is_arming_button_pressed = ReadButton(kArmingButtonPin);
 
     // Implement a little state/transition machine for mode
@@ -148,7 +146,6 @@ void loop()
     mode_ = 
 
         mode_ == hf::kModeIdle &&
-        is_throttle_down &&
         is_arming_button_pressed ?
         hf::kModeArmed :
 
@@ -165,7 +162,7 @@ void loop()
     };
 
     Serial.printf("volts=%2.1f mode=%-10s " 
-            "t=%+05d r=%+05d p=%+05d y=%+05d\n",
+            "throttle=%+05d roll=%+05d pitch=%+05d yaw=%+05d\n",
             volts, kModeNames[mode_], throttle, roll, pitch, yaw);
 
     const short vals[5] = {throttle, roll, pitch, yaw, mode_};
