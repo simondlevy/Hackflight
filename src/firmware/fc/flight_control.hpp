@@ -283,8 +283,32 @@ namespace hf {
                     const FlightController & fc,
                     const uint16_t rawval) -> FlightController
             {
-                return FlightController(fc,
-                        VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval));
+                const auto voltage =
+                    VoltageDivider::Convert(kR1Ohms, kR2Ohms, rawval);
+
+                return FlightController(
+                        fc.ekf_,
+                        fc.optical_flow_filter_,
+                        fc.zranger_filter_,
+                        fc.imu_filter_,
+                        fc.state_,
+                        fc.mode_,
+                        fc.is_flying_,
+                        fc.started_flying_msec_,
+                        voltage,
+                        fc.ekf_prediction_timer_,
+                        fc.flying_check_timer_,
+                        fc.voltage_sensing_timer_,
+                        fc.telemetry_timer_, 
+                        fc.hover_timer_,
+                        fc.heartbeat_timer_, 
+                        fc.fast_blink_timer_,
+                        fc.pid_controller_,
+                        fc.pid_update_usec_prev_,
+                        fc.led_,
+                        fc.was_ever_idle_,
+                        fc.receiver_parser_,
+                        fc.receiver_message_msec_); 
             }
 
             static auto GetTelemetryBytes(
