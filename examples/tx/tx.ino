@@ -28,41 +28,38 @@ static const uint8_t kReceiverAddress[6] = {
 };
 
 
-// Analog input pins ----------------------------------------------------------
-
+// Pins ----------------------------------------------------------------------
 static const uint8_t kThrottlePin = A4;
 static const uint8_t kRollPin = A3;
 static const uint8_t kPitchPin = A2;
 static const uint8_t kYawPin = A1;
-
 static const uint8_t kVoltageDividerPin = A6;
-
 static const uint8_t kArmingButtonPin = A8;
 static const uint8_t kHoverButtonPin = A0;
 static const uint8_t kAutonomousButtonPin = A7;
+static const uint8_t kLedPin = 21;
 
+// Weak-ass button debouncing ------------------------------------------------
 static const uint16_t kButtonAnalogMax = 50;
 
-// Axis extrema determined empirically
+// Axis extrema determined empirically --------------------------------------
 static const uint16_t kThrottleMid = 1903;
 static const uint16_t kRollMid = 1951;
 static const uint16_t kPitchMid = 1950;
 static const uint16_t kYawMid = 1900;
 
+// For traditional (slack throttle) TX emulation -----------------------------
+static const bool kIsTraditional = true;
 static const int16_t kThrottleArmingMin = -1900;
 
-static const uint8_t kLedPin = 21;
-
+// Votage divider constants to scale down for 3.3V analog-read ---------------
 static const float kVoltageDividerR1Ohms = 1000;
 static const float kVoltageDividerR2Ohms = 2200;
 
+// Other constants -----------------------------------------------------------
 static const float kLowVoltage = 3.0;
-
 static const uint8_t kLedIntensity = 255;
-
 static const float kFreqHz = 100;
-
-static hf::BlinkTimer blink_timer_; 
 
 // Intermittent pushbutton as on/off toggle
 class Pushbutton {
@@ -136,6 +133,8 @@ void loop()
             kVoltageDividerR1Ohms, kVoltageDividerR2Ohms, 
             analogRead(kVoltageDividerPin), 12);
 
+    static hf::BlinkTimer blink_timer_; 
+
     blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
 
     const auto led_state = volts < kLowVoltage ? 
@@ -150,6 +149,8 @@ void loop()
 
     const auto is_arming_button_pressed = ReadButton(kArmingButtonPin);
 
+    const auto is_throttle_down = throttle < kThrottleArmingMin;
+
     // Implement a little state/transition machine for mode
     mode_ = 
 
@@ -157,6 +158,7 @@ void loop()
         hf::kModeIdle :
 
         mode_ == hf::kModeIdle &&
+        (!kIsTraditional || is_throttle_down) &&
         is_arming_button_pressed ?
         hf::kModeArmed :
 
@@ -165,6 +167,7 @@ void loop()
         hf::kModeIdle :
 
         mode_ == hf::kModeArmed &&
+        !kIsTraditional && 
         Pushbutton::GetState(hover_button_) ? 
         hf::kModeHovering :
 
