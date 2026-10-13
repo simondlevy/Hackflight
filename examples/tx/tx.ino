@@ -49,7 +49,7 @@ static const uint16_t kPitchMid = 1950;
 static const uint16_t kYawMid = 1900;
 
 // For traditional (slack throttle) TX emulation -----------------------------
-static const bool kIsTraditional = true;
+static const bool kIsTraditional = false;
 static const int16_t kThrottleArmingMin = -1900;
 
 // Votage divider constants to scale down for 3.3V analog-read ---------------
@@ -61,27 +61,34 @@ static const float kLowVoltage = 3.0;
 static const uint8_t kLedIntensity = 255;
 static const float kFreqHz = 100;
 
-// Intermittent pushbutton as on/off toggle
-class Pushbutton {
+// Momentary pushbutton as on/off toggle
+class MomentaryButton {
 
     public:
 
-        Pushbutton(const bool state, const bool was_down)
+        MomentaryButton(const bool state, const bool was_down)
             : state_(state), was_down_(was_down) {}
 
-        Pushbutton() = default;
+        MomentaryButton() = default;
 
-        Pushbutton(const Pushbutton & other) = default;
+        MomentaryButton(const MomentaryButton & other) = default;
 
-        static auto Update( const Pushbutton & pb, const bool is_down,
-                const bool should_reset) -> Pushbutton
+        static auto Update(const MomentaryButton & pb,
+                const uint16_t analog_value,
+                const bool should_reset) -> MomentaryButton
         {
-            return Pushbutton(
-                    should_reset ? false : is_down && !pb.was_down_ ? !pb.state_ : pb.state_,
+            const auto is_down = analog_value < kButtonAnalogMax;
+
+            return MomentaryButton(
+
+                    should_reset ? false :
+                    is_down && !pb.was_down_ ? !pb.state_ :
+                    pb.state_,
+
                     is_down);
         }
 
-        static auto GetState(const Pushbutton & pb) -> bool
+        static auto GetState(const MomentaryButton & pb) -> bool
         {
             return pb.state_;
         }
@@ -92,15 +99,62 @@ class Pushbutton {
         bool was_down_;
 };
 
+// Debouncer for latching pushbutton
+class DebouncedButton {
+
+    private:
+
+        static constexpr uint32_t kDebounceDelayMsec = 250;
+
+    public:
+
+        DebouncedButton(
+                const bool analog_value,
+                const uint32_t last_debounce_msec,
+                const uint8_t state) 
+            : analog_value_(analog_value),
+            last_debounce_msec_(last_debounce_msec),
+            state_(state) {}
+
+        DebouncedButton() = default;
+
+        DebouncedButton(const DebouncedButton & other) = default;
+
+        static auto Update(
+                const DebouncedButton & button,
+                const uint16_t analog_value,
+                const uint32_t msec) -> DebouncedButton
+        {
+            const auto is_down = analog_value < kButtonAnalogMax;
+
+            const auto last_debounce_msec = 
+                analog_value != button.analog_value_ ?
+                msec : button.last_debounce_msec_;
+
+            const auto state =
+                ((msec - button.last_debounce_msec_) >
+                 kDebounceDelayMsec && analog_value != button.state_) ?
+                analog_value : button.state_;
+
+            return DebouncedButton(analog_value, last_debounce_msec, state);
+        }
+
+        static auto GetState(const DebouncedButton & button) -> uint8_t
+        {
+            return button.state_;
+        }
+
+    private:
+
+        bool analog_value_;
+        uint32_t last_debounce_msec_;
+        uint8_t state_;
+};
+
 // Scale to [-2048, +2047]
 static auto ReadAxis(const uint8_t pin, const int16_t mid) -> int16_t
 {
     return analogRead(pin) - mid;
-}
-
-static auto ReadButton(const uint8_t pin) -> bool
-{
-    return analogRead(pin) < kButtonAnalogMax;
 }
 
 void setup()
@@ -120,13 +174,17 @@ void loop()
 
     const auto is_idle = mode_ == hf::kModeIdle;
 
-    static Pushbutton hover_button_;
-    hover_button_ = Pushbutton::Update(
-            hover_button_, ReadButton(kHoverButtonPin), is_idle);
+    static DebouncedButton arming_button_;
+    arming_button_ = DebouncedButton::Update(
+            arming_button_, analogRead(kArmingButtonPin), millis());
 
-    static Pushbutton autonomous_button_;
-    autonomous_button_ = Pushbutton::Update(
-            autonomous_button_, ReadButton(kAutonomousButtonPin), is_idle);
+    static MomentaryButton hover_button_;
+    hover_button_ = MomentaryButton::Update(
+            hover_button_, analogRead(kHoverButtonPin), is_idle);
+
+    static MomentaryButton autonomous_button_;
+    autonomous_button_ = MomentaryButton::Update(
+            autonomous_button_, analogRead(kAutonomousButtonPin), is_idle);
 
     // 12-bit voltage reading
     const auto volts = hf::VoltageDivider::Convert(
@@ -147,7 +205,8 @@ void loop()
     const auto pitch =  ReadAxis(kPitchPin, kPitchMid);
     const auto yaw = ReadAxis(kYawPin, kYawMid);
 
-    const auto is_arming_button_pressed = ReadButton(kArmingButtonPin);
+    const auto is_arming_button_pressed =
+        DebouncedButton::GetState(arming_button_);
 
     const auto is_throttle_down = throttle < kThrottleArmingMin;
 
@@ -168,19 +227,19 @@ void loop()
 
         mode_ == hf::kModeArmed &&
         !kIsTraditional && 
-        Pushbutton::GetState(hover_button_) ? 
+        MomentaryButton::GetState(hover_button_) ? 
         hf::kModeHovering :
 
         mode_ == hf::kModeHovering &&
-        !Pushbutton::GetState(hover_button_) ? 
+        !MomentaryButton::GetState(hover_button_) ? 
         hf::kModeArmed :
 
         mode_ == hf::kModeHovering &&
-        Pushbutton::GetState(autonomous_button_) ? 
+        MomentaryButton::GetState(autonomous_button_) ? 
         hf::kModeAutonomous :
 
         mode_ == hf::kModeAutonomous &&
-        !Pushbutton::GetState(autonomous_button_) ? 
+        !MomentaryButton::GetState(autonomous_button_) ? 
         hf::kModeHovering :
 
         mode_;
