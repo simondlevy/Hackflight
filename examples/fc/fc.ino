@@ -262,19 +262,18 @@ void loop()
     ProfilerRun();
 
     // Update core algorithm with all inputs and run PID controller
-    fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
+    fc_ = hf::FlightController::UpdateCore(fc_, micros(), ImuRead(),
             MotorsGetValues(), kControlLevel);
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
-        hf::FlightController::Update(fc_, micros(), ZRangerRead(),
-                OpticalFlowRead()) :
-        fc_;
+        hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
+                OpticalFlowRead()) : fc_;
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
-        hf::FlightController::Update(fc_, analogRead(kVoltageInputPin)) :
-        fc_;
+        hf::FlightController::UpdateVoltage(
+                fc_, analogRead(kVoltageInputPin)) : fc_;
 
     // Blink LED to indicate status
     const auto led_status = hf::FlightController::GetLedStatus(fc_);

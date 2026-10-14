@@ -161,7 +161,7 @@ namespace hf {
             }
 
 
-            static auto Update(
+            static auto UpdateCore(
                     const FlightController & fc,
                     const uint32_t usec,
                     const Imu::RawData imu_data,
@@ -207,7 +207,7 @@ namespace hf {
                         fc.receiver_message_msec_);
             }
 
-            static auto Update(
+            static auto UpdateHover(
                     const FlightController & fc,
                     const uint32_t usec,
                     const float zdistance,
@@ -247,7 +247,7 @@ namespace hf {
                         fc.receiver_message_msec_); 
             }
 
-            static auto Update(
+            static auto UpdateVoltage(
                     const FlightController & fc,
                     const uint16_t rawval) -> FlightController
             {
