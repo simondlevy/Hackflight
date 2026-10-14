@@ -90,7 +90,74 @@ namespace hf {
                     const int16_t accel_z_raw,
                     const int16_t accel_range) -> ImuFilter
             {
-                return filter;
+                const auto gyromean = filter.gyro_sum_ / kGyroNumberOfSamples;
+
+                const auto gyrovariance =
+                    (filter.gyro_sum_of_squares_/kGyroNumberOfSamples) -
+                    Square(gyromean);
+
+                const auto gyro_val = ThreeAxis(gyro_x_raw, gyro_y_raw, gyro_z_raw);
+
+                const auto gyro_sum = filter.is_gyro_calibrated_ ?
+                    filter.gyro_sum_ : filter.gyro_sum_ + gyro_val;
+
+                const auto gyro_sum_of_squares = filter.is_gyro_calibrated_ ?
+                    filter.gyro_sum_of_squares_ :
+                    filter.gyro_sum_of_squares_ + Square(gyro_val);
+
+                const auto accel = Scale(
+                        ThreeAxis(accel_x_raw, accel_y_raw, accel_z_raw),
+                        accel_range);
+
+                const auto new_buffer_index = filter.gyro_sample_count_ + 1;
+
+                const auto is_buffer_filled =
+                    new_buffer_index == kGyroNumberOfSamples;
+
+                const auto want_update =!filter.is_gyro_calibrated_ &&
+                    is_buffer_filled;
+
+                const bool is_gyro_variance_low =
+                    gyrovariance < kGyroRawVarianceBase;
+
+                const bool in_sample_window =
+                    (filter.gyro_variance_sample_time_msec_ +
+                        kGyroMinBiasTimeoutMsec) < msec_curr;
+
+                const auto should_update =
+                    want_update && is_gyro_variance_low && in_sample_window;
+
+                const auto gyro_bias = 
+                    should_update ?  gyromean : filter.gyro_bias_;
+
+                const auto gyro_variance_sample_time_msec =
+                    should_update ? msec_curr :
+                    filter.gyro_variance_sample_time_msec_;
+
+                const auto is_gyro_calibrated = should_update ? true :
+                    filter.is_gyro_calibrated_;
+
+                const auto gyro_sample_count = is_buffer_filled ? 0 :
+                    new_buffer_index;
+
+                const auto gyro_unbiased =
+                    Scale(gyro_val - gyro_bias, gyro_range);
+
+                const auto gyro_lpf = filter.gyro_lpf_.Apply(
+                        filter.gyro_lpf_, gyro_unbiased, kGyroLpfCuttofFreq);
+
+                const auto gyro_filtered = gyro_lpf.output;
+
+                const auto accel_lpf = filter.accel_lpf_.Apply(
+                        filter.accel_lpf_, accel, kAccelLpfCutoffFreq);
+
+                const auto accel_filtered = filter.accel_lpf_.output;
+
+                const auto output = Data(gyro_filtered, accel_filtered);
+
+                return ImuFilter(output, is_gyro_calibrated, gyro_sum,
+                        gyro_sum_of_squares, gyro_sample_count, gyro_bias,
+                        gyro_variance_sample_time_msec, accel_lpf, gyro_lpf);
             }
   
 
