@@ -42,7 +42,6 @@
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 static const auto kControlLevel = hf::PidController::kControlStabilize;
-static uint32_t kLoopFreq = 2000;
 
 static hf::FlightController fc_;
 
@@ -235,23 +234,6 @@ static void ProfilerRun(const bool should_run=true)
     }
 }
 
-// Loop stability ------------------------------------------------------------
-
-/* Adapted from github.com/nickrehm/dRehmFlight/blob/master/
-   Versions/dRehmFlight_Teensy_BETA_1.3/ dRehmFlight_Teensy_BETA_1.3.ino
- */
-static void RunDelayLoop(const uint32_t usec)
-{
-    const float inv_feq = 1.0 / kLoopFreq * 1000000.0;
-
-    uint32_t checker = micros();
-
-    while (inv_feq > (checker - usec)) {
-        checker = micros();
-    }
-}
-
-
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -276,9 +258,6 @@ void setup()
 
 void loop()
 {
-    //RunDelayLoop(micros());
-    (void)RunDelayLoop;
-
     // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
@@ -286,19 +265,15 @@ void loop()
     fc_ = hf::FlightController::Update(fc_, micros(), ImuRead(),
             MotorsGetValues(), kControlLevel);
 
-    // Get final setpoint from PID controller
-    const auto setpoint = hf::FlightController::GetSetpoint(fc_);
-
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
-        hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
+        hf::FlightController::Update(fc_, micros(), ZRangerRead(),
                 OpticalFlowRead()) :
         fc_;
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
-        hf::FlightController::UpdateVoltage(fc_,
-                analogRead(kVoltageInputPin)) :
+        hf::FlightController::Update(fc_, analogRead(kVoltageInputPin)) :
         fc_;
 
     // Blink LED to indicate status
@@ -310,10 +285,10 @@ void loop()
         digitalWrite(kLedPin, HIGH);
     }
 
-    // Run the mixer and motors
-    MotorsRun(setpoint);
+    // Run the mixer and motors on the final setpoint from the PID controller
+    MotorsRun(hf::FlightController::GetSetpoint(fc_));
 
-    // Periodically send telemetry (receiver setpoint + vehicle state) to the
+    // Periodically send telemetry (receiver data + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
 

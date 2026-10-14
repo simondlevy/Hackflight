@@ -122,59 +122,6 @@ namespace hf {
                             receiver_parser_(receiver_parser),
                             receiver_message_msec_(receiver_message_msec) {}
 
-            FlightController(const FlightController & fc,
-                    const float voltage)
-                :
-                    ekf_(fc.ekf_),
-                    optical_flow_filter_(fc.optical_flow_filter_),
-                    zranger_filter_(fc.zranger_filter_),
-                    state_(fc.state_),
-                    mode_(fc.mode_),
-                    is_flying_(fc.is_flying_),
-                    started_flying_msec_(fc.started_flying_msec_),
-                    voltage_(voltage),
-                    ekf_prediction_timer_(fc.ekf_prediction_timer_),
-                    flying_check_timer_(fc.flying_check_timer_),
-                    voltage_sensing_timer_(fc.voltage_sensing_timer_),
-                    telemetry_timer_(fc.telemetry_timer_), 
-                    hover_timer_(fc.hover_timer_),
-                    heartbeat_timer_(fc.heartbeat_timer_), 
-                    fast_blink_timer_(fc.fast_blink_timer_),
-                    pid_controller_(fc.pid_controller_),
-                    pid_update_usec_prev_(fc.pid_update_usec_prev_),
-                    led_(fc.led_),
-                    was_ever_idle_(fc.was_ever_idle_),
-                    receiver_parser_(fc.receiver_parser_),
-                    receiver_message_msec_(fc.receiver_message_msec_) {}
-
-
-            FlightController(const FlightController & fc,
-                    const EKF & ekf,
-                    const OpticalFlowFilter & optical_flow_filter,
-                    const ZRangerFilter & zranger_filter)
-                :
-                    ekf_(ekf),
-                    optical_flow_filter_(optical_flow_filter),
-                    zranger_filter_(zranger_filter),
-                    state_(fc.state_),
-                    mode_(fc.mode_),
-                    is_flying_(fc.is_flying_),
-                    started_flying_msec_(fc.started_flying_msec_),
-                    voltage_(fc.voltage_),
-                    ekf_prediction_timer_(fc.ekf_prediction_timer_),
-                    flying_check_timer_(fc.flying_check_timer_),
-                    voltage_sensing_timer_(fc.voltage_sensing_timer_),
-                    telemetry_timer_(fc.telemetry_timer_), 
-                    hover_timer_(fc.hover_timer_),
-                    heartbeat_timer_(fc.heartbeat_timer_), 
-                    fast_blink_timer_(fc.fast_blink_timer_),
-                    pid_controller_(fc.pid_controller_),
-                    pid_update_usec_prev_(fc.pid_update_usec_prev_),
-                    led_(fc.led_),
-                    was_ever_idle_(fc.was_ever_idle_),
-                    receiver_parser_(fc.receiver_parser_),
-                    receiver_message_msec_(fc.receiver_message_msec_) {}
-
             static auto ParseReceiverByte(
                     const FlightController & fc,
                     const uint8_t byte,
@@ -260,7 +207,7 @@ namespace hf {
                         fc.receiver_message_msec_);
             }
 
-            static auto UpdateHover(
+            static auto Update(
                     const FlightController & fc,
                     const uint32_t usec,
                     const float zdistance,
@@ -275,11 +222,32 @@ namespace hf {
                 const auto ekf = EKF::Update(
                         fc.ekf_, zranger_filter, optical_flow_filter);
 
-                return FlightController(fc, ekf, optical_flow_filter,
-                        zranger_filter);
+                return FlightController(
+                        ekf,
+                        optical_flow_filter,
+                        zranger_filter,
+                        fc.imu_filter_,
+                        fc.state_,
+                        fc.mode_,
+                        fc.is_flying_,
+                        fc.started_flying_msec_,
+                        fc.voltage_,
+                        fc.ekf_prediction_timer_,
+                        fc.flying_check_timer_,
+                        fc.voltage_sensing_timer_,
+                        fc.telemetry_timer_, 
+                        fc.hover_timer_,
+                        fc.heartbeat_timer_, 
+                        fc.fast_blink_timer_,
+                        fc.pid_controller_,
+                        fc.pid_update_usec_prev_,
+                        fc.led_,
+                        fc.was_ever_idle_,
+                        fc.receiver_parser_,
+                        fc.receiver_message_msec_); 
             }
 
-            static auto UpdateVoltage(
+            static auto Update(
                     const FlightController & fc,
                     const uint16_t rawval) -> FlightController
             {
