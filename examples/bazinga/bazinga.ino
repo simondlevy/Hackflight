@@ -21,7 +21,7 @@ void setup()
 
         ImuOkay(accel_.begin()) &&
 
-        ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+        ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_2000HZ_BW_532HZ)) &&
 
         ImuOkay(gyro_.setRange(kGyroRange)) &&
 
@@ -31,7 +31,7 @@ void setup()
 
         ImuOkay(gyro_.mapDrdyInt3(true)) &&
 
-        ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+        ImuOkay(accel_.setOdr(Bmi088Accel::ODR_800HZ_BW_80HZ)) &&
 
         ImuOkay(accel_.setRange(kAccelRange)))) {
 

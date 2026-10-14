@@ -78,6 +78,22 @@ namespace hf {
                     accel_lpf_(accel_lpf),
                     gyro_lpf_(gyro_lpf) {}
 
+            static auto Update(
+                    const ImuFilter & filter,
+                    const uint32_t msec_curr,
+                    const int16_t gyro_x_raw,
+                    const int16_t gyro_y_raw,
+                    const int16_t gyro_z_raw,
+                    const int16_t gyro_range,
+                    const int16_t accel_x_raw,
+                    const int16_t accel_y_raw,
+                    const int16_t accel_z_raw,
+                    const int16_t accel_range) -> ImuFilter
+            {
+                return filter;
+            }
+  
+
             /**
              * imuraw should come in as follows:
              *   gyro.x: positive roll-rightward
@@ -87,7 +103,7 @@ namespace hf {
              *   accel.y: positive roll-right
              *   accel.z: positive rightside-up
              */
-            static auto Step(
+            static auto Update(
                     const ImuFilter & filter,
                     const uint32_t msec_curr,
                     const Imu::RawData & imuraw) -> ImuFilter

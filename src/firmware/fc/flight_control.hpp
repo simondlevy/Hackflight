@@ -61,7 +61,7 @@ namespace hf {
             static constexpr float kThrottleDownMax = -0.90;
             static constexpr float kTiltAngleFlippedMinDeg = 75;
             static constexpr uint32_t kFailsafeMsec = 500;
-            
+
             // Stick deadband
             static constexpr float kAxisDeadband = 0.02;
 
@@ -161,6 +161,48 @@ namespace hf {
             }
 
 
+            static auto UpdateImu(
+                    const FlightController & fc,
+                    const uint32_t msec_curr,
+                    const int16_t gyro_x_raw,
+                    const int16_t gyro_y_raw,
+                    const int16_t gyro_z_raw,
+                    const int16_t gyro_range,
+                    const int16_t accel_x_raw,
+                    const int16_t accel_y_raw,
+                    const int16_t accel_z_raw,
+                    const int16_t accel_range) -> FlightController
+            {
+                const auto imu_filter = ImuFilter::Update(
+                        fc.imu_filter_, msec_curr,
+                        gyro_x_raw, gyro_y_raw, gyro_z_raw, gyro_range,
+                        accel_x_raw, accel_y_raw, accel_z_raw, accel_range);
+
+                return FlightController(
+                        fc.ekf_,
+                        fc.optical_flow_filter_,
+                        fc.zranger_filter_,
+                        imu_filter,
+                        fc.state_,
+                        fc.mode_,
+                        fc.is_flying_,
+                        fc.started_flying_msec_,
+                        fc.voltage_,
+                        fc.ekf_prediction_timer_,
+                        fc.flying_check_timer_,
+                        fc.voltage_sensing_timer_,
+                        fc.telemetry_timer_, 
+                        fc.hover_timer_,
+                        fc.heartbeat_timer_, 
+                        fc.fast_blink_timer_,
+                        fc.pid_controller_,
+                        fc.pid_update_usec_prev_,
+                        fc.led_,
+                        fc.was_ever_idle_,
+                        fc.receiver_parser_,
+                        fc.receiver_message_msec_);
+            }
+
             static auto UpdateCore(
                     const FlightController & fc,
                     const uint32_t usec,
@@ -186,13 +228,13 @@ namespace hf {
                         Timer::Update(fc.ekf_prediction_timer_,
                             kEkfPredictionRate, msec),
                         Timer::Update(fc.flying_check_timer_,
-                                kFlyingCheckRate, msec),
+                            kFlyingCheckRate, msec),
                         Timer::Update(fc.voltage_sensing_timer_,
-                                kVoltageSensingRate, msec),
+                            kVoltageSensingRate, msec),
                         Timer::Update(fc.telemetry_timer_, 
-                                kTelemetryRate, msec),
+                            kTelemetryRate, msec),
                         Timer::Update(fc.hover_timer_,
-                                kHoverDeckRate, msec),
+                            kHoverDeckRate, msec),
                         Timer::Update(fc.heartbeat_timer_, 
                                 kLedHeartbeatRate, msec),
                         Timer::Update(fc.fast_blink_timer_, 
@@ -405,7 +447,7 @@ namespace hf {
                     const uint32_t msec, 
                     const Imu::RawData data)-> ImuFilter
             {
-                return ImuFilter::Step(fc.imu_filter_, msec, data);
+                return ImuFilter::Update(fc.imu_filter_, msec, data);
             }
 
             static auto UpdateStateEstimator(const FlightController & fc,

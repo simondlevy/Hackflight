@@ -157,7 +157,6 @@ static void ImuStart()
 
 static auto ImuRead() -> hf::Imu::RawData
 {
-
     static int16_t gx_;
     static int16_t gy_;
     static int16_t gz_;
