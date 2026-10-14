@@ -249,6 +249,51 @@ namespace hf {
                         fc.receiver_message_msec_);
             }
 
+            static auto NewUpdateCore(
+                    const FlightController & fc,
+                    const uint32_t usec,
+                    const std::vector<float> motorvals, 
+                    const PidController::ControlLevel
+                    control_level) -> FlightController
+            {
+                // Most updates run on milliseconds
+                const auto msec = usec / 1000;
+
+                return FlightController(
+
+                        UpdateStateEstimator(fc, msec),
+                        fc.optical_flow_filter_,
+                        fc.zranger_filter_,
+                        fc.imu_filter_,
+                        EKF::getVehicleState(fc.ekf_),
+                        UpdateMode(fc, msec, control_level),
+                        UpdateFlyingStatus(fc, msec),
+                        UpdateStartedFlyingTime(fc, msec, motorvals),
+                        fc.voltage_,
+                        Timer::Update(fc.ekf_prediction_timer_,
+                            kEkfPredictionRate, msec),
+                        Timer::Update(fc.flying_check_timer_,
+                            kFlyingCheckRate, msec),
+                        Timer::Update(fc.voltage_sensing_timer_,
+                            kVoltageSensingRate, msec),
+                        Timer::Update(fc.telemetry_timer_, 
+                            kTelemetryRate, msec),
+                        Timer::Update(fc.hover_timer_,
+                            kHoverDeckRate, msec),
+                        Timer::Update(fc.heartbeat_timer_, 
+                                kLedHeartbeatRate, msec),
+                        Timer::Update(fc.fast_blink_timer_, 
+                                kLedFastBlinkRate, msec),
+                        UpdatePidController(fc, usec, control_level),
+                        usec,
+                        UpdateLed(fc, msec,IsGyroCalibrated(fc)
+                                && fc.mode_ != kModePanic),
+                        GetReceiverMode(fc) == kModeIdle ? true :
+                            fc.was_ever_idle_,
+                        fc.receiver_parser_,
+                        fc.receiver_message_msec_);
+            }
+
             static auto UpdateHover(
                     const FlightController & fc,
                     const uint32_t usec,
