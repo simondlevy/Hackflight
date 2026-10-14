@@ -118,39 +118,13 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
 
 // Imu -----------------------------------------------------------------------
 
-static const uint8_t kImuDataReadyPin = 4;
-
-static constexpr Bmi088::GyroRange kGyroRange = Bmi088::GYRO_RANGE_2000DPS;
-static constexpr Bmi088::AccelRange kAccelRange = Bmi088::ACCEL_RANGE_24G;
+static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
+static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
-static auto imu_ = Bmi088(Wire, 0x18, 0x68);
-
-static volatile bool is_imu_data_ready_;
-
 static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
 static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
-
-static auto ImuDataReadyInterrupt()
-{
-    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
-    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
-
-    is_imu_data_ready_ = true;
-
-    imu_.readSensor();
-
-    fc_ = hf::FlightController::UpdateImu(fc_, millis(),
-            imu_.getGyroX_raw(),
-            imu_.getGyroY_raw(),
-            imu_.getGyroZ_raw(),
-            granges[kGyroRange],
-            imu_.getAccelX_raw(),
-            imu_.getAccelY_raw(),
-            imu_.getAccelZ_raw(),
-            aranges[kAccelRange]);
-}
 
 static auto ImuOkay(const int status) -> bool
 {
@@ -159,22 +133,77 @@ static auto ImuOkay(const int status) -> bool
 
 static void ImuStart()
 {
-    if (!(      ImuOkay(imu_.begin())
+    if (!(ImuOkay(gyro_.begin()) &&
 
-                && ImuOkay(imu_.setOdr(Bmi088::ODR_1000HZ))
+        ImuOkay(accel_.begin()) &&
 
-                && ImuOkay(imu_.setRange(Bmi088::ACCEL_RANGE_24G,
-                        Bmi088::GYRO_RANGE_2000DPS))
+        ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-                && imu_.pinModeDrdy(
-                    Bmi088::PIN_MODE_PUSH_PULL, Bmi088::PIN_LEVEL_ACTIVE_HIGH)
+        ImuOkay(gyro_.setRange(kGyroRange)) &&
 
-                && imu_.mapDrdy(Bmi088::PIN_1)
-         )) {
+        ImuOkay(gyro_.pinModeInt3(
+                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+
+        ImuOkay(gyro_.mapDrdyInt3(true)) &&
+
+        ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+
+        ImuOkay(accel_.setRange(kAccelRange)))) {
 
         hf::Debugger::ReportForever("Unable to start Imu");
     }
 }
+
+static int16_t imu_gx_;
+static int16_t imu_gy_;
+static int16_t imu_gz_;
+static int16_t imu_ax_;
+static int16_t imu_ay_;
+static int16_t imu_az_;
+
+static auto ImuRead() -> hf::Imu::RawData
+{
+    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
+
+    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+
+    if (gyro_.getDrdyStatus()) {
+
+        gyro_.readSensor();
+        imu_gx_ = gyro_.getGyroX_raw();
+        imu_gy_ = gyro_.getGyroY_raw();
+        imu_gz_ = gyro_.getGyroZ_raw();
+
+        accel_.readSensor();
+        imu_ax_ = accel_.getAccelX_raw();
+        imu_ay_ = accel_.getAccelY_raw();
+        imu_az_ = accel_.getAccelZ_raw();
+    }
+
+    return hf::Imu::RawData(
+            hf::Imu::ThreeAxisRaw(imu_gx_, imu_gy_, imu_gz_,
+                granges[kGyroRange]),
+            hf::Imu::ThreeAxisRaw(imu_ax_, imu_ay_, imu_az_,
+                aranges[kAccelRange]));
+}
+
+static void ImuNewRead()
+{
+    if (gyro_.getDrdyStatus()) {
+
+        gyro_.readSensor();
+        imu_gx_ = gyro_.getGyroX_raw();
+        imu_gy_ = gyro_.getGyroY_raw();
+        imu_gz_ = gyro_.getGyroZ_raw();
+
+        accel_.readSensor();
+        imu_ax_ = accel_.getAccelX_raw();
+        imu_ay_ = accel_.getAccelY_raw();
+        imu_az_ = accel_.getAccelZ_raw();
+    }
+}
+
 
 // Motors --------------------------------------------------------------------
 
@@ -237,10 +266,6 @@ void setup()
     // Enable heartbeat LED
     pinMode(kLedPin, OUTPUT); 
 
-    // Enable IMU data-ready interrupt
-    pinMode(kImuDataReadyPin, INPUT);
-    attachInterrupt(kImuDataReadyPin, ImuDataReadyInterrupt, RISING);  
-
     // Start the sensors
     ImuStart();
     ZRangerStart();
@@ -256,10 +281,8 @@ void loop()
     ProfilerRun();
 
     // Update core algorithm with all inputs and run PID controller
-    /*
     fc_ = hf::FlightController::UpdateCore(fc_, micros(), ImuRead(),
             MotorsGetValues(), kControlLevel);
-            */
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
