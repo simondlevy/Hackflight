@@ -43,6 +43,8 @@ static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 static const auto kControlLevel = hf::PidController::kControlStabilize;
 
+static const float kTelemetrySendFreq = 50;
+
 static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
@@ -118,7 +120,7 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
 
 // Imu -----------------------------------------------------------------------
 
-static const uint8_t kImuDataReadyPin = 4;
+static const uint8_t kImuDataReadyPin = 22;
 
 static constexpr Bmi088::GyroRange kGyroRange = Bmi088::GYRO_RANGE_2000DPS;
 static constexpr Bmi088::AccelRange kAccelRange = Bmi088::ACCEL_RANGE_24G;
@@ -132,24 +134,12 @@ static volatile bool is_imu_data_ready_;
 static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
 static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
 
+static constexpr int16_t gyro_ranges_[5] = {2000, 1000, 500, 250, 125};
+static constexpr int16_t accel_ranges_[4] = {3, 6, 12, 24};
+
 static auto ImuDataReadyInterrupt()
 {
-    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
-    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
-
     is_imu_data_ready_ = true;
-
-    imu_.readSensor();
-
-    fc_ = hf::FlightController::UpdateImu(fc_, millis(),
-            imu_.getGyroX_raw(),
-            imu_.getGyroY_raw(),
-            imu_.getGyroZ_raw(),
-            granges[kGyroRange],
-            imu_.getAccelX_raw(),
-            imu_.getAccelY_raw(),
-            imu_.getAccelZ_raw(),
-            aranges[kAccelRange]);
 }
 
 static auto ImuOkay(const int status) -> bool
@@ -174,6 +164,22 @@ static void ImuStart()
 
         hf::Debugger::ReportForever("Unable to start Imu");
     }
+}
+
+static void ImuUpdateFc()
+{
+    imu_.readSensor();
+
+    fc_ = hf::FlightController::UpdateImu(
+            fc_, millis(),
+            imu_.getGyroX_raw(),
+            imu_.getGyroY_raw(),
+            imu_.getGyroZ_raw(),
+            gyro_ranges_[kGyroRange],
+            imu_.getAccelX_raw(),
+            imu_.getAccelY_raw(),
+            imu_.getAccelZ_raw(),
+            accel_ranges_[kAccelRange]);
 }
 
 // Motors --------------------------------------------------------------------
@@ -224,15 +230,25 @@ static void ProfilerRun(const bool should_run=true)
     }
 }
 
+// Loop delay adapated from github.com/nickrehm/dRehmFlight ------------------
+
+/*
+void loopRate(const uint32_t current_time, const int freq) {
+  float invFreq = 1.0/freq*1000000.0;
+  unsigned long checker = micros();
+
+  //Sit in loop until appropriate time has passed
+  while (invFreq > (checker - current_time)) {
+    checker = micros();
+  }
+}*/
+
 // Main ----------------------------------------------------------------------
 
 void setup()
 {
     // Start receiver comms
     Serial3.begin(115200);
-
-    // Wait a sec for the receiver to kick in
-    delay(1000);
 
     // Enable heartbeat LED
     pinMode(kLedPin, OUTPUT); 
@@ -248,18 +264,25 @@ void setup()
 
     // Start motors
     MotorsStart();
+
 }
 
 void loop()
 {
+    //loopRate(micros(), 10'000);
+
     // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
-    // Update core algorithm with all inputs and run PID controller
-    /*
-    fc_ = hf::FlightController::UpdateCore(fc_, micros(), ImuRead(),
+    // Update FC with IMU data when available
+    if (is_imu_data_ready_) {
+        ImuUpdateFc();
+        is_imu_data_ready_ = false;
+    }
+
+    // Run core update in tightest loop
+    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(),
             MotorsGetValues(), kControlLevel);
-            */
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
@@ -282,14 +305,4 @@ void loop()
 
     // Run the mixer and motors on the final setpoint from the PID controller
     MotorsRun(hf::FlightController::GetSetpoint(fc_));
-
-    // Periodically send telemetry (receiver data + vehicle state) to the
-    // dongle
-    if (hf::FlightController::ShouldSendTelemetry(fc_)) {
-
-        const auto telemetry_bytes =
-            hf::FlightController::GetTelemetryBytes(fc_);
-
-        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
-    }
 }
