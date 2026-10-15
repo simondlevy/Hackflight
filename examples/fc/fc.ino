@@ -179,6 +179,50 @@ static void ImuUpdate()
 
 }
 
+// Hover deck (zranger + optical-flow fusion) --------------------------------
+
+static void HoverDeckUpdate()
+{
+    fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
+        hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
+                OpticalFlowRead()) : fc_;
+}
+
+// Battery voltage sensing ----------------------------------------------------
+
+static void VoltageUpdate()
+{
+    fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
+        hf::FlightController::UpdateVoltage(
+                fc_, analogRead(kVoltageInputPin)) : fc_;
+}
+
+// LED -----------------------------------------------------------------------
+
+static void LedUpdate()
+{
+    const auto led_status = hf::FlightController::GetLedStatus(fc_);
+    if (led_status == hf::Led::kStatusOff) {
+        digitalWrite(kLedPin, LOW);
+    }
+    else if (led_status == hf::Led::kStatusOn) {
+        digitalWrite(kLedPin, HIGH);
+    }
+}
+
+// Telemetry -----------------------------------------------------------------
+
+static void TelemetryUpdate()
+{
+    if (hf::FlightController::ShouldSendTelemetry(fc_)) {
+
+        const auto telemetry_bytes =
+            hf::FlightController::GetTelemetryBytes(fc_);
+
+        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
+    }
+}
+
 // Motors --------------------------------------------------------------------
 
 static hf::QuadXMixer mixer_;
@@ -197,15 +241,24 @@ static auto MotorsGetValues() -> std::vector<float>
     return hf::QuadXMixer::NewGetMotorValues(mixer_);
 }
 
-static void MotorsRun(const hf::Setpoint & setpoint)
+static void MotorsUpdate()
 {
-    mixer_ = hf::QuadXMixer::Run(setpoint);
+    // Run current PID setpoint through motor mixer
+    mixer_ = hf::QuadXMixer::Run(hf::FlightController::GetSetpoint(fc_));
 
     // Run motors if safe
     if (hf::FlightController::IsSafeToFly(fc_)) {
         MotorsGetValues();
         motors_.run(hf::FlightController::IsArmed(fc_), MotorsGetValues());
     }
+}
+
+// Core (PID / timing) algorithm  --------------------------------------------
+
+static void CoreUpdate()
+{
+    fc_ = hf::FlightController::UpdateCore(fc_, micros(),
+            MotorsGetValues(), kControlLevel);
 }
 
 // Profiling -----------------------------------------------------------------
@@ -254,41 +307,25 @@ void loop()
     // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
+    // Check for new IMU data
     ImuUpdate();
 
     // Update core algorithm with all inputs and run PID controller
-    fc_ = hf::FlightController::UpdateCore(fc_, micros(),
-            MotorsGetValues(), kControlLevel);
+    CoreUpdate();
 
     // Run sensor fusion on hover-deck as indicated
-    fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
-        hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
-                OpticalFlowRead()) : fc_;
+    HoverDeckUpdate();
 
-    // Run sensor fusion on hover-deck as indicated
-    fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
-        hf::FlightController::UpdateVoltage(
-                fc_, analogRead(kVoltageInputPin)) : fc_;
+    // Monitor battery voltage
+    VoltageUpdate();
 
     // Blink LED to indicate status
-    const auto led_status = hf::FlightController::GetLedStatus(fc_);
-    if (led_status == hf::Led::kStatusOff) {
-        digitalWrite(kLedPin, LOW);
-    }
-    else if (led_status == hf::Led::kStatusOn) {
-        digitalWrite(kLedPin, HIGH);
-    }
+    LedUpdate();
 
     // Run the mixer and motors on the final setpoint from the PID controller
-    MotorsRun(hf::FlightController::GetSetpoint(fc_));
+    MotorsUpdate();
 
     // Periodically send telemetry (receiver data + vehicle state) to the
     // dongle
-    if (hf::FlightController::ShouldSendTelemetry(fc_)) {
-
-        const auto telemetry_bytes =
-            hf::FlightController::GetTelemetryBytes(fc_);
-
-        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
-    }
+    TelemetryUpdate();
 }
