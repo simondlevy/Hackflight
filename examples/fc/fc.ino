@@ -1,6 +1,5 @@
 /*
-   Hackflight flight-controller sketch for Teensy quadcopter using ESP32
-   receiver with MSP protocol
+   Hackflight quadcopter sketch
 
    Copyright (C) 2026 Simon D. Levy
 
@@ -223,7 +222,7 @@ static void TelemetryUpdate()
     }
 }
 
-// Motors --------------------------------------------------------------------
+// Mixer / motors -------------------------------------------------------------
 
 static hf::QuadXMixer mixer_;
 
@@ -304,14 +303,11 @@ void setup()
 
 void loop()
 {
-    // We should reach aprrox. 1750 Hz in this loop
+    // Around 1750Hz seesms to work well
     ProfilerRun();
 
     // Check for new IMU data
     ImuUpdate();
-
-    // Update core algorithm with all inputs and run PID controller
-    CoreUpdate();
 
     // Run sensor fusion on hover-deck as indicated
     HoverDeckUpdate();
@@ -321,6 +317,9 @@ void loop()
 
     // Blink LED to indicate status
     LedUpdate();
+
+    // Update core algorithm with all inputs and run PID controller
+    CoreUpdate();
 
     // Run the mixer and motors on the final setpoint from the PID controller
     MotorsUpdate();
