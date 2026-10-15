@@ -45,6 +45,9 @@ static const auto kControlLevel = hf::PidController::kControlStabilize;
 
 static const float kTelemetrySendFreq = 50;
 
+static const float kCoreLoopFreq = 1000;
+
+
 static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
@@ -232,16 +235,16 @@ static void ProfilerRun(const bool should_run=true)
 
 // Loop delay adapated from github.com/nickrehm/dRehmFlight ------------------
 
-/*
-void loopRate(const uint32_t current_time, const int freq) {
-  float invFreq = 1.0/freq*1000000.0;
-  unsigned long checker = micros();
+static void DelayLoopRun(const uint32_t usec_start) 
+{
+    const float inv_freq = 1.0 / kCoreLoopFreq * 1000000.0;
 
-  //Sit in loop until appropriate time has passed
-  while (invFreq > (checker - current_time)) {
-    checker = micros();
-  }
-}*/
+    unsigned long checker = micros();
+
+    while (inv_freq > (checker - usec_start)) {
+        checker = micros();
+    }
+}
 
 // Main ----------------------------------------------------------------------
 
@@ -264,14 +267,12 @@ void setup()
 
     // Start motors
     MotorsStart();
-
 }
 
 void loop()
 {
-    //loopRate(micros(), 10'000);
+    const auto usec_start = micros();
 
-    // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
     // Update FC with IMU data when available
@@ -284,10 +285,12 @@ void loop()
     fc_ = hf::FlightController::NewUpdateCore(fc_, micros(),
             MotorsGetValues(), kControlLevel);
 
+    /*
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
         hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
                 OpticalFlowRead()) : fc_;
+                */
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateVoltage(fc_) ?
@@ -305,4 +308,6 @@ void loop()
 
     // Run the mixer and motors on the final setpoint from the PID controller
     MotorsRun(hf::FlightController::GetSetpoint(fc_));
+
+    DelayLoopRun(usec_start);
 }
