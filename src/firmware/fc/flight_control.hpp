@@ -132,7 +132,7 @@ namespace hf {
                 const auto got_new_message =
                     MspParser::GetId(parser) == kMspSetChannels;
 
-                const auto timestamp_msec =
+                const auto receiver_message_msec =
                     got_new_message ? msec : fc.receiver_message_msec_;
 
                 return FlightController(
@@ -157,7 +157,7 @@ namespace hf {
                         fc.led_,
                         fc.was_ever_idle_,
                         parser,
-                        timestamp_msec);
+                        receiver_message_msec);
             }
 
 

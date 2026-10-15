@@ -258,7 +258,7 @@ void setup()
 void loop()
 {
     // We should reach aprrox. 1750 Hz in this loop
-    ProfilerRun();
+    ProfilerRun(false);
 
     // Update core algorithm with all inputs and run PID controller
     fc_ = hf::FlightController::UpdateCore(fc_, micros(), ImuRead(),
