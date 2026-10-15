@@ -45,7 +45,16 @@ static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
 
+/*
 void serialEvent3()
+{
+    while (Serial3.available()) {
+        fc_ = hf::FlightController::ParseReceiverByte(
+                fc_, Serial3.read(), millis());
+    }
+}*/
+
+static void ReceiverUpdate()
 {
     while (Serial3.available()) {
         fc_ = hf::FlightController::ParseReceiverByte(
@@ -305,6 +314,8 @@ void loop()
 {
     // Around 1750Hz seesms to work well
     ProfilerRun();
+
+    ReceiverUpdate();
 
     // Check for new IMU data
     ImuUpdate();
