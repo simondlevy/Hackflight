@@ -121,9 +121,6 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
 static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
 static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
 
-static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
-static constexpr int16_t aranges[4] = {3, 6, 12, 24};
-
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
 static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
@@ -138,49 +135,50 @@ static void ImuStart()
 {
     if (!(ImuOkay(gyro_.begin()) &&
 
-                ImuOkay(accel_.begin()) &&
+        ImuOkay(accel_.begin()) &&
 
-                ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+        ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
 
-                ImuOkay(gyro_.setRange(kGyroRange)) &&
+        ImuOkay(gyro_.setRange(kGyroRange)) &&
 
-                ImuOkay(gyro_.pinModeInt3(
-                        Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                        Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
+        ImuOkay(gyro_.pinModeInt3(
+                    Bmi088Gyro::PIN_MODE_PUSH_PULL,
+                    Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
 
-                ImuOkay(gyro_.mapDrdyInt3(true)) &&
+        ImuOkay(gyro_.mapDrdyInt3(true)) &&
 
-                ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
+        ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
 
-                ImuOkay(accel_.setRange(kAccelRange)))) {
+        ImuOkay(accel_.setRange(kAccelRange)))) {
 
         hf::Debugger::ReportForever("Unable to start Imu");
     }
 }
 
-static int16_t imu_gx_;
-static int16_t imu_gy_;
-static int16_t imu_gz_;
-static int16_t imu_ax_;
-static int16_t imu_ay_;
-static int16_t imu_az_;
-
-static void ImuRead()
+static void ImuUpdate()
 {
+    static constexpr int16_t gyro_ranges[5] = {2000, 1000, 500, 250, 125};
+    static constexpr int16_t accel_ranges[4] = {3, 6, 12, 24};
+
     if (gyro_.getDrdyStatus()) {
 
         gyro_.readSensor();
-        imu_gx_ = gyro_.getGyroX_raw();
-        imu_gy_ = gyro_.getGyroY_raw();
-        imu_gz_ = gyro_.getGyroZ_raw();
+        const auto gx = gyro_.getGyroX_raw();
+        const auto gy = gyro_.getGyroY_raw();
+        const auto gz = gyro_.getGyroZ_raw();
 
         accel_.readSensor();
-        imu_ax_ = accel_.getAccelX_raw();
-        imu_ay_ = accel_.getAccelY_raw();
-        imu_az_ = accel_.getAccelZ_raw();
-    }
-}
+        const auto ax = accel_.getAccelX_raw();
+        const auto ay = accel_.getAccelY_raw();
+        const auto az = accel_.getAccelZ_raw();
 
+        fc_ = hf::FlightController::UpdateImu(
+                fc_, millis(), 
+                gx, gy, gz, gyro_ranges[kGyroRange],
+                ax, ay, az, accel_ranges[kAccelRange]);
+    }
+
+}
 
 // Motors --------------------------------------------------------------------
 
@@ -257,17 +255,11 @@ void loop()
     // We should reach aprrox. 1750 Hz in this loop
     ProfilerRun();
 
-    // Read from the IMU
-    ImuRead();
-
-    // Use the IMU data to update the flight controller
-    fc_ = hf::FlightController::UpdateImu(fc_, millis(),
-            imu_gx_, imu_gy_, imu_gz_, granges[kGyroRange],
-            imu_ax_, imu_ay_, imu_az_, aranges[kAccelRange]);
+    ImuUpdate();
 
     // Update core algorithm with all inputs and run PID controller
-    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(), MotorsGetValues(),
-            kControlLevel);
+    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(),
+            MotorsGetValues(), kControlLevel);
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?

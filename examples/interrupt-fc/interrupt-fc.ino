@@ -96,6 +96,18 @@ static auto ZRangerRead() -> float
     return distance_;
 }
 
+static auto ZRangerIsDataReady() -> bool
+{
+    if (vl53l1x_.dataReady())  {
+        vl53l1x_.distance();
+        vl53l1x_.clearInterrupt();
+        return true;
+    }
+
+    return false;
+
+} 
+
 // Optical flow --------------------------------------------------------------
 
 static PMW3901 pmw3901_;
@@ -273,7 +285,7 @@ void loop()
             MotorsGetValues(), kControlLevel);
 
     // Run sensor fusion on hover-deck as indicated
-    fc_ = false /*hf::FlightController::ShouldUpdateHover(fc_)*/ ?
+    fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
         hf::FlightController::UpdateHover(fc_, micros(), ZRangerRead(),
                 OpticalFlowRead()) : fc_;
 
@@ -307,6 +319,6 @@ void loop()
 #endif
 
     // Run spin-waiting delay loop to keep things at a steady rate
-    while (micros() - loop_start_usec < 1'000'000/kLoopFreq) {
+    while (micros() - loop_start_usec < 500 /*1'000'000/kLoopFreq*/) {
     }
 }
