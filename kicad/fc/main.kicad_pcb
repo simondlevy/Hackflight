@@ -932,7 +932,7 @@
 			(size 1 2)
 			(layers "F.Cu" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net "unconnected-(J13-Pin_1-Pad1)")
+			(net "/INT")
 			(pinfunction "Pin_1_1")
 			(pintype "passive")
 			(uuid "1d264d4a-70ed-4858-b6ce-d063b044ba8d")
@@ -1278,6 +1278,12 @@
 		(path "/3f00a9d1-159f-495d-83e0-564eb33bd576")
 		(sheetname "/")
 		(sheetfile "main.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_rect
 			(start -0.75 -1.25)
@@ -1597,6 +1603,12 @@
 		(path "/8b61e880-749e-44fe-91ce-c59768f74e6a")
 		(sheetname "/")
 		(sheetfile "main.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_rect
 			(start -0.75 -1.25)
@@ -2142,6 +2154,12 @@
 		(path "/f20efab2-0962-431e-b54b-54b45c52b17c")
 		(sheetname "/")
 		(sheetfile "main.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_rect
 			(start -0.75 -1.25)
@@ -3056,7 +3074,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net "unconnected-(J2-Pin_5-Pad5)")
+			(net "/INT")
 			(pinfunction "Pin_5_5")
 			(pintype "passive")
 			(uuid "3f7d53f9-c411-4caf-a2c3-18648599cea1")
@@ -3332,6 +3350,12 @@
 		(path "/98608b76-bdf1-49f6-9620-cd0039dba74d")
 		(sheetname "/")
 		(sheetfile "main.kicad_sch")
+		(units
+			(unit
+				(name "A")
+				(pins "1")
+			)
+		)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_rect
 			(start -0.75 -1.25)
@@ -4054,6 +4078,18 @@
 			(justify left bottom)
 		)
 	)
+	(gr_text "INT"
+		(at 148.751832 89.383993 0)
+		(layer "F.SilkS")
+		(uuid "dfed818e-e2ba-4eba-94c1-f9a2c4a9315b")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
 	(gr_text "VB"
 		(at 150.02 68.57 0)
 		(layer "F.SilkS")
@@ -4331,7 +4367,7 @@
 		)
 	)
 	(gr_text "DA0"
-		(at 142.275 91.575 90)
+		(at 142.275 92 90)
 		(layer "F.SilkS")
 		(uuid "927b36ad-6475-4566-ae7a-f836b906be23")
 		(effects
@@ -4355,7 +4391,7 @@
 		)
 	)
 	(gr_text "CL0"
-		(at 144.675 91.475 90)
+		(at 144.675 92 90)
 		(layer "F.SilkS")
 		(uuid "19974f2e-aaf0-402a-9756-9e4aff31d902")
 		(effects
@@ -4367,7 +4403,7 @@
 		)
 	)
 	(gr_text "TX5"
-		(at 147.214621 91.475 90)
+		(at 147.214621 92 90)
 		(layer "F.SilkS")
 		(uuid "17ba5d21-8f4f-4b55-b10d-ed7d33f63e6e")
 		(effects
@@ -4391,7 +4427,7 @@
 		)
 	)
 	(gr_text "RX5"
-		(at 149.865297 91.475 90)
+		(at 149.865297 92 90)
 		(layer "F.SilkS")
 		(uuid "df224fb8-561d-472b-be75-1a9be48c2ed3")
 		(effects
@@ -4406,6 +4442,18 @@
 		(at 151.401298 101.792179 90)
 		(layer "F.SilkS")
 		(uuid "b3d58111-e2d2-4f63-bda6-84ec713fb19e")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom)
+		)
+	)
+	(gr_text "INT"
+		(at 152.476187 91.75 90)
+		(layer "F.SilkS")
+		(uuid "3b55097c-f8e9-455f-9e83-88ca25a0f818")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -6549,6 +6597,22 @@
 		(layer "B.Cu")
 		(net "/SDA0")
 		(uuid "ef1d99b6-63b6-4f86-9bee-1b021e5e5f87")
+	)
+	(segment
+		(start 152 92.49)
+		(end 151.765 92.725)
+		(width 0.2)
+		(layer "F.Cu")
+		(net "/INT")
+		(uuid "13d556ac-f4e4-4089-be8f-e3918418eda2")
+	)
+	(segment
+		(start 152 88.87)
+		(end 152 92.49)
+		(width 0.2)
+		(layer "F.Cu")
+		(net "/INT")
+		(uuid "2d408be5-feec-4437-aaea-cc7c9ec336ad")
 	)
 	(zone
 		(net "/GND")
