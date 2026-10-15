@@ -932,7 +932,7 @@
 			(size 1 2)
 			(layers "F.Cu" "F.Mask")
 			(roundrect_rratio 0.25)
-			(net "/INT")
+			(net "unconnected-(J13-Pin_1-Pad1)")
 			(pinfunction "Pin_1_1")
 			(pintype "passive")
 			(uuid "1d264d4a-70ed-4858-b6ce-d063b044ba8d")
@@ -3074,7 +3074,7 @@
 			(drill 1)
 			(layers "*.Cu" "*.Mask")
 			(remove_unused_layers no)
-			(net "/INT")
+			(net "unconnected-(J2-Pin_5-Pad5)")
 			(pinfunction "Pin_5_5")
 			(pintype "passive")
 			(uuid "3f7d53f9-c411-4caf-a2c3-18648599cea1")
@@ -4078,18 +4078,6 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "INT"
-		(at 148.751832 89.383993 0)
-		(layer "F.SilkS")
-		(uuid "dfed818e-e2ba-4eba-94c1-f9a2c4a9315b")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
 	(gr_text "VB"
 		(at 150.02 68.57 0)
 		(layer "F.SilkS")
@@ -4442,18 +4430,6 @@
 		(at 151.401298 101.792179 90)
 		(layer "F.SilkS")
 		(uuid "b3d58111-e2d2-4f63-bda6-84ec713fb19e")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom)
-		)
-	)
-	(gr_text "INT"
-		(at 152.476187 91.75 90)
-		(layer "F.SilkS")
-		(uuid "3b55097c-f8e9-455f-9e83-88ca25a0f818")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -6603,16 +6579,8 @@
 		(end 151.765 92.725)
 		(width 0.2)
 		(layer "F.Cu")
-		(net "/INT")
+		(net "unconnected-(J2-Pin_5-Pad5)")
 		(uuid "13d556ac-f4e4-4089-be8f-e3918418eda2")
-	)
-	(segment
-		(start 152 88.87)
-		(end 152 92.49)
-		(width 0.2)
-		(layer "F.Cu")
-		(net "/INT")
-		(uuid "2d408be5-feec-4437-aaea-cc7c9ec336ad")
 	)
 	(zone
 		(net "/GND")

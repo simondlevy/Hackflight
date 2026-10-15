@@ -155,29 +155,34 @@ static void ImuStart()
     }
 }
 
-static void ImuUpdate()
+static auto ImuRead() -> hf::Imu::RawData
 {
-    static constexpr int16_t gyro_ranges[5] = {2000, 1000, 500, 250, 125};
-    static constexpr int16_t accel_ranges[4] = {3, 6, 12, 24};
+    static int16_t gx_;
+    static int16_t gy_;
+    static int16_t gz_;
+    static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
+
+    static int16_t ax_;
+    static int16_t ay_;
+    static int16_t az_;
+    static constexpr int16_t aranges[4] = {3, 6, 12, 24};
 
     if (gyro_.getDrdyStatus()) {
 
         gyro_.readSensor();
-        const auto gx = gyro_.getGyroX_raw();
-        const auto gy = gyro_.getGyroY_raw();
-        const auto gz = gyro_.getGyroZ_raw();
+        gx_ = gyro_.getGyroX_raw();
+        gy_ = gyro_.getGyroY_raw();
+        gz_ = gyro_.getGyroZ_raw();
 
         accel_.readSensor();
-        const auto ax = accel_.getAccelX_raw();
-        const auto ay = accel_.getAccelY_raw();
-        const auto az = accel_.getAccelZ_raw();
-
-        fc_ = hf::FlightController::UpdateImu(
-                fc_, millis(), 
-                gx, gy, gz, gyro_ranges[kGyroRange],
-                ax, ay, az, accel_ranges[kAccelRange]);
+        ax_ = accel_.getAccelX_raw();
+        ay_ = accel_.getAccelY_raw();
+        az_ = accel_.getAccelZ_raw();
     }
 
+    return hf::Imu::RawData(
+            hf::Imu::ThreeAxisRaw(gx_, gy_, gz_, granges[kGyroRange]),
+            hf::Imu::ThreeAxisRaw(ax_, ay_, az_, aranges[kAccelRange]));
 }
 
 // Motors --------------------------------------------------------------------
@@ -253,12 +258,10 @@ void setup()
 void loop()
 {
     // We should reach aprrox. 1750 Hz in this loop
-    ProfilerRun();
-
-    ImuUpdate();
+    ProfilerRun(false);
 
     // Update core algorithm with all inputs and run PID controller
-    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(),
+    fc_ = hf::FlightController::UpdateCore(fc_, micros(), ImuRead(),
             MotorsGetValues(), kControlLevel);
 
     // Run sensor fusion on hover-deck as indicated

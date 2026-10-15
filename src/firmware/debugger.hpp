@@ -20,7 +20,6 @@
 
 #include <hackflight.h>
 #include <firmware/fc/imu/filter.hpp>
-#include <firmware/fc/imu/rawdata.hpp>
 #include <firmware/fc/imu/three_axis.hpp>
 #include <firmware/fc/optical_flow.hpp>
 #include <firmware/timer.hpp>
@@ -157,17 +156,6 @@ namespace hf {
                 }
             }
 
-            static void Report(const Imu::ThreeAxisRaw & raw)
-            {
-                static Helper helper_;
-
-                if (helper_.Ready()) {
-
-                    printf("%5d | x=%+05d y=%+05d z=%+05d\n",
-                            helper_.count, raw.x, raw.y, raw.z);
-                }
-            }
-
             static void Report(const ThreeAxis & vec)
             {
                 static Helper helper_;
@@ -191,22 +179,6 @@ namespace hf {
                     printf("%5d | gx=%+04.0f gy=%+04.0f gz=%+04.0f DPS | "
                             "ax=%+05.3f ay=%+05.3f az=%+05.3f Gs\n",
                             helper_.count, g.x, g.y, g.z, a.x, a.y, a.z);
-                }
-            }
-
-            static void Report(const Imu::RawData & imuraw)
-            {
-                static Helper helper_;
-
-                if (helper_.Ready()) {
-
-                    const auto gyro = imuraw.gyro;
-                    const auto accel = imuraw.accel;
-
-                    printf("%5d | gx=%+05d gy=%+05d gz=%+05d | "
-                            "ax=%+05d ay=%+05d az=%+05d\n",
-                            helper_.count, gyro.x, gyro.y, gyro.z,
-                            accel.x, accel.y, accel.z);
                 }
             }
 
