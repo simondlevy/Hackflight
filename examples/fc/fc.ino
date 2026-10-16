@@ -101,19 +101,6 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
     return hf::OpticalFlowData(dx, dy);
 }
 
-// Receiver ------------------------------------------------------------------
-
-static auto UpdateReceiver(hf::FlightController & fc)
-    -> hf::FlightController
-{
-    while (Serial3.available()) {
-        fc = hf::FlightController::ParseReceiverByte(
-                fc, Serial3.read(), millis());
-    }
-
-    return fc;
-}
-
 // Imu -----------------------------------------------------------------------
 
 static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
@@ -174,34 +161,6 @@ static auto DoImuUpdate(const hf::FlightController & fc)
             ax, ay, az, accel_ranges[kAccelRange]);
 }
 
-static auto UpdateImu(const hf::FlightController & fc)
-    -> hf::FlightController
-{
-    return gyro_.getDrdyStatus() ? DoImuUpdate(fc) : fc;
-}
-
-// Hover deck (zranger + optical-flow fusion) --------------------------------
-
-static auto UpdateHoverDeck(const hf::FlightController & fc)
-    -> hf::FlightController
-{
-    return hf::FlightController::ShouldUpdateHover(fc) ?
-        hf::FlightController::UpdateHover(fc, micros(), ZRangerRead(),
-                OpticalFlowRead()) :
-        fc;
-}
-
-// Battery voltage sensing ----------------------------------------------------
-
-static auto UpdateVoltage(const hf::FlightController & fc)
-    -> hf::FlightController
-{
-    return hf::FlightController::ShouldUpdateVoltage(fc) ?
-        hf::FlightController::UpdateVoltage(
-                fc, analogRead(kVoltageInputPin)) :
-        fc;
-}
-
 // LED -----------------------------------------------------------------------
 
 static void BlinkLed(const hf::FlightController & fc)
@@ -258,13 +217,54 @@ static void RunMixerAndMotors(const hf::FlightController & fc)
     }
 }
 
-// Core (PID / timing) algorithm  --------------------------------------------
+// Flight-controller update functions ----------------------------------------
+
+static auto UpdateReceiver(hf::FlightController & fc)
+    -> hf::FlightController
+{
+    // Availability of new receiver data drives this update
+    while (Serial3.available()) {
+        fc = hf::FlightController::ParseReceiverByte(
+                fc, Serial3.read(), millis());
+    }
+
+    return fc;
+}
+
+static auto UpdateImu(const hf::FlightController & fc)
+    -> hf::FlightController
+{
+    // Availability of IMU new data drives this update
+    return gyro_.getDrdyStatus() ? DoImuUpdate(fc) : fc;
+}
+
+static auto UpdateHoverDeck(const hf::FlightController & fc)
+    -> hf::FlightController
+{
+    // A time constant in the FlightController class drives this update
+    return hf::FlightController::ShouldUpdateHover(fc) ?
+        hf::FlightController::UpdateHover(fc, micros(), ZRangerRead(),
+                OpticalFlowRead()) :
+        fc;
+}
+
+static auto UpdateVoltage(const hf::FlightController & fc)
+    -> hf::FlightController
+{
+    // A time constant in the FlightController class drives this update
+    return hf::FlightController::ShouldUpdateVoltage(fc) ?
+        hf::FlightController::UpdateVoltage(
+                fc, analogRead(kVoltageInputPin)) :
+        fc;
+}
 
 static auto UpdateCore(const hf::FlightController & fc) -> hf::FlightController
 {
+    // This update is done every loop iteration
     return hf::FlightController::UpdateCore(fc, micros(),
             GetMotorValues());
 }
+
 
 // Profiling -----------------------------------------------------------------
 
@@ -303,7 +303,7 @@ void setup()
     StartZRanger();
     StartOpticalFlow();
 
-    // Start motors
+    // Start the motors
     StartMotors();
 }
 

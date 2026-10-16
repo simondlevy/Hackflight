@@ -79,7 +79,7 @@ namespace hf {
                         // Run PID control to get new setpoint
                         pid_controller = PidController::RunPosHold(
                                 pid_controller,
-                                true,
+                                true, // always airborne
                                 dt,
                                 mode,
                                 state,

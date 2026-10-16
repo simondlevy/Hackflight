@@ -164,7 +164,7 @@ namespace hf {
 
                 return FlightController(
 
-                        UpdateStateEstimator(fc, msec),
+                        UpdateEkf(fc, msec),
                         fc.optical_flow_filter_,
                         fc.zranger_filter_,
                         fc.imu_filter_,
@@ -188,7 +188,7 @@ namespace hf {
                         Timer::Update(fc.fast_blink_timer_, 
                                 kLedFastBlinkRate, msec),
                         UpdatePidController(fc, usec),
-                        usec,
+                        usec, // pid_update_usec_prev
                         UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
                         GetReceiverMode(fc) == kModeIdle ? true :
@@ -437,7 +437,7 @@ namespace hf {
                         Timer::IsReady(fc.fast_blink_timer_));
             }
 
-            static auto UpdateStateEstimator(const FlightController & fc,
+            static auto UpdateEkf(const FlightController & fc,
                     const uint32_t msec) -> EKF
             {
                 auto ekf = fc.ekf_;
