@@ -131,7 +131,8 @@ class Telemetry(MspParser):
         return self.plotter_data
 
     def handle_TELEMETRY(self, mode, volts, thrust, roll, pitch, yaw, dx, dy,
-                         z, dz, phi, dphi, theta, dtheta, psi, dpsi):
+                         z, dz, phi, dphi, theta, dtheta, psi, dpsi,
+                         m1, m2, m3, m4):
 
         # C++ side is simpler if mode is sent as float instead of byte
         mode = int(mode)
@@ -139,18 +140,22 @@ class Telemetry(MspParser):
         print(('mode=%s | volts=%3.1f | ' +
                'thr=%3.3f rol=%+3.3f pit=%+3.3f yaw=%+3.3f | ' +
                'phi=%+5.1f theta=%+5.1f psi=%+5.1f ' +
-               'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') % (
+               'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f | '
+               'm1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f') % (
                ('idle', 'armed', 'hover', 'autopilot')[mode],
                volts, thrust, roll, pitch, yaw,
-               phi, theta, psi, dx, dy, z, dz))
+               phi, theta, psi, dx, dy, z, dz,
+               m1, m2, m3, m4))
+
+        data = (time.time() - self.start_time, volts, thrust,
+                roll, pitch, yaw, dx, dy, z, dz, phi, dphi, theta,
+                dtheta, psi, dpsi, m1, m2, m3, m4)
+
+        fmt = ','.join('%f' for _ in data) + '\n'
 
         # Don't log until armed
         if self.continuous_logging or mode > 0:
-            self.outfile.write(
-                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
-                    % (time.time() - self.start_time, mode, volts, thrust,
-                       roll, pitch, yaw, dx, dy, z, dz, phi, dphi, theta,
-                       dtheta, psi, dpsi))
+            self.outfile.write(fmt % data)
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 

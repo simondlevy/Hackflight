@@ -57,63 +57,72 @@ def main():
         exit(1)
 
     time = data[:, 0]
-    # mode = data[:, 1]
-    # volts = data[:, 2]
-    # thrust = data[:, 3]
-    roll = data[:, 4]
-    pitch = data[:, 5]
-    yaw = data[:, 6]
-    dx = data[:, 7]
-    dy = data[:, 8]
-    z = data[:, 9]
-    dz = data[:, 10]
-    phi = data[:, 11]
-    # dphi = data[:, 12]
-    theta = data[:, 13]
-    # dtheta = data[:, 14]
-    # psi = data[:, 15]
-    dpsi = data[:, 16]
-    # m1 = data[:, 17]
-    # m2 = data[:, 18]
-    # m3 = data[:, 19]
-    # m4 = data[:, 20]
+    # volts = data[:, 1]
+    # thrust = data[:, 2]
+    roll = data[:, 3]
+    pitch = data[:, 4]
+    yaw = data[:, 5]
+    dx = data[:, 6]
+    dy = data[:, 7]
+    z = data[:, 8]
+    dz = data[:, 9]
+    phi = data[:, 10]
+    # dphi = data[:, 11]
+    theta = data[:, 12]
+    # dtheta = data[:, 13]
+    # psi = data[:, 14]
+    dpsi = data[:, 15]
+    m1 = data[:, 16]
+    m2 = data[:, 17]
+    m3 = data[:, 18]
+    m4 = data[:, 19]
 
     beg = (time >= args.begin).argmax()
 
     end = -1 if args.end is None else (time <= args.end).argmin()
 
-    plt.subplot(5, 1, 1)
-    plt.plot(time[beg:end], z[beg:end])
-    plt.plot(time[beg:end], dz[beg:end])
+    t = time[beg:end]
+
+    plt.subplot(6, 1, 1)
+    plt.plot(t, z[beg:end])
+    plt.plot(t, dz[beg:end])
     plt.legend(('z', 'dz/dt'))
     plt.ylabel('Climb')
 
-    plt.subplot(5, 1, 2)
-    plt.plot(time[beg:end], roll[beg:end], 'r')
-    plt.plot(time[beg:end], pitch[beg:end], 'g')
-    plt.plot(time[beg:end], yaw[beg:end], 'b')
-    plotmid(time[beg:end], 0)
+    plt.subplot(6, 1, 2)
+    plt.plot(t, 'r')
+    plt.plot(t, 'g')
+    plt.plot(t, 'b')
+    plotmid(t, 0)
     plt.legend(('roll', 'pitch', 'yaw'))
     plt.ylabel('Setpoint')
 
-    plt.subplot(5, 1, 3)
-    plt.plot(time[beg:end], phi[beg:end], 'r')
-    plt.plot(time[beg:end], theta[beg:end], 'g')
-    plotmid(time[beg:end], 0)
+    plt.subplot(6, 1, 3)
+    plt.plot(t, 'r')
+    plt.plot(t, 'g')
+    plotmid(t, 0)
     plt.legend(('phi', 'theta'))
     plt.ylabel('Angles')
 
-    plt.subplot(5, 1, 4)
-    plt.plot(time[beg:end], dpsi[beg:end])
-    plotmid(time[beg:end], 0)
+    plt.subplot(6, 1, 4)
+    plt.plot(t, dpsi[beg:end])
+    plotmid(t, 0)
     plt.ylabel('dpsi/dt')
 
-    plt.subplot(5, 1, 5)
-    plt.plot(time[beg:end], dy[beg:end], 'r')
-    plt.plot(time[beg:end], dx[beg:end], 'g')
+    plt.subplot(6, 1, 5)
+    plt.plot(t, 'r')
+    plt.plot(t, 'g')
     plt.ylim((-args.vmax, +args.vmax))
     plt.legend(('dy/dt', 'dx/dt'))
     plt.ylabel('Vel (m/s)')
+
+    plt.subplot(6, 1, 6)
+    plt.plot(t, m1[beg:end])
+    plt.plot(t, m2[beg:end])
+    plt.plot(t, m3[beg:end])
+    plt.plot(t, m4[beg:end])
+    plt.legend(('m1', 'm2', 'm3', 'm4'))
+    plt.ylabel('Motors')
 
     plt.xlabel('time (s)')
 

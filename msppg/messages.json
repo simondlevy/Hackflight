@@ -17,7 +17,12 @@
    {"theta":  "float"},
    {"dtheta": "float"},
    {"psi":    "float"},
-   {"dpsi":   "float"}
+   {"dpsi":   "float"},
+   {"m1":     "float"},
+   {"m2":     "float"},
+   {"m3":     "float"},
+   {"m4":     "float"}
+
   ],
 
   "SET_CHANNELS": 

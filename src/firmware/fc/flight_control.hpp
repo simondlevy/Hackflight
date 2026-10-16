@@ -270,11 +270,15 @@ namespace hf {
             }
 
             static auto GetTelemetryBytes(
-                    const FlightController &fc) -> std::vector<uint8_t>
+                    const FlightController &fc,
+                    const std::vector<float> motorvals
+                    ) -> std::vector<uint8_t>
             {
                 const auto setpoint = MakeSetpoint(fc);
 
-                float data[16] = {
+                static const size_t nvals = 20;
+
+                float data[nvals] = {
 
                     (float)fc.mode_,
 
@@ -294,14 +298,19 @@ namespace hf {
                     fc.state_.theta,
                     fc.state_.dtheta,
                     fc.state_.psi,
-                    fc.state_.dpsi
+                    fc.state_.dpsi,
+
+                    motorvals[0],
+                    motorvals[1],
+                    motorvals[2],
+                    motorvals[3]
                 };
 
                 MspSerializer telemetry_serializer;
 
                 telemetry_serializer = MspSerializer::SerializeFloats(
                         telemetry_serializer, kMspTelemetry,
-                        data, 16);
+                        data, nvals);
 
                 return MspSerializer::GetPayload(telemetry_serializer);
             }

@@ -174,19 +174,6 @@ static void BlinkLed(const hf::FlightController & fc)
     }
 }
 
-// Telemetry -----------------------------------------------------------------
-
-static void SendTelemetry(const hf::FlightController & fc)
-{
-    if (hf::FlightController::ShouldSendTelemetry(fc)) {
-
-        const auto telemetry_bytes =
-            hf::FlightController::GetTelemetryBytes(fc);
-
-        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
-    }
-}
-
 // Mixer / motors -------------------------------------------------------------
 
 static hf::QuadXMixer mixer_;
@@ -202,7 +189,20 @@ static void StartMotors()
 
 static auto GetMotorValues() -> std::vector<float>
 {
-    return hf::QuadXMixer::NewGetMotorValues(mixer_);
+    return hf::QuadXMixer::GetMotorValues(mixer_);
+}
+
+// Telemetry -----------------------------------------------------------------
+
+static void SendTelemetry(const hf::FlightController & fc)
+{
+    if (hf::FlightController::ShouldSendTelemetry(fc)) {
+
+        const auto telemetry_bytes =
+            hf::FlightController::GetTelemetryBytes(fc, GetMotorValues());
+
+        Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
+    }
 }
 
 static void RunMixerAndMotors(const hf::FlightController & fc)
