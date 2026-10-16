@@ -40,18 +40,17 @@ namespace hf {
                     const Setpoint & setpoint_in) -> NewPidController
             {
                 const auto stabilize_controller = StabilizeController::Run(
-                        pc.stabilize_controller_,
-                        airborne,
-                        dt,
-                        mode,
-                        state,
+                        pc.stabilize_controller_, airborne, dt, mode, state,
                         setpoint_in);
 
+                const auto setpoint_out =
+                    StabilizeController::GetSetpoint(stabilize_controller);
+
                 return NewPidController(
-                        pc.position_controller_,
+                        pc.pos_hold_controller_,
                         pc.alt_hold_controller_,
                         stabilize_controller,
-                        StabilizeController::GetSetpoint(stabilize_controller));
+                        setpoint_out);
             }
 
             static auto RunAltHold(
@@ -63,19 +62,11 @@ namespace hf {
                     const Setpoint & setpoint_in) -> NewPidController
             {
                 const auto stabilize_controller = StabilizeController::Run(
-                        pc.stabilize_controller_,
-                        airborne,
-                        dt,
-                        mode,
-                        state,
+                        pc.stabilize_controller_, airborne, dt, mode, state,
                         setpoint_in);
 
                 const auto alt_hold_controller = AltHoldController::Run(
-                        pc.alt_hold_controller_,
-                        airborne,
-                        dt,
-                        mode,
-                        state,
+                        pc.alt_hold_controller_, airborne, dt, mode, state,
                         setpoint_in);
 
                 const auto stabilize_setpoint =
@@ -88,11 +79,11 @@ namespace hf {
                     Setpoint(
                             alt_hold_setpoint.thrust,
                             stabilize_setpoint.roll,
-                            stabilize_setpoint.roll,
-                            stabilize_setpoint.roll);
+                            stabilize_setpoint.pitch,
+                            stabilize_setpoint.yaw);
 
                 return NewPidController(
-                        pc.position_controller_,
+                        pc.pos_hold_controller_,
                         alt_hold_controller,
                         stabilize_controller,
                         setpoint_out);
@@ -106,13 +97,39 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> NewPidController
             {
-                (void)airborne;
-                (void)dt;
-                (void)mode;
-                (void)state;
-                (void)setpoint_in;
+                const auto pos_hold_controller = PosHoldController::Run(
+                        pc.pos_hold_controller_, airborne, dt, mode, state,
+                        setpoint_in);
 
-                return pc;
+                const auto pos_hold_setpoint_out =
+                    PosHoldController::GetSetpoint(pos_hold_controller);
+
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_, airborne, dt, mode, state,
+                        setpoint_in);
+
+                const auto alt_hold_controller = AltHoldController::Run(
+                        pc.alt_hold_controller_, airborne, dt, mode, state,
+                        setpoint_in);
+
+                const auto stabilize_setpoint =
+                    StabilizeController::GetSetpoint(stabilize_controller);
+
+                const auto alt_hold_setpoint =
+                    AltHoldController::GetSetpoint(alt_hold_controller);
+
+                const auto setpoint_out =
+                    Setpoint(
+                            alt_hold_setpoint.thrust,
+                            stabilize_setpoint.roll,
+                            stabilize_setpoint.pitch,
+                            stabilize_setpoint.yaw);
+
+                return NewPidController(
+                        pc.pos_hold_controller_,
+                        alt_hold_controller,
+                        stabilize_controller,
+                        setpoint_out);
             }
 
             static auto GetSetpoint(const NewPidController & pc) -> Setpoint
@@ -122,18 +139,18 @@ namespace hf {
 
         private:
 
-            PositionController position_controller_;
+            PosHoldController pos_hold_controller_;
             AltHoldController alt_hold_controller_;
             StabilizeController stabilize_controller_;
             Setpoint setpoint_;
 
             NewPidController(
-                    const PositionController & position_controller,
+                    const PosHoldController & pos_hold_controller,
                     const AltHoldController & alt_hold_controller,
                     const StabilizeController & stabilize_controller,
                     const Setpoint & setpoint)
                 :
-                    position_controller_(position_controller),
+                    pos_hold_controller_(pos_hold_controller),
                     alt_hold_controller_(alt_hold_controller),
                     stabilize_controller_(stabilize_controller),
                     setpoint_(setpoint) {}
