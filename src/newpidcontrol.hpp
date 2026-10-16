@@ -62,13 +62,40 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> NewPidController
             {
-                (void)airborne;
-                (void)dt;
-                (void)mode;
-                (void)state;
-                (void)setpoint_in;
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_,
+                        airborne,
+                        dt,
+                        mode,
+                        state,
+                        setpoint_in);
 
-                return pc;
+                const auto alt_hold_controller = AltHoldController::Run(
+                        pc.alt_hold_controller_,
+                        airborne,
+                        dt,
+                        mode,
+                        state,
+                        setpoint_in);
+
+                const auto stabilize_setpoint =
+                    StabilizeController::GetSetpoint(stabilize_controller);
+
+                const auto alt_hold_setpoint =
+                    AltHoldController::GetSetpoint(alt_hold_controller);
+
+                const auto setpoint_out =
+                    Setpoint(
+                            alt_hold_setpoint.thrust,
+                            stabilize_setpoint.roll,
+                            stabilize_setpoint.roll,
+                            stabilize_setpoint.roll);
+
+                return NewPidController(
+                        pc.position_controller_,
+                        alt_hold_controller,
+                        stabilize_controller,
+                        setpoint_out);
             }
 
             static auto RunPosHold(
