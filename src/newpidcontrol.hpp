@@ -90,7 +90,16 @@ namespace hf {
         private:
 
             Setpoint setpoint_;
+            AltHoldController alt_hold_controller_;
+            StabilizeController stabilize_controller_;
 
-
+            NewPidController(
+                    const Setpoint & setpoint,
+                    const AltHoldController & alt_hold_controller,
+                    const StabilizeController & stabilize_controller)
+                :
+                    setpoint_(setpoint),
+                    alt_hold_controller_(alt_hold_controller),
+                    stabilize_controller_(stabilize_controller) {}
     };
 }
