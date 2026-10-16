@@ -106,7 +106,7 @@ namespace hf {
 
                 const auto stabilize_controller = StabilizeController::Run(
                         pc.stabilize_controller_, airborne, dt, mode, state,
-                        setpoint_in);
+                        pos_hold_setpoint_out);
 
                 const auto alt_hold_controller = AltHoldController::Run(
                         pc.alt_hold_controller_, airborne, dt, mode, state,
@@ -126,7 +126,7 @@ namespace hf {
                             stabilize_setpoint.yaw);
 
                 return NewPidController(
-                        pc.pos_hold_controller_,
+                        pos_hold_controller,
                         alt_hold_controller,
                         stabilize_controller,
                         setpoint_out);
