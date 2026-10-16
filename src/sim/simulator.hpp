@@ -83,8 +83,7 @@ namespace hf {
                                 dt,
                                 mode,
                                 state,
-                                setpoint,
-                                PidController::kControlAltHold);
+                                setpoint);
 
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces

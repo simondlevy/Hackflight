@@ -50,27 +50,6 @@ namespace hf {
             PidController& operator=(
                     const PidController& other) = default;
 
-            PidController(
-                    const float altitude_target,
-                    const AltitudeController & altitude_pid,
-                    const ClimbRateController & climbrate_pid,
-                    const PositionController & position_x_pid,
-                    const PositionController & position_y_pid,
-                    const RollPitchPid & pitch_pid,
-                    const RollPitchPid & roll_pid,
-                    const YawPid & yaw_pid,
-                    const Setpoint & setpoint)
-                :
-                    setpoint_(setpoint),
-                    altitude_target_(altitude_target),
-                    altitude_pid_(altitude_pid),
-                    climbrate_pid_(climbrate_pid),
-                    position_x_pid_(position_x_pid),
-                    position_y_pid_(position_y_pid),
-                    pitch_pid_(pitch_pid),
-                    roll_pid_(roll_pid),
-                    yaw_pid_(yaw_pid) {}
-
             static auto Run(
                     const PidController & pc,
                     const bool airborne,
@@ -185,5 +164,27 @@ namespace hf {
             RollPitchPid roll_pid_;
 
             YawPid yaw_pid_;
+
+            PidController(
+                    const float altitude_target,
+                    const AltitudeController & altitude_pid,
+                    const ClimbRateController & climbrate_pid,
+                    const PositionController & position_x_pid,
+                    const PositionController & position_y_pid,
+                    const RollPitchPid & pitch_pid,
+                    const RollPitchPid & roll_pid,
+                    const YawPid & yaw_pid,
+                    const Setpoint & setpoint)
+                :
+                    setpoint_(setpoint),
+                    altitude_target_(altitude_target),
+                    altitude_pid_(altitude_pid),
+                    climbrate_pid_(climbrate_pid),
+                    position_x_pid_(position_x_pid),
+                    position_y_pid_(position_y_pid),
+                    pitch_pid_(pitch_pid),
+                    roll_pid_(roll_pid),
+                    yaw_pid_(yaw_pid) {}
+
     };
 }
