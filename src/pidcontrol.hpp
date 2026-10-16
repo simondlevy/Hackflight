@@ -50,7 +50,7 @@ namespace hf {
             PidController& operator=(
                     const PidController& other) = default;
 
-            static auto Run(
+             static auto Run(
                     const PidController & pc,
                     const bool airborne,
                     const float dt,

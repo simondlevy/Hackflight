@@ -16,9 +16,6 @@
 
 #pragma once
 
-#include <newpidcontrol/stabilize/rollpitch.hpp>
-#include <newpidcontrol/stabilize/yaw.hpp>
-
 namespace hf {
 
     class StabilizeController {
@@ -43,26 +40,13 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> StabilizeController
             {
-                const auto roll_pid = RollPitchPid::Run(sc.roll_pid_,
-                        dt, airborne, roll_demand, state.phi, state.dphi);
+                (void)airborne;
+                (void)dt;
+                (void)mode;
+                (void)state;
+                (void)setpoint_in;
 
-                const auto pitch_pid = RollPitchPid::Run(sc.pitch_pid_,
-                        dt, airborne, pitch_demand, state.theta, state.dtheta);
-
-                const auto yaw_pid = YawPid::Run(sc.yaw_pid_,
-                        dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
-
-                const auto setpoint_out = Setpoint(
-                        setpoint_in.thrust,
-                        roll_pid.output,
-                        pitch_pid.output,
-                        yaw_pid.output);
-
-                return StabilizeController(
-                        roll_pid,
-                        pitch_pid,
-                        yaw_pid,
-                        setpoint_out);
+                return sc;
             }
 
             static auto GetSetpoint(const StabilizeController & sc) -> Setpoint
@@ -73,21 +57,5 @@ namespace hf {
         private:
 
             Setpoint setpoint_;
-
-            RollPitchPid pitch_pid_;
-            RollPitchPid roll_pid_;
-            YawPid yaw_pid_;
-
-            StabilizeController(
-                    const RollPitchPid & pitch_pid,
-                    const RollPitchPid & roll_pid,
-                    const YawPid & yaw_pid,
-                    const Setpoint & setpoint)
-                :
-                    setpoint_(setpoint),
-                    pitch_pid_(pitch_pid),
-                    roll_pid_(roll_pid),
-                    yaw_pid_(yaw_pid) {}
-
     };
 }

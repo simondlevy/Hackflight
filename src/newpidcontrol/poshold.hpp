@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <newpidcontrol/poshold/position.hpp>
-
 namespace hf {
 
     class PosHoldController {
@@ -37,42 +35,14 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> PosHoldController
             {
-                // Rotate world-coordinate velocities into body coordinates
-                const auto dxw = state.dx;
-                const auto dyw = state.dy;
-                const auto psi = Num::kDeg2Rad * state.psi;
-                const auto cospsi = cos(psi);
-                const auto sinpsi = sin(psi);
-                const auto dxb =  dxw * cospsi + dyw * sinpsi;
-                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
+                (void)airborne;
+                (void)dt;
+                (void)mode;
+                (void)state;
+                (void)setpoint_in;
 
-                const auto position_y_pid =
-                    PositionController::Run(pc.position_y_pid_, airborne, dt,
-                            setpoint_in.roll, dyb);
-
-                const auto position_x_pid =
-                    PositionController::Run(pc.position_x_pid_, airborne, dt,
-                            setpoint_in.pitch, dxb);
-
-                const auto hold_position = control_level == kControlPosHold;
-
-                const auto roll_demand = hold_position ? position_y_pid.output :
-                    PositionController::Bypass(setpoint_in.roll);
-
-                const auto pitch_demand = hold_position ? position_x_pid.output :
-                    PositionController::Bypass(setpoint_in.pitch);
-
-                const auto setpoint_out = Setpoint(
-                        setpoint_in.thrust,
-                        roll_pid.output,
-                        pitch_pid.output,
-                        setpoint_in.yaw);
-
-                return PosHoldController(
-                        setpoint_out,
-                        position_x_pid,
-                        position_y_pid);
-            
+                return pc;
+            }            
 
             static auto GetSetpoint(const PosHoldController & pc) -> Setpoint
             {
@@ -82,17 +52,5 @@ namespace hf {
         private:
 
             Setpoint setpoint_;
-            PositionController position_x_pid_;
-            PositionController position_y_pid_;
-
-            PosHoldController(
-                    const PositionController & position_x_pid,
-                    const PositionController & position_y_pid,
-                    const Setpoint & setpoint)
-                :
-                    setpoint_(setpoint),
-                    position_x_pid_(position_x_pid),
-                    position_y_pid_(position_y_pid) {}
-
     };
 }

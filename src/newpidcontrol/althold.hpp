@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include <newpidcontrol/althold/altitude.hpp>
-#include <newpidcontrol/althold/climbrate.hpp>
 
 namespace hf {
 
@@ -46,35 +44,13 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> AltHoldController
             {
-                // Altitude hold ---------------------------------------------
+                (void)airborne;
+                (void)dt;
+                (void)mode;
+                (void)state;
+                (void)setpoint_in;
 
-                const auto  altitude_target =
-                    ac.altitude_target_ == 0 ? kInitM :
-                    ac.altitude_target_;
-
-                const auto new_altitude_target = Num::ConstrainFloat(
-                        altitude_target +
-                        setpoint_in.thrust * kIncMps * dt,
-                        kMinM, kmaxM);
-
-                const auto hovering =
-                    mode == kModeHover || mode == kModeAutonomous;
-
-                const auto altitude_pid =
-                    AltitudeController::Run(ac.altitude_pid_, hovering, dt,
-                            new_altitude_target, state.z);
-
-                const auto climbrate_pid =
-                    ClimbRateController::Run(ac.climbrate_pid_,
-                            hovering || (state.z > kLandingM),
-                            dt,
-                            altitude_pid.output, state.dz);
-
-                return AltHoldController(
-                        new_altitude_target,
-                        altitude_pid,
-                        climbrate_pid,
-                        setpoint_out);
+                return ac;
             }
 
             static auto GetSetpoint(const AltHoldController & ac) -> Setpoint
@@ -85,20 +61,6 @@ namespace hf {
         private:
 
             Setpoint setpoint_;
-            float altitude_target_;
-            AltitudeController altitude_pid_;
-            ClimbRateController climbrate_pid_;
-
-            AltHoldController(
-                    const float altitude_target,
-                    const AltitudeController & altitude_pid,
-                    const ClimbRateController & climbrate_pid,
-                    const Setpoint & setpoint)
-                :
-                    setpoint_(setpoint),
-                    altitude_target_(altitude_target),
-                    altitude_pid_(altitude_pid),
-                    climbrate_pid_(climbrate_pid) {}
 
     };
 }
