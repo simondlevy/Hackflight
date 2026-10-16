@@ -157,9 +157,7 @@ namespace hf {
             static auto UpdateCore(
                     const FlightController & fc,
                     const uint32_t usec,
-                    const std::vector<float> motorvals, 
-                    const PidController::ControlLevel
-                    control_level) -> FlightController
+                    const std::vector<float> motorvals) -> FlightController
             {
                 // Most updates run on milliseconds
                 const auto msec = usec / 1000;
@@ -171,7 +169,7 @@ namespace hf {
                         fc.zranger_filter_,
                         fc.imu_filter_,
                         EKF::getVehicleState(fc.ekf_),
-                        UpdateMode(fc, msec, control_level),
+                        UpdateMode(fc, msec),
                         UpdateFlyingStatus(fc, msec),
                         UpdateStartedFlyingTime(fc, msec, motorvals),
                         fc.voltage_,
@@ -189,7 +187,7 @@ namespace hf {
                                 kLedHeartbeatRate, msec),
                         Timer::Update(fc.fast_blink_timer_, 
                                 kLedFastBlinkRate, msec),
-                        UpdatePidController(fc, usec, control_level),
+                        UpdatePidController(fc, usec),
                         usec,
                         UpdateLed(fc, msec,IsGyroCalibrated(fc)
                                 && fc.mode_ != kModePanic),
@@ -456,20 +454,16 @@ namespace hf {
 
             static auto UpdatePidController(
                     const FlightController & fc,
-                    const uint32_t usec,
-                    const PidController::ControlLevel
-                    control_level) -> PidController
+                    const uint32_t usec) -> PidController
             {
                 const float dt = (usec - fc.pid_update_usec_prev_)/1000000.0;
 
-                return PidController::Run(
+                return PidController::RunStabilize(
                         fc.pid_controller_,
                         fc.is_flying_,
                         dt,
-                        fc.mode_,
                         fc.state_,
-                        MakeSetpoint(fc),
-                        control_level);
+                        MakeSetpoint(fc));
             }
 
             static auto UpdateVoltage(
@@ -483,8 +477,7 @@ namespace hf {
 
             static auto UpdateMode(
                     const FlightController & fc,
-                    const uint32_t msec,
-                    const PidController::ControlLevel control_level) -> Mode
+                    const uint32_t msec) -> Mode
             {
                 // Run a little state-transition machine to update flight mode
                 return 
@@ -500,7 +493,7 @@ namespace hf {
 
                     // Want arm and safe to arm: enter armed mode
                     GetReceiverMode(fc) == kModeArmed &&
-                    IsSafeToArm(fc, msec, control_level) ?
+                    IsSafeToArm(fc, msec) ?
                     kModeArmed :
 
                     // Want disarm: enter idle mode
@@ -516,8 +509,7 @@ namespace hf {
 
             static auto IsSafeToArm(
                     const FlightController & fc,
-                    const uint32_t msec,
-                    const PidController::ControlLevel control_level) -> bool
+                    const uint32_t msec) -> bool
             {
                 return
 

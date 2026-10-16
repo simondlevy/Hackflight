@@ -39,7 +39,6 @@
 
 static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
-static const auto kControlLevel = hf::PidController::kControlStabilize;
 
 // ZRanger -------------------------------------------------------------------
 
@@ -242,7 +241,7 @@ static void StartMotors()
     motors_.begin();
 }
 
-static auto MotorsGetValues() -> std::vector<float>
+static auto GetMotorValues() -> std::vector<float>
 {
     return hf::QuadXMixer::NewGetMotorValues(mixer_);
 }
@@ -254,8 +253,8 @@ static void RunMixerAndMotors(const hf::FlightController & fc)
 
     // Run motors if safe
     if (hf::FlightController::IsSafeToFly(fc)) {
-        MotorsGetValues();
-        motors_.run(hf::FlightController::IsArmed(fc), MotorsGetValues());
+        GetMotorValues();
+        motors_.run(hf::FlightController::IsArmed(fc), GetMotorValues());
     }
 }
 
@@ -264,7 +263,7 @@ static void RunMixerAndMotors(const hf::FlightController & fc)
 static auto UpdateCore(const hf::FlightController & fc) -> hf::FlightController
 {
     return hf::FlightController::UpdateCore(fc, micros(),
-            MotorsGetValues(), kControlLevel);
+            GetMotorValues());
 }
 
 // Profiling -----------------------------------------------------------------
@@ -317,8 +316,8 @@ void loop()
     // flight-control status
     static hf::FlightController fc_;
 
-    // Update the flight controller by passing it through a composition of
-    // timed update functions
+    // Update the flight-control data structure by passing it through a
+    // composition of timed update functions
     fc_ = UpdateCore(
             UpdateVoltage(
                 UpdateHoverDeck(

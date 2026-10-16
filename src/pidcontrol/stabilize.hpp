@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <newpidcontrol/stabilize/rollpitch.hpp>
-#include <newpidcontrol/stabilize/yaw.hpp>
+#include <pidcontrol/stabilize/rollpitch.hpp>
+#include <pidcontrol/stabilize/yaw.hpp>
 
 namespace hf {
 
@@ -28,7 +28,6 @@ namespace hf {
             static constexpr float kYawMaxDps = 160;     
 
         public:
-
 
             StabilizeController() = default;
 

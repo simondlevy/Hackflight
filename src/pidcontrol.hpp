@@ -16,131 +16,123 @@
 
 #pragma once
 
-#include <pids/altitude.hpp>
-#include <pids/climbrate.hpp>
-#include <pids/position.hpp>
-#include <pids/rollpitch.hpp>
-#include <pids/yaw.hpp>
+#include <pidcontrol/althold.hpp>
+#include <pidcontrol/poshold.hpp>
+#include <pidcontrol/stabilize.hpp>
 
 namespace hf {
 
     class PidController {
 
-        private:
-
-            static constexpr float kAltitudeMinM = 0.2;
-            static constexpr float kAltitudemaxM = 1.0;
-            static constexpr float kAltitudeInitM = 0.4;
-            static constexpr float kAltitudeIncMps = 0.2;
-            static constexpr float kAltitudeLandingM = 0.03;
-            static constexpr float kYawMaxDps = 160;     
-
         public:
-
-            typedef enum {
-
-                kControlStabilize,
-                kControlAltHold,
-                kControlPosHold
-
-            } ControlLevel;
 
             PidController() = default;
 
             PidController& operator=(
                     const PidController& other) = default;
 
-             static auto Run(
+            static auto RunStabilize(
+                    const PidController & pc,
+                    const bool airborne,
+                    const float dt,
+                    const VehicleState & state,
+                    const Setpoint & setpoint_in) -> PidController
+            {
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_, airborne, dt, state,
+                        setpoint_in);
+
+                const auto setpoint_stable =
+                    StabilizeController::GetSetpoint(stabilize_controller);
+
+                const auto setpoint_out = Setpoint(
+                        (setpoint_in.thrust + 1) / 2, // [-1,+1] => [0,1]
+                        setpoint_stable.roll,
+                        setpoint_stable.pitch,
+                        setpoint_stable.yaw);
+
+                return PidController(
+                        pc.pos_hold_controller_,
+                        pc.alt_hold_controller_,
+                        stabilize_controller,
+                        setpoint_out);
+            }
+
+            static auto RunAltHold(
                     const PidController & pc,
                     const bool airborne,
                     const float dt,
                     const Mode mode,
                     const VehicleState & state,
-                    const Setpoint & setpoint_in,
-                    const ControlLevel
-                    control_level=kControlPosHold) -> PidController
+                    const Setpoint & setpoint_in) -> PidController
             {
-                // Altitude hold ---------------------------------------------
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_, airborne, dt, state,
+                        setpoint_in);
 
-                const auto  altitude_target =
-                    pc.altitude_target_ == 0 ? kAltitudeInitM :
-                    pc.altitude_target_;
+                const auto alt_hold_controller = AltHoldController::Run(
+                        pc.alt_hold_controller_, dt, mode, state, setpoint_in);
 
-                const auto new_altitude_target = Num::ConstrainFloat(
-                        altitude_target +
-                        setpoint_in.thrust * kAltitudeIncMps * dt,
-                        kAltitudeMinM, kAltitudemaxM);
+                const auto stabilize_setpoint =
+                    StabilizeController::GetSetpoint(stabilize_controller);
 
-                const auto hovering =
-                    mode == kModeHover || mode == kModeAutonomous;
+                const auto alt_hold_setpoint =
+                    AltHoldController::GetSetpoint(alt_hold_controller);
 
-                const auto altitude_pid =
-                    AltitudeController::Run(pc.altitude_pid_, hovering, dt,
-                            new_altitude_target, state.z);
-
-                const auto climbrate_pid =
-                    ClimbRateController::Run(pc.climbrate_pid_,
-                            hovering || (state.z > kAltitudeLandingM),
-                            dt,
-                            altitude_pid.output, state.dz);
-
-                // Position hold ---------------------------------------------
-
-                // Rotate world-coordinate velocities into body coordinates
-                const auto dxw = state.dx;
-                const auto dyw = state.dy;
-                const auto psi = Num::kDeg2Rad * state.psi;
-                const auto cospsi = cos(psi);
-                const auto sinpsi = sin(psi);
-                const auto dxb =  dxw * cospsi + dyw * sinpsi;
-                const auto dyb = -dxw * sinpsi + dyw * cospsi;       
-
-                const auto position_y_pid =
-                    PositionController::Run(pc.position_y_pid_, airborne, dt,
-                            setpoint_in.roll, dyb);
-
-                const auto position_x_pid =
-                    PositionController::Run(pc.position_x_pid_, airborne, dt,
-                            setpoint_in.pitch, dxb);
-
-                const auto hold_position = control_level == kControlPosHold;
-
-                const auto roll_demand = hold_position ? position_y_pid.output :
-                    PositionController::Bypass(setpoint_in.roll);
-
-                const auto pitch_demand = hold_position ? position_x_pid.output :
-                    PositionController::Bypass(setpoint_in.pitch);
-
-                // Stabilize  ------------------------------------------------
-
-                const auto roll_pid = RollPitchPid::Run(pc.roll_pid_,
-                        dt, airborne, roll_demand, state.phi, state.dphi);
-
-                const auto pitch_pid = RollPitchPid::Run(pc.pitch_pid_,
-                        dt, airborne, pitch_demand, state.theta, state.dtheta);
-
-                const auto yaw_pid = YawPid::Run(pc.yaw_pid_,
-                        dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
-
-                const auto setpoint_out = Setpoint(
-
-                        control_level > kControlStabilize ?
-                        climbrate_pid.output :
-                        (setpoint_in.thrust + 1) / 2, // [-1,+1] => [0,1]
-
-                        roll_pid.output,
-                        pitch_pid.output,
-                        yaw_pid.output);
+                const auto setpoint_out =
+                    Setpoint(
+                            alt_hold_setpoint.thrust,
+                            stabilize_setpoint.roll,
+                            stabilize_setpoint.pitch,
+                            stabilize_setpoint.yaw);
 
                 return PidController(
-                        new_altitude_target,
-                        altitude_pid,
-                        climbrate_pid,
-                        pc.position_x_pid_,
-                        pc.position_y_pid_,
-                        roll_pid,
-                        pitch_pid,
-                        yaw_pid,
+                        pc.pos_hold_controller_,
+                        alt_hold_controller,
+                        stabilize_controller,
+                        setpoint_out);
+            }
+
+            static auto RunPosHold(
+                    const PidController & pc,
+                    const bool airborne,
+                    const float dt,
+                    const Mode mode,
+                    const VehicleState & state,
+                    const Setpoint & setpoint_in) -> PidController
+            {
+                const auto pos_hold_controller = PosHoldController::Run(
+                        pc.pos_hold_controller_, airborne, dt, state,
+                        setpoint_in);
+
+                const auto pos_hold_setpoint_out =
+                    PosHoldController::GetSetpoint(pos_hold_controller);
+
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_, airborne, dt, state,
+                        pos_hold_setpoint_out);
+
+                const auto alt_hold_controller = AltHoldController::Run(
+                        pc.alt_hold_controller_, dt, mode, state,
+                        setpoint_in);
+
+                const auto stabilize_setpoint =
+                    StabilizeController::GetSetpoint(stabilize_controller);
+
+                const auto alt_hold_setpoint =
+                    AltHoldController::GetSetpoint(alt_hold_controller);
+
+                const auto setpoint_out =
+                    Setpoint(
+                            alt_hold_setpoint.thrust,
+                            stabilize_setpoint.roll,
+                            stabilize_setpoint.pitch,
+                            stabilize_setpoint.yaw);
+
+                return PidController(
+                        pos_hold_controller,
+                        alt_hold_controller,
+                        stabilize_controller,
                         setpoint_out);
             }
 
@@ -151,40 +143,20 @@ namespace hf {
 
         private:
 
+            PosHoldController pos_hold_controller_;
+            AltHoldController alt_hold_controller_;
+            StabilizeController stabilize_controller_;
             Setpoint setpoint_;
 
-            float altitude_target_;
-            AltitudeController altitude_pid_;
-            ClimbRateController climbrate_pid_;
-
-            PositionController position_x_pid_;
-            PositionController position_y_pid_;
-
-            RollPitchPid pitch_pid_;
-            RollPitchPid roll_pid_;
-
-            YawPid yaw_pid_;
-
             PidController(
-                    const float altitude_target,
-                    const AltitudeController & altitude_pid,
-                    const ClimbRateController & climbrate_pid,
-                    const PositionController & position_x_pid,
-                    const PositionController & position_y_pid,
-                    const RollPitchPid & pitch_pid,
-                    const RollPitchPid & roll_pid,
-                    const YawPid & yaw_pid,
+                    const PosHoldController & pos_hold_controller,
+                    const AltHoldController & alt_hold_controller,
+                    const StabilizeController & stabilize_controller,
                     const Setpoint & setpoint)
                 :
-                    setpoint_(setpoint),
-                    altitude_target_(altitude_target),
-                    altitude_pid_(altitude_pid),
-                    climbrate_pid_(climbrate_pid),
-                    position_x_pid_(position_x_pid),
-                    position_y_pid_(position_y_pid),
-                    pitch_pid_(pitch_pid),
-                    roll_pid_(roll_pid),
-                    yaw_pid_(yaw_pid) {}
-
+                    pos_hold_controller_(pos_hold_controller),
+                    alt_hold_controller_(alt_hold_controller),
+                    stabilize_controller_(stabilize_controller),
+                    setpoint_(setpoint) {}
     };
 }

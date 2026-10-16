@@ -24,7 +24,7 @@
 
 #include <datatypes.hpp>
 #include <num.hpp>
-#include <newpidcontrol.hpp>
+#include <pidcontrol.hpp>
 #include <sim/datatypes.hpp>
 #include <sim/dynamics.hpp>
 
@@ -44,10 +44,10 @@ namespace hf {
 
             Simulator(const Pose & pose)
                 : dynamics_(Dynamics(pose)),
-                pid_controller_(NewPidController()) {}
+                pid_controller_(PidController()) {}
 
             Simulator(const Dynamics & dynamics,
-                    const NewPidController & pid_controller)
+                    const PidController & pid_controller)
                 : dynamics_(dynamics), pid_controller_(pid_controller) {}
 
             static auto Step(
@@ -77,7 +77,7 @@ namespace hf {
                     for (uint32_t j=0; j<kPidFastFreq/kPidSlowFreq; ++j) {
 
                         // Run PID control to get new setpoint
-                        pid_controller = NewPidController::RunPosHold(
+                        pid_controller = PidController::RunPosHold(
                                 pid_controller,
                                 true,
                                 dt,
@@ -88,7 +88,7 @@ namespace hf {
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces
                         const auto forces = effector_fun(
-                                NewPidController::GetSetpoint(pid_controller));
+                                PidController::GetSetpoint(pid_controller));
 
                         // Run dynamics in inner loop -------------------------
                         for (uint32_t k=0; k<kDynamicsFreq/kPidFastFreq; ++k) {
@@ -108,14 +108,14 @@ namespace hf {
 
             static auto GetSetpoint(const Simulator & sim)
             {
-                return NewPidController::GetSetpoint(sim.pid_controller_);
+                return PidController::GetSetpoint(sim.pid_controller_);
             }
 
         private:
 
             Dynamics dynamics_;
 
-            NewPidController pid_controller_;
+            PidController pid_controller_;
 
             static auto SimStateToVehicleState(
                     const SimState state) -> VehicleState 

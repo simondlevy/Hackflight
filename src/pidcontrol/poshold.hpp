@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <newpidcontrol/poshold/position.hpp>
+#include <pidcontrol/poshold/position.hpp>
 
 namespace hf {
 

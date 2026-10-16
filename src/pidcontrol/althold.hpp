@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <newpidcontrol/althold/altitude.hpp>
-#include <newpidcontrol/althold/climbrate.hpp>
+#include <pidcontrol/althold/altitude.hpp>
+#include <pidcontrol/althold/climbrate.hpp>
 
 namespace hf {
 
