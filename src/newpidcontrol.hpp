@@ -39,11 +39,15 @@ namespace hf {
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> NewPidController
             {
-                (void)airborne;
-                (void)dt;
-                (void)mode;
-                (void)state;
-                (void)setpoint_in;
+                const auto stabilize_controller = StabilizeController::Run(
+                        pc.stabilize_controller_,
+                        airborne,
+                        dt,
+                        mode,
+                        state,
+                        setpoint_in);
+
+                (void)stabilize_controller;
 
                 return pc;
             }
@@ -89,17 +93,20 @@ namespace hf {
 
         private:
 
-            Setpoint setpoint_;
+            PositionController position_controller_;
             AltHoldController alt_hold_controller_;
             StabilizeController stabilize_controller_;
+            Setpoint setpoint_;
 
             NewPidController(
-                    const Setpoint & setpoint,
+                    const PositionController & position_controller,
                     const AltHoldController & alt_hold_controller,
-                    const StabilizeController & stabilize_controller)
+                    const StabilizeController & stabilize_controller,
+                    const Setpoint & setpoint)
                 :
-                    setpoint_(setpoint),
+                    position_controller_(position_controller),
                     alt_hold_controller_(alt_hold_controller),
-                    stabilize_controller_(stabilize_controller) {}
+                    stabilize_controller_(stabilize_controller),
+                    setpoint_(setpoint) {}
     };
 }
