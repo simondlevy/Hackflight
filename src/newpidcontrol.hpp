@@ -47,9 +47,11 @@ namespace hf {
                         state,
                         setpoint_in);
 
-                (void)stabilize_controller;
-
-                return pc;
+                return NewPidController(
+                        pc.position_controller_,
+                        pc.alt_hold_controller_,
+                        stabilize_controller,
+                        StabilizeController::GetSetpoint(stabilize_controller));
             }
 
             static auto RunAltHold(
