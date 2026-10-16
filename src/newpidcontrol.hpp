@@ -35,12 +35,11 @@ namespace hf {
                     const NewPidController & pc,
                     const bool airborne,
                     const float dt,
-                    const Mode mode,
                     const VehicleState & state,
                     const Setpoint & setpoint_in) -> NewPidController
             {
                 const auto stabilize_controller = StabilizeController::Run(
-                        pc.stabilize_controller_, airborne, dt, mode, state,
+                        pc.stabilize_controller_, airborne, dt, state,
                         setpoint_in);
 
                 const auto setpoint_out =
@@ -62,12 +61,11 @@ namespace hf {
                     const Setpoint & setpoint_in) -> NewPidController
             {
                 const auto stabilize_controller = StabilizeController::Run(
-                        pc.stabilize_controller_, airborne, dt, mode, state,
+                        pc.stabilize_controller_, airborne, dt, state,
                         setpoint_in);
 
                 const auto alt_hold_controller = AltHoldController::Run(
-                        pc.alt_hold_controller_, airborne, dt, mode, state,
-                        setpoint_in);
+                        pc.alt_hold_controller_, dt, mode, state, setpoint_in);
 
                 const auto stabilize_setpoint =
                     StabilizeController::GetSetpoint(stabilize_controller);
@@ -98,18 +96,18 @@ namespace hf {
                     const Setpoint & setpoint_in) -> NewPidController
             {
                 const auto pos_hold_controller = PosHoldController::Run(
-                        pc.pos_hold_controller_, airborne, dt, mode, state,
+                        pc.pos_hold_controller_, airborne, dt, state,
                         setpoint_in);
 
                 const auto pos_hold_setpoint_out =
                     PosHoldController::GetSetpoint(pos_hold_controller);
 
                 const auto stabilize_controller = StabilizeController::Run(
-                        pc.stabilize_controller_, airborne, dt, mode, state,
+                        pc.stabilize_controller_, airborne, dt, state,
                         pos_hold_setpoint_out);
 
                 const auto alt_hold_controller = AltHoldController::Run(
-                        pc.alt_hold_controller_, airborne, dt, mode, state,
+                        pc.alt_hold_controller_, dt, mode, state,
                         setpoint_in);
 
                 const auto stabilize_setpoint =
