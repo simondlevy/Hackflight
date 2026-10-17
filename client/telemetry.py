@@ -81,7 +81,7 @@ class Telemetry(MspParser):
             self.outfile = open(args.outfile, 'w')
 
             self.outfile.write(
-                    'time,mode,volts,thrust,roll,pitch,yaw,' +
+                    'time,mode,volts,throttle,roll,pitch,yaw,' +
                     'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
 
         except Exception as e:
@@ -130,8 +130,9 @@ class Telemetry(MspParser):
         self.step()
         return self.plotter_data
 
-    def handle_TELEMETRY(self, mode, volts, thrust, roll, pitch, yaw, dx, dy,
-                         z, dz, phi, dphi, theta, dtheta, psi, dpsi,
+    def handle_TELEMETRY(self, mode, volts, throttle, roll, pitch, yaw,
+                         dx, dy, z, dz,
+                         phi, dphi, theta, dtheta, psi, dpsi,
                          m1, m2, m3, m4):
 
         # C++ side is simpler if mode is sent as float instead of byte
@@ -143,13 +144,14 @@ class Telemetry(MspParser):
                'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f | '
                'm1=%3.3f m2=%3.3f m3=%3.3f m4=%3.3f') % (
                ('idle', 'armed', 'hover', 'autopilot')[mode],
-               volts, thrust, roll, pitch, yaw,
+               volts, throttle, roll, pitch, yaw,
                phi, theta, psi, dx, dy, z, dz,
                m1, m2, m3, m4))
 
-        data = (time.time() - self.start_time, volts, thrust,
-                roll, pitch, yaw, dx, dy, z, dz, phi, dphi, theta,
-                dtheta, psi, dpsi, m1, m2, m3, m4)
+        data = (time.time() - self.start_time, volts,
+                throttle, roll, pitch, yaw,
+                dx, dy, z, dz, phi, dphi, theta, dtheta, psi, dpsi,
+                m1, m2, m3, m4)
 
         fmt = ','.join('%f' for _ in data) + '\n'
 

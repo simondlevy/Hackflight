@@ -21,8 +21,8 @@ import argparse
 from argparse import ArgumentDefaultsHelpFormatter
 
 
-def plotmid(time, value):
-    plt.plot(time, value * np.ones(len(time)), 'k-')
+def plotmid(time, value=0):
+    plt.plot(time, value * np.ones(len(time)), 'k--')
 
 
 def main():
@@ -57,25 +57,6 @@ def main():
         exit(1)
 
     time = data[:, 0]
-    # volts = data[:, 1]
-    # thrust = data[:, 2]
-    roll = data[:, 3]
-    pitch = data[:, 4]
-    yaw = data[:, 5]
-    dx = data[:, 6]
-    dy = data[:, 7]
-    z = data[:, 8]
-    dz = data[:, 9]
-    phi = data[:, 10]
-    # dphi = data[:, 11]
-    theta = data[:, 12]
-    # dtheta = data[:, 13]
-    # psi = data[:, 14]
-    dpsi = data[:, 15]
-    m1 = data[:, 16]
-    m2 = data[:, 17]
-    m3 = data[:, 18]
-    m4 = data[:, 19]
 
     beg = (time >= args.begin).argmax()
 
@@ -83,32 +64,76 @@ def main():
 
     t = time[beg:end]
 
-    plt.subplot(6, 1, 1)
-    plt.plot(t, z[beg:end])
-    plt.plot(t, dz[beg:end])
-    plt.legend(('z', 'dz/dt'))
-    plt.ylabel('Climb')
+    volts = data[:, 1]
 
-    plt.subplot(6, 1, 2)
-    plt.plot(t, 'r')
-    plt.plot(t, 'g')
-    plt.plot(t, 'b')
-    plotmid(t, 0)
-    plt.legend(('roll', 'pitch', 'yaw'))
-    plt.ylabel('Setpoint')
+    throttle = data[beg:end, 2]
+    roll = data[beg:end, 3]
+    pitch = data[beg:end, 4]
+    yaw = data[beg:end, 5]
 
-    plt.subplot(6, 1, 3)
-    plt.plot(t, 'r')
-    plt.plot(t, 'g')
-    plotmid(t, 0)
+    dx = data[beg:end, 6]
+    dy = data[beg:end, 7]
+    z = data[beg:end, 8]
+    dz = data[beg:end, 9]
+    phi = data[beg:end, 10]
+    dphi = data[beg:end, 11]
+    theta = data[beg:end, 12]
+    dtheta = data[beg:end, 13]
+    psi = data[beg:end, 14]
+    dpsi = data[beg:end, 15]
+
+    m1 = data[beg:end, 16]
+    m2 = data[beg:end, 17]
+    m3 = data[beg:end, 18]
+    m4 = data[beg:end, 19]
+
+
+    # Stick demands
+    plt.subplot(3, 1, 1)
+    plt.plot(t, throttle, 'r--')
+    plt.plot(t, roll, 'g')
+    plt.plot(t, pitch, 'b')
+    plt.plot(t, yaw, 'c')
+    plotmid(t)
+    plt.ylim((-1,+1))
+    plt.legend(('throttle', 'roll', 'pitch', 'yaw'))
+    plt.ylabel('Sticks')
+
+    # Roll, pitch angles
+    plt.subplot(3, 1, 2)
+    plt.plot(t, phi, 'r')
+    plt.plot(t, theta, 'g')
+    plotmid(t)
+    plt.ylim((-30, +30))
     plt.legend(('phi', 'theta'))
     plt.ylabel('Angles')
 
-    plt.subplot(6, 1, 4)
-    plt.plot(t, dpsi[beg:end])
-    plotmid(t, 0)
+    #  Motors
+    plt.subplot(3, 1, 3)
+    plt.plot(t, m1, '+')
+    plt.plot(t, m2, '+')
+    plt.plot(t, m3)
+    plt.plot(t, m4)
+    plt.ylim((0, 1))
+    plt.legend(('right-rear', 'right-front', 'left-rear', 'left-front'))
+    plt.ylabel('Motors')
+
+    '''
+    # Yaw velocity
+    plt.subplot(3, 1, 3)
+    plt.plot(t, dpsi)
+    plotmid(t)
     plt.ylabel('dpsi/dt')
 
+    # Altitude, climbrate
+    plt.subplot(3, 1, 1)
+    plt.plot(t, z)
+    plt.plot(t, dz)
+    plt.legend(('z', 'dz/dt'))
+    plt.ylim((-2, +2))
+    plt.ylabel('Climb')
+
+    # Lateral velocity
     plt.subplot(6, 1, 5)
     plt.plot(t, 'r')
     plt.plot(t, 'g')
@@ -116,13 +141,7 @@ def main():
     plt.legend(('dy/dt', 'dx/dt'))
     plt.ylabel('Vel (m/s)')
 
-    plt.subplot(6, 1, 6)
-    plt.plot(t, m1[beg:end], '+')
-    plt.plot(t, m2[beg:end], '+')
-    plt.plot(t, m3[beg:end])
-    plt.plot(t, m4[beg:end])
-    plt.legend(('rr', 'rf', 'lr', 'lf'))
-    plt.ylabel('Motors')
+    '''
 
     plt.xlabel('time (s)')
 
