@@ -117,11 +117,11 @@ def main():
     plt.ylabel('Vel (m/s)')
 
     plt.subplot(6, 1, 6)
-    plt.plot(t, m1[beg:end])
-    plt.plot(t, m2[beg:end])
+    plt.plot(t, m1[beg:end], '+')
+    plt.plot(t, m2[beg:end], '+')
     plt.plot(t, m3[beg:end])
     plt.plot(t, m4[beg:end])
-    plt.legend(('m1', 'm2', 'm3', 'm4'))
+    plt.legend(('rr', 'rf', 'lr', 'lf'))
     plt.ylabel('Motors')
 
     plt.xlabel('time (s)')
