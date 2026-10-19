@@ -15,7 +15,6 @@
 #pragma once
 
 #include <firmware/fc/imu/lpf.hpp>
-#include <firmware/fc/imu/rawdata.hpp>
 #include <firmware/fc/imu/three_axis.hpp>
 
 namespace hf {

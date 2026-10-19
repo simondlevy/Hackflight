@@ -43,6 +43,10 @@ static constexpr uint8_t kVoltageInputPin = A9;
 static const uint8_t kLedPin = 9;
 static const auto kControlLevel = hf::PidController::kControlStabilize;
 
+static const float kTelemetrySendFreq = 50;
+
+const uint32_t kLoopFreq = 1000;
+
 static hf::FlightController fc_;
 
 // Receiver ------------------------------------------------------------------
@@ -92,6 +96,18 @@ static auto ZRangerRead() -> float
     return distance_;
 }
 
+static auto ZRangerIsDataReady() -> bool
+{
+    if (vl53l1x_.dataReady())  {
+        vl53l1x_.distance();
+        vl53l1x_.clearInterrupt();
+        return true;
+    }
+
+    return false;
+
+} 
+
 // Optical flow --------------------------------------------------------------
 
 static PMW3901 pmw3901_;
@@ -118,16 +134,27 @@ static auto OpticalFlowRead() -> hf::OpticalFlowData
 
 // Imu -----------------------------------------------------------------------
 
-static constexpr Bmi088Gyro::Range kGyroRange = Bmi088Gyro::RANGE_2000DPS;
-static constexpr Bmi088Accel::Range kAccelRange = Bmi088Accel::RANGE_24G;
+static const uint8_t kImuDataReadyPin = 22;
 
-static constexpr int16_t granges[5] = {2000, 1000, 500, 250, 125};
-static constexpr int16_t aranges[4] = {3, 6, 12, 24};
+static constexpr Bmi088::GyroRange kGyroRange = Bmi088::GYRO_RANGE_2000DPS;
+static constexpr Bmi088::AccelRange kAccelRange = Bmi088::ACCEL_RANGE_24G;
 
 // The SDO pin should either be pulled low for the 0x18/0x68
 // addresses, high for 0x19/0x69
+static auto imu_ = Bmi088(Wire, 0x18, 0x68);
+
+static volatile bool is_imu_data_ready_;
+
 static Bmi088Accel accel_ = Bmi088Accel(Wire, 0x18);
 static Bmi088Gyro gyro_ = Bmi088Gyro(Wire, 0x68);
+
+static constexpr int16_t gyro_ranges_[5] = {2000, 1000, 500, 250, 125};
+static constexpr int16_t accel_ranges_[4] = {3, 6, 12, 24};
+
+static auto ImuDataReadyInterrupt()
+{
+    is_imu_data_ready_ = true;
+}
 
 static auto ImuOkay(const int status) -> bool
 {
@@ -136,51 +163,38 @@ static auto ImuOkay(const int status) -> bool
 
 static void ImuStart()
 {
-    if (!(ImuOkay(gyro_.begin()) &&
+    if (!(      ImuOkay(imu_.begin())
 
-                ImuOkay(accel_.begin()) &&
+                && ImuOkay(imu_.setOdr(Bmi088::ODR_1000HZ))
 
-                ImuOkay(gyro_.setOdr(Bmi088Gyro::ODR_1000HZ_BW_116HZ)) &&
+                && ImuOkay(imu_.setRange(Bmi088::ACCEL_RANGE_24G,
+                        Bmi088::GYRO_RANGE_2000DPS))
 
-                ImuOkay(gyro_.setRange(kGyroRange)) &&
+                && imu_.pinModeDrdy(
+                    Bmi088::PIN_MODE_PUSH_PULL, Bmi088::PIN_LEVEL_ACTIVE_HIGH)
 
-                ImuOkay(gyro_.pinModeInt3(
-                        Bmi088Gyro::PIN_MODE_PUSH_PULL,
-                        Bmi088Gyro::PIN_LEVEL_ACTIVE_HIGH)) &&
-
-                ImuOkay(gyro_.mapDrdyInt3(true)) &&
-
-                ImuOkay(accel_.setOdr(Bmi088Accel::ODR_1600HZ_BW_145HZ)) &&
-
-                ImuOkay(accel_.setRange(kAccelRange)))) {
+                && imu_.mapDrdy(Bmi088::PIN_1)
+         )) {
 
         hf::Debugger::ReportForever("Unable to start Imu");
     }
 }
 
-static int16_t imu_gx_;
-static int16_t imu_gy_;
-static int16_t imu_gz_;
-static int16_t imu_ax_;
-static int16_t imu_ay_;
-static int16_t imu_az_;
-
-static void ImuRead()
+static void ImuUpdateFc()
 {
-    if (gyro_.getDrdyStatus()) {
+    imu_.readSensor();
 
-        gyro_.readSensor();
-        imu_gx_ = gyro_.getGyroX_raw();
-        imu_gy_ = gyro_.getGyroY_raw();
-        imu_gz_ = gyro_.getGyroZ_raw();
-
-        accel_.readSensor();
-        imu_ax_ = accel_.getAccelX_raw();
-        imu_ay_ = accel_.getAccelY_raw();
-        imu_az_ = accel_.getAccelZ_raw();
-    }
+    fc_ = hf::FlightController::UpdateImu(
+            fc_, millis(),
+            imu_.getGyroX_raw(),
+            imu_.getGyroY_raw(),
+            imu_.getGyroZ_raw(),
+            gyro_ranges_[kGyroRange],
+            imu_.getAccelX_raw(),
+            imu_.getAccelY_raw(),
+            imu_.getAccelZ_raw(),
+            accel_ranges_[kAccelRange]);
 }
-
 
 // Motors --------------------------------------------------------------------
 
@@ -237,11 +251,12 @@ void setup()
     // Start receiver comms
     Serial3.begin(115200);
 
-    // Wait a sec for the receiver to kick in
-    delay(1000);
-
     // Enable heartbeat LED
     pinMode(kLedPin, OUTPUT); 
+
+    // Enable IMU data-ready interrupt
+    pinMode(kImuDataReadyPin, INPUT);
+    attachInterrupt(kImuDataReadyPin, ImuDataReadyInterrupt, RISING);  
 
     // Start the sensors
     ImuStart();
@@ -250,24 +265,24 @@ void setup()
 
     // Start motors
     MotorsStart();
+
 }
 
 void loop()
 {
-    // We should reach aprrox. 1750 Hz in this loop
+    const auto loop_start_usec = micros();
+
     ProfilerRun();
 
-    // Read from the IMU
-    ImuRead();
+    // Update FC with IMU data when available
+    if (is_imu_data_ready_) {
+        ImuUpdateFc();
+        is_imu_data_ready_ = false;
+    }
 
-    // Use the IMU data to update the flight controller
-    fc_ = hf::FlightController::UpdateImu(fc_, millis(),
-            imu_gx_, imu_gy_, imu_gz_, granges[kGyroRange],
-            imu_ax_, imu_ay_, imu_az_, aranges[kAccelRange]);
-
-    // Update core algorithm with all inputs and run PID controller
-    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(), MotorsGetValues(),
-            kControlLevel);
+    // Run core update in tightest loop
+    fc_ = hf::FlightController::NewUpdateCore(fc_, micros(),
+            MotorsGetValues(), kControlLevel);
 
     // Run sensor fusion on hover-deck as indicated
     fc_ = hf::FlightController::ShouldUpdateHover(fc_) ?
@@ -291,6 +306,7 @@ void loop()
     // Run the mixer and motors on the final setpoint from the PID controller
     MotorsRun(hf::FlightController::GetSetpoint(fc_));
 
+#if 0
     // Periodically send telemetry (receiver data + vehicle state) to the
     // dongle
     if (hf::FlightController::ShouldSendTelemetry(fc_)) {
@@ -299,5 +315,10 @@ void loop()
             hf::FlightController::GetTelemetryBytes(fc_);
 
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
+    }
+#endif
+
+    // Run spin-waiting delay loop to keep things at a steady rate
+    while (micros() - loop_start_usec < 500 /*1'000'000/kLoopFreq*/) {
     }
 }
