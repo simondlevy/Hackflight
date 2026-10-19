@@ -25,9 +25,9 @@ static const bool kIsTraditional = true;
 // Hardware-dependent --------------------------------------------------------
 
 static const uint8_t kReceiverAddress[6] = {
-    
+
     // OMGS3
-    0x98,0x3D,0xAE,0xEF,0x0E,0xAC
+    0x98,0x3D,0xAE,0xEF,0x59,0x7C
 };
 
 
