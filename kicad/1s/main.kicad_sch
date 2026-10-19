@@ -2118,6 +2118,16 @@
 	)
 	(wire
 		(pts
+			(xy 68.58 162.56) (xy 73.66 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4afe0656-85ab-4d45-bbac-1fcc2f6ac69a")
+	)
+	(wire
+		(pts
 			(xy 97.79 168.91) (xy 102.87 168.91)
 		)
 		(stroke
@@ -2208,6 +2218,16 @@
 	)
 	(wire
 		(pts
+			(xy 96.52 80.01) (xy 101.6 80.01)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6ca5e288-ab95-40e8-8c8f-f1f261e5a5d5")
+	)
+	(wire
+		(pts
 			(xy 124.46 100.33) (xy 129.54 100.33)
 		)
 		(stroke
@@ -2265,6 +2285,16 @@
 			(type default)
 		)
 		(uuid "79e0cc47-5d41-4c85-b4e4-14dbf5c002b9")
+	)
+	(wire
+		(pts
+			(xy 96.52 100.33) (xy 101.6 100.33)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7a7f252b-ea7d-4e66-9c51-4c1cef4b76db")
 	)
 	(wire
 		(pts
@@ -2388,6 +2418,16 @@
 	)
 	(wire
 		(pts
+			(xy 68.58 167.64) (xy 73.66 167.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b965eed9-c112-4a51-b601-37488a1f9a9c")
+	)
+	(wire
+		(pts
 			(xy 194.31 55.88) (xy 203.2 55.88)
 		)
 		(stroke
@@ -2485,6 +2525,16 @@
 			(type default)
 		)
 		(uuid "e2ee73aa-3473-43ef-9276-a6497941ee31")
+	)
+	(wire
+		(pts
+			(xy 96.52 97.79) (xy 101.6 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e55419a7-c9e8-484f-8816-bc024da0ef82")
 	)
 	(wire
 		(pts
@@ -2656,16 +2706,6 @@
 		)
 		(uuid "1fb7fdbb-2f75-4425-89ba-e45dbb554395")
 	)
-	(label "M2"
-		(at 97.79 87.63 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "20008a87-bd03-4d88-ad25-e9588b442ee9")
-	)
 	(label "GND"
 		(at 48.26 57.15 0)
 		(effects
@@ -2836,6 +2876,16 @@
 		)
 		(uuid "5f957b84-af5e-4d54-a965-e51372c955c3")
 	)
+	(label "M4"
+		(at 96.52 97.79 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "641ef576-1b69-421c-a6bf-5aa32cdb325d")
+	)
 	(label "VBAT"
 		(at 46.99 72.39 0)
 		(effects
@@ -2847,6 +2897,16 @@
 		(uuid "69791a06-910d-4ce6-b0c9-6fa6e4e70697")
 	)
 	(label "GND"
+		(at 68.58 162.56 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "69a7515f-d594-49c4-86c6-df75c7a93714")
+	)
+	(label "GND"
 		(at 46.99 91.44 0)
 		(effects
 			(font
@@ -2855,6 +2915,16 @@
 			(justify left bottom)
 		)
 		(uuid "765d031c-2f51-4804-a643-ec3d0b852477")
+	)
+	(label "VBAT"
+		(at 68.58 167.64 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "76d9a6ff-54a7-44f3-ae6c-ff5e108ad83c")
 	)
 	(label "VBAT"
 		(at 210.82 55.88 0)
@@ -2976,6 +3046,16 @@
 		)
 		(uuid "9b384cb6-85bc-4082-b74f-ab03902cfe1f")
 	)
+	(label "M3"
+		(at 96.52 100.33 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a1308a44-1acd-4fd1-9ef7-87b661a2418d")
+	)
 	(label "TX3"
 		(at 97.79 172.72 0)
 		(effects
@@ -3006,6 +3086,16 @@
 		)
 		(uuid "a89198fd-c31c-4224-8677-449aa1c4eb1f")
 	)
+	(label "M2"
+		(at 99.06 80.01 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "af59296e-9551-42aa-bd35-bc5a80f29859")
+	)
 	(label "SDA0"
 		(at 118.11 138.43 0)
 		(effects
@@ -3035,6 +3125,16 @@
 			(justify left bottom)
 		)
 		(uuid "c0c54083-827c-43ba-a376-a2e6feeb0c7d")
+	)
+	(label "GND"
+		(at 46.99 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c652ba64-97d4-4524-8937-f6cd4ce1711a")
 	)
 	(label "A8"
 		(at 196.85 55.88 0)
@@ -3135,16 +3235,6 @@
 			(justify left bottom)
 		)
 		(uuid "e550d99e-d6cb-4790-8b9b-500a60a0318c")
-	)
-	(label "M1"
-		(at 97.79 85.09 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "e66233e4-6b26-4600-a432-c19cff144785")
 	)
 	(label "SCL1"
 		(at 124.46 102.87 0)
@@ -5132,6 +5222,85 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 63.5 162.56 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a2adef0a-f759-4153-ad69-88646e2e2950")
+		(property "Reference" "J25"
+			(at 64.135 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 64.135 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+			(at 63.5 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 63.5 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "db528816-465c-4b60-8a7a-1ca6ddbcdc2e")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J25")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector:Conn_01x03_Socket")
 		(at 57.15 54.61 0)
 		(unit 1)
@@ -5537,6 +5706,85 @@
 			(project "main"
 				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
 					(reference "J7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x01_Pin")
+		(at 63.5 167.64 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c784170f-1d54-45c7-80d9-402db52b5796")
+		(property "Reference" "J26"
+			(at 64.135 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Conn_01x01_Pin"
+			(at 64.135 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_Wire:SolderWirePad_1x01_SMD_2x4mm"
+			(at 63.5 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 63.5 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x01, script generated"
+			(at 63.5 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d48358a9-7c12-4119-9da3-6ea99519a4fc")
+		)
+		(instances
+			(project "main"
+				(path "/2b1f0318-b347-4cb8-9bbf-78e69ec66761"
+					(reference "J26")
 					(unit 1)
 				)
 			)
