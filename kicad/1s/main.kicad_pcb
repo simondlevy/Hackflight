@@ -771,13 +771,13 @@
 			(layer "F.Fab")
 			(uuid "2c1554bd-a712-4b40-b9a8-f44785e7c9e0")
 		)
-		(fp_text user "R 1000Ω"
+		(fp_text user "R2=3300Ω"
 			(at 3.81 0 0)
 			(layer "B.SilkS")
 			(uuid "20873b62-66e1-43a2-b193-2b60b43ce76c")
 			(effects
 				(font
-					(size 0.72 0.72)
+					(size 0.65 0.65)
 					(thickness 0.108)
 				)
 				(justify mirror)
@@ -2146,13 +2146,13 @@
 			(layer "F.Fab")
 			(uuid "5e42483d-169f-49ad-b67b-155166745e76")
 		)
-		(fp_text user "R 3300Ω"
+		(fp_text user "R1=1000Ω"
 			(at 3.81 0 0)
 			(layer "B.SilkS")
 			(uuid "06049e2d-4993-439d-82e8-4e5b600057ae")
 			(effects
 				(font
-					(size 0.72 0.72)
+					(size 0.65 0.65)
 					(thickness 0.108)
 				)
 				(justify mirror)
