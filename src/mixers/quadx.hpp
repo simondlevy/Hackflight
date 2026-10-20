@@ -1,11 +1,13 @@
 /*
  *  QuadX motor mixer for Hackflight
  *
+ *                 4     2
  *                 cw  ccw
  *                   \ /
  *                    X 
  *                   / \
  *                 ccw  cw
+ *                 3     1
  *
  * Copyright (C) 2024 Simon D. Levy
  *
