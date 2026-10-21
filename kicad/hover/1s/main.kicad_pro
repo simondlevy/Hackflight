@@ -39,9 +39,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 2.5,
-          "height": 2.5,
-          "width": 2.5
+          "drill": 0.0,
+          "height": 4.0,
+          "width": 2.0
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -132,7 +132,7 @@
         "min_hole_to_hole": 0.25,
         "min_microvia_diameter": 0.2,
         "min_microvia_drill": 0.1,
-        "min_resolved_spokes": 2,
+        "min_resolved_spokes": 1,
         "min_silk_clearance": 0.0,
         "min_text_height": 0.8,
         "min_text_thickness": 0.08,
@@ -473,7 +473,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "hover.kicad_pro",
+    "filename": "main.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -513,7 +513,7 @@
       "plot": "",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "teensy2-bottom-small.stl",
       "svg": "",
       "vrml": ""
     },
@@ -640,18 +640,18 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "hover.kicad_sch",
-        "name": "hover",
+        "filename": "main.kicad_sch",
+        "name": "main",
         "uuid": "2b1f0318-b347-4cb8-9bbf-78e69ec66761"
       }
     ],
-    "used_designators": "",
+    "used_designators": "U1,R2-3,J3,J5,J7-18,J23-29",
     "variants": []
   },
   "sheets": [
     [
       "2b1f0318-b347-4cb8-9bbf-78e69ec66761",
-      "hover"
+      "main"
     ]
   ],
   "text_variables": {},
