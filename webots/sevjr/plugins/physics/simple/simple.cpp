@@ -28,7 +28,7 @@ DLLEXPORT void webots_physics_step()
 
     const auto vparams = hf::SevJr::kVehicleParams;
 
-    const auto state = _helper->RunSimulator( hf::SevJr::Run, vparams,
+    const auto state = _helper->RunSimulator(hf::SevJr::Run, vparams,
             message.mode, message.setpoint);
 
     _helper->SetDbodyFromState(vparams, state);

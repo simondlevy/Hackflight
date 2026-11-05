@@ -79,12 +79,12 @@ namespace hf {
                         // Run PID control to get new setpoint
                         pid_controller = PidController::Run(
                                 pid_controller,
-                                true,
+                                true, // always airborne
                                 dt,
                                 mode,
                                 state,
                                 setpoint,
-                                PidController::kControlAltHold);
+                                PidController::kControlPosHold);
 
                         // Run PID-control output through vehicle effector
                         // dynamics to get thrust, roll, pitch, yaw forces
