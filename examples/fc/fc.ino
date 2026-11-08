@@ -233,7 +233,7 @@ static void SendTelemetry(const hf::FlightController & fc)
 
 static hf::QuadXMixer mixer_;
 
-static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
+static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
 
 DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
