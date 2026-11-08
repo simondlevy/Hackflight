@@ -161,6 +161,8 @@ namespace hf {
                     const PidController::ControlLevel
                     control_level) -> FlightController
             {
+                Debugger::Report(MakeSetpoint(fc));
+
                 // Most updates run on milliseconds
                 const auto msec = usec / 1000;
 

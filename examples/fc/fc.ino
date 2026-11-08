@@ -301,8 +301,11 @@ void setup()
 
     // Start the sensors
     StartImu();
-    StartZRanger();
-    StartOpticalFlow();
+    //StartZRanger();
+    //StartOpticalFlow();
+
+    (void)StartZRanger;
+    (void)StartOpticalFlow;
 
     // Start motors
     StartMotors();
@@ -319,11 +322,19 @@ void loop()
 
     // Update the flight controller by passing it through a composition of
     // timed update functions
+    /*
     fc_ = UpdateCore(
             UpdateVoltage(
                 UpdateHoverDeck(
                     UpdateImu(
-                        UpdateReceiver(fc_)))));
+                        UpdateReceiver(fc_)))));*/
+
+    (void)UpdateHoverDeck;
+
+    fc_ = UpdateCore(
+            UpdateVoltage(
+                    UpdateImu(
+                        UpdateReceiver(fc_))));
 
     // Blink LED to indicate status
     BlinkLed(fc_);
