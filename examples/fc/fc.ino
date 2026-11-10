@@ -233,7 +233,7 @@ static void SendTelemetry(const hf::FlightController & fc)
 
 static hf::QuadXMixer mixer_;
 
-static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
+static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
 
 DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
@@ -314,7 +314,8 @@ void setup()
 void loop()
 {
     // Around 1750Hz seesms to work well
-    RunProfiler();
+    //RunProfiler();
+    (void)RunProfiler;
 
     // A data structure that maintains essential info about the 
     // flight-control status
