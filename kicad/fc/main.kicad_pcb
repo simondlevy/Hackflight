@@ -4570,18 +4570,6 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "TX2"
-		(at 140.85 76.2 0)
-		(layer "B.SilkS")
-		(uuid "7142b9d8-2fdd-4301-a1ab-93b86ac6c635")
-		(effects
-			(font
-				(size 0.8 0.8)
-				(thickness 0.15)
-			)
-			(justify left bottom mirror)
-		)
-	)
 	(gr_text "M2"
 		(at 141.13 68.44 0)
 		(layer "B.SilkS")
@@ -4618,10 +4606,10 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "RX2"
-		(at 144.4 76.2 0)
+	(gr_text "M4"
+		(at 147.574835 76.389131 0)
 		(layer "B.SilkS")
-		(uuid "e044d400-bb89-4d06-b366-edc0c8f09b67")
+		(uuid "faae3237-fc30-4802-9c18-f46fe16f48b9")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -4630,10 +4618,10 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "GD"
-		(at 149.3 76.2 0)
+	(gr_text "M3"
+		(at 149.986375 76.404266 0)
 		(layer "B.SilkS")
-		(uuid "4149413e-095c-4767-9349-ec28f3ef1d31")
+		(uuid "cea3935a-e53e-4d79-a07f-81e231b2b3a9")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -4654,10 +4642,10 @@
 			(justify left bottom mirror)
 		)
 	)
-	(gr_text "5V"
-		(at 151.85 76.3 0)
+	(gr_text "M2"
+		(at 152.540439 76.380303 0)
 		(layer "B.SilkS")
-		(uuid "31f5c910-b15b-4d76-adba-dbac580dcff0")
+		(uuid "313e8919-f970-48db-8102-dfaf71b79c09")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -4670,6 +4658,18 @@
 		(at 153.83 68.49 0)
 		(layer "B.SilkS")
 		(uuid "00bc18e2-de61-4065-b945-b42064059ef4")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.15)
+			)
+			(justify left bottom mirror)
+		)
+	)
+	(gr_text "M1"
+		(at 155.247746 76.392285 0)
+		(layer "B.SilkS")
+		(uuid "31f5c910-b15b-4d76-adba-dbac580dcff0")
 		(effects
 			(font
 				(size 0.8 0.8)
@@ -6455,6 +6455,14 @@
 		(uuid "f61606d7-8e32-4bc2-8b83-1333892d88c1")
 	)
 	(segment
+		(start 152 92.49)
+		(end 151.765 92.725)
+		(width 0.2)
+		(layer "F.Cu")
+		(net "unconnected-(J2-Pin_5-Pad5)")
+		(uuid "13d556ac-f4e4-4089-be8f-e3918418eda2")
+	)
+	(segment
 		(start 151.17443 94.867775)
 		(end 151.17443 102.92557)
 		(width 0.2)
@@ -6573,14 +6581,6 @@
 		(layer "B.Cu")
 		(net "/SDA0")
 		(uuid "ef1d99b6-63b6-4f86-9bee-1b021e5e5f87")
-	)
-	(segment
-		(start 152 92.49)
-		(end 151.765 92.725)
-		(width 0.2)
-		(layer "F.Cu")
-		(net "unconnected-(J2-Pin_5-Pad5)")
-		(uuid "13d556ac-f4e4-4089-be8f-e3918418eda2")
 	)
 	(zone
 		(net "/GND")
