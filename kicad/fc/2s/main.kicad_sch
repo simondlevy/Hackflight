@@ -2591,26 +2591,6 @@
 		)
 		(uuid "02493495-f0c3-4a19-a5f5-0b5e35dd5e78")
 	)
-	(label "VBAT"
-		(at 46.99 104.14 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "02ea9e6b-3d8e-45a0-9096-36ab8df4be7d")
-	)
-	(label "M4"
-		(at 46.99 101.6 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "041206e7-caea-4006-9b2f-fcd3acf38093")
-	)
 	(label "LED"
 		(at 96.52 102.87 0)
 		(effects
@@ -2621,15 +2601,25 @@
 		)
 		(uuid "0d561b67-8e9d-45b3-b897-b820768ef1c3")
 	)
-	(label "M2"
-		(at 46.99 69.85 0)
+	(label "M3"
+		(at 46.99 88.9 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "1068adcd-7e36-4357-b5d7-32c5f5aa3c94")
+		(uuid "0ee525be-262c-4183-a403-780e291e71f9")
+	)
+	(label "VBAT"
+		(at 46.99 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "14199065-3511-4b91-a98b-7ee72fe783b4")
 	)
 	(label "TX3"
 		(at 181.61 129.54 0)
@@ -2741,16 +2731,6 @@
 		)
 		(uuid "317ecb92-7da4-45f9-bf66-767682182a66")
 	)
-	(label "M1"
-		(at 48.26 52.07 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "38a9d8cb-4837-4efd-a73c-df2dbab3d945")
-	)
 	(label "SCL1"
 		(at 48.26 134.62 0)
 		(effects
@@ -2770,6 +2750,16 @@
 			(justify left bottom)
 		)
 		(uuid "4b6c6b05-b724-43d3-98d8-54c2696f4c14")
+	)
+	(label "VBAT"
+		(at 46.99 86.36 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4e151fb4-6cb7-435f-b039-4de4bbb45cbb")
 	)
 	(label "MISO"
 		(at 96.52 110.49 0)
@@ -2801,16 +2791,6 @@
 		)
 		(uuid "641ef576-1b69-421c-a6bf-5aa32cdb325d")
 	)
-	(label "VBAT"
-		(at 46.99 72.39 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "69791a06-910d-4ce6-b0c9-6fa6e4e70697")
-	)
 	(label "GND"
 		(at 68.58 162.56 0)
 		(effects
@@ -2820,6 +2800,16 @@
 			(justify left bottom)
 		)
 		(uuid "69a7515f-d594-49c4-86c6-df75c7a93714")
+	)
+	(label "VBAT"
+		(at 48.26 52.07 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6f747194-d6a3-4ec9-a47c-809a924606a1")
 	)
 	(label "SDA1"
 		(at 48.26 137.16 0)
@@ -2871,15 +2861,15 @@
 		)
 		(uuid "8312d7a5-edf2-4b1a-8f24-b4bf3a8a8533")
 	)
-	(label "M3"
-		(at 46.99 86.36 0)
+	(label "M1"
+		(at 48.26 54.61 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "84477452-b5ca-4076-80e4-4bf75bfb1846")
+		(uuid "83799795-9b08-49a3-b85f-86befd71134b")
 	)
 	(label "5V"
 		(at 125.73 77.47 0)
@@ -3091,15 +3081,25 @@
 		)
 		(uuid "ca31e0c4-3cb7-4eb7-8d60-2edb65b58bfe")
 	)
-	(label "VBAT"
-		(at 48.26 54.61 0)
+	(label "M2"
+		(at 46.99 72.39 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "d5810292-9a1e-4097-8d39-09c0b9acc00c")
+		(uuid "cee0a530-1372-4608-916f-3097f4422c5e")
+	)
+	(label "VBAT"
+		(at 46.99 69.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "df490bd1-486c-4cbf-926f-68c217d81375")
 	)
 	(label "3V3"
 		(at 118.11 130.81 0)
@@ -3201,15 +3201,15 @@
 		)
 		(uuid "ed54e554-8687-4ef9-81e0-3fb5c11dcc46")
 	)
-	(label "VBAT"
-		(at 46.99 88.9 0)
+	(label "M4"
+		(at 46.99 104.14 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 			(justify left bottom)
 		)
-		(uuid "f61d7b36-0d99-4bd1-b329-671395cfa392")
+		(uuid "f2d28b03-c7aa-454d-bedc-b915365fc881")
 	)
 	(label "SCK"
 		(at 30.48 142.24 0)
