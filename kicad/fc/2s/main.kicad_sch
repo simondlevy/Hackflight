@@ -2073,6 +2073,16 @@
 	)
 	(wire
 		(pts
+			(xy 99.06 134.62) (xy 104.14 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4147faa4-cccc-45f2-89f6-484e0a77f7b5")
+	)
+	(wire
+		(pts
 			(xy 46.99 142.24) (xy 52.07 142.24)
 		)
 		(stroke
@@ -2120,16 +2130,6 @@
 			(type default)
 		)
 		(uuid "5a5c161c-ae43-407d-97be-e0bece2359b3")
-	)
-	(wire
-		(pts
-			(xy 99.06 130.81) (xy 104.14 130.81)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5b6389f7-0b66-4530-87ab-9b2b80b806bb")
 	)
 	(wire
 		(pts
@@ -2891,16 +2891,6 @@
 		)
 		(uuid "8cf6469b-611d-4842-aa30-2f3674983279")
 	)
-	(label "GND"
-		(at 99.06 130.81 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "8f69e5f8-600d-4506-b868-900b908ac15c")
-	)
 	(label "RX5"
 		(at 124.46 90.17 0)
 		(effects
@@ -3000,6 +2990,16 @@
 			(justify left bottom)
 		)
 		(uuid "b59699eb-bf19-42f3-ae8e-6cd74db4bcf1")
+	)
+	(label "GND"
+		(at 100.33 134.62 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b66063ad-e4d5-4f4c-8835-eadb919ef97e")
 	)
 	(label "RX3"
 		(at 181.61 125.73 0)
