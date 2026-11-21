@@ -233,13 +233,15 @@ static void SendTelemetry(const hf::FlightController & fc)
 
 static hf::QuadXMixer mixer_;
 
+// static std::vector<uint8_t> kMotorPins ={23, 0, 8, 7}; // {4, 5, 2, 3}
 static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
 
 DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
 static void StartMotors()
 {
-    motors_.begin();
+    (void)motors_;
+    //motors_.begin();
 }
 
 static auto MotorsGetValues() -> std::vector<float>
@@ -255,7 +257,7 @@ static void RunMixerAndMotors(const hf::FlightController & fc)
     // Run motors if safe
     if (hf::FlightController::IsSafeToFly(fc)) {
         MotorsGetValues();
-        motors_.run(hf::FlightController::IsArmed(fc), MotorsGetValues());
+        //motors_.run(hf::FlightController::IsArmed(fc), MotorsGetValues());
     }
 }
 

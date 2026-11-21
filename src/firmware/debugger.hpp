@@ -84,13 +84,16 @@ namespace hf {
                 }
             }
 
-            void ReportFloat(const char * label, const float value)
+            void ReportFloat(const char * label, const float value, 
+                    const char * fmt="%f")
             {
                 static Helper helper_;
 
                 if (helper_.Ready()) {
 
-                    printf("%5d | %s=%f\n", helper_.count, label, value);
+                    printf("%5d | %s=", helper_.count, label);
+                    printf(fmt, value);
+                    printf("\n");
                 }
             }
 

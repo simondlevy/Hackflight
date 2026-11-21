@@ -71,6 +71,9 @@ namespace hf {
 
                 const auto output = kP*error + kI*integral + kD*derivative; 
 
+                static Debugger debugger_;
+                debugger_.ReportFloat("error", error, "%+2.0f");
+
                 return YawPid(output, integral, error);
             }
 
