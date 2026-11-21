@@ -42,11 +42,7 @@ namespace hf {
 
             YawPid() = default;
 
-            YawPid(const YawPid & a) 
-                : output(a.output), integral_(a.integral_), error_(a.error_) {}
-
-            YawPid(const float output, const float error, const float integral)
-                : output(output), integral_(integral), error_(error) {}
+            YawPid(const YawPid & other) = default;
 
             YawPid& operator=(const YawPid&) = default;
 
@@ -65,23 +61,40 @@ namespace hf {
                 const auto error = target - actual;
 
                 const auto integral = airborne ? 
-                    Num::ConstrainFloat(p.integral_ + error * dt, kIntegralLimit) : 0;
+                    Num::ConstrainFloat(p.integral_ + error * dt,
+                            kIntegralLimit) :
+                    0;
 
                 const auto derivative = dt > 0 ? (error - p.error_) / dt : 0; 
 
                 const auto output = kP*error + kI*integral + kD*derivative; 
 
-                static Debugger debugger_;
-                debugger_.ReportFloat("error", error, "%+2.0f");
-
-                return YawPid(output, integral, error);
+                return YawPid(
+                        output, target, actual, error, integral, derivative);
             }
 
         private:
 
-            float integral_;
-            float error_;
+             float target_;
+             float actual_;
+             float error_;
+             float integral_;
+             float derivative_;
 
+            YawPid(
+                    const float output,
+                    const float target,
+                    const float actual,
+                    const float error,
+                    const float integral,
+                    const float derivative)
+                : 
+                    output(output),
+                    target_(target),
+                    actual_(actual),
+                    error_(error),
+                    integral_(integral),
+                    derivative_(derivative) {}
     };
 
 }

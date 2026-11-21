@@ -43,11 +43,7 @@ namespace hf {
 
             RollPitchPid() = default;
 
-            RollPitchPid(const RollPitchPid & a) 
-                : output(a.output), integral_(a.integral_) {}
-
-            RollPitchPid(const float output, const float integral)
-                : output(output), integral_(integral) {}
+            RollPitchPid(const RollPitchPid & other) = default;
 
             RollPitchPid& operator=(const RollPitchPid&) = default;
 
@@ -78,5 +74,7 @@ namespace hf {
 
             float integral_;
 
+            RollPitchPid(const float output, const float integral)
+                : output(output), integral_(integral) {}
     };
 }

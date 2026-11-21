@@ -37,9 +37,7 @@ namespace hf {
 
             Pose() = default;
 
-            Pose(const Pose & p) 
-                : x(p.x), y(p.y), z(p.z),
-                phi(p.phi), theta(p.theta), psi(p.psi) {}
+            Pose(const Pose & other) = default;
 
             Pose(
                     const double x, 

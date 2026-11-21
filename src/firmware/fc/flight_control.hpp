@@ -308,6 +308,21 @@ namespace hf {
                 return MspSerializer::GetPayload(telemetry_serializer);
             }
 
+            static auto GetPidTelemetryBytes(
+                    const FlightController &fc) -> std::vector<uint8_t>
+            {
+                const auto yawvals = PidController::GetYawValues(
+                        fc.pid_controller_);
+
+                MspSerializer telemetry_serializer;
+
+                telemetry_serializer = MspSerializer::SerializeFloats(
+                        telemetry_serializer, kMspPid,
+                        yawvals.data(), 6);
+
+                return MspSerializer::GetPayload(telemetry_serializer);
+            }
+
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
             {
                 return PidController::GetSetpoint(fc.pid_controller_);

@@ -39,13 +39,6 @@ namespace hf {
 
             MspSerializer& operator=(const MspSerializer& other) = default;
 
-            MspSerializer(
-                    const Payload & payload,
-                    const uint8_t payloadSize) 
-                :
-                    payload_(payload),
-                    payload_size_(payloadSize) {}
-
             static auto SerializeFloats(
                     const MspSerializer & serializer,
                     const uint8_t id,
@@ -187,5 +180,13 @@ namespace hf {
                 memcpy(&a, &src, 2);
                 serialize16(k, a, payload, checksum);
             }
+
+            MspSerializer(
+                    const Payload & payload,
+                    const uint8_t payloadSize) 
+                :
+                    payload_(payload),
+                    payload_size_(payloadSize) {}
+
     };
 }

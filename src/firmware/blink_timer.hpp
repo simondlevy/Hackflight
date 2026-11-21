@@ -25,12 +25,9 @@ namespace hf {
 
         public:
 
-            BlinkTimer(const Timer & timer, const bool on)
-                : timer_(timer), on_(on) {}
-
             BlinkTimer() = default;
 
-            BlinkTimer(const BlinkTimer & bt) = default;
+            BlinkTimer(const BlinkTimer & other) = default;
 
             static auto Update(
                     const BlinkTimer & bt,
@@ -52,6 +49,9 @@ namespace hf {
 
             Timer timer_;
             bool on_;
+
+            BlinkTimer(const Timer & timer, const bool on)
+                : timer_(timer), on_(on) {}
 
     }; // class BlinkTimer
 

@@ -38,11 +38,7 @@ namespace hf {
 
             PositionController() = default;
 
-            PositionController(const PositionController & a) 
-                : output(a.output), integral_(a.integral_) {}
-
-            PositionController(const float output, const float integral)
-                : output(output), integral_(integral) {}
+            PositionController(const PositionController & other) = default;
 
             PositionController& operator=(const PositionController&) = default;
 
@@ -78,6 +74,9 @@ namespace hf {
         private:
 
             float integral_;
+
+            PositionController(const float output, const float integral)
+                : output(output), integral_(integral) {}
     };
 
 } // namspace hf

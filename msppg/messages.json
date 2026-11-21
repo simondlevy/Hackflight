@@ -20,6 +20,16 @@
    {"dpsi":   "float"}
   ],
 
+  "PID": 
+  [{"ID": 101},
+   {"target":     "float"},
+   {"actual":     "float"},
+   {"error":      "float"},
+   {"integral":   "float"},
+   {"derivative": "float"},
+   {"output":     "float"}
+  ],
+
   "SET_CHANNELS": 
   [{"ID": 203},
    {"throttle":  "short"},

@@ -36,11 +36,7 @@ namespace hf {
 
             ClimbRateController() = default;
 
-            ClimbRateController(const ClimbRateController & a) 
-                : output(a.output), integral_(a.integral_) {}
-
-            ClimbRateController(const float output, const float integral)
-                : output(output), integral_(integral) {}
+            ClimbRateController(const ClimbRateController & other)  = default;
 
             ClimbRateController& operator=(const ClimbRateController&) = default;
 
@@ -73,5 +69,8 @@ namespace hf {
         private:
 
             float integral_;
+
+            ClimbRateController(const float output, const float integral)
+                : output(output), integral_(integral) {}
     };
 }
