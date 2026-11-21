@@ -16,17 +16,23 @@
 
 #pragma once
 
+#include <axispid.hpp>
+
 #include <pids/altitude.hpp>
 #include <pids/climbrate.hpp>
 #include <pids/position.hpp>
 #include <pids/rollpitch.hpp>
-#include <pids/yaw.hpp>
 
 namespace hf {
 
     class PidController {
 
         private:
+
+            static constexpr float kYawP = 0.003;           
+            static constexpr float kYawI = 0.001;          
+            static constexpr float kYawD = 0.0000015;       
+            static constexpr float kYawIntegralLimit = 25.0;     
 
             static constexpr float kAltitudeMinM = 0.2;
             static constexpr float kAltitudemaxM = 1.0;
@@ -119,8 +125,16 @@ namespace hf {
                 const auto pitch_pid = RollPitchPid::Run(pc.pitch_pid_,
                         dt, airborne, pitch_demand, state.theta, state.dtheta);
 
-                const auto yaw_pid = YawPid::Run(pc.yaw_pid_,
-                        dt, airborne, setpoint_in.yaw * kYawMaxDps, state.dpsi);
+                const auto yaw_pid = AxisPid::Run(
+                        pc.yaw_pid,
+                        kYawP, 
+                        kYawI,
+                        kYawD,
+                        kYawIntegralLimit,
+                        dt,
+                        airborne,
+                        setpoint_in.yaw * kYawMaxDps,
+                        state.dpsi);
 
                 const auto setpoint_out = Setpoint(
 
@@ -162,16 +176,6 @@ namespace hf {
             Setpoint setpoint_;
 
             float altitude_target_;
-            AltitudeController altitude_pid_;
-            ClimbRateController climbrate_pid_;
-
-            PositionController position_x_pid_;
-            PositionController position_y_pid_;
-
-            RollPitchPid pitch_pid_;
-            RollPitchPid roll_pid_;
-
-            YawPid yaw_pid_;
 
             PidController(
                     const float altitude_target,
@@ -181,7 +185,7 @@ namespace hf {
                     const PositionController & position_y_pid,
                     const RollPitchPid & pitch_pid,
                     const RollPitchPid & roll_pid,
-                    const YawPid & yaw_pid,
+                    const AxisPid & yaw_pid,
                     const Setpoint & setpoint)
                 :
                     setpoint_(setpoint),
@@ -192,7 +196,20 @@ namespace hf {
                     position_y_pid_(position_y_pid),
                     pitch_pid_(pitch_pid),
                     roll_pid_(roll_pid),
-                    yaw_pid_(yaw_pid) {}
+                    yaw_pid(yaw_pid) {}
 
+
+        public:
+
+            AltitudeController altitude_pid_;
+            ClimbRateController climbrate_pid_;
+
+            PositionController position_x_pid_;
+            PositionController position_y_pid_;
+
+            RollPitchPid pitch_pid_;
+            RollPitchPid roll_pid_;
+
+            AxisPid yaw_pid;
     };
 }
