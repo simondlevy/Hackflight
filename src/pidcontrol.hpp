@@ -21,7 +21,6 @@
 #include <pids/altitude.hpp>
 #include <pids/climbrate.hpp>
 #include <pids/position.hpp>
-#include <pids/rollpitch.hpp>
 
 namespace hf {
 
@@ -124,7 +123,7 @@ namespace hf {
 
                 // Stabilize  ------------------------------------------------
 
-                const auto roll_pid = RollPitchPid::Run(
+                const auto roll_pid = AxisPid::Run(
                         pc.roll_pid_,
                         kRollPitchP,    
                         kRollPitchI,    
@@ -134,9 +133,9 @@ namespace hf {
                         airborne,
                         roll_demand,
                         state.phi,
-                        state.dphi);
+                        -state.dphi);
 
-                const auto pitch_pid = RollPitchPid::Run(
+                const auto pitch_pid = AxisPid::Run(
                         pc.pitch_pid_,
                         kRollPitchP,    
                         kRollPitchI,    
@@ -146,7 +145,7 @@ namespace hf {
                         airborne,
                         pitch_demand,
                         state.theta,
-                        state.dtheta);
+                        -state.dtheta);
 
                 const auto yaw_pid = AxisPid::Run(
                         pc.yaw_pid,
@@ -206,8 +205,8 @@ namespace hf {
                     const ClimbRateController & climbrate_pid,
                     const PositionController & position_x_pid,
                     const PositionController & position_y_pid,
-                    const RollPitchPid & pitch_pid,
-                    const RollPitchPid & roll_pid,
+                    const AxisPid & roll_pid,
+                    const AxisPid & pitch_pid,
                     const AxisPid & yaw_pid,
                     const Setpoint & setpoint)
                 :
@@ -217,8 +216,8 @@ namespace hf {
                     climbrate_pid_(climbrate_pid),
                     position_x_pid_(position_x_pid),
                     position_y_pid_(position_y_pid),
-                    pitch_pid_(pitch_pid),
                     roll_pid_(roll_pid),
+                    pitch_pid_(pitch_pid),
                     yaw_pid(yaw_pid) {}
 
 
@@ -230,8 +229,8 @@ namespace hf {
             PositionController position_x_pid_;
             PositionController position_y_pid_;
 
-            RollPitchPid pitch_pid_;
-            RollPitchPid roll_pid_;
+            AxisPid roll_pid_;
+            AxisPid pitch_pid_;
 
             AxisPid yaw_pid;
     };

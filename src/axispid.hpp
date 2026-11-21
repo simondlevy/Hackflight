@@ -69,6 +69,31 @@ namespace hf {
                         target, actual, error, integral, derivative, output);
             }
 
+             static auto Run(
+                    const AxisPid & pid,
+                    const float kP,
+                    const float kI,
+                    const float kD,
+                    const float kIntegralLimit,
+                     const float dt,
+                    const bool airborne,
+                    const float target,
+                    const float actual,
+                    const float derivative) -> AxisPid
+            {
+                const auto error = target - actual;
+
+                const auto integral = airborne ? 
+                    Num::ConstrainFloat(
+                            pid.integral + error * dt, kIntegralLimit) :
+                    0;
+
+                const auto output = kP * error + kI * integral + kD * derivative; 
+
+                return AxisPid(
+                        target, actual, error, integral, derivative, output);
+            }
+
         private:
 
             AxisPid(
