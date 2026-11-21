@@ -29,6 +29,11 @@ namespace hf {
 
         private:
 
+            static constexpr float kRollPitchP = 0.002;    
+            static constexpr float kRollPitchI = 0.003;    
+            static constexpr float kRollPitchD = 0.0005;   
+            static constexpr float kRollPitchIntegralLimit = 25.0;     
+
             static constexpr float kYawP = 0.003;           
             static constexpr float kYawI = 0.001;          
             static constexpr float kYawD = 0.0000015;       
@@ -119,11 +124,29 @@ namespace hf {
 
                 // Stabilize  ------------------------------------------------
 
-                const auto roll_pid = RollPitchPid::Run(pc.roll_pid_,
-                        dt, airborne, roll_demand, state.phi, state.dphi);
+                const auto roll_pid = RollPitchPid::Run(
+                        pc.roll_pid_,
+                        kRollPitchP,    
+                        kRollPitchI,    
+                        kRollPitchD,   
+                        kRollPitchIntegralLimit,     
+                        dt,
+                        airborne,
+                        roll_demand,
+                        state.phi,
+                        state.dphi);
 
-                const auto pitch_pid = RollPitchPid::Run(pc.pitch_pid_,
-                        dt, airborne, pitch_demand, state.theta, state.dtheta);
+                const auto pitch_pid = RollPitchPid::Run(
+                        pc.pitch_pid_,
+                        kRollPitchP,    
+                        kRollPitchI,    
+                        kRollPitchD,   
+                        kRollPitchIntegralLimit,     
+                        dt,
+                        airborne,
+                        pitch_demand,
+                        state.theta,
+                        state.dtheta);
 
                 const auto yaw_pid = AxisPid::Run(
                         pc.yaw_pid,

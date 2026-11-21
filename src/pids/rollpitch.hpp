@@ -28,15 +28,6 @@ namespace hf {
 
     class RollPitchPid {
 
-        private:
-
-
-            static constexpr float kP = 0.002;    
-            static constexpr float kI = 0.003;    
-            static constexpr float kD = 0.0005;   
-
-            static constexpr float kIntegralLimit = 25.0;     
-
         public:
 
             float output;
@@ -54,7 +45,11 @@ namespace hf {
              */
              static auto Run(
                     const RollPitchPid & p,
-                    const float dt,
+                    const float kP,
+                    const float kI,
+                    const float kD,
+                    const float kIntegralLimit,
+                     const float dt,
                     const bool airborne,
                     const float target,
                     const float angle,
