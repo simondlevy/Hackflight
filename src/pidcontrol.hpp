@@ -28,6 +28,11 @@ namespace hf {
 
         private:
 
+            static constexpr float kPositionP = 10;
+            static constexpr float kPositionI = 1;
+            static constexpr float kPositionIntegralLimit = 5000;
+            static constexpr float kPositionMaxDemandDegrees = 30;
+
             static constexpr float kRollPitchP = 0.002;    
             static constexpr float kRollPitchI = 0.003;    
             static constexpr float kRollPitchD = 0.0005;   
@@ -106,20 +111,38 @@ namespace hf {
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
                 const auto position_y_pid =
-                    PositionController::Run(pc.position_y_pid_, airborne, dt,
-                            setpoint_in.roll, dyb);
+                    PositionController::Run(
+                            pc.position_y_pid_,
+                            kPositionP,
+                            kPositionI,
+                            kPositionIntegralLimit,
+                            kPositionMaxDemandDegrees,
+                            airborne,
+                            dt,
+                            setpoint_in.roll,
+                            dyb);
 
                 const auto position_x_pid =
-                    PositionController::Run(pc.position_x_pid_, airborne, dt,
-                            setpoint_in.pitch, dxb);
+                    PositionController::Run(
+                            pc.position_x_pid_,
+                            kPositionP,
+                            kPositionI,
+                            kPositionIntegralLimit,
+                            kPositionMaxDemandDegrees,
+                            airborne,
+                            dt,
+                            setpoint_in.pitch,
+                            dxb);
 
                 const auto hold_position = control_level == kControlPosHold;
 
                 const auto roll_demand = hold_position ? position_y_pid.output :
-                    PositionController::Bypass(setpoint_in.roll);
+                    PositionController::Bypass(setpoint_in.roll,
+                            kPositionMaxDemandDegrees);
 
                 const auto pitch_demand = hold_position ? position_x_pid.output :
-                    PositionController::Bypass(setpoint_in.pitch);
+                    PositionController::Bypass(setpoint_in.pitch,
+                            kPositionMaxDemandDegrees);
 
                 // Stabilize  ------------------------------------------------
 

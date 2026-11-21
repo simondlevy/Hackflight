@@ -23,15 +23,6 @@ namespace hf {
 
     class PositionController {
 
-        private:
-
-            static constexpr float kP = 10;
-            static constexpr float kI = 1;
-
-            static constexpr float kIntegralLimit = 5000;
-
-            static constexpr float kMaxDemandDegrees = 30;
-
         public:
 
             float output;
@@ -48,6 +39,10 @@ namespace hf {
              */
             static auto Run(
                     const PositionController & c,
+                    const float kP,
+                    const float kI,
+                    const float kIntegralLimit,
+                    const float kMaxDemandDegrees,
                     const bool airborne,
                     const float dt,
                     const float target,
@@ -66,7 +61,8 @@ namespace hf {
                 return PositionController(output, integral);
             }
 
-            static auto Bypass(const float in) -> float
+            static auto Bypass(
+                    const float in, const float kMaxDemandDegrees) -> float
             {
                 return in * kMaxDemandDegrees;
             }

@@ -27,7 +27,6 @@ namespace hf {
 
             static constexpr float kP = 1;
             static constexpr float kI = 0;
-
             static constexpr float kIntegralLimit = 0;
 
         public:
@@ -49,9 +48,9 @@ namespace hf {
                     const bool airborne,
                     const float dt,
                     const float target,
-                    const float dz) -> ClimbRateController
+                    const float actual) -> ClimbRateController
             {
-                const auto error = target - dz;
+                const auto error = target - actual;
 
                 const auto integral = airborne ? 
                     Num::ConstrainFloat(controller.integral_ + error * dt,

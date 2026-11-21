@@ -94,6 +94,75 @@ namespace hf {
                         target, actual, error, integral, derivative, output);
             }
 
+            static auto Run(
+                    const AxisPid & pid,
+                    const float kP,
+                    const float kI,
+                    const float kIntegralLimit,
+                    const bool airborne,
+                    const float dt,
+                    const float target,
+                    const float actual,
+                    const float minval,
+                    const float maxval,
+                    const float offset) -> AxisPid
+            {
+                const auto error = target - actual;
+
+                const auto integral = airborne ? 
+                    Num::ConstrainFloat(pid.integral + error * dt,
+                            kIntegralLimit) :
+                    0;
+
+                const auto tmp = kP * error + kI * integral;
+
+                const auto output = airborne ?
+                    Num::ConstrainFloat(offset + tmp, minval, maxval) :
+                    0;
+
+                return AxisPid(
+                        target,
+                        actual,
+                        error,
+                        integral,
+                        0,
+                        output);
+            }
+
+            /*
+            static auto Run(
+                    const AxisPid & c,
+                    const float kP,
+                    const float kI,
+                    const float kIntegralLimit,
+                    const bool airborne,
+                    const float dt,
+                    const float target,
+                    const float actual) -> AxisPid
+            {
+                const auto error = target - actual;
+
+                const auto integral = airborne ? 
+                    Num::ConstrainFloat(pid.integral + error * dt,
+                            kIntegralLimit) :
+                    0;
+
+                const auto tmp = kP * error + kI * integral;
+
+                const auto output = airborne ?
+                    Num::ConstrainFloat(tmp, kMaxDemandDegrees) :
+                    0;
+
+                return AxisPid(
+                        target,
+                        actual,
+                        error,
+                        integral,
+                        0,
+                        output);
+             }
+             */
+
         private:
 
             AxisPid(

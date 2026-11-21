@@ -27,9 +27,7 @@ namespace hf {
 
             static constexpr float kP = 2;
             static constexpr float kI = 0.5;
-
             static constexpr float kIntegralLimit = 5000;
-
             static constexpr float kVelMax = 1;
             static constexpr float kVelMaxOverhead = 1.10;
             static constexpr float kLandingSpeedMps = 0.15;
