@@ -20,7 +20,6 @@
 
 #include <pids/altitude.hpp>
 #include <pids/climbrate.hpp>
-#include <pids/position.hpp>
 
 namespace hf {
 
@@ -111,37 +110,41 @@ namespace hf {
                 const auto dyb = -dxw * sinpsi + dyw * cospsi;       
 
                 const auto position_y_pid =
-                    PositionController::Run(
+                    AxisPid::Run(
                             pc.position_y_pid_,
                             kPositionP,
                             kPositionI,
                             kPositionIntegralLimit,
-                            kPositionMaxDemandDegrees,
                             airborne,
                             dt,
                             setpoint_in.roll,
-                            dyb);
+                            dyb,
+                            -kPositionMaxDemandDegrees,
+                            +kPositionMaxDemandDegrees,
+                            0);
 
                 const auto position_x_pid =
-                    PositionController::Run(
+                    AxisPid::Run(
                             pc.position_x_pid_,
                             kPositionP,
                             kPositionI,
                             kPositionIntegralLimit,
-                            kPositionMaxDemandDegrees,
                             airborne,
                             dt,
                             setpoint_in.pitch,
-                            dxb);
+                            dxb,
+                            -kPositionMaxDemandDegrees,
+                            +kPositionMaxDemandDegrees,
+                            0);
 
                 const auto hold_position = control_level == kControlPosHold;
 
                 const auto roll_demand = hold_position ? position_y_pid.output :
-                    PositionController::Bypass(setpoint_in.roll,
+                    BypassPositionControl(setpoint_in.roll,
                             kPositionMaxDemandDegrees);
 
                 const auto pitch_demand = hold_position ? position_x_pid.output :
-                    PositionController::Bypass(setpoint_in.pitch,
+                    BypassPositionControl(setpoint_in.pitch,
                             kPositionMaxDemandDegrees);
 
                 // Stabilize  ------------------------------------------------
@@ -226,8 +229,8 @@ namespace hf {
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
                     const ClimbRateController & climbrate_pid,
-                    const PositionController & position_x_pid,
-                    const PositionController & position_y_pid,
+                    const AxisPid & position_x_pid,
+                    const AxisPid & position_y_pid,
                     const AxisPid & roll_pid,
                     const AxisPid & pitch_pid,
                     const AxisPid & yaw_pid,
@@ -244,13 +247,19 @@ namespace hf {
                     yaw_pid(yaw_pid) {}
 
 
+            static auto BypassPositionControl(
+                    const float in, const float maxval) -> float
+            {
+                return in * maxval;
+            }
+
         public:
 
             AltitudeController altitude_pid_;
             ClimbRateController climbrate_pid_;
 
-            PositionController position_x_pid_;
-            PositionController position_y_pid_;
+            AxisPid position_x_pid_;
+            AxisPid position_y_pid_;
 
             AxisPid roll_pid_;
             AxisPid pitch_pid_;
