@@ -23,15 +23,6 @@ namespace hf {
 
     class AltitudeController {
 
-        private:
-
-            static constexpr float kP = 2;
-            static constexpr float kI = 0.5;
-            static constexpr float kIntegralLimit = 5000;
-            static constexpr float kVelMax = 1;
-            static constexpr float kVelMaxOverhead = 1.10;
-            static constexpr float kLandingSpeedMps = 0.15;
-
         public:
 
             float output;
@@ -48,22 +39,26 @@ namespace hf {
              */
             static auto Run(
                     const AltitudeController & controller,
-                    const bool hovering,
+                    const float kP,
+                    const float kI,
+                    const float kIntegralLimit,
+                    const float kClimbRateMax,
+                    const float kClimbRateMaxOverhead,
+                    const bool airborne,
                     const float dt,
                     const float target,
                     const float actual) -> AltitudeController
             {
                 const auto error = target - actual;
 
-                const auto integral = hovering ?
+                const auto integral = airborne ?
                     Num::ConstrainFloat( controller.integral_ + error * dt,
                             kIntegralLimit) :
                     0;
 
-                const auto output = hovering ? 
+                const auto output = 
                     Num::ConstrainFloat(kP * error + kI * integral,
-                            fmaxf(kVelMax, 0.5f)  * kVelMaxOverhead) :
-                    -kLandingSpeedMps;
+                            fmaxf(kClimbRateMax, 0.5f)  * kClimbRateMaxOverhead);
 
                 return AltitudeController(output, integral);
             }

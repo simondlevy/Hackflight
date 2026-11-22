@@ -26,6 +26,13 @@ namespace hf {
 
         private:
 
+            static constexpr float kAltitudeP = 2;
+            static constexpr float kAltitudeI = 0.5;
+            static constexpr float kAltitudeIntegralLimit = 5000;
+            static constexpr float kClimbRateMax = 1;
+            static constexpr float kClimbRateMaxOverhead = 1.10;
+            static constexpr float kLandingSpeedMps = 0.15;
+
             static constexpr float kClimbRateP = 1;
             static constexpr float kClimbRateI = 0;
             static constexpr float kClimbRateIntegralLimit = 0;
@@ -92,8 +99,20 @@ namespace hf {
                     mode == kModeHover || mode == kModeAutonomous;
 
                 const auto altitude_pid =
-                    AltitudeController::Run(pc.altitude_pid_, hovering, dt,
-                            new_altitude_target, state.z);
+                    AltitudeController::Run(
+                            pc.altitude_pid_,
+                            kAltitudeP,
+                            kAltitudeI,
+                            kAltitudeIntegralLimit,
+                            kClimbRateMax,
+                            kClimbRateMaxOverhead,
+                            hovering,
+                            dt,
+                            new_altitude_target,
+                            state.z);
+
+                const auto climbrate_target =
+                    hovering ? altitude_pid.output : -kLandingSpeedMps;
 
                 const auto climbrate_pid =
                     AxisPid::Run(
@@ -103,7 +122,7 @@ namespace hf {
                             kClimbRateIntegralLimit,
                             hovering || (state.z > kAltitudeLandingM),
                             dt,
-                            altitude_pid.output,
+                            climbrate_target,
                             state.dz,
                             0,
                             1,
