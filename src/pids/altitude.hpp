@@ -42,12 +42,12 @@ namespace hf {
                     const float kP,
                     const float kI,
                     const float kIntegralLimit,
-                    const float kClimbRateMax,
-                    const float kClimbRateMaxOverhead,
                     const bool airborne,
                     const float dt,
                     const float target,
-                    const float actual) -> AltitudeController
+                    const float actual,
+                    const float maxval,
+                    const float maxvalOverhead) -> AltitudeController
             {
                 const auto error = target - actual;
 
@@ -58,7 +58,7 @@ namespace hf {
 
                 const auto output = 
                     Num::ConstrainFloat(kP * error + kI * integral,
-                            fmaxf(kClimbRateMax, 0.5f)  * kClimbRateMaxOverhead);
+                            fmaxf(maxval, 0.5f)  * maxvalOverhead);
 
                 return AltitudeController(output, integral);
             }

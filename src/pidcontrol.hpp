@@ -104,12 +104,12 @@ namespace hf {
                             kAltitudeP,
                             kAltitudeI,
                             kAltitudeIntegralLimit,
-                            kClimbRateMax,
-                            kClimbRateMaxOverhead,
                             hovering,
                             dt,
                             new_altitude_target,
-                            state.z);
+                            state.z,
+                            kClimbRateMax,
+                            kClimbRateMaxOverhead);
 
                 const auto climbrate_target =
                     hovering ? altitude_pid.output : -kLandingSpeedMps;
