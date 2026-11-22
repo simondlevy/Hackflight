@@ -19,13 +19,16 @@
 #include <axispid.hpp>
 
 #include <pids/altitude.hpp>
-#include <pids/climbrate.hpp>
 
 namespace hf {
 
     class PidController {
 
         private:
+
+            static constexpr float kClimbRateP = 1;
+            static constexpr float kClimbRateI = 0;
+            static constexpr float kClimbRateIntegralLimit = 0;
 
             static constexpr float kPositionP = 10;
             static constexpr float kPositionI = 1;
@@ -93,10 +96,18 @@ namespace hf {
                             new_altitude_target, state.z);
 
                 const auto climbrate_pid =
-                    ClimbRateController::Run(pc.climbrate_pid_,
+                    AxisPid::Run(
+                            pc.climbrate_pid_,
+                            kClimbRateP,
+                            kClimbRateI,
+                            kClimbRateIntegralLimit,
                             hovering || (state.z > kAltitudeLandingM),
                             dt,
-                            altitude_pid.output, state.dz);
+                            altitude_pid.output,
+                            state.dz,
+                            0,
+                            1,
+                            0.5);
 
                 // Position hold ---------------------------------------------
 
@@ -228,7 +239,7 @@ namespace hf {
             PidController(
                     const float altitude_target,
                     const AltitudeController & altitude_pid,
-                    const ClimbRateController & climbrate_pid,
+                    const AxisPid & climbrate_pid,
                     const AxisPid & position_x_pid,
                     const AxisPid & position_y_pid,
                     const AxisPid & roll_pid,
@@ -256,7 +267,7 @@ namespace hf {
         public:
 
             AltitudeController altitude_pid_;
-            ClimbRateController climbrate_pid_;
+            AxisPid climbrate_pid_;
 
             AxisPid position_x_pid_;
             AxisPid position_y_pid_;
