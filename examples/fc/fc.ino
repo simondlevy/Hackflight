@@ -233,8 +233,8 @@ static void SendTelemetry(const hf::FlightController & fc)
 
 static hf::QuadXMixer mixer_;
 
-//static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
-static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
+static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
+//static std::vector<uint8_t> kMotorPins = {4, 5, 2, 3};
 
 DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
@@ -287,6 +287,18 @@ static void RunProfiler(const bool should_run=true)
     }
 }
 
+// Spin-wait adapted from https://github.com/nickrehm/dRehmFlight
+static void RunLoopDelay(const uint32_t freq, const uint32_t current_time)
+{
+  float invFreq = 1.0/freq*1000000.0;
+  unsigned long checker = micros();
+
+  //Sit in loop until appropriate time has passed
+  while (invFreq > (checker - current_time)) {
+    checker = micros();
+  }
+}
+
 // Main ----------------------------------------------------------------------
 
 void setup()
@@ -314,8 +326,10 @@ void setup()
 
 void loop()
 {
+    const auto current_time = micros();
+
     // Around 1750Hz seesms to work well
-    //RunProfiler();
+    RunProfiler();
     (void)RunProfiler;
 
     // A data structure that maintains essential info about the 
@@ -333,10 +347,7 @@ void loop()
 
     (void)UpdateHoverDeck;
 
-    fc_ = UpdateCore(
-            UpdateVoltage(
-                    UpdateImu(
-                        UpdateReceiver(fc_))));
+    fc_ = UpdateCore(UpdateVoltage( UpdateImu( UpdateReceiver(fc_))));
 
     // Blink LED to indicate status
     BlinkLed(fc_);
@@ -347,4 +358,6 @@ void loop()
     // Periodically send telemetry (receiver data + vehicle state) to the
     // dongle
     SendTelemetry(fc_);
+
+    RunLoopDelay(1900, current_time);
 }
