@@ -311,7 +311,7 @@ namespace hf {
             static auto GetPidTelemetryBytes(
                     const FlightController &fc) -> std::vector<uint8_t>
             {
-                const auto yawvals = PidController::GetYawValues(
+                const auto yawvals = PidController::GetYawPidValues(
                         fc.pid_controller_);
 
                 MspSerializer telemetry_serializer;

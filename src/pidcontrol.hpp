@@ -202,7 +202,7 @@ namespace hf {
                         -state.dtheta);
 
                 const auto yaw_pid = AxisPid::Run(
-                        pc.yaw_pid,
+                        pc.yaw_pid_,
                         kYawP, 
                         kYawI,
                         kYawD,
@@ -239,12 +239,10 @@ namespace hf {
                 return pc.setpoint_;
             }
 
-            static auto GetYawValues(
+            static auto GetYawPidValues(
                     const PidController & pc) -> std::vector<float>
             {
-                (void)pc;
-
-                return {0, 0, 0, 0, 0, 0};
+                return GetPidValues(pc.yaw_pid_);
             }
 
         private:
@@ -272,13 +270,26 @@ namespace hf {
                     position_y_pid_(position_y_pid),
                     roll_pid_(roll_pid),
                     pitch_pid_(pitch_pid),
-                    yaw_pid(yaw_pid) {}
+                    yaw_pid_(yaw_pid) {}
 
 
             static auto BypassPositionControl(
                     const float in, const float maxval) -> float
             {
                 return in * maxval;
+            }
+
+            static auto GetPidValues(
+                    const AxisPid & pid) -> std::vector<float> 
+            {
+                return {
+                    pid.target,
+                    pid.actual,
+                    pid.error,
+                    pid.integral,
+                    pid.derivative,
+                    pid.output
+                };
             }
 
         public:
@@ -292,6 +303,6 @@ namespace hf {
             AxisPid roll_pid_;
             AxisPid pitch_pid_;
 
-            AxisPid yaw_pid;
+            AxisPid yaw_pid_;
     };
 }
