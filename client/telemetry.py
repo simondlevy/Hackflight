@@ -155,7 +155,8 @@ class Telemetry(MspParser):
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
     def handle_PID(self, target, actual, error, integral, derivative, output):
-        print('PID')
+        print('target=%f actual=%f error=%f integral=%f deriv=%f output=%f' %
+              (target, actual, error, integral, derivative, output))
 
     def _roll_data(self, index, newval):
 

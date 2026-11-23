@@ -274,53 +274,7 @@ namespace hf {
             static auto GetTelemetryBytes(
                     const FlightController &fc) -> std::vector<uint8_t>
             {
-                const auto setpoint = MakeSetpoint(fc);
-
-                float data[16] = {
-
-                    (float)fc.mode_,
-
-                    fc.voltage_,
-
-                    setpoint.thrust,
-                    setpoint.roll,
-                    setpoint.pitch,
-                    setpoint.yaw,
-
-                    fc.state_.dx,
-                    fc.state_.dy,
-                    fc.state_.z,
-                    fc.state_.dz,
-                    fc.state_.phi,
-                    fc.state_.dphi,
-                    fc.state_.theta,
-                    fc.state_.dtheta,
-                    fc.state_.psi,
-                    fc.state_.dpsi
-                };
-
-                MspSerializer telemetry_serializer;
-
-                telemetry_serializer = MspSerializer::SerializeFloats(
-                        telemetry_serializer, kMspTelemetry,
-                        data, 16);
-
-                return MspSerializer::GetPayload(telemetry_serializer);
-            }
-
-            static auto GetPidTelemetryBytes(
-                    const FlightController &fc) -> std::vector<uint8_t>
-            {
-                const auto yawvals = PidController::GetYawPidValues(
-                        fc.pid_controller_);
-
-                MspSerializer telemetry_serializer;
-
-                telemetry_serializer = MspSerializer::SerializeFloats(
-                        telemetry_serializer, kMspPid,
-                        yawvals.data(), 6);
-
-                return MspSerializer::GetPayload(telemetry_serializer);
+                return GetYawPidTelemetryBytes(fc);
             }
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
@@ -630,6 +584,59 @@ namespace hf {
                 return false;
             }
 
+            static auto GetFullTelemetryBytes(
+                    const FlightController &fc) -> std::vector<uint8_t>
+            {
+                const auto setpoint = MakeSetpoint(fc);
+
+                float data[16] = {
+
+                    (float)fc.mode_,
+
+                    fc.voltage_,
+
+                    setpoint.thrust,
+                    setpoint.roll,
+                    setpoint.pitch,
+                    setpoint.yaw,
+
+                    fc.state_.dx,
+                    fc.state_.dy,
+                    fc.state_.z,
+                    fc.state_.dz,
+                    fc.state_.phi,
+                    fc.state_.dphi,
+                    fc.state_.theta,
+                    fc.state_.dtheta,
+                    fc.state_.psi,
+                    fc.state_.dpsi
+                };
+
+                MspSerializer telemetry_serializer;
+
+                telemetry_serializer = MspSerializer::SerializeFloats(
+                        telemetry_serializer, kMspTelemetry,
+                        data, 16);
+
+                return MspSerializer::GetPayload(telemetry_serializer);
+            }
+
+            static auto GetYawPidTelemetryBytes(
+                    const FlightController &fc) -> std::vector<uint8_t>
+            {
+                const auto yawvals = PidController::GetYawPidValues(
+                        fc.pid_controller_);
+
+                MspSerializer telemetry_serializer;
+
+                telemetry_serializer = MspSerializer::SerializeFloats(
+                        telemetry_serializer, kMspPid,
+                        yawvals.data(), 6);
+
+                return MspSerializer::GetPayload(telemetry_serializer);
+            }
+
+ 
             // ---------------------------------------------------------------
 
             // Sensor fusion
