@@ -158,8 +158,8 @@ namespace hf {
                     const FlightController & fc,
                     const uint32_t usec,
                     const std::vector<float> motorvals, 
-                    const PidController::ControlLevel
-                    control_level) -> FlightController
+                    const PidController::ControlLevel control_level,
+                    const bool ignore_flip=false) -> FlightController
             {
                 // Most updates run on milliseconds
                 const auto msec = usec / 1000;
@@ -171,7 +171,7 @@ namespace hf {
                         fc.zranger_filter_,
                         fc.imu_filter_,
                         EKF::getVehicleState(fc.ekf_),
-                        UpdateMode(fc, msec, control_level),
+                        UpdateMode(fc, msec, control_level, ignore_flip),
                         UpdateFlyingStatus(fc, msec),
                         UpdateStartedFlyingTime(fc, msec, motorvals),
                         fc.voltage_,
@@ -454,13 +454,14 @@ namespace hf {
             static auto UpdateMode(
                     const FlightController & fc,
                     const uint32_t msec,
-                    const PidController::ControlLevel control_level) -> Mode
+                    const PidController::ControlLevel control_level,
+                    const bool ignore_flip) -> Mode
             {
                 // Run a little state-transition machine to update flight mode
                 return 
 
                     //  Vehicle flipped over: enter panic mode
-                    IsFlipped(fc.state_) ? kModePanic :
+                    IsFlipped(fc.state_) && !ignore_flip ? kModePanic :
 
                     // Panic mode: can't recover
                     fc.mode_ == kModePanic ? kModePanic :
