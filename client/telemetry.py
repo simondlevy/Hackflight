@@ -151,7 +151,6 @@ class Telemetry(MspParser):
                 (mode, volts, thrust, roll, pitch, yaw, dx, dy, z, dz, phi,
                  dphi, theta, dtheta, psi, dpsi))
 
-
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
     def handle_PID(
@@ -164,7 +163,8 @@ class Telemetry(MspParser):
         print('derivative=%+08.1f' % derivative, end=' | ')
         print('output=%+f' % output)
 
-        self._log_when_armed(mode,
+        self._log_when_armed(
+                mode,
                 (target, actual, error, integral, derivative, output))
 
     def _roll_data(self, index, newval):
@@ -179,6 +179,7 @@ class Telemetry(MspParser):
             t = time.time() - self.start_time
             fmt = ('%f,' % t) + ','.join(['%f' for _ in data]) + '\n'
             self.outfile.write(fmt % data)
+
 
 if __name__ == '__main__':
 
