@@ -15,13 +15,9 @@
 #include <TinyPICO.h>
 
 #include <hackflight.h>
-#include <firmware/blink_timer.hpp>
-
 #include <firmware/espnow.hpp>
 
 static const uint32_t kWifiTimeoutMsec = 50;
-
-static hf::BlinkTimer blink_timer_; 
 
 static uint32_t last_wifi_received_msec_;
 
@@ -56,8 +52,6 @@ void loop()
 
     // not connected
     else {
-        blink_timer_ = hf::BlinkTimer::Update(blink_timer_, millis());
-        tp_.DotStar_SetPixelColor(
-                hf::BlinkTimer::IsOn(blink_timer_) ? 255 : 0, 0, 0);
+        tp_.DotStar_SetPixelColor(255, 0, 0);
     }
 }
