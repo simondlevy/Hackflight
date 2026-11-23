@@ -239,10 +239,9 @@ namespace hf {
                 return pc.setpoint_;
             }
 
-            static auto GetYawPidValues(
-                    const PidController & pc) -> std::vector<float>
+            static auto GetYawPid(const PidController & pc) -> AxisPid
             {
-                return GetPidValues(pc.yaw_pid_);
+                return pc.yaw_pid_;
             }
 
         private:

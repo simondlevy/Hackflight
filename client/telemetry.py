@@ -80,10 +80,6 @@ class Telemetry(MspParser):
 
             self.outfile = open(args.outfile, 'w')
 
-            self.outfile.write(
-                    'time,mode,volts,thrust,roll,pitch,yaw,' +
-                    'dx,dy,z,dz,phi,dphi,theta,dtheta,psi,dpsi\n')
-
         except Exception as e:
             print('Unable to open log file %s: %s' %
                   (args.outfile, str(e)))
@@ -133,30 +129,43 @@ class Telemetry(MspParser):
     def handle_TELEMETRY(self, mode, volts, thrust, roll, pitch, yaw, dx, dy,
                          z, dz, phi, dphi, theta, dtheta, psi, dpsi):
 
-        # C++ side is simpler if mode is sent as float instead of byte
-        mode = int(mode)
+        modes = 'idle', 'armed', 'hover', 'autopilot'
 
-        print(('mode=%s | volts=%3.1f | ' +
-               'thr=%3.3f rol=%+3.3f pit=%+3.3f yaw=%+3.3f | ' +
-               'phi=%+5.1f theta=%+5.1f psi=%+5.1f dpsi=%+5.1f ' +
-               'dx=%+3.3f dy=%+3.3f z=%3.3f dz=%+3.3f') % (
-               ('idle', 'armed', 'hover', 'autopilot')[mode],
-               volts, thrust, roll, pitch, yaw,
-               phi, theta, psi, dpsi, dx, dy, z, dz))
+        print('mode=%s' % modes[int(mode)], end=' | ')
+        print('volts=%3.1f' % volts, end=' | ')
+        print('thr=%+3.3f' % thrust, end=' | ')
+        print('rol=%+3.3f' % roll, end=' | ')
+        print('pit=%+3.3f' % pitch, end=' | ')
+        print('yaw=%+3.3f' % yaw, end=' | ')
+        print('phi=%+5.1f' % phi, end=' | ')
+        print('theta=%+5.1f' % theta, end=' | ')
+        print('psi=%+5.1f' % psi, end=' | ')
+        print('dpsi=%+5.1f' % dpsi, end=' | ')
+        print('dx=%+3.3f' % dx, end=' | ')
+        print('dy=%+3.3f' % dy, end=' | ')
+        print('z=%3.3f' % z, end=' | ')
+        print('dz=%+3.3f' % dz)
 
-        # Don't log until armed
-        if self.continuous_logging or mode > 0:
-            self.outfile.write(
-                    '%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n'
-                    % (time.time() - self.start_time, mode, volts, thrust,
-                       roll, pitch, yaw, dx, dy, z, dz, phi, dphi, theta,
-                       dtheta, psi, dpsi))
+        self._log_when_armed(
+                mode,
+                (mode, volts, thrust, roll, pitch, yaw, dx, dy, z, dz, phi,
+                 dphi, theta, dtheta, psi, dpsi))
+
 
         self.plotter_data = self._roll_data(0, z), self._roll_data(1, dz)
 
-    def handle_PID(self, target, actual, error, integral, derivative, output):
-        print('target=%f actual=%f error=%f integral=%f deriv=%f output=%f' %
-              (target, actual, error, integral, derivative, output))
+    def handle_PID(
+            self, mode, target, actual, error, integral, derivative, output):
+
+        print('target=%f' % target, end=' | ')
+        print('actual=%f' % actual, end=' | ')
+        print('error=%f' % error, end=' | ')
+        print('integral=%f' % integral, end=' | ')
+        print('derivative=%f' % derivative, end=' | ')
+        print('output=%f' % output)
+
+        self._log_when_armed(mode,
+                (target, actual, error, integral, derivative, output))
 
     def _roll_data(self, index, newval):
 
@@ -164,6 +173,12 @@ class Telemetry(MspParser):
         data[-1] = newval
         return data
 
+    def _log_when_armed(self, mode, data):
+
+        if self.continuous_logging or mode > 0 or True:
+            t = time.time() - self.start_time
+            fmt = ('%f,' % t) + ','.join(['%f' for _ in data]) + '\n'
+            self.outfile.write(fmt % data)
 
 if __name__ == '__main__':
 

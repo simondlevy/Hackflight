@@ -22,6 +22,8 @@
 
   "PID": 
   [{"ID": 101},
+   {"comment": "mode should be byte, but easier if float"},
+   {"mode":       "float"},
    {"target":     "float"},
    {"actual":     "float"},
    {"error":      "float"},

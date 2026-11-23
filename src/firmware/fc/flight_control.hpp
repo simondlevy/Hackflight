@@ -275,6 +275,7 @@ namespace hf {
                     const FlightController &fc) -> std::vector<uint8_t>
             {
                 return GetYawPidTelemetryBytes(fc);
+                //return GetFullTelemetryBytes(fc);
             }
 
             static auto GetSetpoint(const FlightController & fc) -> Setpoint
@@ -624,19 +625,27 @@ namespace hf {
             static auto GetYawPidTelemetryBytes(
                     const FlightController &fc) -> std::vector<uint8_t>
             {
-                const auto yawvals = PidController::GetYawPidValues(
-                        fc.pid_controller_);
+                const auto pid = PidController::GetYawPid(fc.pid_controller_);
+
+                float data[7] = {
+                    (float)fc.mode_, 
+                    pid.target,
+                    pid.actual,
+                    pid.error,
+                    pid.integral,
+                    pid.derivative,
+                    pid.output
+                };
 
                 MspSerializer telemetry_serializer;
 
                 telemetry_serializer = MspSerializer::SerializeFloats(
-                        telemetry_serializer, kMspPid,
-                        yawvals.data(), 6);
+                        telemetry_serializer, kMspPid, data, 7);
 
                 return MspSerializer::GetPayload(telemetry_serializer);
             }
 
- 
+
             // ---------------------------------------------------------------
 
             // Sensor fusion
