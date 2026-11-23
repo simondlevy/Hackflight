@@ -244,6 +244,11 @@ namespace hf {
                 return pc.yaw_pid_;
             }
 
+            static auto GetPitchPid(const PidController & pc) -> AxisPid
+            {
+                return pc.pitch_pid_;
+            }
+
         private:
 
             Setpoint setpoint_;

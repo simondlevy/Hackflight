@@ -274,7 +274,7 @@ namespace hf {
             static auto GetTelemetryBytes(
                     const FlightController &fc) -> std::vector<uint8_t>
             {
-                return GetYawPidTelemetryBytes(fc);
+                return GetPitchPidTelemetryBytes(fc);
                 //return GetFullTelemetryBytes(fc);
             }
 
@@ -623,10 +623,10 @@ namespace hf {
                 return MspSerializer::GetPayload(telemetry_serializer);
             }
 
-            static auto GetYawPidTelemetryBytes(
+            static auto GetPitchPidTelemetryBytes(
                     const FlightController &fc) -> std::vector<uint8_t>
             {
-                const auto pid = PidController::GetYawPid(fc.pid_controller_);
+                const auto pid = PidController::GetPitchPid(fc.pid_controller_);
 
                 float data[7] = {
                     (float)fc.mode_, 

@@ -44,9 +44,9 @@ def main():
     time = data[:, 0]
 
     plt.subplot(4, 1, 1)
-    plt.plot(time, data[:, 1])
-    plt.plot(time, data[:, 2])
-    plt.plot(time, data[:, 3])
+    plt.plot(time, data[:, 1], 'b')
+    plt.plot(time, data[:, 2], 'g')
+    plt.plot(time, data[:, 3], 'r')
     plt.legend(('target', 'actual', 'error'))
 
     plt.subplot(4, 1, 2)
