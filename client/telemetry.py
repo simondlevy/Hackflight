@@ -157,12 +157,12 @@ class Telemetry(MspParser):
     def handle_PID(
             self, mode, target, actual, error, integral, derivative, output):
 
-        print('target=%f' % target, end=' | ')
-        print('actual=%f' % actual, end=' | ')
-        print('error=%f' % error, end=' | ')
-        print('integral=%f' % integral, end=' | ')
-        print('derivative=%f' % derivative, end=' | ')
-        print('output=%f' % output)
+        print('target=%+6.1f' % target, end=' | ')
+        print('actual=%+6.1f' % actual, end=' | ')
+        print('error=%+6.1f' % error, end=' | ')
+        print('integral=%+05.1f' % integral, end=' | ')
+        print('derivative=%+08.1f' % derivative, end=' | ')
+        print('output=%+f' % output)
 
         self._log_when_armed(mode,
                 (target, actual, error, integral, derivative, output))
