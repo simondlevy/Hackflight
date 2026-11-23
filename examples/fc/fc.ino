@@ -223,7 +223,7 @@ static void SendTelemetry(const hf::FlightController & fc)
     if (hf::FlightController::ShouldSendTelemetry(fc)) {
 
         const auto telemetry_bytes =
-            hf::FlightController::GetTelemetryBytes(fc);
+            hf::FlightController::GetPidTelemetryBytes(fc);
 
         Serial3.write(telemetry_bytes.data(), telemetry_bytes.size());
     }
