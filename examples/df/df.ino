@@ -176,7 +176,39 @@ static bool isArmed;
 static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
 static DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
 
+static hf::MspParser receiver_parser_;
+static hf::Setpoint receiver_setpoint_;
+
 //////////////////////////////////////////////////////////////////////////////
+
+static auto GetReceiverAxisValue(const uint8_t index) -> float
+{
+    const float val =
+        hf::MspParser::GetShort(receiver_parser_, index) / 2048.f;
+
+    return val;
+}
+
+static void ParseReceiverByte(
+        const uint8_t bite,
+        const uint32_t msec)
+{
+    receiver_parser_ = hf::MspParser::Parse(receiver_parser_, bite);
+
+    const auto got_new_message =
+        hf::MspParser::GetId(receiver_parser_) == kMspSetChannels;
+
+    receiver_setpoint_ = got_new_message ?
+
+        hf::Setpoint(
+                GetReceiverAxisValue(0),
+                GetReceiverAxisValue(1),
+                GetReceiverAxisValue(2),
+                GetReceiverAxisValue(3)) :
+
+        receiver_setpoint_;
+}
+
 
 static void runMotorMixer()
 {
@@ -255,19 +287,19 @@ static void getIMUdata() {
 }
 
 /*
-static void calculate_IMU_error() {
+   static void calculate_IMU_error() {
 
-    int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
-    AccErrorX = 0.0;
-    AccErrorY = 0.0;
-    AccErrorZ = 0.0;
-    GyroErrorX = 0.0;
-    GyroErrorY= 0.0;
-    GyroErrorZ = 0.0;
+   int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
+   AccErrorX = 0.0;
+   AccErrorY = 0.0;
+   AccErrorZ = 0.0;
+   GyroErrorX = 0.0;
+   GyroErrorY= 0.0;
+   GyroErrorZ = 0.0;
 
-    int c = 0;
-    while (c < 12000) {
-        mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
+   int c = 0;
+   while (c < 12000) {
+   mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
 
         AccX  = AcX / ACCEL_SCALE_FACTOR;
         AccY  = AcY / ACCEL_SCALE_FACTOR;
@@ -333,8 +365,6 @@ static float invSqrt(float x) {
 
     return 1.0/sqrtf(x); 
 }
-
-
 
 static void Madgwick6DOF(
         float gx, float gy, float gz, float ax, float ay, float az,
@@ -586,20 +616,6 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
     }
 }
 
-static void ParseReceiverByte(
-        const uint8_t bite,
-        const uint32_t msec)
-{
-    static hf::MspParser parser_;
-
-    parser_ = hf::MspParser::Parse(parser_, bite);
-
-    const auto got_new_message =
-        hf::MspParser::GetId(parser_) == kMspSetChannels;
-
-    printf("%d\n", got_new_message);
-}
-
 
 void serialEvent3(void)
 {
@@ -629,6 +645,12 @@ static void runMotors()
         scaleMotor(m4_command_PWM)
     };
     motors_.run(isArmed, motorvals);
+}
+
+void reportLoopRate()
+{
+    static hf::Debugger debugger_;
+    debugger_.ReportFloat("Loop rate", 1e6*dt);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -693,4 +715,6 @@ void loop()
     failSafe(); 
 
     loopRate(2000); 
+
+    reportLoopRate();
 }
