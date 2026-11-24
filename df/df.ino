@@ -48,56 +48,56 @@ static MPU6050 mpu6050;
 
 static const uint8_t num_DSM_channels = 6; 
 
-unsigned long channel_1_fs = 1000; 
-unsigned long channel_2_fs = 1500; 
-unsigned long channel_3_fs = 1500; 
-unsigned long channel_4_fs = 1500; 
-unsigned long channel_5_fs = 2000; 
-unsigned long channel_6_fs = 2000; 
+static unsigned long channel_1_fs = 1000; 
+static unsigned long channel_2_fs = 1500; 
+static unsigned long channel_3_fs = 1500; 
+static unsigned long channel_4_fs = 1500; 
+static unsigned long channel_5_fs = 2000; 
+static unsigned long channel_6_fs = 2000; 
 
-float B_madgwick = 0.04;  
-float B_accel = 0.14;     
-float B_gyro = 0.1;       
-float B_mag = 1.0;        
+static constexpr float B_madgwick = 0.04;  
+static constexpr float B_accel = 0.14;     
+static constexpr float B_gyro = 0.1;       
+static constexpr float B_mag = 1.0;        
 
-float MagErrorX = 0.0;
-float MagErrorY = 0.0; 
-float MagErrorZ = 0.0;
-float MagScaleX = 1.0;
-float MagScaleY = 1.0;
-float MagScaleZ = 1.0;
+static constexpr float MagErrorX = 0.0;
+static constexpr float MagErrorY = 0.0; 
+static constexpr float MagErrorZ = 0.0;
+static constexpr float MagScaleX = 1.0;
+static constexpr float MagScaleY = 1.0;
+static constexpr float MagScaleZ = 1.0;
 
-float AccErrorX = 0.0;
-float AccErrorY = 0.0;
-float AccErrorZ = 0.0;
-float GyroErrorX = 0.0;
-float GyroErrorY= 0.0;
-float GyroErrorZ = 0.0;
+static constexpr float i_limit = 25.0;     
+static constexpr float maxRoll = 30.0;     
+static constexpr float maxPitch = 30.0;    
+static constexpr float maxYaw = 160.0;     
 
-float i_limit = 25.0;     
-float maxRoll = 30.0;     
-float maxPitch = 30.0;    
-float maxYaw = 160.0;     
+static constexpr float Kp_roll_angle = 0.2;    
+static constexpr float Ki_roll_angle = 0.3;    
+static constexpr float Kd_roll_angle = 0.05;   
+static constexpr float B_loop_roll = 0.9;      
+static constexpr float Kp_pitch_angle = 0.2;   
+static constexpr float Ki_pitch_angle = 0.3;   
+static constexpr float Kd_pitch_angle = 0.05;  
+static constexpr float B_loop_pitch = 0.9;     
 
-float Kp_roll_angle = 0.2;    
-float Ki_roll_angle = 0.3;    
-float Kd_roll_angle = 0.05;   
-float B_loop_roll = 0.9;      
-float Kp_pitch_angle = 0.2;   
-float Ki_pitch_angle = 0.3;   
-float Kd_pitch_angle = 0.05;  
-float B_loop_pitch = 0.9;     
+static constexpr float Kp_roll_rate = 0.15;    
+static constexpr float Ki_roll_rate = 0.2;     
+static constexpr float Kd_roll_rate = 0.0002;  
+static constexpr float Kp_pitch_rate = 0.15;   
+static constexpr float Ki_pitch_rate = 0.2;    
+static constexpr float Kd_pitch_rate = 0.0002; 
 
-float Kp_roll_rate = 0.15;    
-float Ki_roll_rate = 0.2;     
-float Kd_roll_rate = 0.0002;  
-float Kp_pitch_rate = 0.15;   
-float Ki_pitch_rate = 0.2;    
-float Kd_pitch_rate = 0.0002; 
+static constexpr float Kp_yaw = 0.3;           
+static constexpr float Ki_yaw = 0.05;          
+static constexpr float Kd_yaw = 0.00015;       
 
-float Kp_yaw = 0.3;           
-float Ki_yaw = 0.05;          
-float Kd_yaw = 0.00015;       
+static float AccErrorX = 0.0;
+static float AccErrorY = 0.0;
+static float AccErrorZ = 0.0;
+static float GyroErrorX = 0.0;
+static float GyroErrorY= 0.0;
+static float GyroErrorZ = 0.0;
 
 const int m1Pin = 0;
 const int m2Pin = 1;
