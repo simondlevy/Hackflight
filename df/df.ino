@@ -157,16 +157,6 @@ static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
 
 static bool armedFly;
 
-static unsigned long rising_edge_start_1, rising_edge_start_2, rising_edge_start_3,
-              rising_edge_start_4, rising_edge_start_5, rising_edge_start_6;
-
-static unsigned long channel_1_raw, channel_2_raw, channel_3_raw, channel_4_raw,
-              channel_5_raw, channel_6_raw;
-
-static int ppm_counter;
-
-static unsigned long time_ms;
-
 //////////////////////////////////////////////////////////////////////////////
 
 void controlMixer()
