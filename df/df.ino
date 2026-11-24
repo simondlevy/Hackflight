@@ -376,7 +376,7 @@ static void getDesState()
     thro_des = (channel_1_pwm - 1000.0)/1000.0; 
     roll_des = (channel_2_pwm - 1500.0)/500.0; 
     pitch_des = (channel_3_pwm - 1500.0)/500.0; 
-    yaw_des = (channel_4_pwm - 1500.0)/500.0; 
+    yaw_des = -(channel_4_pwm - 1500.0)/500.0;  // Negate for gyro Z
     roll_passthru = roll_des/2.0; 
     pitch_passthru = pitch_des/2.0; 
     yaw_passthru = yaw_des/2.0; 
