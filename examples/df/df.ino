@@ -130,7 +130,6 @@ static const int m4Pin = 7;
 
 static float dt;
 static unsigned long current_time, prev_time;
-static unsigned long print_counter;
 static unsigned long blink_counter, blink_delay;
 static bool blinkAlternate;
 
@@ -585,113 +584,6 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
     }
 }
 
-void printArmingStatus() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        printf("Armed: %d\n", isArmed);
-    }
-}
-
-void printRadioData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F(" CH1:"));
-        Serial.print(channel_1_pwm);
-        Serial.print(F(" CH2:"));
-        Serial.print(channel_2_pwm);
-        Serial.print(F(" CH3:"));
-        Serial.print(channel_3_pwm);
-        Serial.print(F(" CH4:"));
-        Serial.print(channel_4_pwm);
-        Serial.print(F(" CH5:"));
-        Serial.println(channel_5_pwm);
-    }
-}
-
-void printDesiredState() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("thro_des:"));
-        Serial.print(thro_des);
-        Serial.print(F(" roll_des:"));
-        Serial.print(roll_des);
-        Serial.print(F(" pitch_des:"));
-        Serial.print(pitch_des);
-        Serial.print(F(" yaw_des:"));
-        Serial.println(yaw_des);
-    }
-}
-
-void printGyroData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("GyroX:"));
-        Serial.print(GyroX);
-        Serial.print(F(" GyroY:"));
-        Serial.print(GyroY);
-        Serial.print(F(" GyroZ:"));
-        Serial.println(GyroZ);
-    }
-}
-
-void printAccelData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("AccX:"));
-        Serial.print(AccX);
-        Serial.print(F(" AccY:"));
-        Serial.print(AccY);
-        Serial.print(F(" AccZ:"));
-        Serial.println(AccZ);
-    }
-}
-
-void printRollPitchYaw() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll:"));
-        Serial.print(roll_IMU);
-        Serial.print(F(" pitch:"));
-        Serial.print(pitch_IMU);
-        Serial.print(F(" yaw:"));
-        Serial.println(yaw_IMU);
-    }
-}
-
-void printPIDoutput() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("roll_PID:"));
-        Serial.print(roll_PID);
-        Serial.print(F(" pitch_PID:"));
-        Serial.print(pitch_PID);
-        Serial.print(F(" yaw_PID:"));
-        Serial.println(yaw_PID);
-    }
-}
-
-void printMotorCommands() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("m1_command:"));
-        Serial.print(m1_command_PWM);
-        Serial.print(F(" m2_command:"));
-        Serial.print(m2_command_PWM);
-        Serial.print(F(" m3_command:"));
-        Serial.print(m3_command_PWM);
-        Serial.print(F(" m4_command:"));
-        Serial.println(m4_command_PWM);
-    }
-}
-
-void printLoopRate() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("dt:"));
-        Serial.println(dt*1000000.0);
-    }
-}
-
 static void radioSetup() {
     Serial3.begin(115000);
 }
@@ -761,8 +653,6 @@ void loop()
     dt = (current_time - prev_time)/1000000.0;
 
     loopBlink(); 
-
-    //printLoopRate();     
 
     armedStatus(); 
 
