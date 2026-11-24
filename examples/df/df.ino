@@ -31,6 +31,8 @@
 #include <hackflight.h>
 #include <datatypes.hpp>
 #include <firmware/debugger.hpp>
+#include <firmware/msp/__messages__.h>
+#include <firmware/msp/parser.hpp>
 #include <mixers/quadx.hpp>
 
 // Local libraries
@@ -584,6 +586,21 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
     }
 }
 
+static void ParseReceiverByte(
+        const uint8_t bite,
+        const uint32_t msec)
+{
+    static hf::MspParser parser_;
+
+    parser_ = hf::MspParser::Parse(parser_, bite);
+
+    const auto got_new_message =
+        hf::MspParser::GetId(parser_) == kMspSetChannels;
+
+    printf("%d\n", got_new_message);
+}
+
+
 void serialEvent3(void)
 {
     while (Serial3.available()) {
@@ -594,7 +611,7 @@ void serialEvent3(void)
 void serialEvent5(void)
 {
     while (Serial5.available()) {
-        printf("x%02X\n", Serial5.read());
+        ParseReceiverByte(Serial5.read(), millis());
     }
 }
 

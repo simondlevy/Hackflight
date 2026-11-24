@@ -110,6 +110,16 @@ namespace hf {
                 }
             }
 
+            void ReportMsec(const char * label, const uint32_t value)
+            {
+                static Helper helper_;
+
+                if (helper_.Ready()) {
+
+                    printf("%5d | %s=%lu msec\n", helper_.count, label, value);
+                }
+            }
+
             static void Report(const std::vector<float> motorvals)
             {
                 static Helper helper_;
