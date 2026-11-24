@@ -106,66 +106,66 @@ static const int m4Pin = 3;
 static const int m5Pin = 4;
 static const int m6Pin = 5;
 
-float dt;
-unsigned long current_time, prev_time;
-unsigned long print_counter, serial_counter;
-unsigned long blink_counter, blink_delay;
-bool blinkAlternate;
+static float dt;
+static unsigned long current_time, prev_time;
+static unsigned long print_counter;
+static unsigned long blink_counter, blink_delay;
+static bool blinkAlternate;
 
-unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm,
+static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm,
               channel_5_pwm, channel_6_pwm;
 
-unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev,
+static unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev,
               channel_4_pwm_prev;
 
-DSM2048 DSM;
+static DSM2048 DSM;
 
-float AccX, AccY, AccZ;
-float AccX_prev, AccY_prev, AccZ_prev;
-float GyroX, GyroY, GyroZ;
-float GyroX_prev, GyroY_prev, GyroZ_prev;
-float MagX, MagY, MagZ;
-float MagX_prev, MagY_prev, MagZ_prev;
-float roll_IMU, pitch_IMU, yaw_IMU;
-float roll_IMU_prev, pitch_IMU_prev;
-float q0 = 1.0f; 
-float q1 = 0.0f;
-float q2 = 0.0f;
-float q3 = 0.0f;
+static float AccX, AccY, AccZ;
+static float AccX_prev, AccY_prev, AccZ_prev;
+static float GyroX, GyroY, GyroZ;
+static float GyroX_prev, GyroY_prev, GyroZ_prev;
+static float MagX, MagY, MagZ;
+static float MagX_prev, MagY_prev, MagZ_prev;
+static float roll_IMU, pitch_IMU, yaw_IMU;
+static float roll_IMU_prev, pitch_IMU_prev;
+static float q0 = 1.0f; 
+static float q1 = 0.0f;
+static float q2 = 0.0f;
+static float q3 = 0.0f;
 
-float thro_des, roll_des, pitch_des, yaw_des;
-float roll_passthru, pitch_passthru, yaw_passthru;
+static float thro_des, roll_des, pitch_des, yaw_des;
+static float roll_passthru, pitch_passthru, yaw_passthru;
 
-float error_roll, error_roll_prev, roll_des_prev, integral_roll,
+static float error_roll, error_roll_prev, roll_des_prev, integral_roll,
       integral_roll_il, integral_roll_ol, integral_roll_prev,
       integral_roll_prev_il, integral_roll_prev_ol, derivative_roll, roll_PID =
       0;
 
-float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch,
+static float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch,
       integral_pitch_il, integral_pitch_ol, integral_pitch_prev,
       integral_pitch_prev_il, integral_pitch_prev_ol, derivative_pitch,
       pitch_PID = 0;
 
-float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
+static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
       derivative_yaw, yaw_PID = 0;
 
-float m1_command_scaled, m2_command_scaled, m3_command_scaled,
+static float m1_command_scaled, m2_command_scaled, m3_command_scaled,
       m4_command_scaled, m5_command_scaled, m6_command_scaled;
 
-int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
+static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
     m5_command_PWM, m6_command_PWM;
 
-bool armedFly = false;
+static bool armedFly;
 
-unsigned long rising_edge_start_1, rising_edge_start_2, rising_edge_start_3,
+static unsigned long rising_edge_start_1, rising_edge_start_2, rising_edge_start_3,
               rising_edge_start_4, rising_edge_start_5, rising_edge_start_6;
 
-unsigned long channel_1_raw, channel_2_raw, channel_3_raw, channel_4_raw,
+static unsigned long channel_1_raw, channel_2_raw, channel_3_raw, channel_4_raw,
               channel_5_raw, channel_6_raw;
 
-int ppm_counter = 0;
+static int ppm_counter;
 
-unsigned long time_ms = 0;
+static unsigned long time_ms;
 
 //////////////////////////////////////////////////////////////////////////////
 
