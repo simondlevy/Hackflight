@@ -159,7 +159,7 @@ static bool armedFly;
 
 //////////////////////////////////////////////////////////////////////////////
 
-void controlMixer()
+static void controlMixer()
 {
 
     m1_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; 
@@ -168,14 +168,14 @@ void controlMixer()
     m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; 
 }
 
-void armedStatus() {
+static void armedStatus() {
 
     if ((channel_5_pwm < 1500) && (channel_1_pwm < 1050)) {
         armedFly = true;
     }
 }
 
-void IMUinit() {
+static void IMUinit() {
 
     Wire.begin();
     Wire.setClock(1000000); 
@@ -192,7 +192,7 @@ void IMUinit() {
     mpu6050.setFullScaleAccelRange(ACCEL_SCALE);
 }
 
-void getIMUdata() {
+static void getIMUdata() {
 
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
@@ -240,7 +240,7 @@ void getIMUdata() {
     MagZ_prev = MagZ;
 }
 
-void calculate_IMU_error() {
+static void calculate_IMU_error() {
 
     int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
     AccErrorX = 0.0;
@@ -297,10 +297,10 @@ void calculate_IMU_error() {
     Serial.print(GyroErrorZ);
     Serial.println(";");
 
-    Serial.println("Paste these values in user specified variables section and comment out calculate_IMU_error() in void setup.");
+    Serial.println("Paste these values in user specified variables section and comment out calculate_IMU_error() in static void setup.");
 }
 
-void calibrateAttitude() {
+static void calibrateAttitude() {
 
     for (int i = 0; i <= 10000; i++) {
         prev_time = current_time;      
@@ -312,7 +312,12 @@ void calibrateAttitude() {
     }
 }
 
-void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float invSampleFreq) {
+static float invSqrt(float x) {
+
+    return 1.0/sqrtf(x); 
+}
+
+static void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float invSampleFreq) {
 
     float recipNorm;
     float s0, s1, s2, s3;
@@ -409,7 +414,7 @@ void Madgwick(float gx, float gy, float gz, float ax, float ay, float az, float 
     yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; 
 }
 
-void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, float invSampleFreq) {
+static void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, float invSampleFreq) {
 
     float recipNorm;
     float s0, s1, s2, s3;
@@ -478,7 +483,7 @@ void Madgwick6DOF(float gx, float gy, float gz, float ax, float ay, float az, fl
     yaw_IMU = -atan2(q1*q2 + q0*q3, 0.5f - q2*q2 - q3*q3)*57.29577951; 
 }
 
-void getDesState()
+static void getDesState()
 {
     thro_des = (channel_1_pwm - 1000.0)/1000.0; 
     roll_des = (channel_2_pwm - 1500.0)/500.0; 
@@ -497,7 +502,7 @@ void getDesState()
     yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
-void controlANGLE() {
+static void controlANGLE() {
 
     error_roll = roll_des - roll_IMU;
     integral_roll = integral_roll_prev + error_roll*dt;
@@ -534,7 +539,7 @@ void controlANGLE() {
     integral_yaw_prev = integral_yaw;
 }
 
-void controlANGLE2() {
+static void controlANGLE2() {
 
     float roll_des_ol, pitch_des_ol;
 
@@ -608,7 +613,7 @@ void controlANGLE2() {
 
 }
 
-void controlRATE() {
+static void controlRATE() {
 
     error_roll = roll_des - GyroX;
     integral_roll = integral_roll_prev + error_roll*dt;
@@ -649,7 +654,7 @@ void controlRATE() {
     integral_yaw_prev = integral_yaw;
 }
 
-void scaleCommands() 
+static void scaleCommands() 
 {
 
     m1_command_PWM = m1_command_scaled*125 + 125;
@@ -667,7 +672,7 @@ void scaleCommands()
     m6_command_PWM = constrain(m6_command_PWM, 125, 250);
 }
 
-void getCommands() {
+static void getCommands() {
 
     if (DSM.timedOut(micros())) {
 
@@ -695,7 +700,7 @@ void getCommands() {
     channel_4_pwm_prev = channel_4_pwm;
 }
 
-void failSafe() {
+static void failSafe() {
 
     unsigned minVal = 800;
     unsigned maxVal = 2200;
@@ -723,7 +728,7 @@ void failSafe() {
     }
 }
 
-void commandMotors() {
+static void commandMotors() {
 
     int wentLow = 0;
     int pulseStart, timer;
@@ -777,7 +782,7 @@ void commandMotors() {
     }
 }
 
-void armMotors() {
+static void armMotors() {
 
     for (int i = 0; i <= 50; i++) {
         commandMotors();
@@ -785,7 +790,7 @@ void armMotors() {
     }
 }
 
-void calibrateESCs()
+static void calibrateESCs()
 {
     while (true) {
         prev_time = current_time;      
@@ -847,7 +852,7 @@ float floatFaderLinear2(float param, float param_des, float param_lower, float p
     return param;
 }
 
-void switchRollYaw(int reverseRoll, int reverseYaw) {
+static void switchRollYaw(int reverseRoll, int reverseYaw) {
 
     float switch_holder;
 
@@ -856,7 +861,7 @@ void switchRollYaw(int reverseRoll, int reverseYaw) {
     roll_des = reverseRoll*switch_holder;
 }
 
-void throttleCut()
+static void throttleCut()
 {
     if ((channel_5_pwm > 1500) || (armedFly == false)) {
         armedFly = false;
@@ -869,7 +874,7 @@ void throttleCut()
     }
 }
 
-void loopRate(int freq)
+static void loopRate(int freq)
 {
     float invFreq = 1.0/freq*1000000.0;
     unsigned long checker = micros();
@@ -879,7 +884,7 @@ void loopRate(int freq)
     }
 }
 
-void loopBlink() {
+static void loopBlink() {
 
     if (current_time - blink_counter > blink_delay) {
         blink_counter = micros();
@@ -896,7 +901,7 @@ void loopBlink() {
     }
 }
 
-void setupBlink(int numBlinks,int upTime, int downTime) {
+static void setupBlink(int numBlinks,int upTime, int downTime) {
 
     for (int j = 1; j<= numBlinks; j++) {
         digitalWrite(13, LOW);
@@ -1024,12 +1029,7 @@ void printLoopRate() {
     }
 }
 
-float invSqrt(float x) {
-
-    return 1.0/sqrtf(x); 
-}
-
-void radioSetup() {
+static void radioSetup() {
     Serial3.begin(115000);
 }
 
