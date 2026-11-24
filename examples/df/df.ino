@@ -537,91 +537,6 @@ static void failSafe() {
     }
 }
 
-/*
-static void commandMotors()
-{
-    int wentLow = 0;
-    int pulseStart, timer;
-    int flagM1 = 0;
-    int flagM2 = 0;
-    int flagM3 = 0;
-    int flagM4 = 0;
-
-    digitalWrite(m1Pin, HIGH);
-    digitalWrite(m2Pin, HIGH);
-    digitalWrite(m3Pin, HIGH);
-    digitalWrite(m4Pin, HIGH);
-    pulseStart = micros();
-
-    while (wentLow < 4 ) { 
-        timer = micros();
-        if ((m1_command_PWM <= timer - pulseStart) && (flagM1==0)) {
-            digitalWrite(m1Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM1 = 1;
-        }
-        if ((m2_command_PWM <= timer - pulseStart) && (flagM2==0)) {
-            digitalWrite(m2Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM2 = 1;
-        }
-        if ((m3_command_PWM <= timer - pulseStart) && (flagM3==0)) {
-            digitalWrite(m3Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM3 = 1;
-        }
-        if ((m4_command_PWM <= timer - pulseStart) && (flagM4==0)) {
-            digitalWrite(m4Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM4 = 1;
-        } 
-}
-
-static void armMotors() {
-
-    for (int i = 0; i <= 50; i++) {
-        commandMotors();
-        delay(2);
-    }
-}
-
-static void motorsSetup()
-{
-    pinMode(m1Pin, OUTPUT);
-    pinMode(m2Pin, OUTPUT);
-    pinMode(m3Pin, OUTPUT);
-    pinMode(m4Pin, OUTPUT);
-}
-
-static void calibrateESCs()
-{
-    while (true) {
-        prev_time = current_time;      
-        current_time = micros();      
-        dt = (current_time - prev_time)/1000000.0;
-
-        digitalWrite(13, HIGH); 
-
-        getCommands(); 
-        failSafe(); 
-        getDesState(); 
-        getIMUdata(); 
-        Madgwick6DOF(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, dt); 
-        getDesState(); 
-
-        m1_command_scaled = thro_des;
-        m2_command_scaled = thro_des;
-        m3_command_scaled = thro_des;
-        m4_command_scaled = thro_des;
-        scaleCommands();
-
-        commandMotors(); 
-
-        loopRate(2000); 
-    }
-}
-*/
-
 static void throttleCut()
 {
     if ((channel_5_pwm < 1500) || (isArmed == false)) {
@@ -828,6 +743,17 @@ void setup()
     setupBlink(3,160,70); 
 }
 
+static void runMotors()
+{
+    const std::vector<float> motorvals = {
+        scaleMotor(m1_command_PWM),
+        scaleMotor(m2_command_PWM),
+        scaleMotor(m3_command_PWM),
+        scaleMotor(m4_command_PWM)
+    };
+    motors_.run(isArmed, motorvals);
+}
+
 void loop()
 {
     prev_time = current_time;      
@@ -854,14 +780,7 @@ void loop()
 
     throttleCut(); 
 
-    //commandMotors(); 
-    const std::vector<float> motorvals = {
-        scaleMotor(m1_command_PWM),
-        scaleMotor(m2_command_PWM),
-        scaleMotor(m3_command_PWM),
-        scaleMotor(m4_command_PWM)
-    };
-    motors_.run(isArmed, motorvals);
+    runMotors();
 
     getCommands(); 
 
