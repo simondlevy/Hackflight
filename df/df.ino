@@ -135,15 +135,14 @@ static float q3 = 0.0f;
 static float thro_des, roll_des, pitch_des, yaw_des;
 static float roll_passthru, pitch_passthru, yaw_passthru;
 
-static float error_roll, integral_roll, integral_roll_prev,
-             integral_roll_prev_ol, derivative_roll, roll_PID;
+static float error_roll, integral_roll, integral_roll_prev, derivative_roll,
+             roll_PID;
 
-static float error_pitch, error_pitch_prev, pitch_des_prev, integral_pitch,
-             integral_pitch_prev, integral_pitch_prev_ol, derivative_pitch,
-             pitch_PID;
+static float error_pitch, integral_pitch, integral_pitch_prev,
+             derivative_pitch, pitch_PID;
 
 static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
-      derivative_yaw, yaw_PID;
+             derivative_yaw, yaw_PID;
 
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled,
       m4_command_scaled, m5_command_scaled, m6_command_scaled;
