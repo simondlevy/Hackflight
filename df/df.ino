@@ -705,38 +705,6 @@ static void calibrateESCs()
 }
 */
 
-float floatFaderLinear(float param, float param_min, float param_max, float fadeTime, int state, int loopFreq){
-
-    float diffParam = (param_max - param_min)/(fadeTime*loopFreq); 
-
-    if (state == 1) { 
-        param = param + diffParam;
-    }
-    else if (state == 0) { 
-        param = param - diffParam;
-    }
-
-    param = constrain(param, param_min, param_max); 
-
-    return param;
-}
-
-float floatFaderLinear2(float param, float param_des, float param_lower, float param_upper, float fadeTime_up, float fadeTime_down, int loopFreq){
-
-    if (param > param_des) { 
-        float diffParam = (param_upper - param_des)/(fadeTime_down*loopFreq);
-        param = param - diffParam;
-    }
-    else if (param < param_des) { 
-        float diffParam = (param_des - param_lower)/(fadeTime_up*loopFreq);
-        param = param + diffParam;
-    }
-
-    param = constrain(param, param_lower, param_upper); 
-
-    return param;
-}
-
 static void throttleCut()
 {
     if ((channel_5_pwm > 1500) || (armedFly == false)) {
