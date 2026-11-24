@@ -1,3 +1,7 @@
+#include <hackflight.h>
+#include <datatypes.hpp>
+#include <mixers/quadx.hpp>
+
 #include <Wire.h>   
 
 #include "src/MPU6050/MPU6050.h"
@@ -141,13 +145,26 @@ static bool isArmed;
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void controlMixer()
+static void runMotorMixer()
 {
+    static hf::QuadXMixer mixer_;
 
+    const auto setpoint = hf::Setpoint(
+            thro_des, roll_PID, pitch_PID, yaw_PID);
+
+    mixer_ = hf::QuadXMixer::Run(setpoint);
+
+    m1_command_scaled = mixer_.rr_cw;
+    m2_command_scaled = mixer_.rf_ccw;
+    m3_command_scaled = mixer_.lr_ccw;
+    m4_command_scaled = mixer_.lf_cw;
+
+    /*
     m1_command_scaled = thro_des + pitch_PID - roll_PID - yaw_PID; 
     m2_command_scaled = thro_des - pitch_PID - roll_PID + yaw_PID; 
     m3_command_scaled = thro_des + pitch_PID + roll_PID + yaw_PID; 
     m4_command_scaled = thro_des - pitch_PID + roll_PID - yaw_PID; 
+    */
 }
 
 static void armedStatus() {
@@ -389,7 +406,7 @@ static void getDesState()
     yaw_passthru = constrain(yaw_passthru, -0.5, 0.5);
 }
 
-static void controlANGLE() {
+static void runPidControl() {
 
     error_roll = roll_des - roll_IMU;
     integral_roll = integral_roll_prev + error_roll*dt;
@@ -801,9 +818,9 @@ void loop() {
 
     getDesState(); 
 
-    controlANGLE(); 
+    runPidControl(); 
 
-    controlMixer(); 
+    runMotorMixer(); 
 
     scaleCommands(); 
 
