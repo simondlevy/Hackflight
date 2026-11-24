@@ -584,14 +584,17 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
     }
 }
 
-static void radioSetup() {
-    Serial3.begin(115000);
-}
-
 void serialEvent3(void)
 {
     while (Serial3.available()) {
         DSM.handleSerialEvent(Serial3.read(), micros());
+    }
+}
+
+void serialEvent5(void)
+{
+    while (Serial5.available()) {
+        printf("x%02X\n", Serial5.read());
     }
 }
 
@@ -600,20 +603,29 @@ static float scaleMotor(const int pwm)
     return (pwm - 125.) / 125;
 }
 
+static void runMotors()
+{
+    const std::vector<float> motorvals = {
+        scaleMotor(m1_command_PWM),
+        scaleMotor(m2_command_PWM),
+        scaleMotor(m3_command_PWM),
+        scaleMotor(m4_command_PWM)
+    };
+    motors_.run(isArmed, motorvals);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 void setup()
 {
-    Serial.begin(500000); 
-    delay(500);
-
     pinMode(13, OUTPUT); 
     digitalWrite(13, HIGH);
 
     motors_.begin();
     delay(5);
 
-    radioSetup();
+    Serial3.begin(115000);
+    Serial5.begin(115000);
 
     channel_1_pwm = channel_1_fs;
     channel_2_pwm = channel_2_fs;
@@ -631,17 +643,6 @@ void setup()
     m4_command_PWM = 125;
 
     setupBlink(3,160,70); 
-}
-
-static void runMotors()
-{
-    const std::vector<float> motorvals = {
-        scaleMotor(m1_command_PWM),
-        scaleMotor(m2_command_PWM),
-        scaleMotor(m3_command_PWM),
-        scaleMotor(m4_command_PWM)
-    };
-    motors_.run(isArmed, motorvals);
 }
 
 void loop()
