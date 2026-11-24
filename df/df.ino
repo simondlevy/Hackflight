@@ -58,14 +58,6 @@ static unsigned long channel_6_fs = 2000;
 static constexpr float B_madgwick = 0.04;  
 static constexpr float B_accel = 0.14;     
 static constexpr float B_gyro = 0.1;       
-static constexpr float B_mag = 1.0;        
-
-static constexpr float MagErrorX = 0.0;
-static constexpr float MagErrorY = 0.0; 
-static constexpr float MagErrorZ = 0.0;
-static constexpr float MagScaleX = 1.0;
-static constexpr float MagScaleY = 1.0;
-static constexpr float MagScaleZ = 1.0;
 
 static constexpr float i_limit = 25.0;     
 static constexpr float maxRoll = 30.0;     
@@ -124,8 +116,6 @@ static float AccX, AccY, AccZ;
 static float AccX_prev, AccY_prev, AccZ_prev;
 static float GyroX, GyroY, GyroZ;
 static float GyroX_prev, GyroY_prev, GyroZ_prev;
-static float MagX, MagY, MagZ;
-static float MagX_prev, MagY_prev, MagZ_prev;
 static float roll_IMU, pitch_IMU, yaw_IMU;
 static float q0 = 1.0f; 
 static float q1 = 0.0f;
@@ -222,17 +212,6 @@ static void getIMUdata() {
     GyroX_prev = GyroX;
     GyroY_prev = GyroY;
     GyroZ_prev = GyroZ;
-
-    MagX = (MagX - MagErrorX)*MagScaleX;
-    MagY = (MagY - MagErrorY)*MagScaleY;
-    MagZ = (MagZ - MagErrorZ)*MagScaleZ;
-
-    MagX = (1.0 - B_mag)*MagX_prev + B_mag*MagX;
-    MagY = (1.0 - B_mag)*MagY_prev + B_mag*MagY;
-    MagZ = (1.0 - B_mag)*MagZ_prev + B_mag*MagZ;
-    MagX_prev = MagX;
-    MagY_prev = MagY;
-    MagZ_prev = MagZ;
 }
 
 /*
@@ -304,7 +283,7 @@ static void calibrateAttitude() {
         current_time = micros();      
         dt = (current_time - prev_time)/1000000.0; 
         getIMUdata();
-        Madgwick(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, MagY, -MagX, MagZ, dt);
+        Madgwick6DOF(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, dt);
         loopRate(2000); 
     }
 }
@@ -357,9 +336,15 @@ static void Madgwick6DOF(
         q3q3 = q3 * q3;
 
         s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
-        s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
-        s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+
+        s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - _4q1 +
+            _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
+
+        s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - _4q2 +
+            _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+
         s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
+
         recipNorm = invSqrt(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3); 
         s0 *= recipNorm;
         s1 *= recipNorm;
@@ -594,7 +579,7 @@ static void calibrateESCs()
         failSafe(); 
         getDesState(); 
         getIMUdata(); 
-        Madgwick(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, MagY, -MagX, MagZ, dt); 
+        Madgwick6DOF(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, dt); 
         getDesState(); 
 
         m1_command_scaled = thro_des;
@@ -715,18 +700,6 @@ void printAccelData() {
         Serial.print(AccY);
         Serial.print(F(" AccZ:"));
         Serial.println(AccZ);
-    }
-}
-
-void printMagData() {
-    if (current_time - print_counter > 10000) {
-        print_counter = micros();
-        Serial.print(F("MagX:"));
-        Serial.print(MagX);
-        Serial.print(F(" MagY:"));
-        Serial.print(MagY);
-        Serial.print(F(" MagZ:"));
-        Serial.println(MagZ);
     }
 }
 
