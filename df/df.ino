@@ -539,121 +539,6 @@ static void controlANGLE() {
     integral_yaw_prev = integral_yaw;
 }
 
-static void controlANGLE2() {
-
-    float roll_des_ol, pitch_des_ol;
-
-    error_roll = roll_des - roll_IMU;
-    integral_roll_ol = integral_roll_prev_ol + error_roll*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_roll_ol = 0;
-    }
-    integral_roll_ol = constrain(integral_roll_ol, -i_limit, i_limit); 
-    derivative_roll = (roll_IMU - roll_IMU_prev)/dt; 
-    roll_des_ol = Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll_ol;
-
-    error_pitch = pitch_des - pitch_IMU;
-    integral_pitch_ol = integral_pitch_prev_ol + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_pitch_ol = 0;
-    }
-    integral_pitch_ol = constrain(integral_pitch_ol, -i_limit, i_limit); 
-    derivative_pitch = (pitch_IMU - pitch_IMU_prev)/dt;
-    pitch_des_ol = Kp_pitch_angle*error_pitch + Ki_pitch_angle*integral_pitch_ol;
-
-    float Kl = 30.0;
-    roll_des_ol = Kl*roll_des_ol;
-    pitch_des_ol = Kl*pitch_des_ol;
-    roll_des_ol = constrain(roll_des_ol, -240.0, 240.0);
-    pitch_des_ol = constrain(pitch_des_ol, -240.0, 240.0);
-    roll_des_ol = (1.0 - B_loop_roll)*roll_des_prev + B_loop_roll*roll_des_ol;
-    pitch_des_ol = (1.0 - B_loop_pitch)*pitch_des_prev + B_loop_pitch*pitch_des_ol;
-
-    error_roll = roll_des_ol - GyroX;
-    integral_roll_il = integral_roll_prev_il + error_roll*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_roll_il = 0;
-    }
-    integral_roll_il = constrain(integral_roll_il, -i_limit, i_limit); 
-    derivative_roll = (error_roll - error_roll_prev)/dt; 
-    roll_PID = .01*(Kp_roll_rate*error_roll + Ki_roll_rate*integral_roll_il + Kd_roll_rate*derivative_roll); 
-
-    error_pitch = pitch_des_ol - GyroY;
-    integral_pitch_il = integral_pitch_prev_il + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_pitch_il = 0;
-    }
-    integral_pitch_il = constrain(integral_pitch_il, -i_limit, i_limit); 
-    derivative_pitch = (error_pitch - error_pitch_prev)/dt; 
-    pitch_PID = .01*(Kp_pitch_rate*error_pitch + Ki_pitch_rate*integral_pitch_il + Kd_pitch_rate*derivative_pitch); 
-
-    error_yaw = yaw_des - GyroZ;
-    integral_yaw = integral_yaw_prev + error_yaw*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_yaw = 0;
-    }
-    integral_yaw = constrain(integral_yaw, -i_limit, i_limit); 
-    derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
-
-    integral_roll_prev_ol = integral_roll_ol;
-    integral_roll_prev_il = integral_roll_il;
-    error_roll_prev = error_roll;
-    roll_IMU_prev = roll_IMU;
-    roll_des_prev = roll_des_ol;
-
-    integral_pitch_prev_ol = integral_pitch_ol;
-    integral_pitch_prev_il = integral_pitch_il;
-    error_pitch_prev = error_pitch;
-    pitch_IMU_prev = pitch_IMU;
-    pitch_des_prev = pitch_des_ol;
-
-    error_yaw_prev = error_yaw;
-    integral_yaw_prev = integral_yaw;
-
-}
-
-static void controlRATE() {
-
-    error_roll = roll_des - GyroX;
-    integral_roll = integral_roll_prev + error_roll*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_roll = 0;
-    }
-    integral_roll = constrain(integral_roll, -i_limit, i_limit); 
-    derivative_roll = (error_roll - error_roll_prev)/dt; 
-    roll_PID = .01*(Kp_roll_rate*error_roll + Ki_roll_rate*integral_roll + Kd_roll_rate*derivative_roll); 
-
-    error_pitch = pitch_des - GyroY;
-    integral_pitch = integral_pitch_prev + error_pitch*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_pitch = 0;
-    }
-    integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
-    derivative_pitch = (error_pitch - error_pitch_prev)/dt; 
-    pitch_PID = .01*(Kp_pitch_rate*error_pitch + Ki_pitch_rate*integral_pitch + Kd_pitch_rate*derivative_pitch); 
-
-    error_yaw = yaw_des - GyroZ;
-    integral_yaw = integral_yaw_prev + error_yaw*dt;
-    if (channel_1_pwm < 1060) {   
-        integral_yaw = 0;
-    }
-    integral_yaw = constrain(integral_yaw, -i_limit, i_limit); 
-    derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
-
-    error_roll_prev = error_roll;
-    integral_roll_prev = integral_roll;
-    GyroX_prev = GyroX;
-
-    error_pitch_prev = error_pitch;
-    integral_pitch_prev = integral_pitch;
-    GyroY_prev = GyroY;
-
-    error_yaw_prev = error_yaw;
-    integral_yaw_prev = integral_yaw;
-}
-
 static void scaleCommands() 
 {
 
@@ -790,6 +675,7 @@ static void armMotors() {
     }
 }
 
+/*
 static void calibrateESCs()
 {
     while (true) {
@@ -819,6 +705,7 @@ static void calibrateESCs()
         loopRate(2000); 
     }
 }
+*/
 
 float floatFaderLinear(float param, float param_min, float param_max, float fadeTime, int state, int loopFreq){
 
@@ -850,15 +737,6 @@ float floatFaderLinear2(float param, float param_des, float param_lower, float p
     param = constrain(param, param_lower, param_upper); 
 
     return param;
-}
-
-static void switchRollYaw(int reverseRoll, int reverseYaw) {
-
-    float switch_holder;
-
-    switch_holder = yaw_des;
-    yaw_des = reverseYaw*roll_des;
-    roll_des = reverseRoll*switch_holder;
 }
 
 static void throttleCut()
