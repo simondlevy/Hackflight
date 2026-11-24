@@ -429,7 +429,6 @@ static void controlANGLE() {
 
 static void scaleCommands() 
 {
-
     m1_command_PWM = m1_command_scaled*125 + 125;
     m2_command_PWM = m2_command_scaled*125 + 125;
     m3_command_PWM = m3_command_scaled*125 + 125;
@@ -762,7 +761,6 @@ void setup() {
     channel_6_pwm = channel_6_fs;
 
     IMUinit();
-
     delay(5);
 
     delay(5);
@@ -784,7 +782,7 @@ void loop() {
 
     loopBlink(); 
 
-    printRadioData();     
+    //printRollPitchYaw();     
 
     armedStatus(); 
 
