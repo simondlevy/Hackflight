@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 
+#include <vector>
+
 #include <hackflight.h>
 #include <firmware/fc/imu/filter.hpp>
 #include <firmware/fc/imu/three_axis.hpp>
@@ -105,6 +107,22 @@ namespace hf {
 
                     printf("%5d | %s=%s\n",
                             helper_.count, label, value ? "true" : "false");
+                }
+            }
+
+            static void Report(const std::vector<float> motorvals)
+            {
+                static Helper helper_;
+
+                if (helper_.Ready()) {
+
+                    printf("%5d | ", helper_.count);
+
+                    for (uint8_t k=0; k<motorvals.size(); ++k) {
+                        printf("m%d=%f ", k, motorvals[k]);
+                    }
+
+                    printf("\n");
                 }
             }
 

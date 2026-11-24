@@ -1,9 +1,39 @@
-#include <hackflight.h>
-#include <datatypes.hpp>
-#include <mixers/quadx.hpp>
+/*
+   Hackflight quadcopter sketch using MPU6050 IMU
 
+   Adapted from https://github.com/nickrehm/dRehmFlight
+
+   Copyright (C) 2026 Simon D. Levy
+
+   This program is free software: you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the Free
+   Software Foundation, in version 3.
+
+   This program is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY without even the implied warranty of MERCHANTABILITY or FITNESS
+   FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+   details.
+
+   You should have received a copy of the GNU General Public License along with
+   this program. If not, see <http:--www.gnu.org/licenses/>.
+ */
+
+// C++ STL
+#include <vector>
+
+// Standard Arduino libraries
 #include <Wire.h>   
 
+// Third-party libraries
+#include <dshot-teensy4.hpp>  
+
+// Hackflight library
+#include <hackflight.h>
+#include <datatypes.hpp>
+#include <firmware/debugger.hpp>
+#include <mixers/quadx.hpp>
+
+// Local libraries
 #include "src/MPU6050/MPU6050.h"
 #include "src/DSMRX/DSMRX.h"  
 
@@ -56,7 +86,6 @@ static unsigned long channel_2_fs = 1500;
 static unsigned long channel_3_fs = 1500; 
 static unsigned long channel_4_fs = 1500; 
 static unsigned long channel_5_fs = 2000; 
-static unsigned long channel_6_fs = 2000; 
 
 static constexpr float B_madgwick = 0.04;  
 static constexpr float B_accel = 0.14;     
@@ -106,7 +135,7 @@ static unsigned long blink_counter, blink_delay;
 static bool blinkAlternate;
 
 static unsigned long channel_1_pwm, channel_2_pwm, channel_3_pwm, channel_4_pwm,
-              channel_5_pwm, channel_6_pwm;
+              channel_5_pwm;
 
 static unsigned long channel_1_pwm_prev, channel_2_pwm_prev, channel_3_pwm_prev,
               channel_4_pwm_prev;
@@ -143,6 +172,9 @@ static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
 
 static bool isArmed;
 
+static std::vector<uint8_t> kMotorPins = {23, 0, 8, 7};
+static DshotTeensy4 motors_ = DshotTeensy4(kMotorPins);
+
 //////////////////////////////////////////////////////////////////////////////
 
 static void runMotorMixer()
@@ -158,13 +190,6 @@ static void runMotorMixer()
     m2_command_scaled = mixer_.rf_ccw;
     m3_command_scaled = mixer_.lr_ccw;
     m4_command_scaled = mixer_.lf_cw;
-
-    /*
-    m1_command_scaled = thro_des + pitch_PID - roll_PID - yaw_PID; 
-    m2_command_scaled = thro_des - pitch_PID - roll_PID + yaw_PID; 
-    m3_command_scaled = thro_des + pitch_PID + roll_PID + yaw_PID; 
-    m4_command_scaled = thro_des - pitch_PID + roll_PID - yaw_PID; 
-    */
 }
 
 static void armedStatus() {
@@ -473,7 +498,6 @@ static void getCommands() {
         channel_3_pwm = values[2];
         channel_4_pwm = values[3];
         channel_5_pwm = values[4];
-        channel_6_pwm = values[5];
     }
 
     float b = 0.7; 
@@ -503,7 +527,6 @@ static void failSafe() {
     if (channel_3_pwm > maxVal || channel_3_pwm < minVal) check3 = 1;
     if (channel_4_pwm > maxVal || channel_4_pwm < minVal) check4 = 1;
     if (channel_5_pwm > maxVal || channel_5_pwm < minVal) check5 = 1;
-    if (channel_6_pwm > maxVal || channel_6_pwm < minVal) check6 = 1;
 
     if ((check1 + check2 + check3 + check4 + check5 + check6) > 0) {
         channel_1_pwm = channel_1_fs;
@@ -511,12 +534,12 @@ static void failSafe() {
         channel_3_pwm = channel_3_fs;
         channel_4_pwm = channel_4_fs;
         channel_5_pwm = channel_5_fs;
-        channel_6_pwm = channel_6_fs;
     }
 }
 
-static void commandMotors() {
-
+/*
+static void commandMotors()
+{
     int wentLow = 0;
     int pulseStart, timer;
     int flagM1 = 0;
@@ -552,7 +575,6 @@ static void commandMotors() {
             wentLow = wentLow + 1;
             flagM4 = 1;
         } 
-    }
 }
 
 static void armMotors() {
@@ -563,7 +585,14 @@ static void armMotors() {
     }
 }
 
-/*
+static void motorsSetup()
+{
+    pinMode(m1Pin, OUTPUT);
+    pinMode(m2Pin, OUTPUT);
+    pinMode(m3Pin, OUTPUT);
+    pinMode(m4Pin, OUTPUT);
+}
+
 static void calibrateESCs()
 {
     while (true) {
@@ -660,9 +689,7 @@ void printRadioData() {
         Serial.print(F(" CH4:"));
         Serial.print(channel_4_pwm);
         Serial.print(F(" CH5:"));
-        Serial.print(channel_5_pwm);
-        Serial.print(F(" CH6:"));
-        Serial.println(channel_6_pwm);
+        Serial.println(channel_5_pwm);
     }
 }
 
@@ -761,20 +788,23 @@ void serialEvent3(void)
     }
 }
 
+static float scaleMotor(const int pwm)
+{
+    return (pwm - 125.) / 125;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
-void setup() {
+void setup()
+{
     Serial.begin(500000); 
     delay(500);
 
     pinMode(13, OUTPUT); 
-    pinMode(m1Pin, OUTPUT);
-    pinMode(m2Pin, OUTPUT);
-    pinMode(m3Pin, OUTPUT);
-    pinMode(m4Pin, OUTPUT);
-
     digitalWrite(13, HIGH);
 
+    //motorsSetup();
+    motors_.begin();
     delay(5);
 
     radioSetup();
@@ -784,31 +814,29 @@ void setup() {
     channel_3_pwm = channel_3_fs;
     channel_4_pwm = channel_4_fs;
     channel_5_pwm = channel_5_fs;
-    channel_6_pwm = channel_6_fs;
 
     IMUinit();
-    delay(5);
 
-    delay(5);
+    delay(10);
 
     m1_command_PWM = 125; 
     m2_command_PWM = 125;
     m3_command_PWM = 125;
     m4_command_PWM = 125;
-    armMotors(); 
+    //armMotors(); 
 
     setupBlink(3,160,70); 
 }
 
-void loop() {
-
+void loop()
+{
     prev_time = current_time;      
     current_time = micros();      
     dt = (current_time - prev_time)/1000000.0;
 
     loopBlink(); 
 
-    //printArmingStatus();     
+    //printLoopRate();     
 
     armedStatus(); 
 
@@ -826,7 +854,14 @@ void loop() {
 
     throttleCut(); 
 
-    commandMotors(); 
+    //commandMotors(); 
+    const std::vector<float> motorvals = {
+        scaleMotor(m1_command_PWM),
+        scaleMotor(m2_command_PWM),
+        scaleMotor(m3_command_PWM),
+        scaleMotor(m4_command_PWM)
+    };
+    motors_.run(isArmed, motorvals);
 
     getCommands(); 
 
