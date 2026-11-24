@@ -610,7 +610,6 @@ void setup()
     pinMode(13, OUTPUT); 
     digitalWrite(13, HIGH);
 
-    //motorsSetup();
     motors_.begin();
     delay(5);
 
@@ -630,7 +629,6 @@ void setup()
     m2_command_PWM = 125;
     m3_command_PWM = 125;
     m4_command_PWM = 125;
-    //armMotors(); 
 
     setupBlink(3,160,70); 
 }
