@@ -95,8 +95,6 @@ static const int m1Pin = 0;
 static const int m2Pin = 1;
 static const int m3Pin = 2;
 static const int m4Pin = 3;
-static const int m5Pin = 4;
-static const int m6Pin = 5;
 
 static float dt;
 static unsigned long current_time, prev_time;
@@ -135,10 +133,10 @@ static float error_yaw, error_yaw_prev, integral_yaw, integral_yaw_prev,
              derivative_yaw, yaw_PID;
 
 static float m1_command_scaled, m2_command_scaled, m3_command_scaled,
-      m4_command_scaled, m5_command_scaled, m6_command_scaled;
+      m4_command_scaled; 
 
-static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM,
-    m5_command_PWM, m6_command_PWM;
+static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
+    
 
 static bool armedFly;
 
@@ -436,15 +434,11 @@ static void scaleCommands()
     m2_command_PWM = m2_command_scaled*125 + 125;
     m3_command_PWM = m3_command_scaled*125 + 125;
     m4_command_PWM = m4_command_scaled*125 + 125;
-    m5_command_PWM = m5_command_scaled*125 + 125;
-    m6_command_PWM = m6_command_scaled*125 + 125;
 
     m1_command_PWM = constrain(m1_command_PWM, 125, 250);
     m2_command_PWM = constrain(m2_command_PWM, 125, 250);
     m3_command_PWM = constrain(m3_command_PWM, 125, 250);
     m4_command_PWM = constrain(m4_command_PWM, 125, 250);
-    m5_command_PWM = constrain(m5_command_PWM, 125, 250);
-    m6_command_PWM = constrain(m6_command_PWM, 125, 250);
 }
 
 static void getCommands() {
@@ -511,18 +505,14 @@ static void commandMotors() {
     int flagM2 = 0;
     int flagM3 = 0;
     int flagM4 = 0;
-    int flagM5 = 0;
-    int flagM6 = 0;
 
     digitalWrite(m1Pin, HIGH);
     digitalWrite(m2Pin, HIGH);
     digitalWrite(m3Pin, HIGH);
     digitalWrite(m4Pin, HIGH);
-    digitalWrite(m5Pin, HIGH);
-    digitalWrite(m6Pin, HIGH);
     pulseStart = micros();
 
-    while (wentLow < 6 ) { 
+    while (wentLow < 4 ) { 
         timer = micros();
         if ((m1_command_PWM <= timer - pulseStart) && (flagM1==0)) {
             digitalWrite(m1Pin, LOW);
@@ -543,16 +533,6 @@ static void commandMotors() {
             digitalWrite(m4Pin, LOW);
             wentLow = wentLow + 1;
             flagM4 = 1;
-        } 
-        if ((m5_command_PWM <= timer - pulseStart) && (flagM5==0)) {
-            digitalWrite(m5Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM5 = 1;
-        } 
-        if ((m6_command_PWM <= timer - pulseStart) && (flagM6==0)) {
-            digitalWrite(m6Pin, LOW);
-            wentLow = wentLow + 1;
-            flagM6 = 1;
         } 
     }
 }
@@ -586,8 +566,6 @@ static void calibrateESCs()
         m2_command_scaled = thro_des;
         m3_command_scaled = thro_des;
         m4_command_scaled = thro_des;
-        m5_command_scaled = thro_des;
-        m6_command_scaled = thro_des;
         scaleCommands();
 
         commandMotors(); 
@@ -605,8 +583,6 @@ static void throttleCut()
         m2_command_PWM = 120;
         m3_command_PWM = 120;
         m4_command_PWM = 120;
-        m5_command_PWM = 120;
-        m6_command_PWM = 120;
     }
 }
 
@@ -737,11 +713,7 @@ void printMotorCommands() {
         Serial.print(F(" m3_command:"));
         Serial.print(m3_command_PWM);
         Serial.print(F(" m4_command:"));
-        Serial.print(m4_command_PWM);
-        Serial.print(F(" m5_command:"));
-        Serial.print(m5_command_PWM);
-        Serial.print(F(" m6_command:"));
-        Serial.println(m6_command_PWM);
+        Serial.println(m4_command_PWM);
     }
 }
 
@@ -775,8 +747,6 @@ void setup() {
     pinMode(m2Pin, OUTPUT);
     pinMode(m3Pin, OUTPUT);
     pinMode(m4Pin, OUTPUT);
-    pinMode(m5Pin, OUTPUT);
-    pinMode(m6Pin, OUTPUT);
 
     digitalWrite(13, HIGH);
 
@@ -801,8 +771,6 @@ void setup() {
     m2_command_PWM = 125;
     m3_command_PWM = 125;
     m4_command_PWM = 125;
-    m5_command_PWM = 125;
-    m6_command_PWM = 125;
     armMotors(); 
 
     setupBlink(3,160,70); 
@@ -821,6 +789,7 @@ void loop() {
     armedStatus(); 
 
     getIMUdata(); 
+
     Madgwick6DOF(GyroX, -GyroY, -GyroZ, -AccX, AccY, AccZ, dt); 
 
     getDesState(); 
@@ -828,6 +797,7 @@ void loop() {
     controlANGLE(); 
 
     controlMixer(); 
+
     scaleCommands(); 
 
     throttleCut(); 
@@ -835,6 +805,7 @@ void loop() {
     commandMotors(); 
 
     getCommands(); 
+
     failSafe(); 
 
     loopRate(2000); 
