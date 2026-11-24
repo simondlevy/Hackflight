@@ -91,10 +91,10 @@ static float GyroErrorX = 0.0;
 static float GyroErrorY= 0.0;
 static float GyroErrorZ = 0.0;
 
-static const int m1Pin = 7;
+static const int m1Pin = 23;
 static const int m2Pin = 0;  
-static const int m3Pin = 23;
-static const int m4Pin = 8;
+static const int m3Pin = 8;
+static const int m4Pin = 7;
 
 static float dt;
 static unsigned long current_time, prev_time;
@@ -138,23 +138,23 @@ static float m1_command_scaled, m2_command_scaled, m3_command_scaled,
 static int m1_command_PWM, m2_command_PWM, m3_command_PWM, m4_command_PWM;
     
 
-static bool armedFly;
+static bool isArmed;
 
 //////////////////////////////////////////////////////////////////////////////
 
 static void controlMixer()
 {
 
-    m1_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; 
+    m1_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; 
     m2_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID; 
-    m3_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; 
-    m4_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; 
+    m3_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; 
+    m4_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; 
 }
 
 static void armedStatus() {
 
-    if ((channel_5_pwm < 1500) && (channel_1_pwm < 1050)) {
-        armedFly = true;
+    if ((channel_5_pwm > 1500) && (channel_1_pwm < 1050)) {
+        isArmed = true;
     }
 }
 
@@ -576,8 +576,8 @@ static void calibrateESCs()
 
 static void throttleCut()
 {
-    if ((channel_5_pwm > 1500) || (armedFly == false)) {
-        armedFly = false;
+    if ((channel_5_pwm < 1500) || (isArmed == false)) {
+        isArmed = false;
         m1_command_PWM = 120;
         m2_command_PWM = 120;
         m3_command_PWM = 120;
@@ -619,6 +619,13 @@ static void setupBlink(int numBlinks,int upTime, int downTime) {
         delay(downTime);
         digitalWrite(13, HIGH);
         delay(upTime);
+    }
+}
+
+void printArmingStatus() {
+    if (current_time - print_counter > 10000) {
+        print_counter = micros();
+        printf("Armed: %d\n", isArmed);
     }
 }
 
@@ -782,7 +789,7 @@ void loop() {
 
     loopBlink(); 
 
-    //printRollPitchYaw();     
+    //printArmingStatus();     
 
     armedStatus(); 
 
