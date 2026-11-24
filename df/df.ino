@@ -145,10 +145,10 @@ static bool isArmed;
 static void controlMixer()
 {
 
-    m1_command_scaled = thro_des + pitch_PID - roll_PID + yaw_PID; 
-    m2_command_scaled = thro_des - pitch_PID - roll_PID - yaw_PID; 
-    m3_command_scaled = thro_des + pitch_PID + roll_PID - yaw_PID; 
-    m4_command_scaled = thro_des - pitch_PID + roll_PID + yaw_PID; 
+    m1_command_scaled = thro_des + pitch_PID - roll_PID - yaw_PID; 
+    m2_command_scaled = thro_des - pitch_PID - roll_PID + yaw_PID; 
+    m3_command_scaled = thro_des + pitch_PID + roll_PID + yaw_PID; 
+    m4_command_scaled = thro_des - pitch_PID + roll_PID - yaw_PID; 
 }
 
 static void armedStatus() {
@@ -399,7 +399,8 @@ static void controlANGLE() {
     }
     integral_roll = constrain(integral_roll, -i_limit, i_limit); 
     derivative_roll = GyroX;
-    roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll - Kd_roll_angle*derivative_roll); 
+    roll_PID = 0.01*(Kp_roll_angle*error_roll + Ki_roll_angle*integral_roll -
+            Kd_roll_angle*derivative_roll); 
 
     error_pitch = pitch_des - pitch_IMU;
     integral_pitch = integral_pitch_prev + error_pitch*dt;
@@ -408,7 +409,8 @@ static void controlANGLE() {
     }
     integral_pitch = constrain(integral_pitch, -i_limit, i_limit); 
     derivative_pitch = GyroY;
-    pitch_PID = .01*(Kp_pitch_angle*error_pitch + Ki_pitch_angle*integral_pitch - Kd_pitch_angle*derivative_pitch); 
+    pitch_PID = .01*(Kp_pitch_angle*error_pitch + Ki_pitch_angle*integral_pitch
+            - Kd_pitch_angle*derivative_pitch); 
 
     error_yaw = yaw_des - GyroZ;
     integral_yaw = integral_yaw_prev + error_yaw*dt;
@@ -417,7 +419,8 @@ static void controlANGLE() {
     }
     integral_yaw = constrain(integral_yaw, -i_limit, i_limit); 
     derivative_yaw = (error_yaw - error_yaw_prev)/dt; 
-    yaw_PID = .01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + Kd_yaw*derivative_yaw); 
+    yaw_PID = -.01*(Kp_yaw*error_yaw + Ki_yaw*integral_yaw + // note negation!
+            Kd_yaw*derivative_yaw); 
 
     integral_roll_prev = integral_roll;
 
