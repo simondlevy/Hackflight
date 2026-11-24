@@ -1,69 +1,13 @@
-//Arduino/Teensy Flight Controller - dRehmFlight
-//Author: Nicholas Rehm
-//Project Start: 1/6/2020
-//Last Updated: 7/29/2022
-//Version: Beta 1.3
- 
-//========================================================================================================================//
+#include <Wire.h>   
+#include <SPI.h>     
+#include <PWMServo.h> 
 
-//CREDITS + SPECIAL THANKS
-/*
-Some elements inspired by:
-http://www.brokking.net/ymfc-32_main.html
+#define USE_DSM_RX
+static const uint8_t num_DSM_channels = 6; 
 
-Madgwick filter function adapted from:
-https://github.com/arduino-libraries/MadgwickAHRS
-
-MPU9250 implementation based on MPU9250 library by:
-brian.taylor@bolderflight.com
-http://www.bolderflight.com
-
-Thank you to:
-RcGroups 'jihlein' - IMU implementation overhaul + SBUS implementation.
-Everyone that sends me pictures and videos of your flying creations! -Nick
-
-*/
-
-
-
-//========================================================================================================================//
-//                                                 USER-SPECIFIED DEFINES                                                 //                                                                 
-//========================================================================================================================//
-
-//Uncomment only one receiver type
-#define USE_PWM_RX
-//#define USE_PPM_RX
-//#define USE_SBUS_RX
-//#define USE_DSM_RX
-static const uint8_t num_DSM_channels = 6; //If using DSM RX, change this to match the number of transmitter channels you have
-
-//Uncomment only one IMU
-#define USE_MPU6050_I2C //Default
-//#define USE_MPU9250_SPI
-
-//Uncomment only one full scale gyro range (deg/sec)
-#define GYRO_250DPS //Default
-//#define GYRO_500DPS
-//#define GYRO_1000DPS
-//#define GYRO_2000DPS
-
-//Uncomment only one full scale accelerometer range (G's)
-#define ACCEL_2G //Default
-//#define ACCEL_4G
-//#define ACCEL_8G
-//#define ACCEL_16G
-
-
-
-//========================================================================================================================//
-
-
-
-//REQUIRED LIBRARIES (included with download in main sketch folder)
-
-#include <Wire.h>     //I2c communication
-#include <SPI.h>      //SPI communication
-#include <PWMServo.h> //Commanding any extra actuators, installed with teensyduino installer
+#define USE_MPU6050_I2C 
+#define GYRO_250DPS 
+#define ACCEL_2G 
 
 #if defined USE_SBUS_RX
   #include "src/SBUS/SBUS.h"   //sBus interface
@@ -553,7 +497,7 @@ void getIMUdata() {
    * the readings. The filter parameters B_gyro and B_accel are set to be good for a 2kHz loop rate. Finally,
    * the constant errors found in calculate_IMU_error() on startup are subtracted from the accelerometer and gyro readings.
    */
-  int16_t AcX,AcY,AcZ,GyX,GyY,GyZ,MgX,MgY,MgZ;
+  int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
 
   #if defined USE_MPU6050_I2C
     mpu6050.getMotion6(&AcX, &AcY, &AcZ, &GyX, &GyY, &GyZ);
@@ -593,10 +537,6 @@ void getIMUdata() {
   GyroY_prev = GyroY;
   GyroZ_prev = GyroZ;
 
-  //Magnetometer
-  MagX = MgX/6.0; //uT
-  MagY = MgY/6.0;
-  MagZ = MgZ/6.0;
   //Correct the outputs with the calculated error values
   MagX = (MagX - MagErrorX)*MagScaleX;
   MagY = (MagY - MagErrorY)*MagScaleY;
@@ -617,7 +557,7 @@ void calculate_IMU_error() {
    * accelerometer values AccX, AccY, AccZ, GyroX, GyroY, GyroZ in getIMUdata(). This eliminates drift in the
    * measurement. 
    */
-  int16_t AcX,AcY,AcZ,GyX,GyY,GyZ,MgX,MgY,MgZ;
+  int16_t AcX,AcY,AcZ,GyX,GyY,GyZ;
   AccErrorX = 0.0;
   AccErrorY = 0.0;
   AccErrorZ = 0.0;
