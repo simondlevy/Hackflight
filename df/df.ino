@@ -91,10 +91,10 @@ static float GyroErrorX = 0.0;
 static float GyroErrorY= 0.0;
 static float GyroErrorZ = 0.0;
 
-static const int m1Pin = 0;
-static const int m2Pin = 1;
-static const int m3Pin = 2;
-static const int m4Pin = 3;
+static const int m1Pin = 7;
+static const int m2Pin = 0;  
+static const int m3Pin = 23;
+static const int m4Pin = 8;
 
 static float dt;
 static unsigned long current_time, prev_time;
