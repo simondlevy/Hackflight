@@ -1,5 +1,4 @@
 #include <Wire.h>   
-#include <PWMServo.h> 
 
 #include "src/MPU6050/MPU6050.h"
 #include "src/DSMRX/DSMRX.h"  
