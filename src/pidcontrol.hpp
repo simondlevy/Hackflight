@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include <axispid.hpp>
 
 namespace hf {
